@@ -48,7 +48,7 @@
         private readonly ConfigEntry<int> thistleReturn;
         private readonly ConfigEntry<int> dandelionReturn;
 
-        //Saplings 15
+        //Saplings 17
         private readonly ConfigEntry<int> birchCost;
         private readonly ConfigEntry<int> oakCost;
         private readonly ConfigEntry<int> ancientCost;
@@ -64,7 +64,9 @@
         private readonly ConfigEntry<float> birchGrowRadius;
         private readonly ConfigEntry<float> oakGrowRadius;
         private readonly ConfigEntry<float> ancientGrowRadius;
-        
+        private readonly ConfigEntry<float> beechGrowRadius;
+        private readonly ConfigEntry<float> pineGrowRadius;
+
 
         internal ModConfig(Config config)
         {
@@ -329,6 +331,16 @@
                 "AncientGrowRadius",
                 2f,
                 "Radius of free space required for an ancient sapling to grow");
+            beechGrowRadius = config.Bind(
+                "Saplings",
+                "BeechGrowRadius",
+                2f,
+                "Radius of free space required for a beech sapling to grow");
+            pineGrowRadius = config.Bind(
+                "Saplings",
+                "PineGrowRadius",
+                2f,
+                "Radius of free space required for a pine sapling to grow");
         }
 
         //internal bool ModEnabled
@@ -526,6 +538,14 @@
         internal float AncientGrowRadius
         {
             get { return ancientGrowRadius.Value; }
+        }
+        internal float BeechGrowRadius
+        {
+            get { return beechGrowRadius.Value; }
+        }
+        internal float PineGrowRadius
+        {
+            get { return pineGrowRadius.Value; }
         }
     }
 }

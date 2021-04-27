@@ -599,8 +599,11 @@ namespace Advize_PlantEverything
                 FixSeed("OakSeeds", prefabRefs["BeechSeeds"]);
                 FixSeed("AncientSeeds", prefabRefs["BeechSeeds"]);
 
-                ModifyTreeDrops();
+                ModifyTreeDrops(); 
             }
+
+            prefabRefs["Beech_Sapling"].GetComponent<Plant>().m_growRadius = config.BeechGrowRadius;
+            prefabRefs["PineTree_Sapling"].GetComponent<Plant>().m_growRadius = config.PineGrowRadius;
 
             foreach (SaplingDB sdb in saplingRefs)
             {
