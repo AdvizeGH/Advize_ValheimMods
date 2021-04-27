@@ -7,6 +7,7 @@
         private readonly ConfigEntry<int> nexusID;
         private readonly ConfigEntry<bool> enableDebugMessages;
         private readonly ConfigEntry<bool> alternateIcons;
+        private readonly ConfigEntry<bool> enableMiscFlora;
         private readonly ConfigEntry<bool> enableLocalization;
         private readonly ConfigEntry<string> language;
 
@@ -88,6 +89,11 @@
                 "AlternateIcons",
                 false,
                 "Use berry icons in the cultivator menu rather than the default ones");
+            enableMiscFlora = config.Bind(
+                "General",
+                "EnableMiscFlora",
+                true,
+                "Enables small trees, bushes, shrubs, and vines.");
             enableLocalization = config.Bind(
                 "General",
                 "EnableLocalization",
@@ -336,6 +342,10 @@
         internal bool AlternateIcons
         {
             get { return alternateIcons.Value; }
+        }
+        internal bool EnableMiscFlora
+        {
+            get { return enableMiscFlora.Value; }
         }
         internal bool EnableLocalization
         {

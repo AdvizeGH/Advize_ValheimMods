@@ -142,7 +142,7 @@ namespace Advize_PlantEverything
         {
             if (forceLog || config.EnableDebugMessages)
             {
-                string str = PluginName + ": " + message;
+                string str = $"{PluginName}: {message}";
                 
                 if (logError)
                 {
@@ -259,6 +259,7 @@ namespace Advize_PlantEverything
             prefabRefs.Add("shrub_2", null);
             prefabRefs.Add("shrub_2_heath", null);
             prefabRefs.Add("vines", null);
+            prefabRefs.Add("Cultivator", null);
             //prefabRefs.Add("Spawner_GreydwarfNest", null);
 
             UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
@@ -306,6 +307,10 @@ namespace Advize_PlantEverything
             {
                 foreach (PrefabDB pdb in pieceRefs)
                 {
+                    if (prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pdb.Prefab))
+                    {
+                        prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Remove(pdb.Prefab);
+                    }
                     Destroy(pdb.Prefab.GetComponent<Piece>());
                 }
                 pieceRefs.Clear();
@@ -387,7 +392,13 @@ namespace Advize_PlantEverything
                     respawnTime = config.DandelionRespawnTime,
                     biome = (int)Heightmap.Biome.Meadows,
                     piece = CreatePiece("PickableDandelionName", "PickableDandelionDescription", prefabRefs["Pickable_Dandelion"].AddComponent<Piece>(), true)
-                },
+                }
+            };
+
+            if (!config.EnableMiscFlora) return;
+
+            pieceRefs.AddRange(new List<PrefabDB>()
+            {
                 new PrefabDB
                 {
                     key = "Beech_small1",
@@ -460,7 +471,7 @@ namespace Advize_PlantEverything
                     biome = (int)Heightmap.Biome.Meadows,
                     piece = CreatePiece("VinesName", "VinesDescription", prefabRefs["vines"].AddComponent<Piece>(), false)
                 }
-            };
+            });
             //pieceRefs.Add("Spawner_GreydwarfNest", new PrefabDB
             //{
             //    key = "Spawner_GreydwarfNest",
@@ -642,20 +653,20 @@ namespace Advize_PlantEverything
         {
             Dbgl("PlantEverything: InitCultivator");
 
-            ItemDrop cultivatorItem = instance.GetItemPrefab("Cultivator").GetComponent<ItemDrop>();
+            ItemDrop cultivator = prefabRefs["Cultivator"].GetComponent<ItemDrop>();
 
             for (int i = 0; i < saplingRefs.Count; i++)
             {
-                if (!cultivatorItem.m_itemData.m_shared.m_buildPieces.m_pieces.Contains(saplingRefs[i].Prefab))
-                    cultivatorItem.m_itemData.m_shared.m_buildPieces.m_pieces.Add(saplingRefs[i].Prefab);
+                if (!cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Contains(saplingRefs[i].Prefab))
+                    cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Add(saplingRefs[i].Prefab);
             }
             for (int i = 0; i < pieceRefs.Count; i++)
             {
-                if (!cultivatorItem.m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pieceRefs[i].Prefab))
-                    cultivatorItem.m_itemData.m_shared.m_buildPieces.m_pieces.Add(pieceRefs[i].Prefab);
+                if (!cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pieceRefs[i].Prefab))
+                    cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Add(pieceRefs[i].Prefab);
             }
-            
-            cultivatorItem.m_itemData.m_shared.m_buildPieces.m_canRemovePieces = true;
+
+            cultivator.m_itemData.m_shared.m_buildPieces.m_canRemovePieces = true;
         }
 
         private static void FinalInit(ZNetScene __instance)
