@@ -272,11 +272,13 @@ namespace Advize_PlantEverything
                     continue;
                 }
 
-                Component[] components = gameObject.GetComponents(typeof(Component));
-                if (components.Length < 2)
+                if (gameObject.name.Equals("FirTree_small"))
                 {
-                    if (gameObject.name.Equals("FirTree_small"))
+                    Component[] components = gameObject.GetComponents(typeof(Component));
+                    if (components.Length < 2)
+                    {
                         continue;
+                    }
                 }
 
                 prefabRefs[gameObject.name] = gameObject;
@@ -288,7 +290,11 @@ namespace Advize_PlantEverything
                         nullValue = true;
                 }
                 if (!nullValue)
+                {
+                    Dbgl("Found all prefab references");
                     break;
+                }
+                    
             }
 
             prefabRefs.Add("BirchCone", CreatePrefab("BirchCone"));
