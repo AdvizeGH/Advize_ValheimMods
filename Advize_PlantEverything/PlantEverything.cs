@@ -223,43 +223,35 @@ namespace Advize_PlantEverything
             {
                 return;
             }
-            prefabRefs.Add("RaspberryBush", null);
-            prefabRefs.Add("BlueberryBush", null);
-            prefabRefs.Add("CloudberryBush", null);
-            prefabRefs.Add("Pickable_Mushroom", null);
-            prefabRefs.Add("Pickable_Mushroom_yellow", null);
-            prefabRefs.Add("Pickable_Mushroom_blue", null);
-            prefabRefs.Add("Pickable_Thistle", null);
+            prefabRefs.Add("Bush02_en", null);
+            prefabRefs.Add("Bush01_heath", null);
+            prefabRefs.Add("Bush01", null);
+            prefabRefs.Add("Beech_small1", null);
+            prefabRefs.Add("FirTree_small_dead", null);
+            prefabRefs.Add("FirTree_small", null);
             prefabRefs.Add("Pickable_Dandelion", null);
-            
+            prefabRefs.Add("CloudberryBush", null);
+            prefabRefs.Add("vines", null);
+            prefabRefs.Add("Cultivator", null);
             prefabRefs.Add("SwampTree1", null);
             prefabRefs.Add("Birch2", null);
             prefabRefs.Add("Oak1", null);
             prefabRefs.Add("Birch1", null);
-
-            prefabRefs.Add("Beech_Sapling", null);
-            prefabRefs.Add("PineTree_Sapling", null);
-
-            prefabRefs.Add("PineCone", null);
-            prefabRefs.Add("BeechSeeds", null);
+            prefabRefs.Add("Pickable_Thistle", null);
             prefabRefs.Add("FirCone", null);
-
-            prefabRefs.Add("vfx_Place_wood_pole", null);
-            prefabRefs.Add("sfx_build_cultivator", null);
-
-            prefabRefs.Add("vfx_SawDust", null);
-            prefabRefs.Add("sfx_bush_hit", null);
-
-            prefabRefs.Add("Beech_small1", null);
-            prefabRefs.Add("FirTree_small", null);
-            prefabRefs.Add("FirTree_small_dead", null);
-            prefabRefs.Add("Bush01", null);
-            prefabRefs.Add("Bush01_heath", null);
-            prefabRefs.Add("Bush02_en", null);
+            prefabRefs.Add("PineCone", null);
             prefabRefs.Add("shrub_2", null);
             prefabRefs.Add("shrub_2_heath", null);
-            prefabRefs.Add("vines", null);
-            prefabRefs.Add("Cultivator", null);
+            prefabRefs.Add("BeechSeeds", null);
+            prefabRefs.Add("Pickable_Mushroom", null);
+            prefabRefs.Add("BlueberryBush", null);
+            prefabRefs.Add("RaspberryBush", null);
+            prefabRefs.Add("Pickable_Mushroom_blue", null);
+            prefabRefs.Add("Pickable_Mushroom_yellow", null);
+            prefabRefs.Add("Beech_Sapling", null);
+            prefabRefs.Add("PineTree_Sapling", null);
+            prefabRefs.Add("vfx_Place_wood_pole", null);
+            prefabRefs.Add("sfx_build_cultivator", null);
             //prefabRefs.Add("Spawner_GreydwarfNest", null);
 
             UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
@@ -605,7 +597,7 @@ namespace Advize_PlantEverything
                 FixSeed("OakSeeds", prefabRefs["BeechSeeds"]);
                 FixSeed("AncientSeeds", prefabRefs["BeechSeeds"]);
 
-                ModifyTreeDrops(); 
+                ModifyTreeDrops();
             }
 
             prefabRefs["Beech_Sapling"].GetComponent<Plant>().m_growRadius = config.BeechGrowRadius;
@@ -642,8 +634,8 @@ namespace Advize_PlantEverything
                 piece.m_placeEffect.m_effectPrefabs[0].m_prefab = prefabRefs["vfx_Place_wood_pole"];
                 piece.m_placeEffect.m_effectPrefabs[1].m_prefab = prefabRefs["sfx_build_cultivator"];
                 piece.m_groundOnly = piece.m_groundPiece = !config.PlaceAnywhere;
-                sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[0].m_prefab = prefabRefs["sfx_bush_hit"];
-                sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab = prefabRefs["vfx_SawDust"];
+                sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[0].m_prefab = prefabRefs[sdb.source].GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[0].m_prefab;
+                sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab = prefabRefs[sdb.source].GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab;
             }
 
             isInitialized = true;
