@@ -250,6 +250,7 @@ namespace Advize_PlantEverything
             prefabRefs.Add("Pickable_Mushroom_yellow", null);
             prefabRefs.Add("Beech_Sapling", null);
             prefabRefs.Add("PineTree_Sapling", null);
+            prefabRefs.Add("FirTree_Sapling", null);
             prefabRefs.Add("vfx_Place_wood_pole", null);
             prefabRefs.Add("sfx_build_cultivator", null);
             //prefabRefs.Add("Spawner_GreydwarfNest", null);
@@ -612,6 +613,7 @@ namespace Advize_PlantEverything
 
             prefabRefs["Beech_Sapling"].GetComponent<Plant>().m_growRadius = config.BeechGrowRadius;
             prefabRefs["PineTree_Sapling"].GetComponent<Plant>().m_growRadius = config.PineGrowRadius;
+            prefabRefs["FirTree_Sapling"].GetComponent<Plant>().m_growRadius = config.FirGrowRadius;
 
             foreach (SaplingDB sdb in saplingRefs)
             {
