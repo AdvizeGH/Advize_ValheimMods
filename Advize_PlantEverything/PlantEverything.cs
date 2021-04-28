@@ -319,31 +319,31 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "RaspberryBush",
-                    icon = "raspberryBushPieceIcon",
                     resourceCost = config.RaspberryCost,
                     resourceReturn = config.RaspberryReturn,
                     respawnTime = config.RaspberryRespawnTime,
                     biome = (int)Heightmap.Biome.Meadows,
+                    icon = true,
                     piece = CreatePiece("RaspberryBushName", "RaspberryBushDescription", prefabRefs["RaspberryBush"].AddComponent<Piece>(), true)
                 },
                 new PrefabDB
                 {
                     key = "BlueberryBush",
-                    icon = "blueberryBushPieceIcon",
                     resourceCost = config.BlueberryCost,
                     resourceReturn = config.BlueberryReturn,
                     respawnTime = config.BlueberryRespawnTime,
                     biome = (int)Heightmap.Biome.BlackForest,
+                    icon = true,
                     piece = CreatePiece("BlueberryBushName", "BlueBerryBushDescription", prefabRefs["BlueberryBush"].AddComponent<Piece>(), true)
                 },
                 new PrefabDB
                 {
                     key = "CloudberryBush",
-                    icon = "cloudberryBushPieceIcon",
                     resourceCost = config.CloudberryCost,
                     resourceReturn = config.CloudberryReturn,
                     respawnTime = config.CloudberryRespawnTime,
                     biome = (int)Heightmap.Biome.Plains,
+                    icon = true,
                     piece = CreatePiece("CloudberryBushName", "CloudberryBushDescription", prefabRefs["CloudberryBush"].AddComponent<Piece>(), true)
                 },
                 new PrefabDB
@@ -403,6 +403,7 @@ namespace Advize_PlantEverything
                     Resource = "BeechSeeds",
                     resourceCost = 1,
                     biome = (int)Heightmap.Biome.Meadows,
+                    icon = true,
                     piece = CreatePiece("BeechSmallName", "BeechSmallDescription", prefabRefs["Beech_small1"].AddComponent<Piece>(), true, false)
                 },
                 new PrefabDB
@@ -411,6 +412,7 @@ namespace Advize_PlantEverything
                     Resource = "FirCone",
                     resourceCost = 1,
                     biome = (int)Heightmap.Biome.Meadows,
+                    icon = true,
                     piece = CreatePiece("FirSmallName", "FirSmallDescription", prefabRefs["FirTree_small"].AddComponent<Piece>(), true, false)
                 },
                 new PrefabDB
@@ -419,6 +421,7 @@ namespace Advize_PlantEverything
                     Resource = "FirCone",
                     resourceCost = 1,
                     biome = (int)Heightmap.Biome.Meadows,
+                    icon = true,
                     piece = CreatePiece("FirSmallDeadName", "FirSmallDeadDescription", prefabRefs["FirTree_small_dead"].AddComponent<Piece>(), true, false)
                 },
                 new PrefabDB
@@ -427,14 +430,16 @@ namespace Advize_PlantEverything
                     Resource = "Wood",
                     resourceCost = 2,
                     biome = (int)Heightmap.Biome.Meadows,
+                    icon = true,
                     piece = CreatePiece("Bush01Name", "Bush01Description", prefabRefs["Bush01"].AddComponent<Piece>(), true, false)
                 },
                 new PrefabDB
                 {
                     key = "Bush01_heath",
-                   Resource = "Wood",
-                   resourceCost = 2,
+                    Resource = "Wood",
+                    resourceCost = 2,
                     biome = (int)Heightmap.Biome.Meadows,
+                    icon = true,
                    piece = CreatePiece("Bush02Name", "Bush02Description", prefabRefs["Bush01_heath"].AddComponent<Piece>(), true, false)
                 },
                 new PrefabDB
@@ -443,6 +448,7 @@ namespace Advize_PlantEverything
                     Resource = "Wood",
                     resourceCost = 3,
                     biome = (int)Heightmap.Biome.Meadows,
+                    icon = true,
                     piece = CreatePiece("PlainsBushName", "PlainsBushDescription", prefabRefs["Bush02_en"].AddComponent<Piece>(), true, false)
                 },
                 new PrefabDB
@@ -451,6 +457,7 @@ namespace Advize_PlantEverything
                     Resource = "Wood",
                     resourceCost = 3,
                     biome = (int)Heightmap.Biome.Meadows,
+                    icon = true,
                     piece = CreatePiece("Shrub01Name", "Shrub01Description", prefabRefs["shrub_2"].AddComponent<Piece>(), true, false)
                 },
                 new PrefabDB
@@ -459,6 +466,7 @@ namespace Advize_PlantEverything
                     Resource = "Wood",
                     resourceCost = 2,
                     biome = (int)Heightmap.Biome.Meadows,
+                    icon = true,
                     piece = CreatePiece("Shrub02Name", "Shrub02Description", prefabRefs["shrub_2_heath"].AddComponent<Piece>(), true, false)
                 },
                 new PrefabDB
@@ -467,6 +475,7 @@ namespace Advize_PlantEverything
                     Resource = "Wood",
                     resourceCost = 2,
                     biome = (int)Heightmap.Biome.Meadows,
+                    icon = true,
                     piece = CreatePiece("VinesName", "VinesDescription", prefabRefs["vines"].AddComponent<Piece>(), false)
                 }
             });
@@ -523,9 +532,9 @@ namespace Advize_PlantEverything
                     pdb.piece.m_onlyInBiome = (Heightmap.Biome)pdb.biome;
                 }
 
-                if (pdb.icon != null && !config.AlternateIcons)
+                if (pdb.icon && !config.AlternateIcons)
                 {
-                    pdb.piece.m_icon = CreateSprite(pdb.icon + ".png", new Rect(0, 0, 64, 64));
+                    pdb.piece.m_icon = CreateSprite($"{pdb.key}PieceIcon.png", new Rect(0, 0, 64, 64));
                 }
                 else
                 {
@@ -763,13 +772,14 @@ namespace Advize_PlantEverything
         private struct PrefabDB
         {
             internal string key;
-            internal string icon;
-            private string m_resource;
+            private string resource;
 
             internal int resourceCost;
             internal int resourceReturn;
             internal int respawnTime;
             internal int biome;
+
+            internal bool icon;
 
             internal Piece piece;
 
@@ -780,8 +790,8 @@ namespace Advize_PlantEverything
 
             internal string Resource
             {
-                get { return m_resource ?? Prefab.GetComponent<Pickable>().m_itemPrefab.name; }
-                set { m_resource = value; }
+                get { return resource ?? Prefab.GetComponent<Pickable>().m_itemPrefab.name; }
+                set { resource = value; }
             }
         }
 

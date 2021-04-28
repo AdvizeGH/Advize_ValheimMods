@@ -98,9 +98,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\blueberryBushPieceIcon.png" />
-    <EmbeddedResource Include="Assets\cloudberryBushPieceIcon.png" />
-    <EmbeddedResource Include="Assets\raspberryBushPieceIcon.png" />
+    <EmbeddedResource Include="Assets\BlueberryBushPieceIcon.png" />
+    <EmbeddedResource Include="Assets\CloudberryBushPieceIcon.png" />
+    <EmbeddedResource Include="Assets\RaspberryBushPieceIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\planteverything" />
@@ -114,6 +114,16 @@
   <ItemGroup>
     <EmbeddedResource Include="Assets\oakSeedsItemIcon.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Beech_small1PieceIcon.png" />
+    <EmbeddedResource Include="Assets\Bush01PieceIcon.png" />
+    <EmbeddedResource Include="Assets\Bush01_heathPieceIcon.png" />
+    <EmbeddedResource Include="Assets\Bush02_enPieceIcon.png" />
+    <EmbeddedResource Include="Assets\FirTree_smallPieceIcon.png" />
+    <EmbeddedResource Include="Assets\FirTree_small_deadPieceIcon.png" />
+    <EmbeddedResource Include="Assets\shrub_2PieceIcon.png" />
+    <EmbeddedResource Include="Assets\shrub_2_heathPieceIcon.png" />
+    <EmbeddedResource Include="Assets\vinesPieceIcon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
