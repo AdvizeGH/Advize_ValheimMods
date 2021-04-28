@@ -455,7 +455,7 @@ namespace Advize_PlantEverything
                 {
                     key = "shrub_2",
                     Resource = "Wood",
-                    resourceCost = 3,
+                    resourceCost = 2,
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
                     piece = CreatePiece("Shrub01Name", "Shrub01Description", prefabRefs["shrub_2"].AddComponent<Piece>(), true, false)
@@ -476,6 +476,7 @@ namespace Advize_PlantEverything
                     resourceCost = 2,
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
+                    recover = true,
                     piece = CreatePiece("VinesName", "VinesDescription", prefabRefs["vines"].AddComponent<Piece>(), false)
                 }
             });
@@ -503,7 +504,7 @@ namespace Advize_PlantEverything
                     {
                         m_resItem = resource,
                         m_amount = pdb.resourceCost,
-                        m_recover = false
+                        m_recover = pdb.recover
                     }
                 };
 
@@ -780,6 +781,7 @@ namespace Advize_PlantEverything
             internal int biome;
 
             internal bool icon;
+            internal bool recover;
 
             internal Piece piece;
 
