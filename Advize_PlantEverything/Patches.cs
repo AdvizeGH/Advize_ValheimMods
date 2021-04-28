@@ -17,7 +17,6 @@ namespace Advize_PlantEverything
                 if (ZNetScene.instance == null) return;
                 Dbgl("& ZNetScene not null");
                 InitItems(__instance);
-                InitCultivator(__instance);
             }
         }
 

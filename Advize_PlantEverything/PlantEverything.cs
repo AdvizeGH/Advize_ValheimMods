@@ -662,7 +662,7 @@ namespace Advize_PlantEverything
             if (!instance.m_items.Contains(prefabRefs["AncientSeeds"])) instance.m_items.Add(prefabRefs["AncientSeeds"]);
         }
 
-        private static void InitCultivator(ObjectDB instance)
+        private static void InitCultivator()
         {
             Dbgl("PlantEverything: InitCultivator");
 
@@ -689,7 +689,9 @@ namespace Advize_PlantEverything
 
             InitSaplingRefs();
             InitSaplings();
-            
+
+            InitCultivator();
+
             List<GameObject> prefabs = new List<GameObject>
             {
                 prefabRefs["BirchCone"],
