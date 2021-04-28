@@ -106,12 +106,8 @@
     <EmbeddedResource Include="Assets\planteverything" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\birchConeItemIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Assets\ancientSeedsItemIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
+	<EmbeddedResource Include="Assets\birchConeItemIcon.png" />
     <EmbeddedResource Include="Assets\oakSeedsItemIcon.png" />
   </ItemGroup>
   <ItemGroup>
