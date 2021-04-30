@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using BepInEx;
+using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
-using Advize_PlantEverything.Configuration;
 using UnityEngine.Events;
+using Advize_PlantEverything.Configuration;
 
 namespace Advize_PlantEverything
 {
@@ -15,9 +15,10 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.4.1";
+        public const string Version = "1.4.2";
 
         private readonly Harmony harmony = new Harmony(PluginID);
+        public static ManualLogSource PELogger = new ManualLogSource($" {PluginName}");
 
         private static readonly Dictionary<string, GameObject> prefabRefs = new Dictionary<string, GameObject>();
         private static List<PrefabDB> pieceRefs = new List<PrefabDB>();
@@ -86,6 +87,7 @@ namespace Advize_PlantEverything
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Called Implicitly")]
         private void Awake()
         {
+            BepInEx.Logging.Logger.Sources.Add(PELogger);
             Config.Init(this, true);
             config = new ModConfig(Config);
             Config.OnConfigReceived.AddListener(new UnityAction(ConfigReceived));
@@ -96,7 +98,7 @@ namespace Advize_PlantEverything
 
         private void LoadLocalizedStrings()
         {
-            string fileName = $"{config.Language}_PlantEverything.json";
+            string fileName = $"{config.Language}_{PluginName}.json";
             string filePath = Path.Combine(modDirectory, fileName);
 
             try
@@ -125,7 +127,7 @@ namespace Advize_PlantEverything
         {
             //Directory.CreateDirectory(modDirectory + "/Localization");
             
-            string filePath = Path.Combine(modDirectory, "english_PlantEverything.json");
+            string filePath = Path.Combine(modDirectory, $"english_{PluginName}.json");
 
             LocalizedStrings localizedStrings = new LocalizedStrings();
             foreach (KeyValuePair<string, string> kvp in stringDictionary)
@@ -142,15 +144,13 @@ namespace Advize_PlantEverything
         {
             if (forceLog || config.EnableDebugMessages)
             {
-                string str = $"{PluginName}: {message}";
-                
                 if (logError)
                 {
-                    Debug.LogError(str);
+                    PELogger.LogError(message);
                 }
                 else
                 {
-                    Debug.Log(str);
+                    PELogger.LogInfo(message);
                 }
             }
         }
@@ -218,7 +218,7 @@ namespace Advize_PlantEverything
 
         private static void InitPrefabRefs()
         {
-            Dbgl("PlantEverything: InitPrefabRefs");
+            Dbgl("InitPrefabRefs");
             if (prefabRefs.Count > 0)
             {
                 return;
@@ -302,7 +302,7 @@ namespace Advize_PlantEverything
 
         private static void InitPieceRefs()
         {
-            Dbgl("PlantEverything: InitPieceRefs");
+            Dbgl("InitPieceRefs");
 
             if (pieceRefs.Count > 0)
             {
@@ -495,7 +495,7 @@ namespace Advize_PlantEverything
 
         private static void InitPieces()
         {
-            Dbgl("PlantEverything: InitPieces");
+            Dbgl("InitPieces");
 
             foreach (PrefabDB pdb in pieceRefs)
             {
@@ -549,7 +549,7 @@ namespace Advize_PlantEverything
 
         private static void InitSaplingRefs()
         {
-            Dbgl("PlantEverything: InitSaplingRefs");
+            Dbgl("InitSaplingRefs");
 
             if (saplingRefs.Count > 0)
             {
@@ -602,7 +602,7 @@ namespace Advize_PlantEverything
 
         private static void InitSaplings()
         {
-            Dbgl("PlantEverything: InitSaplings");
+            Dbgl("InitSaplings");
 
             if (!isInitialized)
             {
@@ -657,7 +657,7 @@ namespace Advize_PlantEverything
 
         private static void InitItems(ObjectDB instance)
         {
-            Dbgl("PlantEverything: InitItems");
+            Dbgl("InitItems");
 
             if (!instance.m_items.Contains(prefabRefs["BirchCone"])) instance.m_items.Add(prefabRefs["BirchCone"]);
             if (!instance.m_items.Contains(prefabRefs["OakSeeds"])) instance.m_items.Add(prefabRefs["OakSeeds"]);
@@ -666,7 +666,7 @@ namespace Advize_PlantEverything
 
         private static void InitCultivator()
         {
-            Dbgl("PlantEverything: InitCultivator");
+            Dbgl("InitCultivator");
 
             ItemDrop cultivator = prefabRefs["Cultivator"].GetComponent<ItemDrop>();
 
