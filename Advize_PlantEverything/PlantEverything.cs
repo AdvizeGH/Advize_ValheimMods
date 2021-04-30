@@ -236,6 +236,8 @@ namespace Advize_PlantEverything
             prefabRefs.Add("SwampTree1", null);
             prefabRefs.Add("Birch2", null);
             prefabRefs.Add("Oak1", null);
+            prefabRefs.Add("Birch2_aut", null);
+            prefabRefs.Add("Birch1_aut", null);
             prefabRefs.Add("Birch1", null);
             prefabRefs.Add("Pickable_Thistle", null);
             prefabRefs.Add("FirCone", null);
@@ -742,6 +744,8 @@ namespace Advize_PlantEverything
             {
                 { prefabRefs["Birch1"], prefabRefs["BirchCone"] },
                 { prefabRefs["Birch2"], prefabRefs["BirchCone"] },
+                { prefabRefs["Birch2_aut"], prefabRefs["BirchCone"] },
+                { prefabRefs["Birch1_aut"], prefabRefs["BirchCone"] },
                 { prefabRefs["Oak1"], prefabRefs["OakSeeds"] },
                 { prefabRefs["SwampTree1"], prefabRefs["AncientSeeds"] }
             };
