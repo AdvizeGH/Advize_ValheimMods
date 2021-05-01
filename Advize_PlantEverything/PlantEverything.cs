@@ -525,10 +525,23 @@ namespace Advize_PlantEverything
                     }
                 };
 
-                if (pdb.Prefab.GetComponent<Pickable>() != null)
+                Pickable pickable = pdb.Prefab.GetComponent<Pickable>();
+                if (pickable != null)
                 {
-                    pdb.Prefab.GetComponent<Pickable>().m_respawnTimeMinutes = pdb.respawnTime;
-                    pdb.Prefab.GetComponent<Pickable>().m_amount = pdb.resourceReturn;
+                    pickable.m_respawnTimeMinutes = pdb.respawnTime;
+                    pickable.m_amount = pdb.resourceReturn;
+
+                    if (pdb.Prefab.transform.Find("visual") != null)
+                    {
+                        if (config.AlwaysShowSpawners)
+                        {
+                            pickable.m_hideWhenPicked = pdb.key.Equals("Pickable_Thistle") ? pdb.Prefab.transform.Find("visual").Find("flare").gameObject : null;
+                        }
+                        else
+                        {
+                            pickable.m_hideWhenPicked = pdb.Prefab.transform.Find("visual").gameObject;
+                        }
+                    }
                 }
 
                 if (config.EnforceBiomes)

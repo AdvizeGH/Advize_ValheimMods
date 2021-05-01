@@ -2,17 +2,16 @@
 {
     class ModConfig
     {
-        //General
-        //private readonly ConfigEntry<bool> modEnabled;
-        private readonly ConfigEntry<int> nexusID;
-        private readonly ConfigEntry<bool> enableDebugMessages;
+        //General 3
+        private readonly ConfigEntry<int> nexusID; //local
+        private readonly ConfigEntry<bool> enableDebugMessages; //local
         private readonly ConfigEntry<bool> alternateIcons;
+        private readonly ConfigEntry<bool> alwaysShowSpawners;
         private readonly ConfigEntry<bool> enableMiscFlora;
-        private readonly ConfigEntry<bool> enableLocalization;
-        private readonly ConfigEntry<string> language;
+        private readonly ConfigEntry<bool> enableLocalization; //local
+        private readonly ConfigEntry<string> language; //local
 
         //Difficulty 4
-        //public static ConfigEntry<bool> enableOtherResources;
         private readonly ConfigEntry<bool> requireCultivation;
         private readonly ConfigEntry<bool> placeAnywhere;
         private readonly ConfigEntry<bool> enforceBiomes;
@@ -82,11 +81,6 @@
         internal ModConfig(Config config)
         {
             //General
-            //modEnabled = config.Bind<bool>(
-            //    "General",
-            //    "Enabled",
-            //    true,
-            //    "Enable this mod");
             nexusID = config.Bind(
                 "General",
                 "NexusID",
@@ -102,6 +96,11 @@
                 "AlternateIcons",
                 false,
                 "Use berry icons in the cultivator menu rather than the default ones");
+            alwaysShowSpawners = config.Bind(
+                "General",
+                "AlwaysShowSpawners",
+                false,
+                "Continue to show mushroom, thistle, and dandelion spawners after being picked. Thistle will lose the glow effect until ready to harvest.");
             enableMiscFlora = config.Bind(
                 "General",
                 "EnableMiscFlora",
@@ -404,10 +403,6 @@
                 "Radius of free space required for a fir sapling to grow");
         }
 
-        //internal bool ModEnabled
-        //{
-        //    get { return modEnabled.Value; }
-        //}
         internal bool EnableDebugMessages
         {
             get { return enableDebugMessages.Value; }
@@ -415,6 +410,10 @@
         internal bool AlternateIcons
         {
             get { return alternateIcons.Value; }
+        }
+        internal bool AlwaysShowSpawners
+        {
+            get { return alwaysShowSpawners.Value; }
         }
         internal bool EnableMiscFlora
         {
