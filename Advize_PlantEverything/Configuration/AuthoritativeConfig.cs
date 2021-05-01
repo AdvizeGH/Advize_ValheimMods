@@ -134,7 +134,7 @@ namespace Advize_PlantEverything.Configuration
                     if (Instance._configEntries.ContainsKey(configKey))
                     {
                         Instance._configEntries[configKey].SetSerializedValue(stringVal);
-                        //Too many config settings in this mod (58+ server authoritative pairs), needed to reduce console spam
+                        //Too many config settings in this mod (64+ server authoritative pairs), needed to reduce console spam
                         //Logger.LogInfo($"Applied Server Authoritative config pair => {configKey}: {stringVal}");
                     }
                     else

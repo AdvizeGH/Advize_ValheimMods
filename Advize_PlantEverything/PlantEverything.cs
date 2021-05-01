@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.4.3";
+        public const string Version = "1.4.4";
 
         private readonly Harmony harmony = new Harmony(PluginID);
         public static ManualLogSource PELogger = new ManualLogSource($" {PluginName}");
@@ -257,7 +257,7 @@ namespace Advize_PlantEverything
             prefabRefs.Add("sfx_build_cultivator", null);
             //prefabRefs.Add("Spawner_GreydwarfNest", null);
 
-            UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
+            Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
             for (int i = 0; i < array.Length; i++)
             {
                 GameObject gameObject = (GameObject)array[i];

@@ -11,11 +11,12 @@
         private readonly ConfigEntry<bool> enableLocalization; //local
         private readonly ConfigEntry<string> language; //local
 
-        //Difficulty 4
+        //Difficulty 5
         private readonly ConfigEntry<bool> requireCultivation;
         private readonly ConfigEntry<bool> placeAnywhere;
         private readonly ConfigEntry<bool> enforceBiomes;
         private readonly ConfigEntry<bool> enforceBiomesVanilla;
+        private readonly ConfigEntry<bool> enableCropOverrides;
 
         //Berries 9
         private readonly ConfigEntry<int> raspberryCost;
@@ -27,6 +28,13 @@
         private readonly ConfigEntry<int> raspberryReturn;
         private readonly ConfigEntry<int> blueberryReturn;
         private readonly ConfigEntry<int> cloudberryReturn;
+
+        //Crops 5
+        private readonly ConfigEntry<float> cropMinScale;
+        private readonly ConfigEntry<float> cropMaxScale;
+        private readonly ConfigEntry<float> cropGrowTimeMin;
+        private readonly ConfigEntry<float> cropGrowTimeMax;
+        private readonly ConfigEntry<float> cropGrowRadius;
 
         //Mushrooms 9
         private readonly ConfigEntry<int> mushroomCost;
@@ -138,6 +146,11 @@
                 "EnforceBiomesVanilla",
                 true,
                 "Restrict vanilla plantables to being placed in their respective biome");
+            enableCropOverrides = config.Bind(
+                "Difficulty",
+                "EnableCropOverrides",
+                false,
+                "Enables the [Crops] section of this config");
 
             //Berries
             raspberryCost = config.Bind(
@@ -185,6 +198,33 @@
                 "CloudberryReturn",
                 1,
                 "Number of berries a cloudberry bush will spawn");
+
+            //Crops
+            cropMinScale = config.Bind(
+                "Crops",
+                "CropMinScale",
+                0.9f,
+                "The minimum scaling factor used to scale crops upon growth");
+            cropMaxScale = config.Bind(
+                "Crops",
+                "CropMaxScale",
+                1.1f,
+                "The maximum scaling factor used to scale crops upon growth");
+            cropGrowTimeMin = config.Bind(
+                "Crops",
+                "CropGrowTimeMin",
+                4000f,
+                "Minimum number of seconds it takes for crops to grow (will take at least 10 seconds after planting to grow)");
+            cropGrowTimeMax = config.Bind(
+                "Crops",
+                "CropGrowTimeMax",
+                5000f,
+                "Maximum number of seconds it takes for crops to grow (will take at least 10 seconds after planting to grow)");
+            cropGrowRadius = config.Bind(
+                "Crops",
+                "CropGrowRadius",
+                0.5f,
+                "Radius of free space required for crops to grow");
 
             //Mushrooms
             mushroomCost = config.Bind(
@@ -443,6 +483,10 @@
         {
             get { return enforceBiomesVanilla.Value; }
         }
+        internal bool EnableCropOverrides
+        {
+            get { return enableCropOverrides.Value; }
+        }
         internal int RaspberryCost
         {
             get { return raspberryCost.Value; }
@@ -478,6 +522,26 @@
         internal int CloudberryReturn
         {
             get { return cloudberryReturn.Value; }
+        }
+        internal float CropMinScale
+        {
+            get { return cropMinScale.Value; }
+        }
+        internal float CropMaxScale
+        {
+            get { return cropMaxScale.Value; }
+        }
+        internal float CropGrowTimeMin
+        {
+            get { return cropGrowTimeMin.Value; }
+        }
+        internal float CropGrowTimeMax
+        {
+            get { return cropGrowTimeMax.Value; }
+        }
+        internal float CropGrowRadius
+        {
+            get { return cropGrowRadius.Value; }
         }
         internal int MushroomCost
         {
