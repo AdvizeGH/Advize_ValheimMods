@@ -164,11 +164,10 @@ namespace Advize_PlantEverything
                 }
                 if (config.EnableCropOverrides && __instance.name.StartsWith("sapling_"))
                 {
-                    Dbgl($"Overriding crop variables on {__instance.name}");
-                    __instance.m_growTime = config.CropGrowTimeMin;
-                    __instance.m_growTimeMax = config.CropGrowTimeMax;
                     __instance.m_minScale = config.CropMinScale;
                     __instance.m_maxScale = config.CropMaxScale;
+                    __instance.m_growTime = config.CropGrowTimeMin;
+                    __instance.m_growTimeMax = config.CropGrowTimeMax;
                     __instance.m_growRadius = config.CropGrowRadius;
                 }
             }
