@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
+using BepInEx.Logging;
 using HarmonyLib;
 using Pipakin.SkillInjectorMod;
 using UnityEngine;
@@ -22,6 +23,7 @@ namespace Advize_CartographySkill
         public const int SKILL_TYPE = 1337;
 
         private readonly Harmony harmony = new Harmony(PluginID);
+        public static ManualLogSource CSLogger = new ManualLogSource($" {PluginName}");
 
         private static GameObject prefab;
         private static Recipe recipe;
@@ -46,6 +48,7 @@ namespace Advize_CartographySkill
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Called Implicitly")]
         private void Awake()
         {
+            BepInEx.Logging.Logger.Sources.Add(CSLogger);
             Config.Init(this, true);
             config = new ModConfig(Config);
             Config.OnConfigReceived.AddListener(new UnityAction(ConfigReceived));
@@ -198,7 +201,7 @@ namespace Advize_CartographySkill
             if (zoomLevel == 1)
             {
                 startingFov = currentFov = GameCamera.instance.m_fov;
-                Dbgl("ChangeZoom() starting fov was " + startingFov);
+                Dbgl($"ChangeZoom() starting fov was {startingFov}");
             }
 
             zoomLevel += delta;
@@ -219,11 +222,11 @@ namespace Advize_CartographySkill
             {
                 case -1:
                     currentFov = Mathf.Max(currentFov + (config.FovReductionFactor + ((zoomLevel + 1) * config.FovReductionFactor)), 5);
-                    Dbgl("Spyglass zoomed out, current fov should be " + currentFov);
+                    Dbgl($"Spyglass zoomed out, current fov should be {currentFov}");
                     break;
                 case 1:
                     currentFov = Mathf.Max(currentFov - (config.FovReductionFactor + (zoomLevel * config.FovReductionFactor)), 5);
-                    Dbgl("Spyglass zoomed in, current fov should be " + currentFov);
+                    Dbgl($"Spyglass zoomed in, current fov should be {currentFov}");
                     break;
             }
         }
@@ -233,7 +236,7 @@ namespace Advize_CartographySkill
             zoomLevel = 1;
             GameCamera.instance.m_fov = currentFov = startingFov;
             isZooming = false;
-            Dbgl("StopZoom() fov is now " + GameCamera.instance.m_fov);
+            Dbgl($"StopZoom() fov is now {GameCamera.instance.m_fov}");
         }
 
         private static bool IsSpyglassEquipped()
@@ -260,7 +263,7 @@ namespace Advize_CartographySkill
             int legitDiscovered = explored.Count(c => c);
             int totalDiscovered = m_explored.Count(c => c);
 
-            Dbgl("legitDiscovered = " + legitDiscovered + " totalDiscovered = " + totalDiscovered);
+            Dbgl($"legitDiscovered = {legitDiscovered} totalDiscovered = {totalDiscovered}");
 
             int uncountedTiles = totalDiscovered - legitDiscovered;
 
@@ -270,7 +273,7 @@ namespace Advize_CartographySkill
                 return;
             }
             
-            instance.Print("Found " + uncountedTiles + " non-officially discovered tiles");
+            instance.Print($"Found {uncountedTiles} non-officially discovered tiles");
 
             //Update our array
             Array.Copy(m_explored, explored, m_explored.Length);
@@ -283,16 +286,14 @@ namespace Advize_CartographySkill
         internal static void Dbgl(string message, bool forceLog = false, bool logError = false)
         {
             if (forceLog || config.EnableDebugMessages)
-            {
-                string str = PluginName + ": " + message;
-                
+            {                
                 if (logError)
                 {
-                    Debug.LogError(str);
+                    CSLogger.LogError(message);
                 }
                 else
                 {
-                    Debug.Log(str);
+                    CSLogger.LogInfo(message);
                 }
             }
         }
@@ -340,7 +341,7 @@ namespace Advize_CartographySkill
 
                 if (__instance.m_exploreRadius != newExploreRadius)
                 {
-                    Dbgl("Previous explore radius was: " + __instance.m_exploreRadius + " new radius is: " + newExploreRadius);
+                    Dbgl($"Previous explore radius was: {__instance.m_exploreRadius} new radius is: {newExploreRadius}");
                     __instance.m_exploreRadius = newExploreRadius;
                 }
             }

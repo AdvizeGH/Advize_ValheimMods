@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using UnityEngine;
 using System;
 using HarmonyLib;
@@ -31,17 +32,13 @@ namespace Advize_CartographySkill.Configuration
         public static string RPC_SYNC_GUID => "AuthoritativeConfig_" + GUID;
         private static BepInEx.Configuration.ConfigEntry<bool> _ServerIsAuthoritative;
         private static bool _DefaultBindAuthority;
-        public static BepInEx.Logging.ManualLogSource Logger;
+        public static ManualLogSource Logger => CartographySkill.CSLogger;
 
         public UnityEvent OnConfigReceived = new UnityEvent();
 
         public void Init(BaseUnityPlugin mod, bool defaultBindServerAuthority = false)
         {
             _mod = mod;
-            //logger
-            Logger = new BepInEx.Logging.ManualLogSource(RPC_SYNC_GUID);
-            BepInEx.Logging.Logger.Sources.Add(Logger);
-
             _configEntries = new Dictionary<string, ConfigBaseEntry>();
             _DefaultBindAuthority = defaultBindServerAuthority;
             _ServerIsAuthoritative = _mod.Config.Bind("ServerAuthoritativeConfig", "ServerIsAuthoritative", true, "<Server Only> Forces Clients to use Server defined configs.");
@@ -54,7 +51,7 @@ namespace Advize_CartographySkill.Configuration
         [HarmonyPostfix]
         private static void RegisterSyncConfigRPC()
         {
-            Logger.LogInfo($"Authoritative Config Registered -> {RPC_SYNC_GUID}");
+            Logger.LogInfo("Authoritative Config Registered");
             ZRoutedRpc.instance.Register(RPC_SYNC_GUID, new Action<long, ZPackage>(RPC_SyncServerConfig));
             //clear server values
             foreach (ConfigBaseEntry entry in Instance._configEntries.Values)
@@ -71,12 +68,11 @@ namespace Advize_CartographySkill.Configuration
             {
                 long? serverPeerID = AccessTools.Method(typeof(ZRoutedRpc), "GetServerPeerID").Invoke(ZRoutedRpc.instance, null) as long?;
                 ZRoutedRpc.instance.InvokeRoutedRPC((long)serverPeerID, RPC_SYNC_GUID, new object[] { new ZPackage() });
-                Logger.LogInfo($"Authoritative Config Registered -> {RPC_SYNC_GUID}");
-                Debug.Log(Instance._mod.Info.Metadata.Name + ": Authoritative Config Requested -> " + RPC_SYNC_GUID);
+                Logger.LogInfo("Authoritative Config Requested");
             }
             else if (!ZNet.IsServer())
             {
-                Logger.LogWarning($"Failed to Request Configs. Bad Peer? Too Early?");
+                Logger.LogWarning("Failed to Request Configs. Bad Peer? Too Early?");
             }
         }
         #endregion
@@ -118,7 +114,7 @@ namespace Advize_CartographySkill.Configuration
                         pkg.Write(item.Key);
                         pkg.Write(item.Value.BaseEntry.GetSerializedValue());
                         entries++;
-                        //LogInfo($"Sending Config {item.Key}: {item.Value.BaseEntry.GetSerializedValue()}");
+                        //Logger.LogInfo($"Sending Config {item.Key}: {item.Value.BaseEntry.GetSerializedValue()}");
                     }
                 }
                 ZRoutedRpc.instance.InvokeRoutedRPC(sender, RPC_SYNC_GUID, new object[] { pkg });
@@ -143,7 +139,7 @@ namespace Advize_CartographySkill.Configuration
                     }
                     else
                     {
-                        Logger.LogError($"Recieved config key we dont have locally. Possible Version Mismatch. {configKey}: {stringVal}");
+                        Logger.LogError($"Received config key we dont have locally. Possible Version Mismatch. {configKey}: {stringVal}");
                     }
                 }
                 Logger.LogInfo($"Applied {entries} config pairs");
@@ -167,7 +163,7 @@ namespace Advize_CartographySkill.Configuration
                 long? serverPeerID = AccessTools.Method(typeof(ZRoutedRpc), "GetServerPeerID").Invoke(ZRoutedRpc.instance, null) as long?;
                 if (serverPeerID == sender)
                 {
-                    //Client handle recieving config
+                    //Client handle receiving config
                     ReadConfigPkg(pkg);
                 }
             }
