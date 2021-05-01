@@ -613,9 +613,42 @@ namespace Advize_PlantEverything
                 ModifyTreeDrops();
             }
 
-            prefabRefs["Beech_Sapling"].GetComponent<Plant>().m_growRadius = config.BeechGrowRadius;
-            prefabRefs["PineTree_Sapling"].GetComponent<Plant>().m_growRadius = config.PineGrowRadius;
-            prefabRefs["FirTree_Sapling"].GetComponent<Plant>().m_growRadius = config.FirGrowRadius;
+            List<SaplingDB> vanillaSaplings = new List<SaplingDB>()
+            {
+                new SaplingDB
+                {
+                    key = "Beech_Sapling",
+                    growTime = config.BeechGrowthTime,
+                    growRadius = config.BeechGrowRadius,
+                    minScale = config.BeechMinScale,
+                    maxScale = config.BeechMaxScale
+                },
+                new SaplingDB
+                {
+                    key = "PineTree_Sapling",
+                    growTime = config.PineGrowthTime,
+                    growRadius = config.PineGrowRadius,
+                    minScale = config.PineMinScale,
+                    maxScale = config.PineMaxScale
+                },
+                new SaplingDB
+                {
+                    key = "FirTree_Sapling",
+                    growTime = config.FirGrowthTime,
+                    growRadius = config.FirGrowRadius,
+                    minScale = config.FirMinScale,
+                    maxScale = config.FirMaxScale
+                }
+            };
+
+            foreach (SaplingDB sdb in vanillaSaplings)
+            {
+                Plant plant = sdb.Prefab.GetComponent<Plant>();
+                plant.m_growTime = plant.m_growTimeMax = sdb.growTime;
+                plant.m_growRadius = sdb.growRadius;
+                plant.m_minScale = sdb.minScale;
+                plant.m_maxScale = sdb.maxScale;
+            }
 
             foreach (SaplingDB sdb in saplingRefs)
             {
@@ -626,7 +659,6 @@ namespace Advize_PlantEverything
                 plant.m_grownPrefabs = sdb.grownPrefabs;
                 plant.m_minScale = sdb.minScale;
                 plant.m_maxScale = sdb.maxScale;
-                plant.m_needCultivatedGround = config.RequireCultivation;
                 plant.m_growRadius = sdb.growRadius;
 
                 piece.m_resources[0].m_resItem = prefabRefs[sdb.resource].GetComponent<ItemDrop>();
@@ -688,10 +720,8 @@ namespace Advize_PlantEverything
         {
             InitPieceRefs();
             InitPieces();
-
             InitSaplingRefs();
             InitSaplings();
-
             InitCultivator();
 
             List<GameObject> prefabs = new List<GameObject>

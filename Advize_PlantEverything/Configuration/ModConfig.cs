@@ -48,22 +48,32 @@
         private readonly ConfigEntry<int> thistleReturn;
         private readonly ConfigEntry<int> dandelionReturn;
 
-        //Saplings 18
+        //Saplings 27
         private readonly ConfigEntry<int> birchCost;
         private readonly ConfigEntry<int> oakCost;
         private readonly ConfigEntry<int> ancientCost;
-        private readonly ConfigEntry<float> birchGrowthTime;
-        private readonly ConfigEntry<float> oakGrowthTime;
-        private readonly ConfigEntry<float> ancientGrowthTime;
         private readonly ConfigEntry<float> birchMinScale;
         private readonly ConfigEntry<float> birchMaxScale;
         private readonly ConfigEntry<float> oakMinScale;
         private readonly ConfigEntry<float> oakMaxScale;
         private readonly ConfigEntry<float> ancientMinScale;
         private readonly ConfigEntry<float> ancientMaxScale;
+        private readonly ConfigEntry<float> birchGrowthTime;
+        private readonly ConfigEntry<float> oakGrowthTime;
+        private readonly ConfigEntry<float> ancientGrowthTime;
         private readonly ConfigEntry<float> birchGrowRadius;
         private readonly ConfigEntry<float> oakGrowRadius;
         private readonly ConfigEntry<float> ancientGrowRadius;
+
+        private readonly ConfigEntry<float> beechGrowthTime;
+        private readonly ConfigEntry<float> pineGrowthTime;
+        private readonly ConfigEntry<float> firGrowthTime;
+        private readonly ConfigEntry<float> beechMinScale;
+        private readonly ConfigEntry<float> beechMaxScale;
+        private readonly ConfigEntry<float> pineMinScale;
+        private readonly ConfigEntry<float> pineMaxScale;
+        private readonly ConfigEntry<float> firMinScale;
+        private readonly ConfigEntry<float> firMaxScale;
         private readonly ConfigEntry<float> beechGrowRadius;
         private readonly ConfigEntry<float> pineGrowRadius;
         private readonly ConfigEntry<float> firGrowRadius;
@@ -332,6 +342,51 @@
                 "AncientGrowRadius",
                 2f,
                 "Radius of free space required for an ancient sapling to grow");
+            beechGrowthTime = config.Bind(
+                "Saplings",
+                "BeechGrowthTime",
+                3000f,
+                "Number of seconds it takes for a beech tree to grow from a beech sapling (will take at least 10 seconds after planting to grow)");
+            pineGrowthTime = config.Bind(
+                "Saplings",
+                "PineGrowthTime",
+                3000f,
+                "Number of seconds it takes for a pine tree to grow from a pine sapling (will take at least 10 seconds after planting to grow)");
+            firGrowthTime = config.Bind(
+                "Saplings",
+                "FirGrowthTime",
+                3000f,
+                "Number of seconds it takes for a fir tree to grow from a fir sapling (will take at least 10 seconds after planting to grow)");
+            beechMinScale = config.Bind(
+                "Saplings",
+                "BeechMinScale",
+                0.5f,
+                "The minimum scaling factor used to scale a beech tree upon growth");
+            beechMaxScale = config.Bind(
+                "Saplings",
+                "BeechMaxScale",
+                2f,
+                "The maximum scaling factor used to scale a beech tree upon growth");
+            pineMinScale = config.Bind(
+                "Saplings",
+                "PineMinScale",
+                0.5f,
+                "The minimum scaling factor used to scale a pine tree upon growth");
+            pineMaxScale = config.Bind(
+                "Saplings",
+                "PineMaxScale",
+                2f,
+                "The maximum scaling factor used to scale a pine tree upon growth");
+            firMinScale = config.Bind(
+                "Saplings",
+                "FirMinScale",
+                0.5f,
+                "The minimum scaling factor used to scale a fir tree upon growth");
+            firMaxScale = config.Bind(
+                "Saplings",
+                "FirMaxScale",
+                2f,
+                "The maximum scaling factor used to scale a fir tree upon growth");
             beechGrowRadius = config.Bind(
                 "Saplings",
                 "BeechGrowRadius",
@@ -544,6 +599,42 @@
         internal float AncientGrowRadius
         {
             get { return ancientGrowRadius.Value; }
+        }
+        internal float BeechGrowthTime
+        {
+            get { return beechGrowthTime.Value; }
+        }
+        internal float PineGrowthTime
+        {
+            get { return pineGrowthTime.Value; }
+        }
+        internal float FirGrowthTime
+        {
+            get { return firGrowthTime.Value; }
+        }
+        internal float BeechMinScale
+        {
+            get { return beechMinScale.Value; }
+        }
+        internal float BeechMaxScale
+        {
+            get { return beechMaxScale.Value; }
+        }
+        internal float PineMinScale
+        {
+            get { return pineMinScale.Value; }
+        }
+        internal float PineMaxScale
+        {
+            get { return pineMaxScale.Value; }
+        }
+        internal float FirMinScale
+        {
+            get { return firMinScale.Value; }
+        }
+        internal float FirMaxScale
+        {
+            get { return firMaxScale.Value; }
         }
         internal float BeechGrowRadius
         {
