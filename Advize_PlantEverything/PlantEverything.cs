@@ -569,7 +569,7 @@ namespace Advize_PlantEverything
                     growRadius = config.BirchGrowRadius,
                     minScale = config.BirchMinScale,
                     maxScale = config.BirchMaxScale,
-                    grownPrefabs = new GameObject[] { prefabRefs["Birch1"], prefabRefs["Birch2"] }
+                    grownPrefabs = new GameObject[] { prefabRefs["Birch1"], prefabRefs["Birch2"], prefabRefs["Birch1_aut"], prefabRefs["Birch2_aut"] }
                 },
                 new SaplingDB
                 {
