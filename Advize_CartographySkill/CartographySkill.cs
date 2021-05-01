@@ -19,7 +19,7 @@ namespace Advize_CartographySkill
     {
         public const string PluginID = "advize.CartographySkill";
         public const string PluginName = "CartographySkill";
-        public const string Version = "1.5.0";
+        public const string Version = "1.5.1";
         public const int SKILL_TYPE = 1337;
 
         private readonly Harmony harmony = new Harmony(PluginID);
@@ -37,7 +37,7 @@ namespace Advize_CartographySkill
         private static bool[] explored;
 
         private static readonly AssetBundle assetBundle = LoadAssetBundle("spyglass");
-        private static Dictionary<string, Texture2D> cachedTextures = new Dictionary<string, Texture2D>();
+        private static readonly Dictionary<string, Texture2D> cachedTextures = new Dictionary<string, Texture2D>();
 
         private new Config Config
         {
