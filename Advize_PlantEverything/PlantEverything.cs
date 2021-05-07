@@ -736,7 +736,7 @@ namespace Advize_PlantEverything
             InitSaplingRefs();
             InitSaplings();
             InitCultivator();
-            //Forcefully inject localized strings if SetupLanguage() was triggered before our postfix was applied
+
             if (stringDictionary.Count > 0)
             {
                 InitLocalization();

@@ -172,27 +172,5 @@ namespace Advize_PlantEverything
                 }
             }
         }
-
-        [HarmonyPatch(typeof(Localization), "SetupLanguage")]
-        public static class LocalizationSetupLanguage
-        {
-            private static Dictionary<string, string> m_translations;
-            public static void Postfix(ref Dictionary<string, string> ___m_translations)
-            {
-                m_translations = ___m_translations;
-                foreach (KeyValuePair<string, string> kvp in stringDictionary)
-                {
-                    AddWord(kvp.Key, kvp.Value);
-                }
-
-                stringDictionary.Clear();
-            }
-
-            private static void AddWord(string key, string value)
-            {
-                m_translations.Remove($"pe{key}");
-                m_translations.Add($"pe{key}", value);
-            }
-        }
     }
 }
