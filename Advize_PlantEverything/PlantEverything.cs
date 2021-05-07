@@ -84,7 +84,6 @@ namespace Advize_PlantEverything
             { "GreydwarfNestDescription", "Plant your very own greydwarf nest" }*/
         };
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Called Implicitly")]
         private void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
@@ -727,6 +726,7 @@ namespace Advize_PlantEverything
             }
 
             cultivator.m_itemData.m_shared.m_buildPieces.m_canRemovePieces = true;
+            //cultivator.m_itemData.m_shared.m_buildPieces.m_useCategories = true;
         }
 
         private static void FinalInit(ZNetScene __instance)
@@ -736,6 +736,11 @@ namespace Advize_PlantEverything
             InitSaplingRefs();
             InitSaplings();
             InitCultivator();
+            //Forcefully inject localized strings if SetupLanguage() was triggered before our postfix was applied
+            if (stringDictionary.Count > 0)
+            {
+                InitLocalization();
+            }
 
             List<GameObject> prefabs = new List<GameObject>
             {
@@ -814,6 +819,16 @@ namespace Advize_PlantEverything
         {
             Dbgl("Config Received, re-initializing mod");
             FinalInit(ZNetScene.instance);
+        }
+
+        public static void InitLocalization()
+        {
+            Dbgl("InitLocalization");
+            foreach (KeyValuePair<string, string> kvp in stringDictionary)
+            {
+                Traverse.Create(Localization.instance).Method("AddWord", $"pe{kvp.Key}", kvp.Value).GetValue($"pe{kvp.Key}", kvp.Value);
+            }
+            stringDictionary.Clear();
         }
 
         internal class LocalizedStrings
