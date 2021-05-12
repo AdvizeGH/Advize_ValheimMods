@@ -13,7 +13,7 @@ namespace Advize_PlantEverything
             public static void Postfix(ObjectDB __instance)
             {
                 Dbgl("ObjectDBAwake");
-
+                InitPrefabRefs();
                 if (ZNetScene.instance == null) return;
                 Dbgl("& ZNetScene not null");
                 InitItems(__instance);
@@ -26,7 +26,6 @@ namespace Advize_PlantEverything
             public static void Postfix(ObjectDB other)
             {
                 Dbgl("ObjectDBCopyOtherDB");
-                InitPrefabRefs();
                 InitItems(other);
             }
         }
@@ -47,7 +46,7 @@ namespace Advize_PlantEverything
         {
             public static void Postfix(int hash, ref GameObject __result, ObjectDB __instance)
             {
-                if (__result == null)
+                if (__result == null && prefabRefs.Count > 0)
                 {
                     List<GameObject> prefabs = new List<GameObject>
                     {

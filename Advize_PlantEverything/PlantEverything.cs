@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.4.4";
+        public const string Version = "1.5.0";
 
         private readonly Harmony harmony = new Harmony(PluginID);
         public static ManualLogSource PELogger = new ManualLogSource($" {PluginName}");
