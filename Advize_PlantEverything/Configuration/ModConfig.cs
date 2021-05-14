@@ -85,7 +85,6 @@
         private readonly ConfigEntry<float> pineGrowRadius;
         private readonly ConfigEntry<float> firGrowRadius;
 
-
         internal ModConfig(Config config)
         {
             //General

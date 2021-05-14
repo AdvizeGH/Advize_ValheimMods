@@ -884,5 +884,4 @@ namespace Advize_PlantEverything
             }
         }
     }
-
 }
