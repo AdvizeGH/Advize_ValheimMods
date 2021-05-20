@@ -29,12 +29,13 @@
         private readonly ConfigEntry<int> blueberryReturn;
         private readonly ConfigEntry<int> cloudberryReturn;
 
-        //Crops 5
+        //Crops 6
         private readonly ConfigEntry<float> cropMinScale;
         private readonly ConfigEntry<float> cropMaxScale;
         private readonly ConfigEntry<float> cropGrowTimeMin;
         private readonly ConfigEntry<float> cropGrowTimeMax;
         private readonly ConfigEntry<float> cropGrowRadius;
+        private readonly ConfigEntry<bool> cropRequireCultivation;
 
         //Mushrooms 9
         private readonly ConfigEntry<int> mushroomCost;
@@ -134,7 +135,7 @@
                 "Difficulty",
                 "PlaceAnywhere",
                 false,
-                "Allow resources to be placed anywhere. This will only apply to bushes and trees");
+                "Allow resources to be placed anywhere (not just on the ground). Does not apply to mushrooms or flowers");
             enforceBiomes = config.Bind(
                 "Difficulty",
                 "EnforceBiomes",
@@ -224,6 +225,11 @@
                 "CropGrowRadius",
                 0.5f,
                 "Radius of free space required for crops to grow");
+            cropRequireCultivation = config.Bind(
+                "Crops",
+                "CropsRequireCultivation",
+                true,
+                "Crops can only be planted on cultivated ground");
 
             //Mushrooms
             mushroomCost = config.Bind(
@@ -541,6 +547,10 @@
         internal float CropGrowRadius
         {
             get { return cropGrowRadius.Value; }
+        }
+        internal bool CropRequireCultivation
+        {
+            get { return cropRequireCultivation.Value; }
         }
         internal int MushroomCost
         {
