@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.5.0";
+        public const string Version = "1.5.1";
 
         private readonly Harmony harmony = new Harmony(PluginID);
         public static ManualLogSource PELogger = new ManualLogSource($" {PluginName}");
@@ -204,13 +204,13 @@ namespace Advize_PlantEverything
             return result;
         }
 
-        private static Piece CreatePiece(string name, string description, Piece component, bool isGrounded, bool canBeRemoved = true)
+        private static Piece CreatePiece(string name, string description, Piece component, bool? isGrounded = null, bool canBeRemoved = true)
         {
             component.m_name = $"$pe{name}";
             component.m_description = $"$pe{description}";
             component.m_category = Piece.PieceCategory.Misc;
-            component.m_cultivatedGroundOnly = config.RequireCultivation;
-            component.m_groundOnly = component.m_groundPiece = isGrounded/* || !config.PlaceAnywhere*/;
+            component.m_cultivatedGroundOnly = (name.Contains("berryBush") || name.Contains("Pickable")) && config.RequireCultivation;
+            component.m_groundOnly = component.m_groundPiece = isGrounded ?? !config.PlaceAnywhere;
             component.m_canBeRemoved = canBeRemoved;
             return component;
         }
@@ -326,7 +326,7 @@ namespace Advize_PlantEverything
                     respawnTime = config.RaspberryRespawnTime,
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
-                    piece = CreatePiece("RaspberryBushName", "RaspberryBushDescription", prefabRefs["RaspberryBush"].AddComponent<Piece>(), true)
+                    piece = CreatePiece("RaspberryBushName", "RaspberryBushDescription", prefabRefs["RaspberryBush"].AddComponent<Piece>())
                 },
                 new PrefabDB
                 {
@@ -336,7 +336,7 @@ namespace Advize_PlantEverything
                     respawnTime = config.BlueberryRespawnTime,
                     biome = (int)Heightmap.Biome.BlackForest,
                     icon = true,
-                    piece = CreatePiece("BlueberryBushName", "BlueBerryBushDescription", prefabRefs["BlueberryBush"].AddComponent<Piece>(), true)
+                    piece = CreatePiece("BlueberryBushName", "BlueBerryBushDescription", prefabRefs["BlueberryBush"].AddComponent<Piece>())
                 },
                 new PrefabDB
                 {
@@ -346,7 +346,7 @@ namespace Advize_PlantEverything
                     respawnTime = config.CloudberryRespawnTime,
                     biome = (int)Heightmap.Biome.Plains,
                     icon = true,
-                    piece = CreatePiece("CloudberryBushName", "CloudberryBushDescription", prefabRefs["CloudberryBush"].AddComponent<Piece>(), true)
+                    piece = CreatePiece("CloudberryBushName", "CloudberryBushDescription", prefabRefs["CloudberryBush"].AddComponent<Piece>())
                 },
                 new PrefabDB
                 {
@@ -355,7 +355,7 @@ namespace Advize_PlantEverything
                     resourceReturn = config.MushroomReturn,
                     respawnTime = config.MushroomRespawnTime,
                     biome = 9,
-                    piece = CreatePiece("PickableMushroomName", "PickableMushroomDescription", prefabRefs["Pickable_Mushroom"].AddComponent<Piece>(), true)
+                    piece = CreatePiece("PickableMushroomName", "PickableMushroomDescription", prefabRefs["Pickable_Mushroom"].AddComponent<Piece>(), isGrounded: true)
                 },
                 new PrefabDB
                 {
@@ -364,7 +364,7 @@ namespace Advize_PlantEverything
                     resourceReturn = config.YellowMushroomReturn,
                     respawnTime = config.YellowMushroomRespawnTime,
                     biome = 10,
-                    piece = CreatePiece("PickableYellowMushroomName", "PickableYellowMushroomDescription", prefabRefs["Pickable_Mushroom_yellow"].AddComponent<Piece>(), true)
+                    piece = CreatePiece("PickableYellowMushroomName", "PickableYellowMushroomDescription", prefabRefs["Pickable_Mushroom_yellow"].AddComponent<Piece>(), isGrounded: true)
                 },
                 new PrefabDB
                 {
@@ -373,7 +373,7 @@ namespace Advize_PlantEverything
                     resourceReturn = config.BlueMushroomReturn,
                     respawnTime = config.BlueMushroomRespawnTime,
                     biome = 10,
-                    piece = CreatePiece("PickableBlueMushroomName", "PickableBlueMushroomDescription", prefabRefs["Pickable_Mushroom_blue"].AddComponent<Piece>(), true)
+                    piece = CreatePiece("PickableBlueMushroomName", "PickableBlueMushroomDescription", prefabRefs["Pickable_Mushroom_blue"].AddComponent<Piece>(), isGrounded: true)
                 },
                 new PrefabDB
                 {
@@ -382,7 +382,7 @@ namespace Advize_PlantEverything
                     resourceReturn = config.ThistleReturn,
                     respawnTime = config.ThistleRespawnTime,
                     biome = 10,
-                    piece = CreatePiece("PickableThistleName", "PickableThistleDescription", prefabRefs["Pickable_Thistle"].AddComponent<Piece>(), true)
+                    piece = CreatePiece("PickableThistleName", "PickableThistleDescription", prefabRefs["Pickable_Thistle"].AddComponent<Piece>(), isGrounded: true)
                 },
                 new PrefabDB
                 {
@@ -391,7 +391,7 @@ namespace Advize_PlantEverything
                     resourceReturn = config.DandelionReturn,
                     respawnTime = config.DandelionRespawnTime,
                     biome = (int)Heightmap.Biome.Meadows,
-                    piece = CreatePiece("PickableDandelionName", "PickableDandelionDescription", prefabRefs["Pickable_Dandelion"].AddComponent<Piece>(), true)
+                    piece = CreatePiece("PickableDandelionName", "PickableDandelionDescription", prefabRefs["Pickable_Dandelion"].AddComponent<Piece>(), isGrounded: true)
                 }
             };
 
@@ -406,7 +406,7 @@ namespace Advize_PlantEverything
                     resourceCost = 1,
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
-                    piece = CreatePiece("BeechSmallName", "BeechSmallDescription", prefabRefs["Beech_small1"].AddComponent<Piece>(), true, false)
+                    piece = CreatePiece("BeechSmallName", "BeechSmallDescription", prefabRefs["Beech_small1"].AddComponent<Piece>(), canBeRemoved: false)
                 },
                 new PrefabDB
                 {
@@ -415,7 +415,7 @@ namespace Advize_PlantEverything
                     resourceCost = 1,
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
-                    piece = CreatePiece("FirSmallName", "FirSmallDescription", prefabRefs["FirTree_small"].AddComponent<Piece>(), true, false)
+                    piece = CreatePiece("FirSmallName", "FirSmallDescription", prefabRefs["FirTree_small"].AddComponent<Piece>(), canBeRemoved: false)
                 },
                 new PrefabDB
                 {
@@ -424,7 +424,7 @@ namespace Advize_PlantEverything
                     resourceCost = 1,
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
-                    piece = CreatePiece("FirSmallDeadName", "FirSmallDeadDescription", prefabRefs["FirTree_small_dead"].AddComponent<Piece>(), true, false)
+                    piece = CreatePiece("FirSmallDeadName", "FirSmallDeadDescription", prefabRefs["FirTree_small_dead"].AddComponent<Piece>(), canBeRemoved: false)
                 },
                 new PrefabDB
                 {
@@ -433,7 +433,7 @@ namespace Advize_PlantEverything
                     resourceCost = 2,
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
-                    piece = CreatePiece("Bush01Name", "Bush01Description", prefabRefs["Bush01"].AddComponent<Piece>(), true, false)
+                    piece = CreatePiece("Bush01Name", "Bush01Description", prefabRefs["Bush01"].AddComponent<Piece>(), canBeRemoved: false)
                 },
                 new PrefabDB
                 {
@@ -442,7 +442,7 @@ namespace Advize_PlantEverything
                     resourceCost = 2,
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
-                   piece = CreatePiece("Bush02Name", "Bush02Description", prefabRefs["Bush01_heath"].AddComponent<Piece>(), true, false)
+                   piece = CreatePiece("Bush02Name", "Bush02Description", prefabRefs["Bush01_heath"].AddComponent<Piece>(), canBeRemoved: false)
                 },
                 new PrefabDB
                 {
@@ -451,7 +451,7 @@ namespace Advize_PlantEverything
                     resourceCost = 3,
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
-                    piece = CreatePiece("PlainsBushName", "PlainsBushDescription", prefabRefs["Bush02_en"].AddComponent<Piece>(), true, false)
+                    piece = CreatePiece("PlainsBushName", "PlainsBushDescription", prefabRefs["Bush02_en"].AddComponent<Piece>(), canBeRemoved: false)
                 },
                 new PrefabDB
                 {
@@ -460,7 +460,7 @@ namespace Advize_PlantEverything
                     resourceCost = 2,
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
-                    piece = CreatePiece("Shrub01Name", "Shrub01Description", prefabRefs["shrub_2"].AddComponent<Piece>(), true, false)
+                    piece = CreatePiece("Shrub01Name", "Shrub01Description", prefabRefs["shrub_2"].AddComponent<Piece>(), canBeRemoved: false)
                 },
                 new PrefabDB
                 {
@@ -469,7 +469,7 @@ namespace Advize_PlantEverything
                     resourceCost = 2,
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
-                    piece = CreatePiece("Shrub02Name", "Shrub02Description", prefabRefs["shrub_2_heath"].AddComponent<Piece>(), true, false)
+                    piece = CreatePiece("Shrub02Name", "Shrub02Description", prefabRefs["shrub_2_heath"].AddComponent<Piece>(), canBeRemoved: false)
                 },
                 new PrefabDB
                 {
@@ -479,7 +479,7 @@ namespace Advize_PlantEverything
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
                     recover = true,
-                    piece = CreatePiece("VinesName", "VinesDescription", prefabRefs["vines"].AddComponent<Piece>(), false)
+                    piece = CreatePiece("VinesName", "VinesDescription", prefabRefs["vines"].AddComponent<Piece>(), isGrounded: false)
                 }
             });
             //pieceRefs.Add("Spawner_GreydwarfNest", new PrefabDB
@@ -691,7 +691,6 @@ namespace Advize_PlantEverything
                 piece.m_icon = piece.m_resources[0].m_resItem.m_itemData.GetIcon();
                 piece.m_placeEffect.m_effectPrefabs[0].m_prefab = prefabRefs["vfx_Place_wood_pole"];
                 piece.m_placeEffect.m_effectPrefabs[1].m_prefab = prefabRefs["sfx_build_cultivator"];
-                piece.m_groundOnly = piece.m_groundPiece = !config.PlaceAnywhere;
                 sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[0].m_prefab = prefabRefs[sdb.source].GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[0].m_prefab;
                 sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab = prefabRefs[sdb.source].GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab;
             }
