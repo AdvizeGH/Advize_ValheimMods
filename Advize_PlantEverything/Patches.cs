@@ -125,33 +125,6 @@ namespace Advize_PlantEverything
             }
         }
 
-        [HarmonyPatch(typeof(Pickable), "SetPicked")]
-        public static class PickableSetPicked
-        {
-            public class PickState
-            {
-                public long picked_time;
-                public bool picked;
-            }
-
-            public static void Prefix(ZNetView ___m_nview, bool ___m_picked, ref PickState __state)
-            {
-                __state = new PickState
-                {
-                    picked_time = ___m_nview.GetZDO().GetLong("picked_time", 0L),
-                    picked = ___m_picked
-                };
-            }
-
-            public static void Postfix(ZNetView ___m_nview, bool ___m_picked, ref PickState __state)
-            {
-                if (__state != null && __state.picked == ___m_picked && ___m_nview.IsOwner())
-                {
-                    ___m_nview.GetZDO().Set("picked_time", __state.picked_time);
-                }
-            }
-        }
-
         [HarmonyPatch(typeof(Plant), "Awake")]
         public static class PlantAwake
         {
