@@ -104,7 +104,7 @@ namespace Advize_PlantEverything
                 ItemDrop.ItemData rightItem = __instance.GetRightItem();
                 if (rightItem.m_shared.m_name == "$item_cultivator")
                 {
-                    if (Physics.Raycast(GameCamera.instance.transform.position, GameCamera.instance.transform.forward, out var hitInfo, 50f, LayerMask.GetMask("item", "piece_nonsolid", "terrain")) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
+                    if (Physics.Raycast(GameCamera.instance.transform.position, GameCamera.instance.transform.forward, out var hitInfo, 50f, LayerMask.GetMask("item", "piece_nonsolid", "Default_small")) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
                     {
                         Pickable pickable = hitInfo.collider.GetComponentInParent<Pickable>();
                         if (pickable == null) return true;
@@ -118,8 +118,8 @@ namespace Advize_PlantEverything
                         __instance.FaceLookDirection();
                         ___m_zanim.SetTrigger(rightItem.m_shared.m_attack.m_attackAnimation);
                         __result = true;
-                        return false;
                     }
+                    return false;
                 }
                 return true;
             }
