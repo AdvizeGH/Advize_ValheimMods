@@ -106,18 +106,37 @@ namespace Advize_PlantEverything
                 {
                     if (Physics.Raycast(GameCamera.instance.transform.position, GameCamera.instance.transform.forward, out var hitInfo, 50f, LayerMask.GetMask("item", "piece_nonsolid", "Default_small")) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
                     {
-                        Pickable pickable = hitInfo.collider.GetComponentInParent<Pickable>();
-                        if (pickable == null) return true;
+                        Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
+                        if (piece && piece.m_name.StartsWith("$pe"))
+                        {
+                            if (!piece.m_canBeRemoved) return false;
+                            if (!PrivateArea.CheckAccess(piece.transform.position))
+                            {
+                                __instance.Message(MessageHud.MessageType.Center, "$msg_privatezone");
+                                return false;
+                            }
 
-                        ZNetView component = pickable.GetComponent<ZNetView>();
-                        if (component == null) return true;
-
-                        component.ClaimOwnership();
-                        __instance.m_removeEffects.Create(pickable.transform.position, Quaternion.identity);
-                        ZNetScene.instance.Destroy(pickable.gameObject);
-                        __instance.FaceLookDirection();
-                        ___m_zanim.SetTrigger(rightItem.m_shared.m_attack.m_attackAnimation);
-                        __result = true;
+                            ZNetView component = piece.GetComponent<ZNetView>();
+                            if (component == null) return false;
+                            
+                            WearNTear component2 = piece.GetComponent<WearNTear>();
+                            if (component2)
+                            {
+                                __instance.m_removeEffects.Create(piece.transform.position, Quaternion.identity);
+                                component2.Remove();
+                            }
+                            else
+                            {
+                                component.ClaimOwnership();
+                                piece.DropResources();
+                                piece.m_placeEffect.Create(piece.transform.position, piece.transform.rotation, piece.gameObject.transform);
+                                __instance.m_removeEffects.Create(piece.transform.position, Quaternion.identity);
+                                ZNetScene.instance.Destroy(piece.gameObject);
+                                __instance.FaceLookDirection();
+                                ___m_zanim.SetTrigger(rightItem.m_shared.m_attack.m_attackAnimation);
+                            }
+                            __result = true;
+                        }
                     }
                     return false;
                 }
