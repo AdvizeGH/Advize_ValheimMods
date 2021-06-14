@@ -132,9 +132,9 @@ namespace Advize_PlantEverything
                                 piece.m_placeEffect.Create(piece.transform.position, piece.transform.rotation, piece.gameObject.transform);
                                 __instance.m_removeEffects.Create(piece.transform.position, Quaternion.identity);
                                 ZNetScene.instance.Destroy(piece.gameObject);
-                                __instance.FaceLookDirection();
-                                ___m_zanim.SetTrigger(rightItem.m_shared.m_attack.m_attackAnimation);
                             }
+                            __instance.FaceLookDirection();
+                            ___m_zanim.SetTrigger(rightItem.m_shared.m_attack.m_attackAnimation);
                             __result = true;
                         }
                     }
