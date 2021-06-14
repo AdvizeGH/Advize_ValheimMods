@@ -11,12 +11,13 @@
         private readonly ConfigEntry<bool> enableLocalization; //local
         private readonly ConfigEntry<string> language; //local
 
-        //Difficulty 5
+        //Difficulty 6
         private readonly ConfigEntry<bool> requireCultivation;
         private readonly ConfigEntry<bool> placeAnywhere;
         private readonly ConfigEntry<bool> enforceBiomes;
         private readonly ConfigEntry<bool> enforceBiomesVanilla;
         private readonly ConfigEntry<bool> enableCropOverrides;
+        private readonly ConfigEntry<bool> recoverResources;
 
         //Berries 9
         private readonly ConfigEntry<int> raspberryCost;
@@ -151,6 +152,11 @@
                 "EnableCropOverrides",
                 false,
                 "Enables the [Crops] section of this config");
+            recoverResources = config.Bind(
+                "Difficulty",
+                "RecoverResources",
+                false,
+                "Recover resources when pickables are removed with the cultivator. Applies to berries, mushrooms, and flowers");
 
             //Berries
             raspberryCost = config.Bind(
@@ -491,6 +497,10 @@
         internal bool EnableCropOverrides
         {
             get { return enableCropOverrides.Value; }
+        }
+        internal bool RecoverResources
+        {
+            get { return recoverResources.Value; }
         }
         internal int RaspberryCost
         {

@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.5.3";
+        public const string Version = "1.6.0";
 
         private readonly Harmony harmony = new Harmony(PluginID);
         public static ManualLogSource PELogger = new ManualLogSource($" {PluginName}");
@@ -326,6 +326,7 @@ namespace Advize_PlantEverything
                     respawnTime = config.RaspberryRespawnTime,
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
+                    recover = config.RecoverResources,
                     piece = CreatePiece("RaspberryBushName", "RaspberryBushDescription", prefabRefs["RaspberryBush"].AddComponent<Piece>())
                 },
                 new PrefabDB
@@ -336,6 +337,7 @@ namespace Advize_PlantEverything
                     respawnTime = config.BlueberryRespawnTime,
                     biome = (int)Heightmap.Biome.BlackForest,
                     icon = true,
+                    recover = config.RecoverResources,
                     piece = CreatePiece("BlueberryBushName", "BlueBerryBushDescription", prefabRefs["BlueberryBush"].AddComponent<Piece>())
                 },
                 new PrefabDB
@@ -346,6 +348,7 @@ namespace Advize_PlantEverything
                     respawnTime = config.CloudberryRespawnTime,
                     biome = (int)Heightmap.Biome.Plains,
                     icon = true,
+                    recover = config.RecoverResources,
                     piece = CreatePiece("CloudberryBushName", "CloudberryBushDescription", prefabRefs["CloudberryBush"].AddComponent<Piece>())
                 },
                 new PrefabDB
@@ -355,6 +358,7 @@ namespace Advize_PlantEverything
                     resourceReturn = config.MushroomReturn,
                     respawnTime = config.MushroomRespawnTime,
                     biome = 9,
+                    recover = config.RecoverResources,
                     piece = CreatePiece("PickableMushroomName", "PickableMushroomDescription", prefabRefs["Pickable_Mushroom"].AddComponent<Piece>(), isGrounded: true)
                 },
                 new PrefabDB
@@ -364,6 +368,7 @@ namespace Advize_PlantEverything
                     resourceReturn = config.YellowMushroomReturn,
                     respawnTime = config.YellowMushroomRespawnTime,
                     biome = 10,
+                    recover = config.RecoverResources,
                     piece = CreatePiece("PickableYellowMushroomName", "PickableYellowMushroomDescription", prefabRefs["Pickable_Mushroom_yellow"].AddComponent<Piece>(), isGrounded: true)
                 },
                 new PrefabDB
@@ -373,6 +378,7 @@ namespace Advize_PlantEverything
                     resourceReturn = config.BlueMushroomReturn,
                     respawnTime = config.BlueMushroomRespawnTime,
                     biome = 10,
+                    recover = config.RecoverResources,
                     piece = CreatePiece("PickableBlueMushroomName", "PickableBlueMushroomDescription", prefabRefs["Pickable_Mushroom_blue"].AddComponent<Piece>(), isGrounded: true)
                 },
                 new PrefabDB
@@ -382,6 +388,7 @@ namespace Advize_PlantEverything
                     resourceReturn = config.ThistleReturn,
                     respawnTime = config.ThistleRespawnTime,
                     biome = 10,
+                    recover = config.RecoverResources,
                     piece = CreatePiece("PickableThistleName", "PickableThistleDescription", prefabRefs["Pickable_Thistle"].AddComponent<Piece>(), isGrounded: true)
                 },
                 new PrefabDB
@@ -391,6 +398,7 @@ namespace Advize_PlantEverything
                     resourceReturn = config.DandelionReturn,
                     respawnTime = config.DandelionRespawnTime,
                     biome = (int)Heightmap.Biome.Meadows,
+                    recover = config.RecoverResources,
                     piece = CreatePiece("PickableDandelionName", "PickableDandelionDescription", prefabRefs["Pickable_Dandelion"].AddComponent<Piece>(), isGrounded: true)
                 }
             };
