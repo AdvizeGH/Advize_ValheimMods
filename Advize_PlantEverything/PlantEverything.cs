@@ -686,7 +686,7 @@ namespace Advize_PlantEverything
 
                 if (config.EnforceBiomes)
                 {
-                    piece.m_onlyInBiome = (Heightmap.Biome)sdb.biome;
+                    piece.m_onlyInBiome = plant.m_biome = (Heightmap.Biome)sdb.biome;
                 }
 
                 if (isInitialized) continue;
