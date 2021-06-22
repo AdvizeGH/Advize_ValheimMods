@@ -144,6 +144,24 @@ namespace Advize_PlantEverything
             }
         }
 
+        [HarmonyPatch(typeof(Piece), "SetCreator")]
+        public static class PieceSetCreator
+        {
+            public static void Postfix(Piece __instance)
+            {
+                if (config.ResourcesSpawnEmpty)
+                {
+                    if (__instance.m_name.StartsWith("$pe") && __instance.m_name.Contains("berryBush"))
+                    {
+                        if (__instance.GetComponentInParent<Pickable>())
+                        {
+                            __instance.GetComponent<ZNetView>().InvokeRPC(ZNetView.Everybody, "SetPicked", true);
+                        }
+                    }
+                }
+            }
+        }
+
         [HarmonyPatch(typeof(Plant), "Awake")]
         public static class PlantAwake
         {

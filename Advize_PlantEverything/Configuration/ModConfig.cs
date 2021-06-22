@@ -11,13 +11,14 @@
         private readonly ConfigEntry<bool> enableLocalization; //local
         private readonly ConfigEntry<string> language; //local
 
-        //Difficulty 6
+        //Difficulty 7
         private readonly ConfigEntry<bool> requireCultivation;
         private readonly ConfigEntry<bool> placeAnywhere;
         private readonly ConfigEntry<bool> enforceBiomes;
         private readonly ConfigEntry<bool> enforceBiomesVanilla;
         private readonly ConfigEntry<bool> enableCropOverrides;
         private readonly ConfigEntry<bool> recoverResources;
+        private readonly ConfigEntry<bool> resourcesSpawnEmpty;
 
         //Berries 9
         private readonly ConfigEntry<int> raspberryCost;
@@ -157,6 +158,11 @@
                 "RecoverResources",
                 false,
                 "Recover resources when pickables are removed with the cultivator. Applies to berries, mushrooms, and flowers");
+            resourcesSpawnEmpty = config.Bind(
+                "Difficulty",
+                "ResourcesSpawnEmpty",
+                false,
+                "Specifies whether resources should spawn empty or full. Currently only applies to berry bushes");
 
             //Berries
             raspberryCost = config.Bind(
@@ -501,6 +507,10 @@
         internal bool RecoverResources
         {
             get { return recoverResources.Value; }
+        }
+        internal bool ResourcesSpawnEmpty
+        {
+            get { return resourcesSpawnEmpty.Value; }
         }
         internal int RaspberryCost
         {
