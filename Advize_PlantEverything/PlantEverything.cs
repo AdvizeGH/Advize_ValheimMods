@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.6.2";
+        public const string Version = "1.6.3";
 
         private readonly Harmony harmony = new Harmony(PluginID);
         public static ManualLogSource PELogger = new ManualLogSource($" {PluginName}");
@@ -212,6 +212,7 @@ namespace Advize_PlantEverything
             component.m_cultivatedGroundOnly = (name.Contains("berryBush") || name.Contains("Pickable")) && config.RequireCultivation;
             component.m_groundOnly = component.m_groundPiece = isGrounded ?? !config.PlaceAnywhere;
             component.m_canBeRemoved = canBeRemoved;
+            component.m_targetNonPlayerBuilt = false;
             return component;
         }
 
