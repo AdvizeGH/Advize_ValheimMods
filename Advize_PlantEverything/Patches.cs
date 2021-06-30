@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Reflection.Emit;
 using HarmonyLib;
 using UnityEngine;
 
@@ -149,16 +151,52 @@ namespace Advize_PlantEverything
         {
             public static void Postfix(Piece __instance)
             {
-                if (config.ResourcesSpawnEmpty)
+                if (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling"))
                 {
-                    if (__instance.m_name.StartsWith("$pe") && __instance.m_name.Contains("berryBush"))
+                    if (config.ResourcesSpawnEmpty && __instance.m_name.Contains("berryBush"))
                     {
-                        if (__instance.GetComponentInParent<Pickable>())
+                        __instance.GetComponent<ZNetView>().InvokeRPC(ZNetView.Everybody, "SetPicked", true);
+                    }
+
+                    if (config.PlaceAnywhere)
+                    {
+                        StaticPhysics sp = __instance.GetComponent<StaticPhysics>();
+                        if (sp)
                         {
-                            __instance.GetComponent<ZNetView>().InvokeRPC(ZNetView.Everybody, "SetPicked", true);
+                            sp.m_fall = false;
+                            __instance.GetComponent<ZNetView>().GetZDO().Set("pe_placeAnywhere", true);
                         }
                     }
                 }
+            }
+        }
+
+        [HarmonyPatch(typeof(Piece), "Awake")]
+        public static class PieceAwake
+        {
+            public static void Postfix(Piece __instance)
+            {
+                CheckZDO(__instance);
+            }
+        }
+
+        [HarmonyPatch(typeof(TreeBase), "Awake")]
+        public static class TreeBaseAwake
+        {
+            public static void Postfix(TreeBase __instance)
+            {
+                CheckZDO(__instance);
+            }
+        }
+
+        public static void CheckZDO(Component instance)
+        {
+            ZNetView nview = instance.GetComponent<ZNetView>();
+            if (!nview || nview.GetZDO() == null) return;
+
+            if (nview.GetZDO().GetBool("pe_placeAnywhere"))
+            {
+                instance.GetComponent<StaticPhysics>().m_fall = false;
             }
         }
 
@@ -180,6 +218,61 @@ namespace Advize_PlantEverything
                     __instance.m_growRadius = config.CropGrowRadius;
                     __instance.m_needCultivatedGround = config.CropRequireCultivation;
                     (__instance.GetComponentInParent(typeof(Piece)) as Piece).m_cultivatedGroundOnly = config.CropRequireCultivation;
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(Plant), "HaveRoof")]
+        public static class PlantHaveRoof
+        {
+            public static bool Prefix(Plant __instance, ref bool __result)
+            {
+                if (config.PlaceAnywhere && (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling")))
+                {
+                    __result = false;
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(Plant), "HaveGrowSpace")]
+        public static class PlantHaveGrowSpace
+        {
+            public static bool Prefix(Plant __instance, ref bool __result)
+            {
+                if (config.PlaceAnywhere && (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling")))
+                {
+                    __result = true;
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(Plant), "Grow")]
+        public static class PlantGrow
+        {
+            private static readonly MethodInfo ModifyGrowMethod = AccessTools.Method(typeof(PlantGrow), nameof(ModifyGrow));
+
+            public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+            {
+                return new CodeMatcher(instructions)
+                .MatchForward(true, new CodeMatch(OpCodes.Stloc_2))
+                .MatchForward(false, new CodeMatch(OpCodes.Callvirt))
+                .Advance(-1)
+                .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0))
+                .InsertAndAdvance(new CodeInstruction(OpCodes.Ldloc_2))
+                .InsertAndAdvance(new CodeInstruction(OpCodes.Call, ModifyGrowMethod))
+                .InstructionEnumeration();
+            }
+
+            private static void ModifyGrow(Plant plant, TreeBase treeBase)
+            {
+                if (plant.GetComponent<ZNetView>().GetZDO().GetBool("pe_placeAnywhere"))
+                {
+                    treeBase.GetComponent<StaticPhysics>().m_fall = false;
+                    treeBase.GetComponent<ZNetView>().GetZDO().Set("pe_placeAnywhere", true);
                 }
             }
         }

@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.6.3";
+        public const string Version = "1.7.0";
 
         private readonly Harmony harmony = new Harmony(PluginID);
         public static ManualLogSource PELogger = new ManualLogSource($" {PluginName}");
@@ -669,6 +669,7 @@ namespace Advize_PlantEverything
                 plant.m_growRadius = sdb.growRadius;
                 plant.m_minScale = sdb.minScale;
                 plant.m_maxScale = sdb.maxScale;
+                plant.m_destroyIfCantGrow = sdb.Prefab.GetComponent<Piece>().m_groundOnly = !config.PlaceAnywhere;
             }
 
             foreach (SaplingDB sdb in saplingRefs)
@@ -689,6 +690,7 @@ namespace Advize_PlantEverything
                 {
                     piece.m_onlyInBiome = plant.m_biome = (Heightmap.Biome)sdb.biome;
                 }
+                plant.m_destroyIfCantGrow = piece.m_groundOnly = !config.PlaceAnywhere;
 
                 if (isInitialized) continue;
 
