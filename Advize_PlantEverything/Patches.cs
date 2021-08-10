@@ -103,46 +103,81 @@ namespace Advize_PlantEverything
         {
             public static bool Prefix(Player __instance, ZSyncAnimation ___m_zanim, ref bool __result)
             {
-                ItemDrop.ItemData rightItem = __instance.GetRightItem();
-                if (rightItem.m_shared.m_name == "$item_cultivator")
+                if (__instance.GetRightItem().m_shared.m_name == "$item_cultivator")
                 {
                     if (Physics.Raycast(GameCamera.instance.transform.position, GameCamera.instance.transform.forward, out var hitInfo, 50f, LayerMask.GetMask("item", "piece_nonsolid", "Default_small")) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
                     {
-                        Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
-                        if (piece && piece.m_name.StartsWith("$pe"))
+                        do
                         {
-                            if (!piece.m_canBeRemoved) return false;
-                            if (!PrivateArea.CheckAccess(piece.transform.position))
+                            Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
+                            if (piece && piece.m_name.StartsWith("$pe"))
                             {
-                                __instance.Message(MessageHud.MessageType.Center, "$msg_privatezone");
-                                return false;
+                                if (!CanRemove(piece.gameObject, __instance, true)) break;
+
+                                RemoveObject(piece.gameObject, __instance, ___m_zanim, true);
+                                __result = true;
+                                break;
                             }
 
-                            ZNetView component = piece.GetComponent<ZNetView>();
-                            if (component == null) return false;
-                            
-                            WearNTear component2 = piece.GetComponent<WearNTear>();
-                            if (component2)
+                            Pickable pickable = hitInfo.collider.GetComponentInParent<Pickable>();
+                            if (pickable && (pickable.name.Contains("Branch") || pickable.name.Contains("Stone") || pickable.name.Contains("Flint")))
                             {
-                                __instance.m_removeEffects.Create(piece.transform.position, Quaternion.identity);
-                                component2.Remove();
+                                if (!CanRemove(pickable.gameObject, __instance, false)) break;
+
+                                RemoveObject(pickable.gameObject, __instance, ___m_zanim, false);
+                                __result = true;
+                                break;
                             }
-                            else
-                            {
-                                component.ClaimOwnership();
-                                piece.DropResources();
-                                piece.m_placeEffect.Create(piece.transform.position, piece.transform.rotation, piece.gameObject.transform);
-                                __instance.m_removeEffects.Create(piece.transform.position, Quaternion.identity);
-                                ZNetScene.instance.Destroy(piece.gameObject);
-                            }
-                            __instance.FaceLookDirection();
-                            ___m_zanim.SetTrigger(rightItem.m_shared.m_attack.m_attackAnimation);
-                            __result = true;
-                        }
+                        } while (false);
                     }
                     return false;
                 }
                 return true;
+            }
+            
+            private static bool CanRemove(GameObject component, Player instance, bool isPiece)
+            {
+                bool canRemove = true;
+                if (isPiece)
+                {
+                    if (!component.GetComponent<Piece>().m_canBeRemoved) canRemove = false;
+                }
+                if (!PrivateArea.CheckAccess(component.transform.position))
+                {
+                    instance.Message(MessageHud.MessageType.Center, "$msg_privatezone");
+                    canRemove = false;
+                }
+                if (component.GetComponent<ZNetView>() == null) canRemove = false;
+                return canRemove;
+            }
+
+            private static void RemoveObject(GameObject component, Player player, ZSyncAnimation m_zanim, bool isPiece)
+            {
+                ZNetView component2 = component.GetComponent<ZNetView>();
+                WearNTear component3 = component.GetComponent<WearNTear>();
+                if (component3)
+                {
+                    player.m_removeEffects.Create(component.transform.position, Quaternion.identity);
+                    component3.Remove();
+                }
+                else
+                {
+                    component2.ClaimOwnership();
+                    if (isPiece)
+                    {
+                        Piece piece = component.GetComponent<Piece>();
+                        piece.DropResources();
+                        piece.m_placeEffect.Create(piece.transform.position, piece.transform.rotation, piece.gameObject.transform);
+                    }
+                    else
+                    {
+                        component2.InvokeRPC("Pick"); ;
+                    }
+                    player.m_removeEffects.Create(component.transform.position, Quaternion.identity);
+                    ZNetScene.instance.Destroy(component.gameObject);
+                }
+                player.FaceLookDirection();
+                m_zanim.SetTrigger(player.GetRightItem().m_shared.m_attack.m_attackAnimation);
             }
         }
 
