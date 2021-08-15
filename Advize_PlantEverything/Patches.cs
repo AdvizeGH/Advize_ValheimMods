@@ -311,5 +311,42 @@ namespace Advize_PlantEverything
                 }
             }
         }
+
+        [HarmonyPatch(typeof(Pickable), "GetHoverText")]
+        public static class PickableGetHoverText
+        {
+            [HarmonyPostfix]
+            public static void Postfix(Pickable __instance, bool ___m_picked, ZNetView ___m_nview, int ___m_respawnTimeMinutes, ref string __result)
+            {
+                if (___m_picked && config.EnablePickableTimers && ___m_nview.GetZDO() != null)
+                {
+                    if (__instance.name.ToLower().Contains("surt"))
+                        return;
+
+                    DateTime pickedTime = new DateTime(___m_nview.GetZDO().GetLong("picked_time", 0L));
+                    TimeSpan difference = ZNet.instance.GetTime() - pickedTime;
+                    TimeSpan t = TimeSpan.FromSeconds(((float)___m_respawnTimeMinutes * 60) - difference.TotalSeconds);
+
+                    double remainingMinutes = ___m_respawnTimeMinutes - difference.TotalMinutes;
+                    double remainingRatio = remainingMinutes / (float)___m_respawnTimeMinutes;
+
+                    string color = "red";
+                    if (remainingRatio < 0)
+                        color = "cyan";
+                    else if (remainingRatio < 0.25)
+                        color = "lime";
+                    else if (remainingRatio < 0.5)
+                        color = "yellow";
+                    else if (remainingRatio < 0.75)
+                        color = "orange";
+
+                    string timeRemaining = t.Hours <= 0 ? t.Minutes <= 0 ?
+                    $"{t.Seconds:D2}s" : $"{t.Minutes:D2}m {t.Seconds:D2}s" : $"{t.Hours:D2}h {t.Minutes:D2}m {t.Seconds:D2}s";
+                    string message = remainingMinutes < 0.0 ? $"\n(<color={color}>Ready any second now</color>)" : $"\n(Ready in <color={color}>{timeRemaining}</color>)";
+
+                    __result = Localization.instance.Localize(__instance.GetHoverName() + message);
+                }
+            }
+        }
     }
 }

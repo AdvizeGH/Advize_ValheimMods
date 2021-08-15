@@ -8,6 +8,7 @@
         private readonly ConfigEntry<bool> alternateIcons;
         private readonly ConfigEntry<bool> alwaysShowSpawners;
         private readonly ConfigEntry<bool> enableMiscFlora;
+        private readonly ConfigEntry<bool> enablePickableTimers; //local
         private readonly ConfigEntry<bool> enableLocalization; //local
         private readonly ConfigEntry<string> language; //local
 
@@ -116,6 +117,11 @@
                 "EnableMiscFlora",
                 true,
                 "Enables small trees, bushes, shrubs, and vines.");
+            enablePickableTimers = config.Bind(
+                "General",
+                "EnablePickableTimers",
+                true,
+                "Enables display of growth time remaining on pickable resources.", false);
             enableLocalization = config.Bind(
                 "General",
                 "EnableLocalization",
@@ -475,6 +481,10 @@
         internal bool EnableMiscFlora
         {
             get { return enableMiscFlora.Value; }
+        }
+        internal bool EnablePickableTimers
+        {
+            get { return enablePickableTimers.Value; }
         }
         internal bool EnableLocalization
         {
