@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
@@ -15,7 +16,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.7.1";
+        public const string Version = "1.8.0";
 
         private readonly Harmony harmony = new Harmony(PluginID);
         public static ManualLogSource PELogger = new ManualLogSource($" {PluginName}");
@@ -79,7 +80,9 @@ namespace Advize_PlantEverything
             { "Shrub02Name", "Small Shrub 2" },
             { "Shrub02Description", "Plant a small shrub." },
             { "VinesName", "Vines" },
-            { "VinesDescription", "Plant vines." }/*,
+            { "VinesDescription", "Plant vines." },
+            { "GlowingMushroomName", "Glowing Mushroom"},
+            { "GlowingMushroomDescription", "Plant a large glowing mushroom."}/*,
             { "GreydwarfNestName", "Greydwarf Nest" },
             { "GreydwarfNestDescription", "Plant your very own greydwarf nest" }*/
         };
@@ -226,6 +229,7 @@ namespace Advize_PlantEverything
             prefabRefs.Add("Bush02_en", null);
             prefabRefs.Add("Bush01_heath", null);
             prefabRefs.Add("Bush01", null);
+            prefabRefs.Add("GlowingMushroom", null);
             prefabRefs.Add("Beech_small1", null);
             prefabRefs.Add("FirTree_small_dead", null);
             prefabRefs.Add("FirTree_small", null);
@@ -411,8 +415,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "Beech_small1",
-                    Resource = "BeechSeeds",
-                    resourceCost = 1,
+                    Resource = new KeyValuePair<string, int>("BeechSeeds", 1),
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
                     piece = CreatePiece("BeechSmallName", "BeechSmallDescription", prefabRefs["Beech_small1"].AddComponent<Piece>(), canBeRemoved: false)
@@ -420,8 +423,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "FirTree_small",
-                    Resource = "FirCone",
-                    resourceCost = 1,
+                    Resource = new KeyValuePair<string, int>("FirCone", 1),
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
                     piece = CreatePiece("FirSmallName", "FirSmallDescription", prefabRefs["FirTree_small"].AddComponent<Piece>(), canBeRemoved: false)
@@ -429,8 +431,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "FirTree_small_dead",
-                    Resource = "FirCone",
-                    resourceCost = 1,
+                    Resource = new KeyValuePair<string, int>("FirCone", 1),
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
                     piece = CreatePiece("FirSmallDeadName", "FirSmallDeadDescription", prefabRefs["FirTree_small_dead"].AddComponent<Piece>(), canBeRemoved: false)
@@ -438,8 +439,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "Bush01",
-                    Resource = "Wood",
-                    resourceCost = 2,
+                    Resource = new KeyValuePair<string, int>("Wood", 2),
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
                     piece = CreatePiece("Bush01Name", "Bush01Description", prefabRefs["Bush01"].AddComponent<Piece>(), canBeRemoved: false)
@@ -447,8 +447,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "Bush01_heath",
-                    Resource = "Wood",
-                    resourceCost = 2,
+                    Resource = new KeyValuePair<string, int>("Wood", 2),
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
                    piece = CreatePiece("Bush02Name", "Bush02Description", prefabRefs["Bush01_heath"].AddComponent<Piece>(), canBeRemoved: false)
@@ -456,8 +455,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "Bush02_en",
-                    Resource = "Wood",
-                    resourceCost = 3,
+                    Resource = new KeyValuePair<string, int>("Wood", 3),
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
                     piece = CreatePiece("PlainsBushName", "PlainsBushDescription", prefabRefs["Bush02_en"].AddComponent<Piece>(), canBeRemoved: false)
@@ -465,8 +463,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "shrub_2",
-                    Resource = "Wood",
-                    resourceCost = 2,
+                    Resource = new KeyValuePair<string, int>("Wood", 2),
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
                     piece = CreatePiece("Shrub01Name", "Shrub01Description", prefabRefs["shrub_2"].AddComponent<Piece>(), canBeRemoved: false)
@@ -474,8 +471,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "shrub_2_heath",
-                    Resource = "Wood",
-                    resourceCost = 2,
+                    Resource = new KeyValuePair<string, int>("Wood", 2),
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
                     piece = CreatePiece("Shrub02Name", "Shrub02Description", prefabRefs["shrub_2_heath"].AddComponent<Piece>(), canBeRemoved: false)
@@ -483,12 +479,20 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "vines",
-                    Resource = "Wood",
-                    resourceCost = 2,
+                    Resource = new KeyValuePair<string, int>("Wood", 2),
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
                     recover = true,
                     piece = CreatePiece("VinesName", "VinesDescription", prefabRefs["vines"].AddComponent<Piece>(), isGrounded: false)
+                },
+                new PrefabDB
+                {
+                    key = "GlowingMushroom",
+                    Resources = new Dictionary<string, int>(){ {"MushroomYellow", 3}, { "BoneFragments", 1 }, { "Ooze", 1} },
+                    biome = (int)Heightmap.Biome.Meadows,
+                    icon = true,
+                    recover = true,
+                    piece = CreatePiece("GlowingMushroomName", "GlowingMushroomDescription", prefabRefs["GlowingMushroom"].AddComponent<Piece>(), isGrounded: true, canBeRemoved: true)
                 }
             });
             //pieceRefs.Add("Spawner_GreydwarfNest", new PrefabDB
@@ -507,17 +511,34 @@ namespace Advize_PlantEverything
 
             foreach (PrefabDB pdb in pieceRefs)
             {
-                ItemDrop resource = ObjectDB.instance.GetItemPrefab(pdb.Resource).GetComponent<ItemDrop>();
+                ItemDrop resource = ObjectDB.instance.GetItemPrefab(pdb.Resource.Key).GetComponent<ItemDrop>();
 
-                pdb.piece.m_resources = new Piece.Requirement[]
+                if (pdb.Resources.Count > 0)
                 {
-                    new Piece.Requirement
+                    List<Piece.Requirement> resources = new List<Piece.Requirement>();
+                    foreach (string item in pdb.Resources.Keys)
                     {
-                        m_resItem = resource,
-                        m_amount = pdb.resourceCost,
-                        m_recover = pdb.recover
+                        resources.Add(new Piece.Requirement
+                        {
+                            m_resItem = ObjectDB.instance.GetItemPrefab(item).GetComponent<ItemDrop>(),
+                            m_amount = pdb.Resources[item],
+                            m_recover = pdb.recover
+                        });
                     }
-                };
+                    pdb.piece.m_resources = resources.ToArray();
+                }
+                else
+                {
+                    pdb.piece.m_resources = new Piece.Requirement[]
+                    {
+                        new Piece.Requirement
+                        {
+                            m_resItem = resource,
+                            m_amount = pdb.resourceCost,
+                            m_recover = pdb.recover
+                        }
+                    };
+                }
 
                 pdb.piece.m_placeEffect.m_effectPrefabs = new EffectList.EffectData[]
                 {
@@ -849,7 +870,7 @@ namespace Advize_PlantEverything
         private struct PrefabDB
         {
             internal string key;
-            private string resource;
+            private Dictionary<string, int> resources;
 
             internal int resourceCost;
             internal int resourceReturn;
@@ -866,10 +887,16 @@ namespace Advize_PlantEverything
                 get { return prefabRefs[key]; }
             }
 
-            internal string Resource
+            internal KeyValuePair<string, int> Resource
             {
-                get { return resource ?? Prefab.GetComponent<Pickable>().m_itemPrefab.name; }
-                set { resource = value; }
+                get { return Resources.Count > 0 ? Resources.First() : new KeyValuePair<string, int>(Prefab.GetComponent<Pickable>().m_itemPrefab.name, resourceCost); }
+                set { if (resources == null) { resources = new Dictionary<string, int>(); } if (!resources.ContainsKey(value.Key)) resources.Add(value.Key, value.Value); }
+            }
+
+            internal Dictionary<string, int> Resources
+            {
+                get { return resources ?? new Dictionary<string, int>(); }
+                set { resources = value; }
             }
         }
 
