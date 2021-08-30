@@ -10,6 +10,7 @@
     <RootNamespace>Advize_PlantEverything</RootNamespace>
     <AssemblyName>Advize_PlantEverything</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
@@ -120,6 +121,7 @@
     <EmbeddedResource Include="Assets\shrub_2PieceIcon.png" />
     <EmbeddedResource Include="Assets\shrub_2_heathPieceIcon.png" />
     <EmbeddedResource Include="Assets\vinesPieceIcon.png" />
+    <EmbeddedResource Include="Assets\GlowingMushroomPieceIcon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
