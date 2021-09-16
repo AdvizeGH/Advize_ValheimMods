@@ -50,10 +50,10 @@ namespace Advize_PlantEverything
             {
                 if (__result == null && prefabRefs.Count > 0)
                 {
-                    List<GameObject> prefabs = new List<GameObject>
+                    List<GameObject> prefabs = new()
                     {
-                        prefabRefs["BirchCone"],
-                        prefabRefs["OakSeeds"],
+                        //prefabRefs["BirchCone"],
+                        //prefabRefs["OakSeeds"],
                         prefabRefs["AncientSeeds"]
                     };
 
@@ -76,13 +76,13 @@ namespace Advize_PlantEverything
             {
                 if (__result == null)
                 {
-                    List<GameObject> prefabs = new List<GameObject>
+                    List<GameObject> prefabs = new()
                     {
-                        prefabRefs["BirchCone"],
-                        prefabRefs["OakSeeds"],
+                        //prefabRefs["BirchCone"],
+                        //prefabRefs["OakSeeds"],
                         prefabRefs["AncientSeeds"],
-                        prefabRefs["Birch_Sapling"],
-                        prefabRefs["Oak_Sapling"],
+                        //prefabRefs["Birch_Sapling"],
+                        //prefabRefs["Oak_Sapling"],
                         prefabRefs["Ancient_Sapling"]
                     };
 
@@ -167,7 +167,7 @@ namespace Advize_PlantEverything
                     {
                         Piece piece = component.GetComponent<Piece>();
                         piece.DropResources();
-                        piece.m_placeEffect.Create(piece.transform.position, piece.transform.rotation, piece.gameObject.transform);
+                        piece.m_placeEffect.Create(piece.transform.position, piece.transform.rotation);
                     }
                     else
                     {
@@ -323,7 +323,7 @@ namespace Advize_PlantEverything
                     if (__instance.name.ToLower().Contains("surt"))
                         return;
 
-                    DateTime pickedTime = new DateTime(___m_nview.GetZDO().GetLong("picked_time", 0L));
+                    DateTime pickedTime = new(___m_nview.GetZDO().GetLong("picked_time", 0L));
                     TimeSpan difference = ZNet.instance.GetTime() - pickedTime;
                     TimeSpan t = TimeSpan.FromSeconds(((float)___m_respawnTimeMinutes * 60) - difference.TotalSeconds);
 

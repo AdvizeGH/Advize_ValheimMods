@@ -16,20 +16,20 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.8.0";
+        public const string Version = "1.8.1";
 
-        private readonly Harmony harmony = new Harmony(PluginID);
-        public static ManualLogSource PELogger = new ManualLogSource($" {PluginName}");
+        private readonly Harmony harmony = new(PluginID);
+        public static ManualLogSource PELogger = new($" {PluginName}");
 
-        private static readonly Dictionary<string, GameObject> prefabRefs = new Dictionary<string, GameObject>();
-        private static List<PrefabDB> pieceRefs = new List<PrefabDB>();
-        private static List<SaplingDB> saplingRefs = new List<SaplingDB>();
+        private static readonly Dictionary<string, GameObject> prefabRefs = new();
+        private static List<PrefabDB> pieceRefs = new();
+        private static List<SaplingDB> saplingRefs = new();
 
         private static bool isInitialized = false; 
 
         private static readonly string modDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static readonly AssetBundle assetBundle = LoadAssetBundle("planteverything");
-        private static readonly Dictionary<string, Texture2D> cachedTextures = new Dictionary<string, Texture2D>();
+        private static readonly Dictionary<string, Texture2D> cachedTextures = new();
 
         private new Config Config
         {
@@ -37,15 +37,15 @@ namespace Advize_PlantEverything
         }
         internal static ModConfig config;
 
-        private static readonly Dictionary<string, string> stringDictionary = new Dictionary<string, string>() {
-            { "BirchConeName", "Birch Cone" },
-            { "BirchConeDescription", "Plant it to grow a birch tree." },
-            { "OakSeedsName", "Oak Seeds" },
-            { "OakSeedsDescription", "Plant them to grow an oak tree." },
+        private static readonly Dictionary<string, string> stringDictionary = new() {
+            //{ "BirchConeName", "Birch Cone" },
+            //{ "BirchConeDescription", "Plant it to grow a birch tree." },
+            //{ "OakSeedsName", "Oak Seeds" },
+            //{ "OakSeedsDescription", "Plant them to grow an oak tree." },
             { "AncientSeedsName", "Ancient Seeds" },
             { "AncientSeedsDescription", "Plant them to grow an ancient tree." },
-            { "BirchSapling", "Birch Sapling" },
-            { "OakSapling", "Oak Sapling" },
+            //{ "BirchSapling", "Birch Sapling" },
+            //{ "OakSapling", "Oak Sapling" },
             { "AncientSapling", "Ancient Sapling" },
             { "RaspberryBushName", "Raspberry Bush" },
             { "RaspberryBushDescription", "Plant raspberries to grow raspberry bushes." },
@@ -131,7 +131,7 @@ namespace Advize_PlantEverything
             
             string filePath = Path.Combine(modDirectory, $"english_{PluginName}.json");
 
-            LocalizedStrings localizedStrings = new LocalizedStrings();
+            LocalizedStrings localizedStrings = new();
             foreach (KeyValuePair<string, string> kvp in stringDictionary)
             {
                 localizedStrings.localizedStrings.Add($"{kvp.Key}:{kvp.Value}");
@@ -199,7 +199,7 @@ namespace Advize_PlantEverything
                 Stream manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"Advize_{PluginName}.Assets.{fileName}");
                 byte[] array = new byte[manifestResourceStream.Length];
                 manifestResourceStream.Read(array, 0, array.Length);
-                Texture2D texture = new Texture2D(0, 0);
+                Texture2D texture = new(0, 0);
                 ImageConversion.LoadImage(texture, array);
                 result = texture;
             }
@@ -257,6 +257,8 @@ namespace Advize_PlantEverything
             prefabRefs.Add("Beech_Sapling", null);
             prefabRefs.Add("PineTree_Sapling", null);
             prefabRefs.Add("FirTree_Sapling", null);
+            prefabRefs.Add("Oak_Sapling", null);
+            prefabRefs.Add("Birch_Sapling", null);
             prefabRefs.Add("vfx_Place_wood_pole", null);
             prefabRefs.Add("sfx_build_cultivator", null);
             //prefabRefs.Add("Spawner_GreydwarfNest", null);
@@ -281,7 +283,7 @@ namespace Advize_PlantEverything
                 }
 
                 prefabRefs[gameObject.name] = gameObject;
-
+                
                 bool nullValue = false;
                 foreach (KeyValuePair<string, GameObject> kvp in prefabRefs)
                 {
@@ -296,11 +298,11 @@ namespace Advize_PlantEverything
                     
             }
 
-            prefabRefs.Add("BirchCone", CreatePrefab("BirchCone"));
-            prefabRefs.Add("OakSeeds", CreatePrefab("OakSeeds"));
+            //prefabRefs.Add("BirchCone", CreatePrefab("BirchCone"));
+            //prefabRefs.Add("OakSeeds", CreatePrefab("OakSeeds"));
             prefabRefs.Add("AncientSeeds", CreatePrefab("AncientSeeds"));
-            prefabRefs.Add("Birch_Sapling", CreatePrefab("Birch_Sapling"));
-            prefabRefs.Add("Oak_Sapling", CreatePrefab("Oak_Sapling"));
+            //prefabRefs.Add("Birch_Sapling", CreatePrefab("Birch_Sapling"));
+            //prefabRefs.Add("Oak_Sapling", CreatePrefab("Oak_Sapling"));
             prefabRefs.Add("Ancient_Sapling", CreatePrefab("Ancient_Sapling"));
         }
 
@@ -515,7 +517,7 @@ namespace Advize_PlantEverything
 
                 if (pdb.Resources.Count > 0)
                 {
-                    List<Piece.Requirement> resources = new List<Piece.Requirement>();
+                    List<Piece.Requirement> resources = new();
                     foreach (string item in pdb.Resources.Keys)
                     {
                         resources.Add(new Piece.Requirement
@@ -600,38 +602,38 @@ namespace Advize_PlantEverything
 
             saplingRefs = new List<SaplingDB>()
             {
-                new SaplingDB
-                {
-                    key = "Birch_Sapling",
-                    source = "PineTree_Sapling",
-                    resource = "BirchCone",
-                    resourceCost = config.BirchCost,
-                    biome = 17,
-                    growTime = config.BirchGrowthTime,
-                    growRadius = config.BirchGrowRadius,
-                    minScale = config.BirchMinScale,
-                    maxScale = config.BirchMaxScale,
-                    grownPrefabs = new GameObject[] { prefabRefs["Birch1"], prefabRefs["Birch2"], prefabRefs["Birch1_aut"], prefabRefs["Birch2_aut"] }
-                },
-                new SaplingDB
-                {
-                    key = "Oak_Sapling",
-                    source = "Beech_Sapling",
-                    resource = "OakSeeds",
-                    resourceCost = config.OakCost,
-                    biome = 17,
-                    growTime = config.OakGrowthTime,
-                    growRadius = config.OakGrowRadius,
-                    minScale = config.OakMinScale,
-                    maxScale = config.OakMaxScale,
-                    grownPrefabs = new GameObject[] { prefabRefs["Oak1"] }
-                },
+                //new SaplingDB
+                //{
+                //    key = "Birch_Sapling",
+                //    source = "PineTree_Sapling",
+                //    resource = "BirchCone",
+                //    resourceCost = config.BirchCost,
+                //    biome = 17,
+                //    growTime = config.BirchGrowthTime,
+                //    growRadius = config.BirchGrowRadius,
+                //    minScale = config.BirchMinScale,
+                //    maxScale = config.BirchMaxScale,
+                //    grownPrefabs = new GameObject[] { prefabRefs["Birch1"], prefabRefs["Birch2"], prefabRefs["Birch1_aut"], prefabRefs["Birch2_aut"] }
+                //},
+                //new SaplingDB
+                //{
+                //    key = "Oak_Sapling",
+                //    source = "Beech_Sapling",
+                //    resource = "OakSeeds",
+                //    resourceCost = config.OakCost,
+                //    biome = 17,
+                //    growTime = config.OakGrowthTime,
+                //    growRadius = config.OakGrowRadius,
+                //    minScale = config.OakMinScale,
+                //    maxScale = config.OakMaxScale,
+                //    grownPrefabs = new GameObject[] { prefabRefs["Oak1"] }
+                //},
                 new SaplingDB
                 {
                     key = "Ancient_Sapling",
                     source = "PineTree_Sapling",
                     resource = "AncientSeeds",
-                    resourceCost = config.AncientCost,
+                    //resourceCost = config.AncientCost,
                     biome = (int)Heightmap.Biome.Swamp,
                     growTime = config.AncientGrowthTime,
                     growRadius = config.AncientGrowRadius,
@@ -648,14 +650,14 @@ namespace Advize_PlantEverything
 
             if (!isInitialized)
             {
-                FixSeed("BirchCone", prefabRefs["PineCone"]);
-                FixSeed("OakSeeds", prefabRefs["BeechSeeds"]);
+                //FixSeed("BirchCone", prefabRefs["PineCone"]);
+                //FixSeed("OakSeeds", prefabRefs["BeechSeeds"]);
                 FixSeed("AncientSeeds", prefabRefs["BeechSeeds"]);
 
                 ModifyTreeDrops();
             }
 
-            List<SaplingDB> vanillaSaplings = new List<SaplingDB>()
+            List<SaplingDB> vanillaSaplings = new()
             {
                 new SaplingDB
                 {
@@ -680,6 +682,22 @@ namespace Advize_PlantEverything
                     growRadius = config.FirGrowRadius,
                     minScale = config.FirMinScale,
                     maxScale = config.FirMaxScale
+                },
+                new SaplingDB
+                {
+                    key = "Birch_Sapling",
+                    growTime = config.BirchGrowthTime,
+                    growRadius = config.BirchGrowRadius,
+                    minScale = config.BirchMinScale,
+                    maxScale = config.BirchMaxScale
+                },
+                new SaplingDB
+                {
+                    key = "Oak_Sapling",
+                    growTime = config.OakGrowthTime,
+                    growRadius = config.OakGrowRadius,
+                    minScale = config.OakMinScale,
+                    maxScale = config.OakMaxScale
                 }
             };
 
@@ -734,8 +752,8 @@ namespace Advize_PlantEverything
         {
             Dbgl("InitItems");
 
-            if (!instance.m_items.Contains(prefabRefs["BirchCone"])) instance.m_items.Add(prefabRefs["BirchCone"]);
-            if (!instance.m_items.Contains(prefabRefs["OakSeeds"])) instance.m_items.Add(prefabRefs["OakSeeds"]);
+            //if (!instance.m_items.Contains(prefabRefs["BirchCone"])) instance.m_items.Add(prefabRefs["BirchCone"]);
+            //if (!instance.m_items.Contains(prefabRefs["OakSeeds"])) instance.m_items.Add(prefabRefs["OakSeeds"]);
             if (!instance.m_items.Contains(prefabRefs["AncientSeeds"])) instance.m_items.Add(prefabRefs["AncientSeeds"]);
         }
 
@@ -773,13 +791,13 @@ namespace Advize_PlantEverything
                 InitLocalization();
             }
 
-            List<GameObject> prefabs = new List<GameObject>
+            List<GameObject> prefabs = new()
             {
-                prefabRefs["BirchCone"],
-                prefabRefs["OakSeeds"],
+                //prefabRefs["BirchCone"],
+                //prefabRefs["OakSeeds"],
                 prefabRefs["AncientSeeds"],
-                prefabRefs["Birch_Sapling"],
-                prefabRefs["Oak_Sapling"],
+                //prefabRefs["Birch_Sapling"],
+                //prefabRefs["Oak_Sapling"],
                 prefabRefs["Ancient_Sapling"]
             };
 
@@ -819,13 +837,14 @@ namespace Advize_PlantEverything
 
         private static void ModifyTreeDrops()
         {
-            Dictionary<GameObject, GameObject> dropsByTarget = new Dictionary<GameObject, GameObject>
+            //Update later to add config options for seed drop rates
+            Dictionary<GameObject, GameObject> dropsByTarget = new()
             {
-                { prefabRefs["Birch1"], prefabRefs["BirchCone"] },
-                { prefabRefs["Birch2"], prefabRefs["BirchCone"] },
-                { prefabRefs["Birch2_aut"], prefabRefs["BirchCone"] },
-                { prefabRefs["Birch1_aut"], prefabRefs["BirchCone"] },
-                { prefabRefs["Oak1"], prefabRefs["OakSeeds"] },
+                //{ prefabRefs["Birch1"], prefabRefs["BirchCone"] },
+                //{ prefabRefs["Birch2"], prefabRefs["BirchCone"] },
+                //{ prefabRefs["Birch2_aut"], prefabRefs["BirchCone"] },
+                //{ prefabRefs["Birch1_aut"], prefabRefs["BirchCone"] },
+                //{ prefabRefs["Oak1"], prefabRefs["OakSeeds"] },
                 { prefabRefs["SwampTree1"], prefabRefs["AncientSeeds"] }
             };
 
@@ -864,7 +883,7 @@ namespace Advize_PlantEverything
 
         internal class LocalizedStrings
         {
-            public List<string> localizedStrings = new List<string>();
+            public List<string> localizedStrings = new();
         }
 
         private struct PrefabDB

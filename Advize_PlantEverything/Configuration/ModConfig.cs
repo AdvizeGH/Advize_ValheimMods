@@ -59,10 +59,10 @@
         private readonly ConfigEntry<int> thistleReturn;
         private readonly ConfigEntry<int> dandelionReturn;
 
-        //Saplings 27
-        private readonly ConfigEntry<int> birchCost;
-        private readonly ConfigEntry<int> oakCost;
-        private readonly ConfigEntry<int> ancientCost;
+        //Saplings 24
+        //private readonly ConfigEntry<int> birchCost;
+        //private readonly ConfigEntry<int> oakCost;
+        //private readonly ConfigEntry<int> ancientCost;
         private readonly ConfigEntry<float> birchMinScale;
         private readonly ConfigEntry<float> birchMaxScale;
         private readonly ConfigEntry<float> oakMinScale;
@@ -329,21 +329,21 @@
                 "Number of dandelion a pickable dandelion spawner will spawn");
 
             //Saplings
-            birchCost = config.Bind(
-                "Saplings",
-                "BirchCost",
-                1,
-                "Number of birch cones required to place a birch sapling");
-            oakCost = config.Bind(
-                "Saplings",
-                "OakCost",
-                1,
-                "Number of oak seeds required to place an oak sapling");
-            ancientCost = config.Bind(
-                "Saplings",
-                "AncientCost",
-                1,
-                "Number of ancient seeds required to place an ancient sapling");
+            //birchCost = config.Bind(
+            //    "Saplings",
+            //    "BirchCost",
+            //    1,
+            //    "Number of birch cones required to place a birch sapling");
+            //oakCost = config.Bind(
+            //    "Saplings",
+            //    "OakCost",
+            //    1,
+            //    "Number of oak seeds required to place an oak sapling");
+            //ancientCost = config.Bind(
+            //    "Saplings",
+            //    "AncientCost",
+            //    1,
+            //    "Number of ancient seeds required to place an ancient sapling");
             birchMinScale = config.Bind(
                 "Saplings",
                 "BirchMinScale",
@@ -642,18 +642,18 @@
         {
             get { return dandelionReturn.Value; }
         }
-        internal int BirchCost
-        {
-            get { return birchCost.Value; }
-        }
-        internal int OakCost
-        {
-            get { return oakCost.Value; }
-        }
-        internal int AncientCost
-        {
-            get { return ancientCost.Value; }
-        }
+        //internal int BirchCost
+        //{
+        //    get { return birchCost.Value; }
+        //}
+        //internal int OakCost
+        //{
+        //    get { return oakCost.Value; }
+        //}
+        //internal int AncientCost
+        //{
+        //    get { return ancientCost.Value; }
+        //}
         internal float BirchMinScale
         {
             get { return birchMinScale.Value; }
