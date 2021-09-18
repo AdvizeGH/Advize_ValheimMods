@@ -16,7 +16,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.8.1";
+        public const string Version = "1.8.2";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -633,7 +633,7 @@ namespace Advize_PlantEverything
                     key = "Ancient_Sapling",
                     source = "PineTree_Sapling",
                     resource = "AncientSeeds",
-                    //resourceCost = config.AncientCost,
+                    resourceCost = 1,
                     biome = (int)Heightmap.Biome.Swamp,
                     growTime = config.AncientGrowthTime,
                     growRadius = config.AncientGrowRadius,
