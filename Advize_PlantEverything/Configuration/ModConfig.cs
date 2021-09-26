@@ -89,6 +89,12 @@
         private readonly ConfigEntry<float> pineGrowRadius;
         private readonly ConfigEntry<float> firGrowRadius;
 
+        //Seeds 4
+        private readonly ConfigEntry<int> seedDropMin;
+        private readonly ConfigEntry<int> seedDropMax;
+        private readonly ConfigEntry<float> dropChance;
+        private readonly ConfigEntry<bool> oneOfEach;
+
         internal ModConfig(Config config)
         {
             //General
@@ -464,6 +470,26 @@
                 "FirGrowRadius",
                 2f,
                 "Radius of free space required for a fir sapling to grow");
+            seedDropMin = config.Bind(
+                "Seeds",
+                "seedDropMin",
+                1,
+                "Determines minimum amount of seeds that can drop when trees drop seeds");
+            seedDropMax = config.Bind(
+                "Seeds",
+                "seedDropMax",
+                2,
+                "Determines maximum amount of seeds that can drop when trees drop seeds");
+            dropChance = config.Bind(
+                "Seeds",
+                "dropChance",
+                0.5f,
+                "Chance that items will drop from trees when destroyed. Default value 0.5f (50%), will only drop one or two items on loot table unless oneOfEach is set to true. Set between 0 and 1f");
+            oneOfEach = config.Bind(
+                "Seeds",
+                "oneOfEach",
+                false,
+                "When enabled, destroyed trees will drop every available item on their drop table when loot is dropped. Setting this to true will ensure that seeds are guaranteed to drop whenever the tree drops items (governed by dropChance setting)");
         }
 
         internal bool EnableDebugMessages
@@ -749,6 +775,22 @@
         internal float FirGrowRadius
         {
             get { return firGrowRadius.Value; }
+        }
+        internal int SeedDropMin
+        {
+            get { return seedDropMin.Value; }
+        }
+        internal int SeedDropMax
+        {
+            get { return seedDropMax.Value; }
+        }
+        internal float DropChance
+        {
+            get { return dropChance.Value; }
+        }
+        internal bool OneOfEach
+        {
+            get { return oneOfEach.Value; }
         }
     }
 }

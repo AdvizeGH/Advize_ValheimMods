@@ -16,7 +16,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.8.2";
+        public const string Version = "1.8.3";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -230,6 +230,8 @@ namespace Advize_PlantEverything
             prefabRefs.Add("Bush01_heath", null);
             prefabRefs.Add("Bush01", null);
             prefabRefs.Add("GlowingMushroom", null);
+            prefabRefs.Add("Pinetree_01", null);
+            prefabRefs.Add("FirTree", null);
             prefabRefs.Add("Beech_small1", null);
             prefabRefs.Add("FirTree_small_dead", null);
             prefabRefs.Add("FirTree_small", null);
@@ -238,6 +240,7 @@ namespace Advize_PlantEverything
             prefabRefs.Add("vines", null);
             prefabRefs.Add("Cultivator", null);
             prefabRefs.Add("SwampTree1", null);
+            prefabRefs.Add("Beech1", null);
             prefabRefs.Add("Birch2", null);
             prefabRefs.Add("Oak1", null);
             prefabRefs.Add("Birch2_aut", null);
@@ -248,6 +251,8 @@ namespace Advize_PlantEverything
             prefabRefs.Add("PineCone", null);
             prefabRefs.Add("shrub_2", null);
             prefabRefs.Add("shrub_2_heath", null);
+            prefabRefs.Add("BirchSeeds", null);
+            prefabRefs.Add("Acorn", null);
             prefabRefs.Add("BeechSeeds", null);
             prefabRefs.Add("Pickable_Mushroom", null);
             prefabRefs.Add("BlueberryBush", null);
@@ -262,6 +267,7 @@ namespace Advize_PlantEverything
             prefabRefs.Add("vfx_Place_wood_pole", null);
             prefabRefs.Add("sfx_build_cultivator", null);
             //prefabRefs.Add("Spawner_GreydwarfNest", null);
+            
 
             Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
             for (int i = 0; i < array.Length; i++)
@@ -840,28 +846,41 @@ namespace Advize_PlantEverything
             //Update later to add config options for seed drop rates
             Dictionary<GameObject, GameObject> dropsByTarget = new()
             {
-                //{ prefabRefs["Birch1"], prefabRefs["BirchCone"] },
-                //{ prefabRefs["Birch2"], prefabRefs["BirchCone"] },
-                //{ prefabRefs["Birch2_aut"], prefabRefs["BirchCone"] },
-                //{ prefabRefs["Birch1_aut"], prefabRefs["BirchCone"] },
-                //{ prefabRefs["Oak1"], prefabRefs["OakSeeds"] },
-                { prefabRefs["SwampTree1"], prefabRefs["AncientSeeds"] }
+                { prefabRefs["Birch1"], prefabRefs["BirchSeeds"] },
+                { prefabRefs["Birch2"], prefabRefs["BirchSeeds"] },
+                { prefabRefs["Birch2_aut"], prefabRefs["BirchSeeds"] },
+                { prefabRefs["Birch1_aut"], prefabRefs["BirchSeeds"] },
+                { prefabRefs["Oak1"], prefabRefs["Acorn"] },
+                { prefabRefs["SwampTree1"], prefabRefs["AncientSeeds"] },
+                { prefabRefs["Beech1"], prefabRefs["BeechSeeds"] },
+                { prefabRefs["Pinetree_01"], prefabRefs["PineCone"] },
+                { prefabRefs["FirTree"], prefabRefs["FirCone"] }
             };
 
             foreach (KeyValuePair<GameObject, GameObject> kvp in dropsByTarget)
             {
                 TreeBase target = kvp.Key.GetComponent<TreeBase>();
-                DropTable.DropData item = default;
+                DropTable.DropData itemDrop = default;
+                bool dropExists = false;
 
-                item.m_item = kvp.Value;
-                item.m_stackMin = 1;
-                item.m_stackMax = 5;
+                foreach (DropTable.DropData drop in target.m_dropWhenDestroyed.m_drops)
+                {
+                    if (drop.m_item.Equals(kvp.Value))
+                    {
+                        dropExists = true;
+                        itemDrop = drop;
+                        break;
+                    }
+                }
 
-                target.m_dropWhenDestroyed.m_drops.Add(item);
-                target.m_dropWhenDestroyed.m_dropChance = 1f;
-                target.m_dropWhenDestroyed.m_oneOfEach = true;
-                target.m_dropWhenDestroyed.m_dropMin = 1;
-                target.m_dropWhenDestroyed.m_dropMax = 3;
+                if (dropExists) target.m_dropWhenDestroyed.m_drops.Remove(itemDrop);
+
+                itemDrop.m_item = kvp.Value;
+                itemDrop.m_stackMin = config.SeedDropMin;
+                itemDrop.m_stackMax = config.SeedDropMax;
+                target.m_dropWhenDestroyed.m_drops.Add(itemDrop);
+                target.m_dropWhenDestroyed.m_dropChance = Mathf.Clamp(config.DropChance, 0f, 1f);
+                target.m_dropWhenDestroyed.m_oneOfEach = config.OneOfEach;
             }
         }
 
