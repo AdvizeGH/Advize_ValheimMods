@@ -16,7 +16,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.8.3";
+        public const string Version = "1.8.4";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -878,6 +878,8 @@ namespace Advize_PlantEverything
                 itemDrop.m_item = kvp.Value;
                 itemDrop.m_stackMin = config.SeedDropMin;
                 itemDrop.m_stackMax = config.SeedDropMax;
+                target.m_dropWhenDestroyed.m_dropMin = 1;
+                target.m_dropWhenDestroyed.m_dropMax = 3;
                 target.m_dropWhenDestroyed.m_drops.Add(itemDrop);
                 target.m_dropWhenDestroyed.m_dropChance = Mathf.Clamp(config.DropChance, 0f, 1f);
                 target.m_dropWhenDestroyed.m_oneOfEach = config.OneOfEach;
