@@ -25,7 +25,7 @@
                     {
                         if (!_didError)
                         {
-                            //Config.Logger.LogWarning($"No recieved value for Server Authoritative Config. {BaseEntry.Definition}. Falling back to client config.");
+                            //Config.Logger.LogWarning($"No received value for Server Authoritative Config. {BaseEntry.Definition}. Falling back to client config.");
                             _didError = true;
                         }
                         return _configEntry.Value;

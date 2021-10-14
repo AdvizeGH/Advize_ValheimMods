@@ -52,10 +52,6 @@
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\BepInEx\core\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="SkillInjector">
-      <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\BepInEx\plugins\SkillInjector.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -84,6 +80,10 @@
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\unstripped_corlib\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\unstripped_corlib\UnityEngine.JSONSerializeModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\unstripped_corlib\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
@@ -99,9 +99,9 @@
     <Compile Include="Configuration\ConfigBaseEntry.cs" />
     <Compile Include="Configuration\ConfigEntry.cs" />
     <Compile Include="Configuration\ModConfig.cs" />
+    <Compile Include="Patches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Assets\spyglass" />
   </ItemGroup>

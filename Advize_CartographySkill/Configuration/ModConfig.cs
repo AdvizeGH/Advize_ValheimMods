@@ -3,22 +3,23 @@
     class ModConfig
     {
         //General
-        private ConfigEntry<float> exploreRadiusIncrease;
-        private ConfigEntry<float> baseExploreRadius;
-        private ConfigEntry<int> nexusID;
+        private readonly ConfigEntry<float> exploreRadiusIncrease;
+        private readonly ConfigEntry<float> baseExploreRadius;
+        private readonly ConfigEntry<int> nexusID;
         //Progression
-        private ConfigEntry<float> skillIncrease;
-        private ConfigEntry<int> tilesDiscoveredForXPGain;
+        private readonly ConfigEntry<bool> enableSkill;
+        private readonly ConfigEntry<float> skillIncrease;
+        private readonly ConfigEntry<int> tilesDiscoveredForXPGain;
         //Spyglass
-        private ConfigEntry<bool> enableSpyglass;
-        private ConfigEntry<float> fovReductionFactor;
-        private ConfigEntry<float> zoomMultiplier;
+        private readonly ConfigEntry<bool> enableSpyglass;
+        private readonly ConfigEntry<float> fovReductionFactor;
+        private readonly ConfigEntry<float> zoomMultiplier;
         //Controls
-        private ConfigEntry<string> increaseZoomKey;
-        private ConfigEntry<string> decreaseZoomModifierKey;
-        private ConfigEntry<string> removeZoomKey;
+        private readonly ConfigEntry<string> increaseZoomKey;
+        private readonly ConfigEntry<string> decreaseZoomModifierKey;
+        private readonly ConfigEntry<string> removeZoomKey;
         //Troubleshooting
-        private ConfigEntry<bool> enableDebugMessages;
+        private readonly ConfigEntry<bool> enableDebugMessages;
 
         internal ModConfig(Config config)
         {
@@ -37,6 +38,11 @@
                 "BaseExploreRadius",
                 100f,
                 "BaseExploreRadius (Vanilla value is 100)");
+            enableSkill = config.Bind(
+                "Progression",
+                "EnableSkill",
+                true,
+                "Enables the cartography skill", false);
             skillIncrease = config.Bind(
                 "Progression",
                 "LevelingIncrement",
@@ -51,7 +57,7 @@
                 "Spyglass",
                 "EnableSpyglass",
                 true,
-                "Enables the spyglass item");
+                "Enables the spyglass item", false);
             fovReductionFactor = config.Bind(
                 "Spyglass",
                 "FovReductionFactor",
@@ -82,10 +88,12 @@
                 "EnableDebugMessages",
                 false,
                 "Enable mod debug messages in console", false);
-
-            
         }
 
+        internal bool EnableSkill
+        {
+            get { return enableSkill.Value; }
+        }
         internal float SkillIncrease
         {
             get { return skillIncrease.Value; }
