@@ -15,7 +15,7 @@ namespace Advize_CartographySkill
     {
         public const string PluginID = "advize.CartographySkill";
         public const string PluginName = "CartographySkill";
-        public const string Version = "2.0.1";
+        public const string Version = "2.0.2";
         public const int SKILL_TYPE = 1337;
 
         private readonly Harmony harmony = new Harmony(PluginID);
@@ -23,7 +23,7 @@ namespace Advize_CartographySkill
 
         private static GameObject prefab;
         private static Recipe recipe;
-        private static readonly CustomSkill customSkill = new CustomSkill();
+        private static CustomSkill customSkill;
 
         private static int zoomLevel = 1;
         private static float startingFov;
@@ -55,6 +55,7 @@ namespace Advize_CartographySkill
             config = new ModConfig(Config);
             Config.OnConfigReceived.AddListener(new UnityAction(ConfigReceived));
             LoadLocalizedStrings();
+            customSkill = new CustomSkill();
             harmony.PatchAll();
         }
 
