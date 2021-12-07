@@ -304,6 +304,12 @@ namespace Advize_PlantEverything
 
             private static void ModifyGrow(Plant plant, TreeBase treeBase)
             {
+                if (!plant || !treeBase)
+                {
+                    Dbgl("ModifyGrow not executed, reference is null", logError : true);
+                    return;
+                }
+                
                 if (plant.GetComponent<ZNetView>().GetZDO().GetBool("pe_placeAnywhere"))
                 {
                     treeBase.GetComponent<StaticPhysics>().m_fall = false;
