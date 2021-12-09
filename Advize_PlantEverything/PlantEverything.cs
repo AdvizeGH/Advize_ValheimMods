@@ -16,7 +16,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.8.5";
+        public const string Version = "1.8.6";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -334,7 +334,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "RaspberryBush",
-                    resourceCost = config.RaspberryCost,
+                    ResourceCost = config.RaspberryCost,
                     resourceReturn = config.RaspberryReturn,
                     respawnTime = config.RaspberryRespawnTime,
                     biome = (int)Heightmap.Biome.Meadows,
@@ -345,7 +345,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "BlueberryBush",
-                    resourceCost = config.BlueberryCost,
+                    ResourceCost = config.BlueberryCost,
                     resourceReturn = config.BlueberryReturn,
                     respawnTime = config.BlueberryRespawnTime,
                     biome = (int)Heightmap.Biome.BlackForest,
@@ -356,7 +356,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "CloudberryBush",
-                    resourceCost = config.CloudberryCost,
+                    ResourceCost = config.CloudberryCost,
                     resourceReturn = config.CloudberryReturn,
                     respawnTime = config.CloudberryRespawnTime,
                     biome = (int)Heightmap.Biome.Plains,
@@ -367,7 +367,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "Pickable_Mushroom",
-                    resourceCost = config.MushroomCost,
+                    ResourceCost = config.MushroomCost,
                     resourceReturn = config.MushroomReturn,
                     respawnTime = config.MushroomRespawnTime,
                     biome = 9,
@@ -377,7 +377,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "Pickable_Mushroom_yellow",
-                    resourceCost = config.YellowMushroomCost,
+                    ResourceCost = config.YellowMushroomCost,
                     resourceReturn = config.YellowMushroomReturn,
                     respawnTime = config.YellowMushroomRespawnTime,
                     biome = 10,
@@ -387,7 +387,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "Pickable_Mushroom_blue",
-                    resourceCost = config.BlueMushroomCost,
+                    ResourceCost = config.BlueMushroomCost,
                     resourceReturn = config.BlueMushroomReturn,
                     respawnTime = config.BlueMushroomRespawnTime,
                     biome = 10,
@@ -397,7 +397,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "Pickable_Thistle",
-                    resourceCost = config.ThistleCost,
+                    ResourceCost = config.ThistleCost,
                     resourceReturn = config.ThistleReturn,
                     respawnTime = config.ThistleRespawnTime,
                     biome = 10,
@@ -407,7 +407,7 @@ namespace Advize_PlantEverything
                 new PrefabDB
                 {
                     key = "Pickable_Dandelion",
-                    resourceCost = config.DandelionCost,
+                    ResourceCost = config.DandelionCost,
                     resourceReturn = config.DandelionReturn,
                     respawnTime = config.DandelionRespawnTime,
                     biome = (int)Heightmap.Biome.Meadows,
@@ -542,7 +542,7 @@ namespace Advize_PlantEverything
                         new Piece.Requirement
                         {
                             m_resItem = resource,
-                            m_amount = pdb.resourceCost,
+                            m_amount = pdb.ResourceCost,
                             m_recover = pdb.recover
                         }
                     };
@@ -776,6 +776,8 @@ namespace Advize_PlantEverything
             }
             for (int i = 0; i < pieceRefs.Count; i++)
             {
+                if (!pieceRefs[i].enabled)
+                    continue;
                 if (!cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pieceRefs[i].Prefab))
                     cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Add(pieceRefs[i].Prefab);
             }
@@ -912,13 +914,14 @@ namespace Advize_PlantEverything
             internal string key;
             private Dictionary<string, int> resources;
 
-            internal int resourceCost;
+            private int resourceCost;
             internal int resourceReturn;
             internal int respawnTime;
             internal int biome;
 
             internal bool icon;
             internal bool recover;
+            internal bool enabled;
 
             internal Piece piece;
 
@@ -930,13 +933,19 @@ namespace Advize_PlantEverything
             internal KeyValuePair<string, int> Resource
             {
                 get { return Resources.Count > 0 ? Resources.First() : new KeyValuePair<string, int>(Prefab.GetComponent<Pickable>().m_itemPrefab.name, resourceCost); }
-                set { if (resources == null) { resources = new Dictionary<string, int>(); } if (!resources.ContainsKey(value.Key)) resources.Add(value.Key, value.Value); }
+                set { if (resources == null) { resources = new Dictionary<string, int>(); } if (!resources.ContainsKey(value.Key)) resources.Add(value.Key, value.Value); enabled = true; }
             }
 
             internal Dictionary<string, int> Resources
             {
                 get { return resources ?? new Dictionary<string, int>(); }
-                set { resources = value; }
+                set { resources = value; enabled = true; }
+            }
+
+            internal int ResourceCost
+            {
+                get { return resourceCost; }
+                set { resourceCost = value; enabled = value != 0; }
             }
         }
 

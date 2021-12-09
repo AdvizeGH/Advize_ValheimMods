@@ -181,17 +181,17 @@
                 "Berries",
                 "RaspberryCost",
                 5,
-                "Number of raspberries required to place a raspberry bush");
+                "Number of raspberries required to place a raspberry bush. Set to 0 to disable the ability to plant this resource");
             blueberryCost = config.Bind(
                 "Berries",
                 "BlueberryCost",
                 5,
-                "Number of blueberries required to place a blueberry bush");
+                "Number of blueberries required to place a blueberry bush. Set to 0 to disable the ability to plant this resource");
             cloudberryCost = config.Bind(
                 "Berries",
                 "CloudberryCost",
                 5,
-                "Number of cloudberries required to place a cloudberry bush");
+                "Number of cloudberries required to place a cloudberry bush. Set to 0 to disable the ability to plant this resource");
             raspberryRespawnTime = config.Bind(
                 "Berries",
                 "RaspberryRespawnTime",
@@ -260,17 +260,17 @@
                 "Mushrooms",
                 "MushroomCost",
                 5,
-                "Number of mushrooms required to place a pickable mushroom spawner");
+                "Number of mushrooms required to place a pickable mushroom spawner. Set to 0 to disable the ability to plant this resource");
             yellowMushroomCost = config.Bind(
                 "Mushrooms",
                 "YellowMushroomCost",
                 5,
-                "Number of yellow mushrooms required to place a pickable yellow mushroom spawner");
+                "Number of yellow mushrooms required to place a pickable yellow mushroom spawner. Set to 0 to disable the ability to plant this resource");
             blueMushroomCost = config.Bind(
                 "Mushrooms",
                 "BlueMushroomCost",
                 5,
-                "Number of blue mushrooms required to place a pickable blue mushroom spawner");
+                "Number of blue mushrooms required to place a pickable blue mushroom spawner. Set to 0 to disable the ability to plant this resource");
             mushroomRespawnTime = config.Bind(
                 "Mushrooms",
                 "MushroomRespawnTime",
@@ -307,12 +307,12 @@
                 "Flowers",
                 "ThistleCost",
                 5,
-                "Number of thistle required to place a pickable thistle spawner");
+                "Number of thistle required to place a pickable thistle spawner. Set to 0 to disable the ability to plant this resource");
             dandelionCost = config.Bind(
                 "Flowers",
                 "DandelionCost",
                 5,
-                "Number of dandelion required to place a pickable dandelion spawner");
+                "Number of dandelion required to place a pickable dandelion spawner. Set to 0 to disable the ability to plant this resource");
             thistleRespawnTime = config.Bind(
                 "Flowers",
                 "ThistleRespawnTime",
