@@ -126,15 +126,11 @@ namespace Advize_CartographySkill
         {
             public static void Postfix(int hash, ref GameObject __result)
             {
-                if (!config.EnableSpyglass) return;
-                if (__result == null && prefab)
-                {
-                    int spyglassHash = ZNetScene.instance.GetPrefabHash(prefab);
-                    if (hash == spyglassHash)
-                    {
-                        __result = prefab;
-                    }
-                }
+                if (__result != null || !config.EnableSpyglass || !prefab || !ZNetScene.instance) return;
+
+                int spyglassHash = ZNetScene.instance.GetPrefabHash(prefab);
+                if (hash == spyglassHash)
+                    __result = prefab;
             }
         }
 
