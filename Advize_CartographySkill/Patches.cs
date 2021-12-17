@@ -141,7 +141,7 @@ namespace Advize_CartographySkill
             {
                 if (!config.EnableSpyglass || !GameCamera.instance) return;
 
-                if (isZooming && (!IsSpyglassEquipped() || ZInput.GetButtonDown("Attack") || (config.RemoveZoomKey != "" && Input.GetKeyDown(config.RemoveZoomKey))))
+                if (isZooming && (!IsSpyglassEquipped() || ZInput.GetButtonDown("Attack") || (config.RemoveZoomKey != KeyCode.None && Input.GetKeyDown(config.RemoveZoomKey))))
                 {
                     StopZoom();
                 }

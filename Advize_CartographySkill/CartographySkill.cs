@@ -6,7 +6,6 @@ using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
 using Advize_CartographySkill.Configuration;
-using UnityEngine.Events;
 
 namespace Advize_CartographySkill
 {
@@ -15,7 +14,7 @@ namespace Advize_CartographySkill
     {
         public const string PluginID = "advize.CartographySkill";
         public const string PluginName = "CartographySkill";
-        public const string Version = "2.0.3";
+        public const string Version = "2.1.0";
         public const int SKILL_TYPE = 1337;
 
         private readonly Harmony harmony = new Harmony(PluginID);
@@ -36,11 +35,8 @@ namespace Advize_CartographySkill
         private static readonly AssetBundle assetBundle = LoadAssetBundle("spyglass");
         private static readonly Dictionary<string, Texture2D> cachedTextures = new Dictionary<string, Texture2D>();
 
-        private new Config Config
-        {
-            get { return Config.Instance; }
-        }
         private static ModConfig config;
+
 
         private static readonly Dictionary<string, string> stringDictionary = new Dictionary<string, string>()
         {
@@ -51,9 +47,7 @@ namespace Advize_CartographySkill
         private void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(CSLogger);
-            Config.Init(this, true);
-            config = new ModConfig(Config);
-            Config.OnConfigReceived.AddListener(new UnityAction(ConfigReceived));
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = "2.1.0", MinimumRequiredVersion = "2.1.0" });
             LoadLocalizedStrings();
             customSkill = new CustomSkill();
             harmony.PatchAll();
@@ -99,14 +93,6 @@ namespace Advize_CartographySkill
             File.WriteAllText(filePath, JsonUtility.ToJson(localizedStrings, true));
 
             Dbgl($"Saved english localized strings to {filePath}");
-        }
-
-        private void ConfigReceived()
-        {
-            if (!config.EnableSkill) return;
-            Minimap.instance.m_exploreRadius = config.BaseExploreRadius;
-
-            Dbgl($"Explore Radius is now: {config.BaseExploreRadius}");
         }
 
         public static void InitLocalization()

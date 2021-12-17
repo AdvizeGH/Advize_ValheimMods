@@ -13,6 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,7 +36,7 @@
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\BepInEx\core\0Harmony.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="assembly_guiutils">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\valheim_Data\Managed\assembly_guiutils.dll</HintPath>
@@ -50,7 +52,11 @@
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\BepInEx\core\BepInEx.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServerSync, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Release\ServerSync.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -95,9 +101,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CartographySkill.cs" />
-    <Compile Include="Configuration\AuthoritativeConfig.cs" />
-    <Compile Include="Configuration\ConfigBaseEntry.cs" />
-    <Compile Include="Configuration\ConfigEntry.cs" />
     <Compile Include="Configuration\ModConfig.cs" />
     <Compile Include="Patches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -109,5 +112,15 @@
     <EmbeddedResource Include="Assets\cartographyicon.png" />
     <EmbeddedResource Include="Assets\spyglassicon.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets'))" />
+  </Target>
 </Project>

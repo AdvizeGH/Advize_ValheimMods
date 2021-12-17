@@ -1,8 +1,16 @@
-﻿namespace Advize_CartographySkill.Configuration
+﻿using BepInEx.Configuration;
+using ServerSync;
+using UnityEngine;
+
+namespace Advize_CartographySkill.Configuration
 {
     class ModConfig
     {
+        private ConfigFile Config;
+        private ConfigSync ConfigSync;
+
         //General
+        private readonly ConfigEntry<bool> serverConfigLocked;
         private readonly ConfigEntry<float> exploreRadiusIncrease;
         private readonly ConfigEntry<float> baseExploreRadius;
         private readonly ConfigEntry<int> nexusID;
@@ -15,79 +23,104 @@
         private readonly ConfigEntry<float> fovReductionFactor;
         private readonly ConfigEntry<float> zoomMultiplier;
         //Controls
-        private readonly ConfigEntry<string> increaseZoomKey;
-        private readonly ConfigEntry<string> decreaseZoomModifierKey;
-        private readonly ConfigEntry<string> removeZoomKey;
+        private readonly ConfigEntry<KeyboardShortcut> increaseZoomKey;
+        private readonly ConfigEntry<KeyboardShortcut> decreaseZoomModifierKey;
+        private readonly ConfigEntry<KeyboardShortcut> removeZoomKey;
         //Troubleshooting
         private readonly ConfigEntry<bool> enableDebugMessages;
 
-        internal ModConfig(Config config)
+        private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true)
         {
-            nexusID = config.Bind(
+            ConfigEntry<T> configEntry = Config.Bind(group, name, value, description);
+
+            SyncedConfigEntry<T> syncedConfigEntry = ConfigSync.AddConfigEntry(configEntry);
+            syncedConfigEntry.SynchronizedConfig = synchronizedSetting;
+
+            return configEntry;
+        }
+
+        private ConfigEntry<T> config<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => config(group, name, value, new ConfigDescription(description), synchronizedSetting);
+
+        internal ModConfig(ConfigFile configFile, ConfigSync configSync)
+        {
+            Config = configFile; ConfigSync = configSync;
+
+            serverConfigLocked = config(
+                "General",
+                "Lock Configuration",
+                false,
+                "If on, the configuration is locked and can be changed by server admins only.");
+            nexusID = config(
                 "General",
                 "NexusID",
                 394,
-                "Nexus mod ID for updates.", false);
-            exploreRadiusIncrease = config.Bind(
+                "Nexus mod ID for updates.",
+                false);
+            exploreRadiusIncrease = config(
                 "General",
                 "RadiusIncreasePerLevel",
                 1f,
                 "Amount to increase base explore radius by per skill level");
-            baseExploreRadius = config.Bind(
+            baseExploreRadius = config(
                 "General",
                 "BaseExploreRadius",
                 100f,
                 "BaseExploreRadius (Vanilla value is 100)");
-            enableSkill = config.Bind(
+            enableSkill = config(
                 "Progression",
                 "EnableSkill",
                 true,
-                "Enables the cartography skill", false);
-            skillIncrease = config.Bind(
+                "Enables the cartography skill",
+                false);
+            skillIncrease = config(
                 "Progression",
                 "LevelingIncrement",
                 0.5f,
                 "Experience gain when cartography skill XP is awarded");
-            tilesDiscoveredForXPGain = config.Bind(
+            tilesDiscoveredForXPGain = config(
                 "Progression",
                 "TileDiscoveryRequirement",
                 100,
                 "Amount of map tiles that need to be discovered before XP is awarded (influences BetterUI xp gain spam)");
-            enableSpyglass = config.Bind(
+            enableSpyglass = config(
                 "Spyglass",
                 "EnableSpyglass",
                 true,
-                "Enables the spyglass item", false);
-            fovReductionFactor = config.Bind(
+                "Enables the spyglass item",
+                false);
+            fovReductionFactor = config(
                 "Spyglass",
                 "FovReductionFactor",
                 5f,
                 "Influences field of view when zoomed, recommended range is 0 (disabled) to 5");
-            zoomMultiplier = config.Bind(
+            zoomMultiplier = config(
                 "Spyglass",
                 "ZoomMultiplier",
                 5f,
                 "Increase/Decrease camera zoom distance");
-            increaseZoomKey = config.Bind(
+            increaseZoomKey = config(
                 "Controls",
                 "IncreaseZoomKey",
-                "mouse 1",
-                "Key to increase zoom level. See https://docs.unity3d.com/Manual/class-InputManager.html", false);
-            decreaseZoomModifierKey = config.Bind(
+                new KeyboardShortcut(KeyCode.Mouse1),
+                "Key to increase zoom level. See https://docs.unity3d.com/Manual/class-InputManager.html",
+                false);
+            decreaseZoomModifierKey = config(
                 "Controls",
                 "DecreaseZoomModifierKey",
-                "left shift",
+                new KeyboardShortcut(KeyCode.LeftShift),
                 "Hold this key while pressing IncreaseZoomKey to decrease zoom level. See https://docs.unity3d.com/Manual/class-InputManager.html", false);
-            removeZoomKey = config.Bind(
+            removeZoomKey = config(
                 "Controls",
                 "RemoveZoomKey",
-                "",
+                new KeyboardShortcut(),
                 "Optional key to fully zoom out. See https://docs.unity3d.com/Manual/class-InputManager.html", false);
-            enableDebugMessages = config.Bind(
+            enableDebugMessages = config(
                 "Troubleshooting",
                 "EnableDebugMessages",
                 false,
                 "Enable mod debug messages in console", false);
+
+            configSync.AddLockingConfigEntry(serverConfigLocked);
         }
 
         internal bool EnableSkill
@@ -126,17 +159,17 @@
         {
             get { return zoomMultiplier.Value; }
         }
-        internal string IncreaseZoomKey
+        internal KeyCode IncreaseZoomKey
         {
-            get { return increaseZoomKey.Value; }
+            get { return increaseZoomKey.Value.MainKey; }
         }
-        internal string DecreaseZoomModifierKey
+        internal KeyCode DecreaseZoomModifierKey
         {
-            get { return decreaseZoomModifierKey.Value; }
+            get { return decreaseZoomModifierKey.Value.MainKey; }
         }
-        internal string RemoveZoomKey
+        internal KeyCode RemoveZoomKey
         {
-            get { return removeZoomKey.Value; }
+            get { return removeZoomKey.Value.MainKey; }
         }
     }
 }
