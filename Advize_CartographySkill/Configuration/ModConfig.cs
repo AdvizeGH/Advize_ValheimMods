@@ -102,18 +102,18 @@ namespace Advize_CartographySkill.Configuration
                 "Controls",
                 "IncreaseZoomKey",
                 new KeyboardShortcut(KeyCode.Mouse1),
-                "Key to increase zoom level. See https://docs.unity3d.com/Manual/class-InputManager.html",
+                "Key to increase zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                 false);
             decreaseZoomModifierKey = config(
                 "Controls",
                 "DecreaseZoomModifierKey",
                 new KeyboardShortcut(KeyCode.LeftShift),
-                "Hold this key while pressing IncreaseZoomKey to decrease zoom level. See https://docs.unity3d.com/Manual/class-InputManager.html", false);
+                "Hold this key while pressing IncreaseZoomKey to decrease zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html", false);
             removeZoomKey = config(
                 "Controls",
                 "RemoveZoomKey",
                 new KeyboardShortcut(),
-                "Optional key to fully zoom out. See https://docs.unity3d.com/Manual/class-InputManager.html", false);
+                "Optional key to fully zoom out. See https://docs.unity3d.com/ScriptReference/KeyCode.html", false);
             enableDebugMessages = config(
                 "Troubleshooting",
                 "EnableDebugMessages",
