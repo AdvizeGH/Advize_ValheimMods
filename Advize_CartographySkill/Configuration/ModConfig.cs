@@ -54,7 +54,7 @@ namespace Advize_CartographySkill.Configuration
                 "General",
                 "NexusID",
                 394,
-                "Nexus mod ID for updates.",
+                new ConfigDescription("Nexus mod ID for updates.", null, new ConfigurationManagerAttributes{ Category = "Internal", ReadOnly = true }),
                 false);
             exploreRadiusIncrease = config(
                 "General",
@@ -102,18 +102,29 @@ namespace Advize_CartographySkill.Configuration
                 "Controls",
                 "IncreaseZoomKey",
                 new KeyboardShortcut(KeyCode.Mouse1),
-                "Key to increase zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+                new ConfigDescription(
+                    "Key to increase zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+                    null,
+                    new ConfigurationManagerAttributes { Description = "Key to increase zoom level." }),
                 false);
             decreaseZoomModifierKey = config(
                 "Controls",
                 "DecreaseZoomModifierKey",
                 new KeyboardShortcut(KeyCode.LeftShift),
-                "Hold this key while pressing IncreaseZoomKey to decrease zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html", false);
+                new ConfigDescription(
+                    "Hold this key while pressing IncreaseZoomKey to decrease zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+                    null,
+                    new ConfigurationManagerAttributes { Description = "Hold this key while pressing IncreaseZoomKey to decrease zoom level." }),
+                false);
             removeZoomKey = config(
                 "Controls",
                 "RemoveZoomKey",
                 new KeyboardShortcut(),
-                "Optional key to fully zoom out. See https://docs.unity3d.com/ScriptReference/KeyCode.html", false);
+                new ConfigDescription(
+                    "Optional key to fully zoom out. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+                    null,
+                    new ConfigurationManagerAttributes { Description = "Optional key to fully zoom out." }),
+                false);
             enableDebugMessages = config(
                 "Troubleshooting",
                 "EnableDebugMessages",
