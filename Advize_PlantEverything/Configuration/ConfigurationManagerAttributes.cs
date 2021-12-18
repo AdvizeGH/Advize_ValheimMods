@@ -1,4 +1,4 @@
-﻿namespace Advize_CartographySkill.Configuration
+﻿namespace Advize_PlantEverything.Configuration
 {
 #pragma warning disable CS8632
 	/// <summary>

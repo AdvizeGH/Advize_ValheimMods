@@ -6,7 +6,6 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.Events;
 using Advize_PlantEverything.Configuration;
 
 namespace Advize_PlantEverything
@@ -16,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.8.6";
+        public const string Version = "1.9.0";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -31,11 +30,7 @@ namespace Advize_PlantEverything
         private static readonly AssetBundle assetBundle = LoadAssetBundle("planteverything");
         private static readonly Dictionary<string, Texture2D> cachedTextures = new();
 
-        private new Config Config
-        {
-            get { return Config.Instance; }
-        }
-        internal static ModConfig config;
+        private static ModConfig config;
 
         private static readonly Dictionary<string, string> stringDictionary = new() {
             //{ "BirchConeName", "Birch Cone" },
@@ -90,9 +85,7 @@ namespace Advize_PlantEverything
         private void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
-            Config.Init(this, true);
-            config = new ModConfig(Config);
-            Config.OnConfigReceived.AddListener(new UnityAction(ConfigReceived));
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.9.0" });
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
             harmony.PatchAll();
@@ -659,9 +652,9 @@ namespace Advize_PlantEverything
                 //FixSeed("BirchCone", prefabRefs["PineCone"]);
                 //FixSeed("OakSeeds", prefabRefs["BeechSeeds"]);
                 FixSeed("AncientSeeds", prefabRefs["BeechSeeds"]);
-
-                ModifyTreeDrops();
             }
+
+            ModifyTreeDrops();
 
             List<SaplingDB> vanillaSaplings = new()
             {
@@ -845,7 +838,6 @@ namespace Advize_PlantEverything
 
         private static void ModifyTreeDrops()
         {
-            //Update later to add config options for seed drop rates
             Dictionary<GameObject, GameObject> dropsByTarget = new()
             {
                 { prefabRefs["Birch1"], prefabRefs["BirchSeeds"] },
@@ -888,9 +880,21 @@ namespace Advize_PlantEverything
             }
         }
 
-        private static void ConfigReceived()
+        //private static void ConfigReceived()
+        //{
+        //    Dbgl("Config Received, re-initializing mod");
+        //    FinalInit(ZNetScene.instance);
+        //}
+
+        //internal static void SaplingSettingChanged(object o, EventArgs e)
+        //{
+        //    InitSaplingRefs();
+        //    InitSaplings();
+        //}
+
+        internal static void ConfigSettingChanged(object o, BepInEx.Configuration.SettingChangedEventArgs e)
         {
-            Dbgl("Config Received, re-initializing mod");
+            Dbgl($"Config Setting {e.ChangedSetting.Definition} changed, re-initializing mod");
             FinalInit(ZNetScene.instance);
         }
 
