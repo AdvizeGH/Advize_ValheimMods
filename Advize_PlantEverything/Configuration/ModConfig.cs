@@ -155,17 +155,20 @@ namespace Advize_PlantEverything.Configuration
                 "General",
                 "EnablePickableTimers",
                 true,
-                "Enables display of growth time remaining on pickable resources.", false);
+                "Enables display of growth time remaining on pickable resources.",
+                false);
             enableLocalization = config(
                 "General",
                 "EnableLocalization",
                 false,
-                "Enable this to attempt to load localized text data for the language set in the following setting", false);
+                "Enable this to attempt to load localized text data for the language set in the following setting",
+                false);
             language = config(
                 "General",
                 "Language",
                 "english",
-                "Language to be used. If EnableLocalization is enabled, game will attempt to load localized text from a file named {language}_PlantEverything.json", false);
+                "Language to be used. If EnableLocalization is enabled, game will attempt to load localized text from a file named {language}_PlantEverything.json",
+                false);
 
             //Difficulty
             requireCultivation = config(
@@ -498,6 +501,8 @@ namespace Advize_PlantEverything.Configuration
                 "FirGrowRadius",
                 2f,
                 "Radius of free space required for a fir sapling to grow");
+
+            //Seeds
             seedDropMin = config(
                 "Seeds",
                 "seedDropMin",
@@ -519,32 +524,94 @@ namespace Advize_PlantEverything.Configuration
                 false,
                 "When enabled, destroyed trees will drop every available item on their drop table when loot is dropped. Setting this to true will ensure that seeds are guaranteed to drop whenever the tree drops items (governed by dropChance setting)");
             
-            //ancientGrowRadius.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //ancientGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //ancientMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //ancientMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //beechGrowRadius.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //beechGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //beechMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //beechMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //pineGrowRadius.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //pineGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //pineMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //pineMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //firGrowRadius.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //firGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //firMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //firMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //birchGrowRadius.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //birchGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //birchMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //birchMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //oakGrowRadius.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //oakGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //oakMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
-            //oakMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
+            //General
+            resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            alternateIcons.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            alwaysShowSpawners.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            enableMiscFlora.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+
+            //Difficulty
+            requireCultivation.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            placeAnywhere.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            enforceBiomes.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            enforceBiomesVanilla.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            enableCropOverrides.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            recoverResources.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+
+            //Berries
+            raspberryCost.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            blueberryCost.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            cloudberryCost.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            raspberryRespawnTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            blueberryRespawnTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            cloudberryRespawnTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            raspberryReturn.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            blueberryReturn.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            cloudberryReturn.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+
+            //Crops
+            cropMinScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            cropMaxScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            cropGrowTimeMin.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            cropGrowTimeMax.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            cropGrowRadius.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            cropRequireCultivation.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+
+            //Mushrooms
+            mushroomCost.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            yellowMushroomCost.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            blueMushroomCost.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            mushroomRespawnTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            yellowMushroomRespawnTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            blueMushroomRespawnTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            mushroomReturn.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            yellowMushroomReturn.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            blueMushroomReturn.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+
+            //Flowers
+            thistleCost.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            dandelionCost.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            thistleRespawnTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            dandelionRespawnTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            thistleReturn.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            dandelionReturn.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+
+            //Saplings
+            ancientGrowRadius.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            ancientGrowthTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            ancientMinScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            ancientMaxScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            beechGrowRadius.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            beechGrowthTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            beechMinScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            beechMaxScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            pineGrowRadius.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            pineGrowthTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            pineMinScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            pineMaxScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            firGrowRadius.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            firGrowthTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            firMinScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            firMaxScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            birchGrowRadius.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            birchGrowthTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            birchMinScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            birchMaxScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            oakGrowRadius.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            oakGrowthTime.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            oakMinScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            oakMaxScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+
+            //Seeds
+            seedDropMin.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            seedDropMax.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            dropChance.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            oneOfEach.SettingChanged += PlantEverything.ConfigurationSettingChanged;
 
             configSync.AddLockingConfigEntry(serverConfigLocked);
+
+            //Config.SettingChanged += PlantEverything.ConfigSettingChanged;
         }
 
         internal bool EnableDebugMessages
