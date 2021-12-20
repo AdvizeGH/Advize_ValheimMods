@@ -310,22 +310,36 @@ namespace Advize_PlantEverything
 
             if (pieceRefs.Count > 0)
             {
-                foreach (PrefabDB pdb in pieceRefs)
+                try
                 {
-                    if (prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pdb.Prefab))
+                    foreach (PrefabDB pdb in pieceRefs)
                     {
-                        prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Remove(pdb.Prefab);
-                    }
-                    if (update)
-                    {
-                        // Used to prevent null ref if someone is using cultivator
-                        if (Player.m_localPlayer != null && Player.m_localPlayer.GetRightItem() != null && Player.m_localPlayer.GetRightItem().m_shared.m_name == "$item_cultivator")
+                        if (prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pdb.Prefab))
                         {
-                            Dbgl("Cultivator equipped");
-                            Player.m_localPlayer.HideHandItems();
+                            prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Remove(pdb.Prefab);
+                        }
+                        if (update)
+                        {
+                            // Used to prevent null ref if someone is using cultivator
+                            if (Player.m_localPlayer != null && Player.m_localPlayer.GetRightItem() != null && Player.m_localPlayer.GetRightItem().m_shared.m_name == "$item_cultivator")
+                            {
+                                Dbgl("Cultivator equipped");
+                                Player.m_localPlayer.HideHandItems();
+                            }
+                        }
+                        DestroyImmediate(pdb.Prefab.GetComponent<Piece>());
+                    }
+                }
+                finally
+                {
+                    foreach (PrefabDB pdb in pieceRefs)
+                    {
+                        Piece test = pdb.Prefab.GetComponent<Piece>();
+                        if (test != null)
+                        {
+                            Dbgl("Piece not yet destroyed");
                         }
                     }
-                    Destroy(pdb.Prefab.GetComponent<Piece>());
                 }
                 pieceRefs.Clear();
             }
