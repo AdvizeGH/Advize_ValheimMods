@@ -319,6 +319,7 @@ namespace Advize_PlantEverything
                     //Used to prevent null ref if someone is using cultivator
                     if (Player.m_localPlayer != null && Player.m_localPlayer.GetRightItem() != null && Player.m_localPlayer.GetRightItem().m_shared.m_name == "$item_cultivator")
                     {
+                        PELogger.LogWarning("Cultivator updated through config change, unequipping cultivator");
                         Player.m_localPlayer.HideHandItems();
                     }
                     DestroyImmediate(pdb.Prefab.GetComponent<Piece>());
@@ -886,9 +887,9 @@ namespace Advize_PlantEverything
             }
         }
 
-        internal static void CoreConfigurationSettingChanged(object o, System.EventArgs e)
+        internal static void CoreSettingChanged(object o, System.EventArgs e)
         {
-            Dbgl($"Config Setting changed, re-initializing mod");
+            Dbgl($"Config setting changed, re-initializing mod");
             InitPieceRefs();
             InitPieces();
             InitSaplingRefs();
@@ -898,7 +899,7 @@ namespace Advize_PlantEverything
 
         internal static void PickableSettingChanged(object o, System.EventArgs e)
         {
-            Dbgl($"Config Setting changed, re-initializing pieces");
+            Dbgl($"Config setting changed, re-initializing pieces");
             InitPieceRefs();
             InitPieces();
             InitCultivator();
@@ -906,14 +907,14 @@ namespace Advize_PlantEverything
 
         internal static void SaplingSettingChanged(object o, System.EventArgs e)
         {
-            Dbgl($"Config Setting changed, re-initializing saplings");
+            Dbgl($"Config setting changed, re-initializing saplings");
             InitSaplingRefs();
             InitSaplings();
         }
 
         internal static void SeedSettingChanged(object o, System.EventArgs e)
         {
-            Dbgl($"Config Setting changed, modifying treebase drop tables");
+            Dbgl($"Config setting changed, modifying TreeBase drop tables");
             ModifyTreeDrops();
         }
 

@@ -526,17 +526,17 @@ namespace Advize_PlantEverything.Configuration
             
             //General
             //resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
-            alternateIcons.SettingChanged += PlantEverything.CoreConfigurationSettingChanged;
-            alwaysShowSpawners.SettingChanged += PlantEverything.CoreConfigurationSettingChanged;
-            enableMiscFlora.SettingChanged += PlantEverything.CoreConfigurationSettingChanged;
+            alternateIcons.SettingChanged += PlantEverything.CoreSettingChanged;
+            alwaysShowSpawners.SettingChanged += PlantEverything.CoreSettingChanged;
+            enableMiscFlora.SettingChanged += PlantEverything.CoreSettingChanged;
 
             //Difficulty
-            requireCultivation.SettingChanged += PlantEverything.CoreConfigurationSettingChanged;
-            placeAnywhere.SettingChanged += PlantEverything.CoreConfigurationSettingChanged;
-            enforceBiomes.SettingChanged += PlantEverything.CoreConfigurationSettingChanged;
+            requireCultivation.SettingChanged += PlantEverything.CoreSettingChanged;
+            placeAnywhere.SettingChanged += PlantEverything.CoreSettingChanged;
+            enforceBiomes.SettingChanged += PlantEverything.CoreSettingChanged;
             //enforceBiomesVanilla.SettingChanged += PlantEverything.ConfigurationSettingChanged;
             //enableCropOverrides.SettingChanged += PlantEverything.ConfigurationSettingChanged;
-            recoverResources.SettingChanged += PlantEverything.CoreConfigurationSettingChanged;
+            recoverResources.SettingChanged += PlantEverything.CoreSettingChanged;
             //resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
 
             //Berries
