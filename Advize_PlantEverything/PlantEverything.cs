@@ -304,42 +304,24 @@ namespace Advize_PlantEverything
             prefabRefs.Add("Ancient_Sapling", CreatePrefab("Ancient_Sapling"));
         }
 
-        private static void InitPieceRefs(bool update = false)
+        private static void InitPieceRefs()
         {
-            Dbgl($"InitPieceRefs : update = {update}");
+            Dbgl($"InitPieceRefs");
 
             if (pieceRefs.Count > 0)
             {
-                try
+                foreach (PrefabDB pdb in pieceRefs)
                 {
-                    foreach (PrefabDB pdb in pieceRefs)
+                    if (prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pdb.Prefab))
                     {
-                        if (prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pdb.Prefab))
-                        {
-                            prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Remove(pdb.Prefab);
-                        }
-                        if (update)
-                        {
-                            // Used to prevent null ref if someone is using cultivator
-                            if (Player.m_localPlayer != null && Player.m_localPlayer.GetRightItem() != null && Player.m_localPlayer.GetRightItem().m_shared.m_name == "$item_cultivator")
-                            {
-                                Dbgl("Cultivator equipped");
-                                Player.m_localPlayer.HideHandItems();
-                            }
-                        }
-                        DestroyImmediate(pdb.Prefab.GetComponent<Piece>());
+                        prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Remove(pdb.Prefab);
                     }
-                }
-                finally
-                {
-                    foreach (PrefabDB pdb in pieceRefs)
+                    //Used to prevent null ref if someone is using cultivator
+                    if (Player.m_localPlayer != null && Player.m_localPlayer.GetRightItem() != null && Player.m_localPlayer.GetRightItem().m_shared.m_name == "$item_cultivator")
                     {
-                        Piece test = pdb.Prefab.GetComponent<Piece>();
-                        if (test != null)
-                        {
-                            Dbgl("Piece not yet destroyed");
-                        }
+                        Player.m_localPlayer.HideHandItems();
                     }
+                    DestroyImmediate(pdb.Prefab.GetComponent<Piece>());
                 }
                 pieceRefs.Clear();
             }
@@ -549,18 +531,6 @@ namespace Advize_PlantEverything
                 }
                 else
                 {
-                    if (pdb.key == "RaspberryBush")
-                    {
-                        Dbgl($"RaspberryBush PieceInit, pdb.ResourceCost: {pdb.ResourceCost} config.RaspberryCost : {config.RaspberryCost}");
-                    }
-                    if (pdb.key == "BlueberryBush")
-                    {
-                        Dbgl($"BlueberryBush PieceInit, pdb.ResourceCost: {pdb.ResourceCost} config.BlueberryCost : {config.BlueberryCost}");
-                    }
-                    if (pdb.key == "CloudberryBush")
-                    {
-                        Dbgl($"CloudBerryBush PieceInit, pdb.ResourceCost: {pdb.ResourceCost} config.CloudBerryCost : {config.CloudberryCost}");
-                    }
                     pdb.piece.m_resources = new Piece.Requirement[]
                     {
                         new Piece.Requirement
@@ -621,7 +591,7 @@ namespace Advize_PlantEverything
             }
         }
 
-        private static void InitSaplingRefs(bool update = false)
+        private static void InitSaplingRefs()
         {
             Dbgl("InitSaplingRefs");
 
@@ -916,38 +886,36 @@ namespace Advize_PlantEverything
             }
         }
 
-        //private static void ConfigReceived()
-        //{
-        //    Dbgl("Config Received, re-initializing mod");
-        //    FinalInit(ZNetScene.instance);
-        //}
-
-        internal static void ConfigurationSettingChanged(object o, System.EventArgs e)
+        internal static void CoreConfigurationSettingChanged(object o, System.EventArgs e)
         {
             Dbgl($"Config Setting changed, re-initializing mod");
-            InitPieceRefs(true);
+            InitPieceRefs();
             InitPieces();
-            InitSaplingRefs(/*true*/);
+            InitSaplingRefs();
             InitSaplings();
-            InitCultivator(/*true*/);
+            InitCultivator();
         }
 
-        //internal static void ConfigSettingChanged(object o, BepInEx.Configuration.SettingChangedEventArgs e)
-        //{
-        //    Dbgl($"Config Setting {e.ChangedSetting.Definition} changed, re-initializing mod");
+        internal static void PickableSettingChanged(object o, System.EventArgs e)
+        {
+            Dbgl($"Config Setting changed, re-initializing pieces");
+            InitPieceRefs();
+            InitPieces();
+            InitCultivator();
+        }
 
-        //    string[] split = e.ChangedSetting.Definition.ToString().Split('.');
-        //    for (int i = 0; i < split.Count(); i++)
-        //    {
-        //        Dbgl(split[i]);
-        //    }
+        internal static void SaplingSettingChanged(object o, System.EventArgs e)
+        {
+            Dbgl($"Config Setting changed, re-initializing saplings");
+            InitSaplingRefs();
+            InitSaplings();
+        }
 
-        //    InitPieceRefs(/*true*/);
-        //    InitPieces();
-        //    InitSaplingRefs(/*true*/);
-        //    InitSaplings();
-        //    InitCultivator(/*true*/);
-        //}
+        internal static void SeedSettingChanged(object o, System.EventArgs e)
+        {
+            Dbgl($"Config Setting changed, modifying treebase drop tables");
+            ModifyTreeDrops();
+        }
 
         public static void InitLocalization()
         {
@@ -980,32 +948,10 @@ namespace Advize_PlantEverything
 
             internal Piece piece;
 
-            //internal void Update(PrefabDB source)
-            //{
-            //    key = source.key;
-            //    resources = source.resources;
-            //    Dbgl($"old cost = {resourceCost} new cost = {source.resourceCost}");
-            //    resourceCost = source.resourceCost;
-            //    resourceReturn = source.resourceReturn;
-            //    respawnTime = source.respawnTime;
-            //    biome = source.biome;
-            //    icon = source.icon;
-            //    recover = source.recover;
-            //    enabled = source.enabled;
-            //    piece = source.piece;
-            //    //Prefab.GetComponent<Piece>().enabled = true;
-            //}
-
             internal GameObject Prefab
             {
                 get { return prefabRefs[key]; }
             }
-
-            //internal Piece Piece
-            //{
-            //    get { return prefabRefs[key].GetComponent<Piece>(); }
-            //    set { piece = value; }
-            //}
 
             internal KeyValuePair<string, int> Resource
             {
@@ -1041,17 +987,6 @@ namespace Advize_PlantEverything
             internal float maxScale;
 
             internal GameObject[] grownPrefabs;
-
-            //internal void Update(SaplingDB source)
-            //{
-            //    resource = source.resource;
-            //    resourceCost = source.resourceCost;
-            //    biome = source.biome;
-            //    growTime = source.growTime;
-            //    growRadius = source.growRadius;
-            //    minScale = source.minScale;
-            //    maxScale = source.maxScale;
-            //}
 
             internal GameObject Prefab
             {

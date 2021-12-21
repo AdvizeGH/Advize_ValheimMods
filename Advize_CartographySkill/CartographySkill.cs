@@ -17,8 +17,8 @@ namespace Advize_CartographySkill
         public const string Version = "2.1.1";
         public const int SKILL_TYPE = 1337;
 
-        private readonly Harmony harmony = new Harmony(PluginID);
-        public static ManualLogSource CSLogger = new ManualLogSource($" {PluginName}");
+        private readonly Harmony harmony = new(PluginID);
+        public static ManualLogSource CSLogger = new($" {PluginName}");
 
         private static GameObject prefab;
         private static Recipe recipe;
@@ -33,11 +33,11 @@ namespace Advize_CartographySkill
 
         private static readonly string modDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static readonly AssetBundle assetBundle = LoadAssetBundle("spyglass");
-        private static readonly Dictionary<string, Texture2D> cachedTextures = new Dictionary<string, Texture2D>();
+        private static readonly Dictionary<string, Texture2D> cachedTextures = new();
 
         private static ModConfig config;
 
-        private static readonly Dictionary<string, string> stringDictionary = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> stringDictionary = new()
         {
             { "SpyglassName", "Spyglass" },
             { "SpyglassDescription", "See further into the distance, or bash your enemies with it." }
@@ -138,7 +138,7 @@ namespace Advize_CartographySkill
                 Stream manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"Advize_{PluginName}.Assets.{fileName}");
                 byte[] array = new byte[manifestResourceStream.Length];
                 manifestResourceStream.Read(array, 0, array.Length);
-                Texture2D texture = new Texture2D(0, 0);
+                Texture2D texture = new(0, 0);
                 ImageConversion.LoadImage(texture, array);
                 result = texture;
             }
@@ -197,7 +197,7 @@ namespace Advize_CartographySkill
                 }
             }
 
-            List<Piece.Requirement> requirements = new List<Piece.Requirement>
+            List<Piece.Requirement> requirements = new()
             {
                 new Piece.Requirement
                 {
@@ -300,7 +300,7 @@ namespace Advize_CartographySkill
         private class CustomSkill
         {
             public string name = "Cartography";
-            public Skills.SkillDef skillDef = new Skills.SkillDef
+            public Skills.SkillDef skillDef = new()
             {
                 m_description = "Increases map explore radius.",
                 m_icon = CreateSprite("cartographyicon.png", new Rect(0, 0, 32, 32)),
@@ -311,7 +311,7 @@ namespace Advize_CartographySkill
 
         internal class LocalizedStrings
         {
-            public List<string> localizedStrings = new List<string>();
+            public List<string> localizedStrings = new();
         }
     }
 }
