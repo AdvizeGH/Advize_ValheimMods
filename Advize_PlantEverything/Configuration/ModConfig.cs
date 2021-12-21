@@ -121,7 +121,7 @@ namespace Advize_PlantEverything.Configuration
             //General
             serverConfigLocked = config(
                 "General",
-                "Lock Configuration",
+                "LockConfiguration",
                 false,
                 "If on, the configuration is locked and can be changed by server admins only.");
             nexusID = config(
