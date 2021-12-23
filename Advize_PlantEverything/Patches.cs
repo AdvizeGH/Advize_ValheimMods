@@ -387,7 +387,8 @@ namespace Advize_PlantEverything
                 $"{t.Seconds:D2}s" : $"{t.Minutes:D2}m {t.Seconds:D2}s" : $"{t.Hours:D2}h {t.Minutes:D2}m {t.Seconds:D2}s";
 
             string formattedString = config.GrowthAsPercentage ?
-                $"(<color={color}>{growthPercentage}%</color>)" : remainingMinutes < 0.0 ? $"(<color={color}>Ready any second now</color>)" : $"(Ready in <color={color}>{timeRemaining}</color>)";
+                $"(<color={color}>{growthPercentage}%</color>)" : remainingMinutes < 0.0 ?
+                $"(<color={color}>Ready any second now</color>)" : $"(Ready in <color={color}>{timeRemaining}</color>)";
 
             return formattedString;
         }
