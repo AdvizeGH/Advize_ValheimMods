@@ -16,6 +16,7 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<bool> alwaysShowSpawners;
         private readonly ConfigEntry<bool> enableMiscFlora;
         private readonly ConfigEntry<bool> enablePickableTimers; //local
+        private readonly ConfigEntry<bool> enablePlantTimers; //local
         private readonly ConfigEntry<bool> enableLocalization; //local
         private readonly ConfigEntry<string> language; //local
 
@@ -156,6 +157,12 @@ namespace Advize_PlantEverything.Configuration
                 "EnablePickableTimers",
                 true,
                 "Enables display of growth time remaining on pickable resources.",
+                false);
+            enablePlantTimers = config(
+                "General",
+                "EnablePlantTimers",
+                true,
+                "Enables display of growth time remaining on planted resources, such as crops and saplings.",
                 false);
             enableLocalization = config(
                 "General",
@@ -633,6 +640,10 @@ namespace Advize_PlantEverything.Configuration
         internal bool EnablePickableTimers
         {
             get { return enablePickableTimers.Value; }
+        }
+        internal bool EnablePlantTimers
+        {
+            get { return enablePlantTimers.Value; }
         }
         internal bool EnableLocalization
         {

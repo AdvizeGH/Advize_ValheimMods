@@ -336,23 +336,63 @@ namespace Advize_PlantEverything
                     double remainingMinutes = ___m_respawnTimeMinutes - difference.TotalMinutes;
                     double remainingRatio = remainingMinutes / (float)___m_respawnTimeMinutes;
 
-                    string color = "red";
-                    if (remainingRatio < 0)
-                        color = "cyan";
-                    else if (remainingRatio < 0.25)
-                        color = "lime";
-                    else if (remainingRatio < 0.5)
-                        color = "yellow";
-                    else if (remainingRatio < 0.75)
-                        color = "orange";
+                    string timeString = FormatTimeString(t, remainingMinutes, remainingRatio);
 
-                    string timeRemaining = t.Hours <= 0 ? t.Minutes <= 0 ?
-                    $"{t.Seconds:D2}s" : $"{t.Minutes:D2}m {t.Seconds:D2}s" : $"{t.Hours:D2}h {t.Minutes:D2}m {t.Seconds:D2}s";
-                    string message = remainingMinutes < 0.0 ? $"\n(<color={color}>Ready any second now</color>)" : $"\n(Ready in <color={color}>{timeRemaining}</color>)";
-
-                    __result = Localization.instance.Localize(__instance.GetHoverName() + message);
+                    __result = Localization.instance.Localize(__instance.GetHoverName()) + $"\n{timeString}";
                 }
             }
+        }
+
+        [HarmonyPatch(typeof(Plant), "GetHoverText")]
+        public static class PlantGetHoverText
+        {
+            [HarmonyPostfix]
+            public static void Postfix(Plant __instance, ZNetView ___m_nview, int ___m_status, ref string __result)
+            {
+                if (config.EnablePlantTimers && ___m_status == 0)
+                {
+                    float growthTime = GetGrowTime(__instance, ___m_nview);
+
+                    DateTime plantTime = new(___m_nview.GetZDO().GetLong("plantTime", ZNet.instance.GetTime().Ticks));
+                    TimeSpan difference = ZNet.instance.GetTime() - plantTime;
+                    TimeSpan t = TimeSpan.FromSeconds(growthTime - difference.TotalSeconds);
+
+                    double remainingMinutes = (growthTime / 60) - difference.TotalMinutes;
+                    double remainingRatio = remainingMinutes / (growthTime / 60);
+
+                    string timeString = FormatTimeString(t, remainingMinutes, remainingRatio);
+
+                    __result += $"\n{timeString}";
+                }
+            }
+
+            public static float GetGrowTime(Plant plant, ZNetView m_nview)
+            {
+                UnityEngine.Random.State state = UnityEngine.Random.state;
+                UnityEngine.Random.InitState((int)(m_nview.GetZDO().m_uid.id + m_nview.GetZDO().m_uid.userID));
+                float value = UnityEngine.Random.value;
+                UnityEngine.Random.state = state;
+                return Mathf.Lerp(plant.m_growTime, plant.m_growTimeMax, value);
+            }
+        }
+
+        public static string FormatTimeString(TimeSpan t, double remainingMinutes, double remainingRatio)
+        {
+            string color = "red";
+            if (remainingRatio < 0)
+                color = "cyan";
+            else if (remainingRatio < 0.25)
+                color = "lime";
+            else if (remainingRatio < 0.5)
+                color = "yellow";
+            else if (remainingRatio < 0.75)
+                color = "orange";
+
+            string timeRemaining = t.Hours <= 0 ? t.Minutes <= 0 ?
+                    $"{t.Seconds:D2}s" : $"{t.Minutes:D2}m {t.Seconds:D2}s" : $"{t.Hours:D2}h {t.Minutes:D2}m {t.Seconds:D2}s";
+            string formattedString = remainingMinutes < 0.0 ? $"(<color={color}>Ready any second now</color>)" : $"(Ready in <color={color}>{timeRemaining}</color>)";
+
+            return formattedString;
         }
     }
 }
