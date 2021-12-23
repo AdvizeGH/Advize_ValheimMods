@@ -15,8 +15,6 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<bool> alternateIcons;
         private readonly ConfigEntry<bool> alwaysShowSpawners;
         private readonly ConfigEntry<bool> enableMiscFlora;
-        private readonly ConfigEntry<bool> enablePickableTimers; //local
-        private readonly ConfigEntry<bool> enablePlantTimers; //local
         private readonly ConfigEntry<bool> enableLocalization; //local
         private readonly ConfigEntry<string> language; //local
 
@@ -103,6 +101,11 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<float> dropChance;
         private readonly ConfigEntry<bool> oneOfEach;
 
+        //UI
+        private readonly ConfigEntry<bool> enablePickableTimers; //local
+        private readonly ConfigEntry<bool> enablePlantTimers; //local
+        private readonly ConfigEntry<bool> growthAsPercentage; //local
+
         private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true)
         {
             ConfigEntry<T> configEntry = Config.Bind(group, name, value, description);
@@ -152,18 +155,6 @@ namespace Advize_PlantEverything.Configuration
                 "EnableMiscFlora",
                 true,
                 "Enables small trees, bushes, shrubs, and vines.");
-            enablePickableTimers = config(
-                "General",
-                "EnablePickableTimers",
-                true,
-                "Enables display of growth time remaining on pickable resources.",
-                false);
-            enablePlantTimers = config(
-                "General",
-                "EnablePlantTimers",
-                true,
-                "Enables display of growth time remaining on planted resources, such as crops and saplings.",
-                false);
             enableLocalization = config(
                 "General",
                 "EnableLocalization",
@@ -530,7 +521,27 @@ namespace Advize_PlantEverything.Configuration
                 "oneOfEach",
                 false,
                 "When enabled, destroyed trees will drop every available item on their drop table when loot is dropped. Setting this to true will ensure that seeds are guaranteed to drop whenever the tree drops items (governed by dropChance setting)");
-            
+
+            //UI
+            enablePickableTimers = config(
+                "UI",
+                "EnablePickableTimers",
+                true,
+                "Enables display of growth time remaining on pickable resources.",
+                false);
+            enablePlantTimers = config(
+                "UI",
+                "EnablePlantTimers",
+                true,
+                "Enables display of growth time remaining on planted resources, such as crops and saplings.",
+                false);
+            growthAsPercentage = config(
+                "UI",
+                "GrowthAsPercentage",
+                false,
+                "Enables display of growth time as a percentage instead of time remaining.",
+                false);
+
             //General
             //resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
             alternateIcons.SettingChanged += PlantEverything.CoreSettingChanged;
@@ -636,14 +647,6 @@ namespace Advize_PlantEverything.Configuration
         internal bool EnableMiscFlora
         {
             get { return enableMiscFlora.Value; }
-        }
-        internal bool EnablePickableTimers
-        {
-            get { return enablePickableTimers.Value; }
-        }
-        internal bool EnablePlantTimers
-        {
-            get { return enablePlantTimers.Value; }
         }
         internal bool EnableLocalization
         {
@@ -924,6 +927,18 @@ namespace Advize_PlantEverything.Configuration
         internal bool OneOfEach
         {
             get { return oneOfEach.Value; }
+        }
+        internal bool EnablePickableTimers
+        {
+            get { return enablePickableTimers.Value; }
+        }
+        internal bool EnablePlantTimers
+        {
+            get { return enablePlantTimers.Value; }
+        }
+        internal bool GrowthAsPercentage
+        {
+            get { return growthAsPercentage.Value; }
         }
     }
 }

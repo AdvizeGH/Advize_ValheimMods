@@ -329,14 +329,9 @@ namespace Advize_PlantEverything
                     if (__instance.name.ToLower().Contains("surt"))
                         return;
 
+                    float growthTime = ___m_respawnTimeMinutes * 60;
                     DateTime pickedTime = new(___m_nview.GetZDO().GetLong("picked_time", 0L));
-                    TimeSpan difference = ZNet.instance.GetTime() - pickedTime;
-                    TimeSpan t = TimeSpan.FromSeconds(((float)___m_respawnTimeMinutes * 60) - difference.TotalSeconds);
-
-                    double remainingMinutes = ___m_respawnTimeMinutes - difference.TotalMinutes;
-                    double remainingRatio = remainingMinutes / (float)___m_respawnTimeMinutes;
-
-                    string timeString = FormatTimeString(t, remainingMinutes, remainingRatio);
+                    string timeString = FormatTimeString(growthTime, pickedTime);
 
                     __result = Localization.instance.Localize(__instance.GetHoverName()) + $"\n{timeString}";
                 }
@@ -352,15 +347,8 @@ namespace Advize_PlantEverything
                 if (config.EnablePlantTimers && ___m_status == 0)
                 {
                     float growthTime = GetGrowTime(__instance, ___m_nview);
-
                     DateTime plantTime = new(___m_nview.GetZDO().GetLong("plantTime", ZNet.instance.GetTime().Ticks));
-                    TimeSpan difference = ZNet.instance.GetTime() - plantTime;
-                    TimeSpan t = TimeSpan.FromSeconds(growthTime - difference.TotalSeconds);
-
-                    double remainingMinutes = (growthTime / 60) - difference.TotalMinutes;
-                    double remainingRatio = remainingMinutes / (growthTime / 60);
-
-                    string timeString = FormatTimeString(t, remainingMinutes, remainingRatio);
+                    string timeString = FormatTimeString(growthTime, plantTime);
 
                     __result += $"\n{timeString}";
                 }
@@ -376,8 +364,15 @@ namespace Advize_PlantEverything
             }
         }
 
-        public static string FormatTimeString(TimeSpan t, double remainingMinutes, double remainingRatio)
+        public static string FormatTimeString(float growthTime, DateTime placedTime)
         {
+            TimeSpan timeSincePlaced = ZNet.instance.GetTime() - placedTime;
+            TimeSpan t = TimeSpan.FromSeconds(growthTime - timeSincePlaced.TotalSeconds);
+
+            double remainingMinutes = (growthTime / 60) - timeSincePlaced.TotalMinutes;
+            double remainingRatio = remainingMinutes / (growthTime / 60);
+            int growthPercentage = Math.Min((int)((timeSincePlaced.TotalSeconds * 100) / growthTime), 100);
+
             string color = "red";
             if (remainingRatio < 0)
                 color = "cyan";
@@ -389,8 +384,10 @@ namespace Advize_PlantEverything
                 color = "orange";
 
             string timeRemaining = t.Hours <= 0 ? t.Minutes <= 0 ?
-                    $"{t.Seconds:D2}s" : $"{t.Minutes:D2}m {t.Seconds:D2}s" : $"{t.Hours:D2}h {t.Minutes:D2}m {t.Seconds:D2}s";
-            string formattedString = remainingMinutes < 0.0 ? $"(<color={color}>Ready any second now</color>)" : $"(Ready in <color={color}>{timeRemaining}</color>)";
+                $"{t.Seconds:D2}s" : $"{t.Minutes:D2}m {t.Seconds:D2}s" : $"{t.Hours:D2}h {t.Minutes:D2}m {t.Seconds:D2}s";
+
+            string formattedString = config.GrowthAsPercentage ?
+                $"(<color={color}>{growthPercentage}%</color>)" : remainingMinutes < 0.0 ? $"(<color={color}>Ready any second now</color>)" : $"(Ready in <color={color}>{timeRemaining}</color>)";
 
             return formattedString;
         }
