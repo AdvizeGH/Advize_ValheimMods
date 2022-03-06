@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.9.2";
+        public const string Version = "1.10.0";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -33,14 +33,6 @@ namespace Advize_PlantEverything
         private static ModConfig config;
 
         private static readonly Dictionary<string, string> stringDictionary = new() {
-            //{ "BirchConeName", "Birch Cone" },
-            //{ "BirchConeDescription", "Plant it to grow a birch tree." },
-            //{ "OakSeedsName", "Oak Seeds" },
-            //{ "OakSeedsDescription", "Plant them to grow an oak tree." },
-            { "AncientSeedsName", "Ancient Seeds" },
-            { "AncientSeedsDescription", "Plant them to grow an ancient tree." },
-            //{ "BirchSapling", "Birch Sapling" },
-            //{ "OakSapling", "Oak Sapling" },
             { "AncientSapling", "Ancient Sapling" },
             { "RaspberryBushName", "Raspberry Bush" },
             { "RaspberryBushDescription", "Plant raspberries to grow raspberry bushes." },
@@ -77,9 +69,7 @@ namespace Advize_PlantEverything
             { "VinesName", "Vines" },
             { "VinesDescription", "Plant vines." },
             { "GlowingMushroomName", "Glowing Mushroom" },
-            { "GlowingMushroomDescription", "Plant a large glowing mushroom." }/*,
-            { "GreydwarfNestName", "Greydwarf Nest" },
-            { "GreydwarfNestDescription", "Plant your very own greydwarf nest" }*/
+            { "GlowingMushroomDescription", "Plant a large glowing mushroom." }
         };
 
         private void Awake()
@@ -120,8 +110,6 @@ namespace Advize_PlantEverything
 
         private void SerializeDict()
         {
-            //Directory.CreateDirectory(modDirectory + "/Localization");
-
             string filePath = Path.Combine(modDirectory, $"english_{PluginName}.json");
 
             LocalizedStrings localizedStrings = new();
@@ -245,6 +233,7 @@ namespace Advize_PlantEverything
             prefabRefs.Add("shrub_2", null);
             prefabRefs.Add("shrub_2_heath", null);
             prefabRefs.Add("BirchSeeds", null);
+            prefabRefs.Add("AncientSeed", null);
             prefabRefs.Add("Acorn", null);
             prefabRefs.Add("BeechSeeds", null);
             prefabRefs.Add("Pickable_Mushroom", null);
@@ -259,8 +248,6 @@ namespace Advize_PlantEverything
             prefabRefs.Add("Birch_Sapling", null);
             prefabRefs.Add("vfx_Place_wood_pole", null);
             prefabRefs.Add("sfx_build_cultivator", null);
-            //prefabRefs.Add("Spawner_GreydwarfNest", null);
-
 
             Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
             for (int i = 0; i < array.Length; i++)
@@ -296,11 +283,6 @@ namespace Advize_PlantEverything
                 }
             }
 
-            //prefabRefs.Add("BirchCone", CreatePrefab("BirchCone"));
-            //prefabRefs.Add("OakSeeds", CreatePrefab("OakSeeds"));
-            prefabRefs.Add("AncientSeeds", CreatePrefab("AncientSeeds"));
-            //prefabRefs.Add("Birch_Sapling", CreatePrefab("Birch_Sapling"));
-            //prefabRefs.Add("Oak_Sapling", CreatePrefab("Oak_Sapling"));
             prefabRefs.Add("Ancient_Sapling", CreatePrefab("Ancient_Sapling"));
         }
 
@@ -597,9 +579,8 @@ namespace Advize_PlantEverything
             Dbgl("InitSaplingRefs");
 
             if (saplingRefs.Count > 0)
-            {
                 saplingRefs.Clear();
-            }
+
             saplingRefs = GenerateSaplingRefs();
         }
 
@@ -607,37 +588,11 @@ namespace Advize_PlantEverything
         {
             List<SaplingDB> newList = new()
             {
-                //new SaplingDB
-                //{
-                //    key = "Birch_Sapling",
-                //    source = "PineTree_Sapling",
-                //    resource = "BirchCone",
-                //    resourceCost = config.BirchCost,
-                //    biome = 17,
-                //    growTime = config.BirchGrowthTime,
-                //    growRadius = config.BirchGrowRadius,
-                //    minScale = config.BirchMinScale,
-                //    maxScale = config.BirchMaxScale,
-                //    grownPrefabs = new GameObject[] { prefabRefs["Birch1"], prefabRefs["Birch2"], prefabRefs["Birch1_aut"], prefabRefs["Birch2_aut"] }
-                //},
-                //new SaplingDB
-                //{
-                //    key = "Oak_Sapling",
-                //    source = "Beech_Sapling",
-                //    resource = "OakSeeds",
-                //    resourceCost = config.OakCost,
-                //    biome = 17,
-                //    growTime = config.OakGrowthTime,
-                //    growRadius = config.OakGrowRadius,
-                //    minScale = config.OakMinScale,
-                //    maxScale = config.OakMaxScale,
-                //    grownPrefabs = new GameObject[] { prefabRefs["Oak1"] }
-                //},
                 new SaplingDB
                 {
                     key = "Ancient_Sapling",
                     source = "PineTree_Sapling",
-                    resource = "AncientSeeds",
+                    resource = "AncientSeed",
                     resourceCost = 1,
                     biome = (int)Heightmap.Biome.Swamp,
                     growTime = config.AncientGrowthTime,
@@ -654,13 +609,6 @@ namespace Advize_PlantEverything
         private static void InitSaplings()
         {
             Dbgl("InitSaplings");
-
-            if (!isInitialized)
-            {
-                //FixSeed("BirchCone", prefabRefs["PineCone"]);
-                //FixSeed("OakSeeds", prefabRefs["BeechSeeds"]);
-                FixSeed("AncientSeeds", prefabRefs["BeechSeeds"]);
-            }
 
             ModifyTreeDrops();
 
@@ -755,15 +703,6 @@ namespace Advize_PlantEverything
             isInitialized = true;
         }
 
-        private static void InitItems(ObjectDB instance)
-        {
-            Dbgl("InitItems");
-
-            //if (!instance.m_items.Contains(prefabRefs["BirchCone"])) instance.m_items.Add(prefabRefs["BirchCone"]);
-            //if (!instance.m_items.Contains(prefabRefs["OakSeeds"])) instance.m_items.Add(prefabRefs["OakSeeds"]);
-            if (!instance.m_items.Contains(prefabRefs["AncientSeeds"])) instance.m_items.Add(prefabRefs["AncientSeeds"]);
-        }
-
         private static void InitCultivator()
         {
             Dbgl("InitCultivator");
@@ -795,56 +734,16 @@ namespace Advize_PlantEverything
             InitCultivator();
 
             if (stringDictionary.Count > 0)
-            {
                 InitLocalization();
-            }
 
-            List<GameObject> prefabs = new()
-            {
-                //prefabRefs["BirchCone"],
-                //prefabRefs["OakSeeds"],
-                prefabRefs["AncientSeeds"],
-                //prefabRefs["Birch_Sapling"],
-                //prefabRefs["Oak_Sapling"],
-                prefabRefs["Ancient_Sapling"]
-            };
-
-            foreach (GameObject prefab in prefabs)
-            {
-                if (!__instance.m_prefabs.Contains(prefab))
-                    __instance.m_prefabs.Add(prefab);
-            }
-        }
-
-        private static void FixSeed(string name, GameObject source)
-        {
-            GameObject prefab = prefabRefs[name];
-            // prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_icons[0] = source.GetComponent<ItemDrop>().m_itemData.m_shared.m_icons[0];
-
-            if (source == prefabRefs["PineCone"])
-            {
-                prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_icons[0] = CreateSprite("birchConeItemIcon.png", new Rect(0, 0, 64, 64));
-                prefab.transform.Find("cone").gameObject.GetComponent<MeshFilter>().mesh = source.transform.Find("cone").gameObject.GetComponent<MeshFilter>().mesh;
-                prefab.transform.Find("cone").gameObject.GetComponent<MeshRenderer>().sharedMaterials = source.transform.Find("cone").gameObject.GetComponent<MeshRenderer>().sharedMaterials;
-                prefab.transform.Find("cone").gameObject.GetComponent<MeshCollider>().sharedMesh = source.transform.Find("cone").gameObject.GetComponent<MeshCollider>().sharedMesh;
-                //prefab.GetComponent<ParticleSystem>(). // particle renderer could be copied here but unsure how
-            }
-
-            if (source == prefabRefs["BeechSeeds"])
-            {
-                string fileName = name.Equals("OakSeeds") ? "oakSeedsItemIcon.png" : "ancientSeedsItemIcon.png";
-                prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_icons[0] = CreateSprite(fileName, new Rect(0, 0, 64, 64));
-                prefab.transform.Find("Sphere (5)").gameObject.GetComponent<MeshFilter>().mesh = source.transform.Find("Sphere (5)").gameObject.GetComponent<MeshFilter>().mesh;
-                prefab.transform.Find("Sphere (5)").gameObject.GetComponent<MeshRenderer>().sharedMaterials = source.transform.Find("Sphere (5)").gameObject.GetComponent<MeshRenderer>().sharedMaterials;
-                prefab.transform.Find("Sphere (6)").gameObject.GetComponent<MeshFilter>().mesh = source.transform.Find("Sphere (6)").gameObject.GetComponent<MeshFilter>().mesh;
-                prefab.transform.Find("Sphere (6)").gameObject.GetComponent<MeshRenderer>().sharedMaterials = source.transform.Find("Sphere (5)").gameObject.GetComponent<MeshRenderer>().sharedMaterials;
-                prefab.transform.Find("Sphere (7)").gameObject.GetComponent<MeshFilter>().mesh = source.transform.Find("Sphere (7)").gameObject.GetComponent<MeshFilter>().mesh;
-                prefab.transform.Find("Sphere (7)").gameObject.GetComponent<MeshRenderer>().sharedMaterials = source.transform.Find("Sphere (5)").gameObject.GetComponent<MeshRenderer>().sharedMaterials;
-            }
+            if (!__instance.m_prefabs.Contains(prefabRefs["Ancient_Sapling"]))
+                __instance.m_prefabs.Add(prefabRefs["Ancient_Sapling"]);
         }
 
         private static void ModifyTreeDrops()
         {
+            if (!config.EnableSeedOverrides) return;
+
             Dictionary<GameObject, GameObject> dropsByTarget = new()
             {
                 { prefabRefs["Birch1"], prefabRefs["BirchSeeds"] },
@@ -852,7 +751,7 @@ namespace Advize_PlantEverything
                 { prefabRefs["Birch2_aut"], prefabRefs["BirchSeeds"] },
                 { prefabRefs["Birch1_aut"], prefabRefs["BirchSeeds"] },
                 { prefabRefs["Oak1"], prefabRefs["Acorn"] },
-                { prefabRefs["SwampTree1"], prefabRefs["AncientSeeds"] },
+                { prefabRefs["SwampTree1"], prefabRefs["AncientSeed"] },
                 { prefabRefs["Beech1"], prefabRefs["BeechSeeds"] },
                 { prefabRefs["Pinetree_01"], prefabRefs["PineCone"] },
                 { prefabRefs["FirTree"], prefabRefs["FirCone"] }

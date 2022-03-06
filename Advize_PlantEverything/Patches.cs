@@ -16,19 +16,6 @@ namespace Advize_PlantEverything
             {
                 Dbgl("ObjectDBAwake");
                 InitPrefabRefs();
-                if (ZNetScene.instance == null) return;
-                Dbgl("& ZNetScene not null");
-                InitItems(__instance);
-            }
-        }
-
-        [HarmonyPatch(typeof(ObjectDB), "CopyOtherDB")]
-        public static class ObjectDBCopyOtherDB
-        {
-            public static void Postfix(ObjectDB other)
-            {
-                Dbgl("ObjectDBCopyOtherDB");
-                InitItems(other);
             }
         }
 
@@ -43,32 +30,6 @@ namespace Advize_PlantEverything
             }
         }
 
-        [HarmonyPatch(typeof(ObjectDB), "GetItemPrefab", new Type[] { typeof(int) })]
-        public static class ObjectDBGetItemPrefab
-        {
-            public static void Postfix(int hash, ref GameObject __result, ObjectDB __instance)
-            {
-                if (__result == null && prefabRefs.Count > 0)
-                {
-                    List<GameObject> prefabs = new()
-                    {
-                        //prefabRefs["BirchCone"],
-                        //prefabRefs["OakSeeds"],
-                        prefabRefs["AncientSeeds"]
-                    };
-
-                    foreach (GameObject prefab in prefabs)
-                    {
-                        if (hash == __instance.GetPrefabHash(prefab))
-                        {
-                            __result = prefab;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
         [HarmonyPatch(typeof(ZNetScene), "GetPrefab", new Type[] { typeof(int) })]
         public static class ZNetSceneGetPrefab
         {
@@ -76,24 +37,8 @@ namespace Advize_PlantEverything
             {
                 if (__result == null)
                 {
-                    List<GameObject> prefabs = new()
-                    {
-                        //prefabRefs["BirchCone"],
-                        //prefabRefs["OakSeeds"],
-                        prefabRefs["AncientSeeds"],
-                        //prefabRefs["Birch_Sapling"],
-                        //prefabRefs["Oak_Sapling"],
-                        prefabRefs["Ancient_Sapling"]
-                    };
-
-                    foreach (GameObject prefab in prefabs)
-                    {
-                        if (hash == __instance.GetPrefabHash(prefab))
-                        {
-                            __result = prefab;
-                            break;
-                        }
-                    }
+                    if (hash == __instance.GetPrefabHash(prefabRefs["Ancient_Sapling"]))
+                        __result = prefabRefs["Ancient_Sapling"];
                 }
             }
         }
