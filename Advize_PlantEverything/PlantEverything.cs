@@ -981,17 +981,17 @@ namespace Advize_PlantEverything
             internal GameObject[] grownPrefabs;
         }
 
-        /*
-         * Double check config options and descriptions (including old ones that have been reorganized). Normalize them all.
+        /* TODO: * = Incomplete, *** = Complete, *~ = Skipped for now
+         *~ Double check config options and descriptions (including old ones that have been reorganized). Normalize them all.
          *** Add listeners for crop config setting changes
          *** Make executive decisions on which individual crop settings should be configurable
          *** Change when and how crop settings are applied (awake method init doesn't work for existing instances of game objects)
          *** Might need to write custom crop piece change code for cultivator
          *** Check if sort order can be changed in configuration manager (I think it can) or if its needed at all
-         * Remove outdated screenshots. Update them? (Nexus first)
+         *** Remove outdated screenshots. Update them? (Nexus first)
          *~ Update all localization files to remove ancient seeds
          *~ Double check seed drop related fields
-         * Clean up PrefabDB usage, remove duplicate code
+         *~ Clean up PrefabDB usage, remove duplicate code
          * */
     }
 }
