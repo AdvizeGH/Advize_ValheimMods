@@ -18,12 +18,11 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<bool> enableLocalization; //local
         private readonly ConfigEntry<string> language; //local
 
-        //Difficulty 7
+        //Difficulty 6
         private readonly ConfigEntry<bool> requireCultivation;
         private readonly ConfigEntry<bool> placeAnywhere;
         private readonly ConfigEntry<bool> enforceBiomes;
         private readonly ConfigEntry<bool> enforceBiomesVanilla;
-        private readonly ConfigEntry<bool> enableCropOverrides;
         private readonly ConfigEntry<bool> recoverResources;
         private readonly ConfigEntry<bool> resourcesSpawnEmpty;
 
@@ -38,13 +37,30 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<int> blueberryReturn;
         private readonly ConfigEntry<int> cloudberryReturn;
 
-        //Crops 6
+        //Crops 23
+        private readonly ConfigEntry<bool> enableCropOverrides;
+        private readonly ConfigEntry<bool> cropRequireCultivation;
         private readonly ConfigEntry<float> cropMinScale;
         private readonly ConfigEntry<float> cropMaxScale;
         private readonly ConfigEntry<float> cropGrowTimeMin;
         private readonly ConfigEntry<float> cropGrowTimeMax;
         private readonly ConfigEntry<float> cropGrowRadius;
-        private readonly ConfigEntry<bool> cropRequireCultivation;
+        private readonly ConfigEntry<int> barleyCost;
+        private readonly ConfigEntry<int> barleyReturn;
+        private readonly ConfigEntry<int> carrotCost;
+        private readonly ConfigEntry<int> carrotReturn;
+        private readonly ConfigEntry<int> flaxCost;
+        private readonly ConfigEntry<int> flaxReturn;
+        private readonly ConfigEntry<int> onionCost;
+        private readonly ConfigEntry<int> onionReturn;
+        private readonly ConfigEntry<int> seedCarrotCost;
+        private readonly ConfigEntry<int> seedCarrotReturn;
+        private readonly ConfigEntry<int> seedOnionCost;
+        private readonly ConfigEntry<int> seedOnionReturn;
+        private readonly ConfigEntry<int> seedTurnipCost;
+        private readonly ConfigEntry<int> seedTurnipReturn;
+        private readonly ConfigEntry<int> turnipCost;
+        private readonly ConfigEntry<int> turnipReturn;
 
         //Mushrooms 9
         private readonly ConfigEntry<int> mushroomCost;
@@ -66,9 +82,6 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<int> dandelionReturn;
 
         //Saplings 24
-        //private readonly ConfigEntry<int> birchCost;
-        //private readonly ConfigEntry<int> oakCost;
-        //private readonly ConfigEntry<int> ancientCost;
         private readonly ConfigEntry<float> birchMinScale;
         private readonly ConfigEntry<float> birchMaxScale;
         private readonly ConfigEntry<float> oakMinScale;
@@ -81,7 +94,6 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<float> birchGrowRadius;
         private readonly ConfigEntry<float> oakGrowRadius;
         private readonly ConfigEntry<float> ancientGrowRadius;
-
         private readonly ConfigEntry<float> beechGrowthTime;
         private readonly ConfigEntry<float> pineGrowthTime;
         private readonly ConfigEntry<float> firGrowthTime;
@@ -95,13 +107,14 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<float> pineGrowRadius;
         private readonly ConfigEntry<float> firGrowRadius;
 
-        //Seeds 4
+        //Seeds 5
+        private readonly ConfigEntry<bool> enableSeedOverrides;
         private readonly ConfigEntry<int> seedDropMin;
         private readonly ConfigEntry<int> seedDropMax;
         private readonly ConfigEntry<float> dropChance;
         private readonly ConfigEntry<bool> oneOfEach;
 
-        //UI
+        //UI 3
         private readonly ConfigEntry<bool> enablePickableTimers; //local
         private readonly ConfigEntry<bool> enablePlantTimers; //local
         private readonly ConfigEntry<bool> growthAsPercentage; //local
@@ -189,11 +202,6 @@ namespace Advize_PlantEverything.Configuration
                 "EnforceBiomesVanilla",
                 true,
                 "Restrict vanilla plantables to being placed in their respective biome");
-            enableCropOverrides = config(
-                "Difficulty",
-                "EnableCropOverrides",
-                false,
-                "Enables the [Crops] section of this config");
             recoverResources = config(
                 "Difficulty",
                 "RecoverResources",
@@ -253,6 +261,11 @@ namespace Advize_PlantEverything.Configuration
                 "Number of berries a cloudberry bush will spawn");
 
             //Crops
+            enableCropOverrides = config(
+                "Crops",
+                "EnableCropOverrides",
+                false,
+                new ConfigDescription("Enables the [Crops] section of this config", null, new ConfigurationManagerAttributes { Order = 25 }));
             cropMinScale = config(
                 "Crops",
                 "CropMinScale",
@@ -283,6 +296,86 @@ namespace Advize_PlantEverything.Configuration
                 "CropsRequireCultivation",
                 true,
                 "Crops can only be planted on cultivated ground");
+            barleyCost = config(
+                "Crops",
+                "BarleyCost",
+                1,
+                "Resource cost of planting barley");
+            barleyReturn = config(
+                "Crops",
+                "BarleyReturn",
+                2,
+                "Resources gained upon harvesting barley (does not apply to wild barley)");
+            carrotCost = config(
+                "Crops",
+                "CarrotCost",
+                1,
+                "Resource cost of planting carrots");
+            carrotReturn = config(
+                "Crops",
+                "CarrotReturn",
+                1,
+                "Resources gained upon harvesting carrots");
+            flaxCost = config(
+                "Crops",
+                "FlaxCost",
+                1,
+                "Resource cost of planting flax");
+            flaxReturn = config(
+                "Crops",
+                "FlaxReturn",
+                2,
+                "Resources gained upon harvesting flax (does not apply to wild flax)");
+            onionCost = config(
+                "Crops",
+                "OnionCost",
+                1,
+                "Resource cost of planting onions");
+            onionReturn = config(
+                "Crops",
+                "OnionReturn",
+                1,
+                "Resources gained upon harvesting onions");
+            seedCarrotCost = config(
+                "Crops",
+                "SeedCarrotCost",
+                1,
+                "Resource cost of planting seed carrots");
+            seedCarrotReturn = config(
+                "Crops",
+                "SeedCarrotReturn",
+                3,
+                "Resources gained upon harvesting seed carrots");
+            seedOnionCost = config(
+                "Crops",
+                "SeedOnionCost",
+                1,
+                "Resource cost of planting seed onions");
+            seedOnionReturn = config(
+                "Crops",
+                "SeedOnionReturn",
+                3,
+                "Resources gained upon harvesting seed onions");
+            seedTurnipCost = config(
+                "Crops",
+                "SeedTurnipCost",
+                1,
+                "Resource cost of planting seed turnips");
+            seedTurnipReturn = config(
+                "Crops",
+                "SeedTurnipReturn",
+                3,
+                "Resources gained upon harvesting seed turnips");
+            turnipCost = config(
+                "Crops",
+                "TurnipCost",
+                1,
+                "Resource cost of planting turnips");
+            turnipReturn = config(
+                "Crops",
+                "TurnipReturn",
+                1,
+                "Resources gained upon harvesting turnips");
 
             //Mushrooms
             mushroomCost = config(
@@ -364,21 +457,6 @@ namespace Advize_PlantEverything.Configuration
                 "Number of dandelion a pickable dandelion spawner will spawn");
 
             //Saplings
-            //birchCost = config.Bind(
-            //    "Saplings",
-            //    "BirchCost",
-            //    1,
-            //    "Number of birch cones required to place a birch sapling");
-            //oakCost = config.Bind(
-            //    "Saplings",
-            //    "OakCost",
-            //    1,
-            //    "Number of oak seeds required to place an oak sapling");
-            //ancientCost = config.Bind(
-            //    "Saplings",
-            //    "AncientCost",
-            //    1,
-            //    "Number of ancient seeds required to place an ancient sapling");
             birchMinScale = config(
                 "Saplings",
                 "BirchMinScale",
@@ -501,6 +579,11 @@ namespace Advize_PlantEverything.Configuration
                 "Radius of free space required for a fir sapling to grow");
 
             //Seeds
+            enableSeedOverrides = config(
+                "Seeds",
+                "EnableSeedOverrides",
+                false,
+                new ConfigDescription("Enables the [Seeds] section of this config", null, new ConfigurationManagerAttributes { Order = 10 }));
             seedDropMin = config(
                 "Seeds",
                 "seedDropMin",
@@ -553,7 +636,6 @@ namespace Advize_PlantEverything.Configuration
             placeAnywhere.SettingChanged += PlantEverything.CoreSettingChanged;
             enforceBiomes.SettingChanged += PlantEverything.CoreSettingChanged;
             //enforceBiomesVanilla.SettingChanged += PlantEverything.ConfigurationSettingChanged;
-            //enableCropOverrides.SettingChanged += PlantEverything.ConfigurationSettingChanged;
             recoverResources.SettingChanged += PlantEverything.CoreSettingChanged;
             //resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
 
@@ -569,12 +651,29 @@ namespace Advize_PlantEverything.Configuration
             cloudberryReturn.SettingChanged += PlantEverything.PickableSettingChanged;
 
             //Crops
-            //cropMinScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
-            //cropMaxScale.SettingChanged += PlantEverything.ConfigurationSettingChanged;
-            //cropGrowTimeMin.SettingChanged += PlantEverything.ConfigurationSettingChanged;
-            //cropGrowTimeMax.SettingChanged += PlantEverything.ConfigurationSettingChanged;
-            //cropGrowRadius.SettingChanged += PlantEverything.ConfigurationSettingChanged;
-            //cropRequireCultivation.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            enableCropOverrides.SettingChanged += PlantEverything.CropSettingChanged;
+            cropMinScale.SettingChanged += PlantEverything.CropSettingChanged;
+            cropMaxScale.SettingChanged += PlantEverything.CropSettingChanged;
+            cropGrowTimeMin.SettingChanged += PlantEverything.CropSettingChanged;
+            cropGrowTimeMax.SettingChanged += PlantEverything.CropSettingChanged;
+            cropGrowRadius.SettingChanged += PlantEverything.CropSettingChanged;
+            cropRequireCultivation.SettingChanged += PlantEverything.CropSettingChanged;
+            barleyCost.SettingChanged += PlantEverything.CropSettingChanged;
+            barleyReturn.SettingChanged += PlantEverything.CropSettingChanged;
+            carrotCost.SettingChanged += PlantEverything.CropSettingChanged;
+            carrotReturn.SettingChanged += PlantEverything.CropSettingChanged;
+            flaxCost.SettingChanged += PlantEverything.CropSettingChanged;
+            flaxReturn.SettingChanged += PlantEverything.CropSettingChanged;
+            onionCost.SettingChanged += PlantEverything.CropSettingChanged;
+            onionReturn.SettingChanged += PlantEverything.CropSettingChanged;
+            seedCarrotCost.SettingChanged += PlantEverything.CropSettingChanged;
+            seedCarrotReturn.SettingChanged += PlantEverything.CropSettingChanged;
+            seedOnionCost.SettingChanged += PlantEverything.CropSettingChanged;
+            seedOnionReturn.SettingChanged += PlantEverything.CropSettingChanged;
+            seedTurnipCost.SettingChanged += PlantEverything.CropSettingChanged;
+            seedTurnipReturn.SettingChanged += PlantEverything.CropSettingChanged;
+            turnipCost.SettingChanged += PlantEverything.CropSettingChanged;
+            turnipReturn.SettingChanged += PlantEverything.CropSettingChanged;
 
             //Mushrooms
             mushroomCost.SettingChanged += PlantEverything.PickableSettingChanged;
@@ -622,6 +721,7 @@ namespace Advize_PlantEverything.Configuration
             oakMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
 
             //Seeds
+            enableSeedOverrides.SettingChanged += PlantEverything.SeedSettingChanged;
             seedDropMin.SettingChanged += PlantEverything.SeedSettingChanged;
             seedDropMax.SettingChanged += PlantEverything.SeedSettingChanged;
             dropChance.SettingChanged += PlantEverything.SeedSettingChanged;
@@ -672,10 +772,6 @@ namespace Advize_PlantEverything.Configuration
         {
             get { return enforceBiomesVanilla.Value; }
         }
-        internal bool EnableCropOverrides
-        {
-            get { return enableCropOverrides.Value; }
-        }
         internal bool RecoverResources
         {
             get { return recoverResources.Value; }
@@ -720,6 +816,10 @@ namespace Advize_PlantEverything.Configuration
         {
             get { return cloudberryReturn.Value; }
         }
+        internal bool EnableCropOverrides
+        {
+            get { return enableCropOverrides.Value; }
+        }
         internal float CropMinScale
         {
             get { return cropMinScale.Value; }
@@ -743,6 +843,70 @@ namespace Advize_PlantEverything.Configuration
         internal bool CropRequireCultivation
         {
             get { return cropRequireCultivation.Value; }
+        }
+        internal int BarleyCost
+        {
+            get { return barleyCost.Value; }
+        }
+        internal int BarleyReturn
+        {
+            get { return barleyReturn.Value; }
+        }
+        internal int CarrotCost
+        {
+            get { return carrotCost.Value; }
+        }
+        internal int CarrotReturn
+        {
+            get { return carrotReturn.Value; }
+        }
+        internal int FlaxCost
+        {
+            get { return flaxCost.Value; }
+        }
+        internal int FlaxReturn
+        {
+            get { return flaxReturn.Value; }
+        }
+        internal int OnionCost
+        {
+            get { return onionCost.Value; }
+        }
+        internal int OnionReturn
+        {
+            get { return onionReturn.Value; }
+        }
+        internal int SeedCarrotCost
+        {
+            get { return seedCarrotCost.Value; }
+        }
+        internal int SeedCarrotReturn
+        {
+            get { return seedCarrotReturn.Value; }
+        }
+        internal int SeedOnionCost
+        {
+            get { return seedOnionCost.Value; }
+        }
+        internal int SeedOnionReturn
+        {
+            get { return seedOnionReturn.Value; }
+        }
+        internal int SeedTurnipCost
+        {
+            get { return seedTurnipCost.Value; }
+        }
+        internal int SeedTurnipReturn
+        {
+            get { return seedTurnipReturn.Value; }
+        }
+        internal int TurnipCost
+        {
+            get { return turnipCost.Value; }
+        }
+        internal int TurnipReturn
+        {
+            get { return turnipReturn.Value; }
         }
         internal int MushroomCost
         {
@@ -911,6 +1075,10 @@ namespace Advize_PlantEverything.Configuration
         internal float FirGrowRadius
         {
             get { return firGrowRadius.Value; }
+        }
+        internal bool EnableSeedOverrides
+        {
+            get { return enableSeedOverrides.Value; }
         }
         internal int SeedDropMin
         {

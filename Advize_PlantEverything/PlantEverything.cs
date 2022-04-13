@@ -21,7 +21,7 @@ namespace Advize_PlantEverything
         public static ManualLogSource PELogger = new($" {PluginName}");
 
         private static readonly Dictionary<string, GameObject> prefabRefs = new();
-        private static List<PrefabDB> pieceRefs = new();
+        private static List<PieceDB> pieceRefs = new();
         private static List<SaplingDB> saplingRefs = new();
 
         private static bool isInitialized = false;
@@ -241,11 +241,19 @@ namespace Advize_PlantEverything
             prefabRefs.Add("RaspberryBush", null);
             prefabRefs.Add("Pickable_Mushroom_blue", null);
             prefabRefs.Add("Pickable_Mushroom_yellow", null);
+            prefabRefs.Add("sapling_seedonion", null);
             prefabRefs.Add("Beech_Sapling", null);
             prefabRefs.Add("PineTree_Sapling", null);
             prefabRefs.Add("FirTree_Sapling", null);
+            prefabRefs.Add("sapling_onion", null);
+            prefabRefs.Add("sapling_turnip", null);
             prefabRefs.Add("Oak_Sapling", null);
+            prefabRefs.Add("sapling_barley", null);
             prefabRefs.Add("Birch_Sapling", null);
+            prefabRefs.Add("sapling_carrot", null);
+            prefabRefs.Add("sapling_seedcarrot", null);
+            prefabRefs.Add("sapling_flax", null);
+            prefabRefs.Add("sapling_seedturnip", null);
             prefabRefs.Add("vfx_Place_wood_pole", null);
             prefabRefs.Add("sfx_build_cultivator", null);
 
@@ -292,7 +300,7 @@ namespace Advize_PlantEverything
 
             if (pieceRefs.Count > 0)
             {
-                foreach (PrefabDB pdb in pieceRefs)
+                foreach (PieceDB pdb in pieceRefs)
                 {
                     if (prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pdb.Prefab))
                     {
@@ -311,11 +319,11 @@ namespace Advize_PlantEverything
             pieceRefs = GeneratePieceRefs();
         }
 
-        private static List<PrefabDB> GeneratePieceRefs()
+        private static List<PieceDB> GeneratePieceRefs()
         {
-            List<PrefabDB> newList = new()
+            List<PieceDB> newList = new()
             {
-                new PrefabDB
+                new PieceDB
                 {
                     key = "RaspberryBush",
                     ResourceCost = config.RaspberryCost,
@@ -326,7 +334,7 @@ namespace Advize_PlantEverything
                     recover = config.RecoverResources,
                     piece = CreatePiece("RaspberryBushName", "RaspberryBushDescription", prefabRefs["RaspberryBush"].GetOrAddComponent<Piece>())
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "BlueberryBush",
                     ResourceCost = config.BlueberryCost,
@@ -337,7 +345,7 @@ namespace Advize_PlantEverything
                     recover = config.RecoverResources,
                     piece = CreatePiece("BlueberryBushName", "BlueBerryBushDescription", prefabRefs["BlueberryBush"].GetOrAddComponent<Piece>())
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "CloudberryBush",
                     ResourceCost = config.CloudberryCost,
@@ -348,7 +356,7 @@ namespace Advize_PlantEverything
                     recover = config.RecoverResources,
                     piece = CreatePiece("CloudberryBushName", "CloudberryBushDescription", prefabRefs["CloudberryBush"].GetOrAddComponent<Piece>())
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "Pickable_Mushroom",
                     ResourceCost = config.MushroomCost,
@@ -358,7 +366,7 @@ namespace Advize_PlantEverything
                     recover = config.RecoverResources,
                     piece = CreatePiece("PickableMushroomName", "PickableMushroomDescription", prefabRefs["Pickable_Mushroom"].GetOrAddComponent<Piece>(), isGrounded: true)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "Pickable_Mushroom_yellow",
                     ResourceCost = config.YellowMushroomCost,
@@ -368,7 +376,7 @@ namespace Advize_PlantEverything
                     recover = config.RecoverResources,
                     piece = CreatePiece("PickableYellowMushroomName", "PickableYellowMushroomDescription", prefabRefs["Pickable_Mushroom_yellow"].GetOrAddComponent<Piece>(), isGrounded: true)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "Pickable_Mushroom_blue",
                     ResourceCost = config.BlueMushroomCost,
@@ -378,7 +386,7 @@ namespace Advize_PlantEverything
                     recover = config.RecoverResources,
                     piece = CreatePiece("PickableBlueMushroomName", "PickableBlueMushroomDescription", prefabRefs["Pickable_Mushroom_blue"].GetOrAddComponent<Piece>(), isGrounded: true)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "Pickable_Thistle",
                     ResourceCost = config.ThistleCost,
@@ -388,7 +396,7 @@ namespace Advize_PlantEverything
                     recover = config.RecoverResources,
                     piece = CreatePiece("PickableThistleName", "PickableThistleDescription", prefabRefs["Pickable_Thistle"].GetOrAddComponent<Piece>(), isGrounded: true)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "Pickable_Dandelion",
                     ResourceCost = config.DandelionCost,
@@ -402,9 +410,9 @@ namespace Advize_PlantEverything
 
             if (!config.EnableMiscFlora) return newList;
 
-            newList.AddRange(new List<PrefabDB>()
+            newList.AddRange(new List<PieceDB>()
             {
-                new PrefabDB
+                new PieceDB
                 {
                     key = "Beech_small1",
                     Resource = new KeyValuePair<string, int>("BeechSeeds", 1),
@@ -412,7 +420,7 @@ namespace Advize_PlantEverything
                     icon = true,
                     piece = CreatePiece("BeechSmallName", "BeechSmallDescription", prefabRefs["Beech_small1"].GetOrAddComponent<Piece>(), canBeRemoved: false)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "FirTree_small",
                     Resource = new KeyValuePair<string, int>("FirCone", 1),
@@ -420,7 +428,7 @@ namespace Advize_PlantEverything
                     icon = true,
                     piece = CreatePiece("FirSmallName", "FirSmallDescription", prefabRefs["FirTree_small"].GetOrAddComponent<Piece>(), canBeRemoved: false)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "FirTree_small_dead",
                     Resource = new KeyValuePair<string, int>("FirCone", 1),
@@ -428,7 +436,7 @@ namespace Advize_PlantEverything
                     icon = true,
                     piece = CreatePiece("FirSmallDeadName", "FirSmallDeadDescription", prefabRefs["FirTree_small_dead"].GetOrAddComponent<Piece>(), canBeRemoved: false)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "Bush01",
                     Resource = new KeyValuePair<string, int>("Wood", 2),
@@ -436,7 +444,7 @@ namespace Advize_PlantEverything
                     icon = true,
                     piece = CreatePiece("Bush01Name", "Bush01Description", prefabRefs["Bush01"].GetOrAddComponent<Piece>(), canBeRemoved: false)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "Bush01_heath",
                     Resource = new KeyValuePair<string, int>("Wood", 2),
@@ -444,7 +452,7 @@ namespace Advize_PlantEverything
                     icon = true,
                     piece = CreatePiece("Bush02Name", "Bush02Description", prefabRefs["Bush01_heath"].GetOrAddComponent<Piece>(), canBeRemoved: false)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "Bush02_en",
                     Resource = new KeyValuePair<string, int>("Wood", 3),
@@ -452,7 +460,7 @@ namespace Advize_PlantEverything
                     icon = true,
                     piece = CreatePiece("PlainsBushName", "PlainsBushDescription", prefabRefs["Bush02_en"].GetOrAddComponent<Piece>(), canBeRemoved: false)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "shrub_2",
                     Resource = new KeyValuePair<string, int>("Wood", 2),
@@ -460,7 +468,7 @@ namespace Advize_PlantEverything
                     icon = true,
                     piece = CreatePiece("Shrub01Name", "Shrub01Description", prefabRefs["shrub_2"].GetOrAddComponent<Piece>(), canBeRemoved: false)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "shrub_2_heath",
                     Resource = new KeyValuePair<string, int>("Wood", 2),
@@ -468,7 +476,7 @@ namespace Advize_PlantEverything
                     icon = true,
                     piece = CreatePiece("Shrub02Name", "Shrub02Description", prefabRefs["shrub_2_heath"].GetOrAddComponent<Piece>(), canBeRemoved: false)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "vines",
                     Resource = new KeyValuePair<string, int>("Wood", 2),
@@ -477,7 +485,7 @@ namespace Advize_PlantEverything
                     recover = true,
                     piece = CreatePiece("VinesName", "VinesDescription", prefabRefs["vines"].GetOrAddComponent<Piece>(), isGrounded: false)
                 },
-                new PrefabDB
+                new PieceDB
                 {
                     key = "GlowingMushroom",
                     Resources = new Dictionary<string, int>() { { "MushroomYellow", 3 }, { "BoneFragments", 1 }, { "Ooze", 1 } },
@@ -494,7 +502,7 @@ namespace Advize_PlantEverything
         {
             Dbgl("InitPieces");
 
-            foreach (PrefabDB pdb in pieceRefs)
+            foreach (PieceDB pdb in pieceRefs)
             {
                 ItemDrop resource = ObjectDB.instance.GetItemPrefab(pdb.Resource.Key).GetComponent<ItemDrop>();
 
@@ -703,6 +711,88 @@ namespace Advize_PlantEverything
             isInitialized = true;
         }
 
+        private static void InitCrops()
+        {
+            Dbgl("InitCrops");
+            if (!config.EnableCropOverrides)
+                return;
+
+            List<PrefabDB> crops = new()
+            {
+                new PrefabDB
+                {
+                    key = "sapling_barley",
+                    resourceCost = config.BarleyCost,
+                    resourceReturn = config.BarleyReturn
+                },
+                new PrefabDB
+                {
+                    key = "sapling_carrot",
+                    resourceCost = config.CarrotCost,
+                    resourceReturn = config.CarrotReturn
+                },
+                new PrefabDB
+                {
+                    key = "sapling_flax",
+                    resourceCost = config.FlaxCost,
+                    resourceReturn = config.FlaxReturn
+                },
+                new PrefabDB
+                {
+                    key = "sapling_onion",
+                    resourceCost = config.OnionCost,
+                    resourceReturn = config.OnionCost
+                },
+                new PrefabDB
+                {
+                    key = "sapling_seedcarrot",
+                    resourceCost = config.SeedCarrotCost,
+                    resourceReturn = config.SeedCarrotReturn
+                },
+                new PrefabDB
+                {
+                    key = "sapling_seedonion",
+                    resourceCost = config.SeedOnionCost,
+                    resourceReturn = config.SeedOnionReturn
+                },
+                new PrefabDB
+                {
+                    key = "sapling_seedturnip",
+                    resourceCost = config.SeedTurnipCost,
+                    resourceReturn = config.SeedTurnipReturn
+                },
+                new PrefabDB
+                {
+                    key = "sapling_turnip",
+                    resourceCost = config.TurnipCost,
+                    resourceReturn = config.TurnipReturn
+                }
+            };
+
+            foreach (PrefabDB pdb in crops)
+            {
+                Piece piece = pdb.Prefab.GetComponent<Piece>();
+                Plant plant = pdb.Prefab.GetComponent<Plant>();
+                Pickable pickable = plant.m_grownPrefabs[0].GetComponent<Pickable>();
+
+                piece.m_resources[0].m_amount = pdb.resourceCost;
+
+                plant.m_destroyIfCantGrow = pdb.Prefab.GetComponent<Piece>().m_groundOnly = !config.PlaceAnywhere;
+
+                if (!config.EnforceBiomesVanilla)
+                    plant.m_biome = (Heightmap.Biome)895;
+
+                plant.m_minScale = config.CropMinScale;
+                plant.m_maxScale = config.CropMaxScale;
+                plant.m_growTime = config.CropGrowTimeMin;
+                plant.m_growTimeMax = config.CropGrowTimeMax;
+                plant.m_growRadius = config.CropGrowRadius;
+                plant.m_needCultivatedGround = piece.m_cultivatedGroundOnly = config.CropRequireCultivation;
+
+                pickable.m_amount = pdb.resourceReturn;
+            }
+        }
+
         private static void InitCultivator()
         {
             Dbgl("InitCultivator");
@@ -731,6 +821,7 @@ namespace Advize_PlantEverything
             InitPieces();
             InitSaplingRefs();
             InitSaplings();
+            InitCrops();
             InitCultivator();
 
             if (stringDictionary.Count > 0)
@@ -817,6 +908,12 @@ namespace Advize_PlantEverything
             ModifyTreeDrops();
         }
 
+        internal static void CropSettingChanged(object o, System.EventArgs e)
+        {
+            Dbgl($"Config setting changed, re-initializing crops");
+            InitCrops();
+        }
+
         public static void InitLocalization()
         {
             Dbgl("InitLocalization");
@@ -832,26 +929,27 @@ namespace Advize_PlantEverything
             public List<string> localizedStrings = new();
         }
 
-        private struct PrefabDB
+        internal class PrefabDB
         {
             internal string key;
-            private Dictionary<string, int> resources;
-
-            private int resourceCost;
-            internal int resourceReturn;
-            internal int respawnTime;
             internal int biome;
-
-            internal bool icon;
-            internal bool recover;
-            internal bool enabled;
-
-            internal Piece piece;
+            internal int resourceCost;
+            internal int resourceReturn;
 
             internal GameObject Prefab
             {
                 get { return prefabRefs[key]; }
             }
+        }
+
+        private class PieceDB : PrefabDB
+        {
+            private Dictionary<string, int> resources;
+            internal int respawnTime;
+            internal bool icon;
+            internal bool recover;
+            internal bool enabled;
+            internal Piece piece;
 
             internal KeyValuePair<string, int> Resource
             {
@@ -872,26 +970,28 @@ namespace Advize_PlantEverything
             }
         }
 
-        private struct SaplingDB
+        private class SaplingDB : PrefabDB
         {
-            internal string key;
             internal string source;
             internal string resource;
-
-            internal int resourceCost;
-            internal int biome;
-
             internal float growTime;
             internal float growRadius;
             internal float minScale;
             internal float maxScale;
-
             internal GameObject[] grownPrefabs;
-
-            internal GameObject Prefab
-            {
-                get { return prefabRefs[key]; }
-            }
         }
+
+        /*
+         * Double check config options and descriptions (including old ones that have been reorganized). Normalize them all.
+         *** Add listeners for crop config setting changes
+         *** Make executive decisions on which individual crop settings should be configurable
+         *** Change when and how crop settings are applied (awake method init doesn't work for existing instances of game objects)
+         *** Might need to write custom crop piece change code for cultivator
+         *** Check if sort order can be changed in configuration manager (I think it can) or if its needed at all
+         * Remove outdated screenshots. Update them? (Nexus first)
+         *~ Update all localization files to remove ancient seeds
+         *~ Double check seed drop related fields
+         * Clean up PrefabDB usage, remove duplicate code
+         * */
     }
 }
