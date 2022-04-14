@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.10.0";
+        public const string Version = "1.10.1";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -714,58 +714,58 @@ namespace Advize_PlantEverything
         private static void InitCrops()
         {
             Dbgl("InitCrops");
-            if (!config.EnableCropOverrides)
-                return;
+
+            bool enableCropOverrides = config.EnableCropOverrides;
 
             List<PrefabDB> crops = new()
             {
                 new PrefabDB
                 {
                     key = "sapling_barley",
-                    resourceCost = config.BarleyCost,
-                    resourceReturn = config.BarleyReturn
+                    resourceCost = enableCropOverrides ? config.BarleyCost : 1,
+                    resourceReturn = enableCropOverrides ? config.BarleyReturn : 2
                 },
                 new PrefabDB
                 {
                     key = "sapling_carrot",
-                    resourceCost = config.CarrotCost,
-                    resourceReturn = config.CarrotReturn
+                    resourceCost = enableCropOverrides ? config.CarrotCost : 1,
+                    resourceReturn = enableCropOverrides ? config.CarrotReturn : 1
                 },
                 new PrefabDB
                 {
                     key = "sapling_flax",
-                    resourceCost = config.FlaxCost,
-                    resourceReturn = config.FlaxReturn
+                    resourceCost = enableCropOverrides ? config.FlaxCost : 1,
+                    resourceReturn = enableCropOverrides ? config.FlaxReturn : 2
                 },
                 new PrefabDB
                 {
                     key = "sapling_onion",
-                    resourceCost = config.OnionCost,
-                    resourceReturn = config.OnionCost
+                    resourceCost = enableCropOverrides ? config.OnionCost : 1,
+                    resourceReturn = enableCropOverrides ? config.OnionCost : 1
                 },
                 new PrefabDB
                 {
                     key = "sapling_seedcarrot",
-                    resourceCost = config.SeedCarrotCost,
-                    resourceReturn = config.SeedCarrotReturn
+                    resourceCost = enableCropOverrides ? config.SeedCarrotCost : 1,
+                    resourceReturn = enableCropOverrides ? config.SeedCarrotReturn : 3
                 },
                 new PrefabDB
                 {
                     key = "sapling_seedonion",
-                    resourceCost = config.SeedOnionCost,
-                    resourceReturn = config.SeedOnionReturn
+                    resourceCost = enableCropOverrides ? config.SeedOnionCost : 1,
+                    resourceReturn = enableCropOverrides ? config.SeedOnionReturn : 3
                 },
                 new PrefabDB
                 {
                     key = "sapling_seedturnip",
-                    resourceCost = config.SeedTurnipCost,
-                    resourceReturn = config.SeedTurnipReturn
+                    resourceCost = enableCropOverrides ? config.SeedTurnipCost : 1,
+                    resourceReturn = enableCropOverrides ? config.SeedTurnipReturn : 3
                 },
                 new PrefabDB
                 {
                     key = "sapling_turnip",
-                    resourceCost = config.TurnipCost,
-                    resourceReturn = config.TurnipReturn
+                    resourceCost = enableCropOverrides ? config.TurnipCost : 1,
+                    resourceReturn = enableCropOverrides ? config.TurnipReturn : 1
                 }
             };
 
@@ -782,12 +782,12 @@ namespace Advize_PlantEverything
                 if (!config.EnforceBiomesVanilla)
                     plant.m_biome = (Heightmap.Biome)895;
 
-                plant.m_minScale = config.CropMinScale;
-                plant.m_maxScale = config.CropMaxScale;
-                plant.m_growTime = config.CropGrowTimeMin;
-                plant.m_growTimeMax = config.CropGrowTimeMax;
-                plant.m_growRadius = config.CropGrowRadius;
-                plant.m_needCultivatedGround = piece.m_cultivatedGroundOnly = config.CropRequireCultivation;
+                plant.m_minScale = enableCropOverrides ? config.CropMinScale : 0.9f;
+                plant.m_maxScale = enableCropOverrides ? config.CropMaxScale : 1.1f;
+                plant.m_growTime = enableCropOverrides ? config.CropGrowTimeMin : 4000f;
+                plant.m_growTimeMax = enableCropOverrides ? config.CropGrowTimeMax : 5000f;
+                plant.m_growRadius = enableCropOverrides ? config.CropGrowRadius : 0.5f;
+                plant.m_needCultivatedGround = piece.m_cultivatedGroundOnly = !enableCropOverrides || config.CropRequireCultivation;
 
                 pickable.m_amount = pdb.resourceReturn;
             }
@@ -884,6 +884,7 @@ namespace Advize_PlantEverything
             InitPieces();
             InitSaplingRefs();
             InitSaplings();
+            InitCrops();
             InitCultivator();
         }
 
