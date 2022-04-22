@@ -13,7 +13,7 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<int> nexusID; //local
         private readonly ConfigEntry<bool> enableDebugMessages; //local
         private readonly ConfigEntry<bool> alternateIcons;
-        private readonly ConfigEntry<bool> alwaysShowSpawners;
+        private readonly ConfigEntry<bool> showPickableSpawners;
         private readonly ConfigEntry<bool> enableMiscFlora;
         private readonly ConfigEntry<bool> enableLocalization; //local
         private readonly ConfigEntry<string> language; //local
@@ -158,11 +158,11 @@ namespace Advize_PlantEverything.Configuration
                 "AlternateIcons",
                 false,
                 "Use berry icons in the cultivator menu rather than the default ones");
-            alwaysShowSpawners = config(
+            showPickableSpawners = config(
                 "General",
-                "AlwaysShowSpawners",
-                false,
-                "Continue to show mushroom, thistle, and dandelion spawners after being picked. Thistle will lose the glow effect until ready to harvest.");
+                "ShowPickableSpawners",
+                true,
+                "Continue to show mushroom, thistle, and dandelion spawners after being picked. (Requires world reload on client to take effect)");
             enableMiscFlora = config(
                 "General",
                 "EnableMiscFlora",
@@ -295,7 +295,7 @@ namespace Advize_PlantEverything.Configuration
                 "Crops",
                 "CropsRequireCultivation",
                 true,
-                "Crops can only be planted on cultivated ground");
+                new ConfigDescription("Crops can only be planted on cultivated ground", null, new ConfigurationManagerAttributes { Order = 24 }));
             barleyCost = config(
                 "Crops",
                 "BarleyCost",
@@ -628,7 +628,7 @@ namespace Advize_PlantEverything.Configuration
             //General
             //resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
             alternateIcons.SettingChanged += PlantEverything.CoreSettingChanged;
-            alwaysShowSpawners.SettingChanged += PlantEverything.CoreSettingChanged;
+            showPickableSpawners.SettingChanged += PlantEverything.CoreSettingChanged;
             enableMiscFlora.SettingChanged += PlantEverything.CoreSettingChanged;
 
             //Difficulty
@@ -740,9 +740,9 @@ namespace Advize_PlantEverything.Configuration
         {
             get { return alternateIcons.Value; }
         }
-        internal bool AlwaysShowSpawners
+        internal bool ShowPickableSpawners
         {
-            get { return alwaysShowSpawners.Value; }
+            get { return showPickableSpawners.Value; }
         }
         internal bool EnableMiscFlora
         {
