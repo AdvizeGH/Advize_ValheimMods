@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.10.1";
+        public const string Version = "1.11.0";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -292,6 +292,11 @@ namespace Advize_PlantEverything
             }
 
             prefabRefs.Add("Ancient_Sapling", CreatePrefab("Ancient_Sapling"));
+            prefabRefs.Add("Pickable_Dandelion_Picked", CreatePrefab("Pickable_Dandelion_Picked"));
+            prefabRefs.Add("Pickable_Thistle_Picked", CreatePrefab("Pickable_Thistle_Picked"));
+            prefabRefs.Add("Pickable_Mushroom_Picked", CreatePrefab("Pickable_Mushroom_Picked"));
+            prefabRefs.Add("Pickable_Mushroom_yellow_Picked", CreatePrefab("Pickable_Mushroom_yellow_Picked"));
+            prefabRefs.Add("Pickable_Mushroom_blue_Picked", CreatePrefab("Pickable_Mushroom_blue_Picked"));
         }
 
         private static void InitPieceRefs()
@@ -483,8 +488,15 @@ namespace Advize_PlantEverything
                     biome = (int)Heightmap.Biome.Meadows,
                     icon = true,
                     recover = true,
-                    piece = CreatePiece("VinesName", "VinesDescription", prefabRefs["vines"].GetOrAddComponent<Piece>(), isGrounded: false)
-                },
+                    piece = CreatePiece("VinesName", "VinesDescription", prefabRefs["vines"].GetOrAddComponent<Piece>(), isGrounded: false),
+                    points = new()
+                    {
+                        { new Vector3(1f, 0.5f, 0) },
+                        { new Vector3(-1f, 0.5f, 0) },
+                        { new Vector3(1f, -1f, 0) },
+                        { new Vector3(-1f, -1f, 0) }
+                    }
+        },
                 new PieceDB
                 {
                     key = "GlowingMushroom",
@@ -555,13 +567,44 @@ namespace Advize_PlantEverything
 
                     if (pdb.Prefab.transform.Find("visual") != null)
                     {
-                        if (config.AlwaysShowSpawners)
+                        if (config.ShowPickableSpawners)
                         {
-                            pickable.m_hideWhenPicked = pdb.key.Equals("Pickable_Thistle") ? pdb.Prefab.transform.Find("visual").Find("flare").gameObject : null;
+                            Transform t = prefabRefs[pdb.key + "_Picked"].transform.Find("PE_Picked");
+                            if (t)
+                            {
+                                t.SetParent(pdb.Prefab.transform);
+                                t.gameObject.GetComponent<MeshRenderer>().sharedMaterials = pdb.key.Equals("Pickable_Thistle") ?
+                                    pdb.Prefab.transform.Find("visual").Find("default").GetComponent<MeshRenderer>().sharedMaterials : pdb.Prefab.transform.Find("visual").GetComponent<MeshRenderer>().sharedMaterials;
+                                if (pdb.key.Contains("Dandelion"))
+                                {
+                                    Material[] m = pdb.Prefab.transform.Find("visual").GetComponent<MeshRenderer>().sharedMaterials;
+                                    t.gameObject.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { m[0], m[0] };
+                                }
+                            }
                         }
                         else
                         {
-                            pickable.m_hideWhenPicked = pdb.Prefab.transform.Find("visual").gameObject;
+                            Transform t = prefabRefs[pdb.key].transform.Find("PE_Picked");
+                            if (t)
+                            {
+                                t.SetParent(prefabRefs[pdb.key + "_Picked"].transform);
+                            }
+                        }
+                    }
+
+                    if (pdb.points != null)
+                    {
+                        Transform sp = pdb.Prefab.transform.Find("_snappoint");
+                        if (!sp)
+                        {
+                            foreach (Vector3 point in pdb.points)
+                            {
+                                GameObject snapPoint = new("_snappoint");
+                                snapPoint.tag = "snappoint";
+                                snapPoint.transform.position = point;
+                                snapPoint.transform.SetParent(prefabRefs["vines"].transform);
+                                snapPoint.SetActive(false);
+                            }
                         }
                     }
                 }
@@ -951,6 +994,7 @@ namespace Advize_PlantEverything
             internal bool recover;
             internal bool enabled;
             internal Piece piece;
+            internal List<Vector3> points;
 
             internal KeyValuePair<string, int> Resource
             {
@@ -983,16 +1027,12 @@ namespace Advize_PlantEverything
         }
 
         /* TODO: * = Incomplete, *** = Complete, *~ = Skipped for now
-         *~ Double check config options and descriptions (including old ones that have been reorganized). Normalize them all.
-         *** Add listeners for crop config setting changes
-         *** Make executive decisions on which individual crop settings should be configurable
-         *** Change when and how crop settings are applied (awake method init doesn't work for existing instances of game objects)
-         *** Might need to write custom crop piece change code for cultivator
-         *** Check if sort order can be changed in configuration manager (I think it can) or if its needed at all
-         *** Remove outdated screenshots. Update them? (Nexus first)
+         * Double check config options and descriptions (including old ones that have been reorganized). Normalize them all.
+         * Update all documentation and screenshots (Nexus first)
          *~ Update all localization files to remove ancient seeds
          *~ Double check seed drop related fields
          *~ Clean up PrefabDB usage, remove duplicate code
+         * Repurpose AlwaysShowSpawners to be ShowPickableSpawners set default to true
          * */
     }
 }
