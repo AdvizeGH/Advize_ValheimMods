@@ -591,10 +591,13 @@ namespace Advize_PlantEverything
                             }
                         }
                     }
+                }
 
-                    if (pdb.points != null)
+                if (pdb.points != null)
+                {
+                    Transform sp = pdb.Prefab.transform.Find("_snappoint");
+                    if (config.SnappableVines)
                     {
-                        Transform sp = pdb.Prefab.transform.Find("_snappoint");
                         if (!sp)
                         {
                             foreach (Vector3 point in pdb.points)
@@ -602,9 +605,17 @@ namespace Advize_PlantEverything
                                 GameObject snapPoint = new("_snappoint");
                                 snapPoint.tag = "snappoint";
                                 snapPoint.transform.position = point;
-                                snapPoint.transform.SetParent(prefabRefs["vines"].transform);
+                                snapPoint.transform.SetParent(pdb.Prefab.transform);
                                 snapPoint.SetActive(false);
                             }
+                        }
+                    }
+                    else
+                    {
+                        while (sp)
+                        {
+                            DestroyImmediate(sp.gameObject);
+                            sp = pdb.Prefab.transform.Find("_snappoint");
                         }
                     }
                 }
@@ -1026,13 +1037,12 @@ namespace Advize_PlantEverything
             internal GameObject[] grownPrefabs;
         }
 
-        /* TODO: * = Incomplete, *** = Complete, *~ = Skipped for now
-         * Double check config options and descriptions (including old ones that have been reorganized). Normalize them all.
-         * Update all documentation and screenshots (Nexus first)
+        /* TODO: * = Incomplete, ** = Partly Complete, *** = Complete, *~ = Skipped for now
+         ** Double check config options and descriptions (including old ones that have been reorganized). Normalize them all.
+         ** Update all documentation and screenshots (Nexus first)
          *~ Update all localization files to remove ancient seeds
          *~ Double check seed drop related fields
-         *~ Clean up PrefabDB usage, remove duplicate code
-         * Repurpose AlwaysShowSpawners to be ShowPickableSpawners set default to true
+         *~ Clean up PrefabDB usage, remove any duplicate code
          * */
     }
 }

@@ -8,13 +8,14 @@ namespace Advize_PlantEverything.Configuration
         private ConfigFile Config;
         private ConfigSync ConfigSync;
 
-        //General 4
+        //General 3
         private readonly ConfigEntry<bool> serverConfigLocked;
         private readonly ConfigEntry<int> nexusID; //local
         private readonly ConfigEntry<bool> enableDebugMessages; //local
         private readonly ConfigEntry<bool> alternateIcons;
-        private readonly ConfigEntry<bool> showPickableSpawners;
+        private readonly ConfigEntry<bool> showPickableSpawners; //local
         private readonly ConfigEntry<bool> enableMiscFlora;
+        private readonly ConfigEntry<bool> snappableVines; //local
         private readonly ConfigEntry<bool> enableLocalization; //local
         private readonly ConfigEntry<string> language; //local
 
@@ -162,12 +163,19 @@ namespace Advize_PlantEverything.Configuration
                 "General",
                 "ShowPickableSpawners",
                 true,
-                "Continue to show mushroom, thistle, and dandelion spawners after being picked. (Requires world reload on client to take effect)");
+                "Continue to show mushroom, thistle, and dandelion spawners after being picked. (Requires world reload on client to take effect)",
+                false);
             enableMiscFlora = config(
                 "General",
                 "EnableMiscFlora",
                 true,
-                "Enables small trees, bushes, shrubs, and vines.");
+                "Enables small trees, bushes, shrubs, vines, and large mushrooms.");
+            snappableVines = config(
+                "General",
+                "SnappableVines",
+                true,
+                "Enables snap points when placing vines adjacently",
+                false);
             enableLocalization = config(
                 "General",
                 "EnableLocalization",
@@ -630,6 +638,7 @@ namespace Advize_PlantEverything.Configuration
             alternateIcons.SettingChanged += PlantEverything.CoreSettingChanged;
             showPickableSpawners.SettingChanged += PlantEverything.CoreSettingChanged;
             enableMiscFlora.SettingChanged += PlantEverything.CoreSettingChanged;
+            snappableVines.SettingChanged += PlantEverything.CoreSettingChanged;
 
             //Difficulty
             requireCultivation.SettingChanged += PlantEverything.CoreSettingChanged;
@@ -747,6 +756,10 @@ namespace Advize_PlantEverything.Configuration
         internal bool EnableMiscFlora
         {
             get { return enableMiscFlora.Value; }
+        }
+        internal bool SnappableVines
+        {
+            get { return snappableVines.Value; }
         }
         internal bool EnableLocalization
         {
