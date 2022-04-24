@@ -12,7 +12,6 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<bool> serverConfigLocked;
         private readonly ConfigEntry<int> nexusID; //local
         private readonly ConfigEntry<bool> enableDebugMessages; //local
-        private readonly ConfigEntry<bool> alternateIcons;
         private readonly ConfigEntry<bool> showPickableSpawners; //local
         private readonly ConfigEntry<bool> enableMiscFlora;
         private readonly ConfigEntry<bool> snappableVines; //local
@@ -62,6 +61,14 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<int> seedTurnipReturn;
         private readonly ConfigEntry<int> turnipCost;
         private readonly ConfigEntry<int> turnipReturn;
+
+        //Debris 6
+        private readonly ConfigEntry<int> pickableBranchCost;
+        private readonly ConfigEntry<int> pickableBranchReturn;
+        private readonly ConfigEntry<int> pickableStoneCost;
+        private readonly ConfigEntry<int> pickableStoneReturn;
+        private readonly ConfigEntry<int> pickableFlintCost;
+        private readonly ConfigEntry<int> pickableFlintReturn;
 
         //Mushrooms 9
         private readonly ConfigEntry<int> mushroomCost;
@@ -154,11 +161,6 @@ namespace Advize_PlantEverything.Configuration
                 false,
                 "Enable mod debug messages in console",
                 false);
-            alternateIcons = config(
-                "General",
-                "AlternateIcons",
-                false,
-                "Use berry icons in the cultivator menu rather than the default ones");
             showPickableSpawners = config(
                 "General",
                 "ShowPickableSpawners",
@@ -384,6 +386,38 @@ namespace Advize_PlantEverything.Configuration
                 "TurnipReturn",
                 1,
                 "Resources gained upon harvesting turnips");
+
+            //Debris
+            pickableBranchCost = config(
+                "Debris",
+                "PickableBranchCost",
+                5,
+                "Amount of wood required to place branch debris. Set to 0 to disable the ability to plant this resource");
+            pickableBranchReturn = config(
+                "Debris",
+                "PickableBranchReturn",
+                1,
+                "Amount of wood that branch debris drops when picked");
+            pickableStoneCost = config(
+                "Debris",
+                "PickableStoneCost",
+                1,
+                "Amount of stone required to place stone debris. Set to 0 to disable the ability to plant this resource");
+            pickableStoneReturn = config(
+                "Debris",
+                "PickableStoneReturn",
+                1,
+                "Amount of stones that stone debris drops when picked");
+            pickableFlintCost = config(
+                "Debris",
+                "PickableFlintCost",
+                5,
+                "Amount of flint required to place flint debris. Set to 0 to disable the ability to plant this resource");
+            pickableFlintReturn = config(
+                "Debris",
+                "PickableFlintReturn",
+                1,
+                "Amount of flint that flint debris drops when picked");
 
             //Mushrooms
             mushroomCost = config(
@@ -635,7 +669,6 @@ namespace Advize_PlantEverything.Configuration
 
             //General
             //resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
-            alternateIcons.SettingChanged += PlantEverything.CoreSettingChanged;
             showPickableSpawners.SettingChanged += PlantEverything.CoreSettingChanged;
             enableMiscFlora.SettingChanged += PlantEverything.CoreSettingChanged;
             snappableVines.SettingChanged += PlantEverything.CoreSettingChanged;
@@ -683,6 +716,14 @@ namespace Advize_PlantEverything.Configuration
             seedTurnipReturn.SettingChanged += PlantEverything.CropSettingChanged;
             turnipCost.SettingChanged += PlantEverything.CropSettingChanged;
             turnipReturn.SettingChanged += PlantEverything.CropSettingChanged;
+
+            //Debris
+            pickableBranchCost.SettingChanged += PlantEverything.PickableSettingChanged;
+            pickableBranchReturn.SettingChanged += PlantEverything.PickableSettingChanged;
+            pickableStoneCost.SettingChanged += PlantEverything.PickableSettingChanged;
+            pickableStoneReturn.SettingChanged += PlantEverything.PickableSettingChanged;
+            pickableFlintCost.SettingChanged += PlantEverything.PickableSettingChanged;
+            pickableFlintReturn.SettingChanged += PlantEverything.PickableSettingChanged;
 
             //Mushrooms
             mushroomCost.SettingChanged += PlantEverything.PickableSettingChanged;
@@ -744,10 +785,6 @@ namespace Advize_PlantEverything.Configuration
         internal bool EnableDebugMessages
         {
             get { return enableDebugMessages.Value; }
-        }
-        internal bool AlternateIcons
-        {
-            get { return alternateIcons.Value; }
         }
         internal bool ShowPickableSpawners
         {
@@ -921,6 +958,30 @@ namespace Advize_PlantEverything.Configuration
         {
             get { return turnipReturn.Value; }
         }
+        internal int PickableBranchCost
+        {
+            get { return pickableBranchCost.Value; }
+        }
+        internal int PickableBranchReturn
+        {
+            get { return pickableBranchReturn.Value; }
+        }
+        internal int PickableStoneCost
+        {
+            get { return pickableStoneCost.Value; }
+        }
+        internal int PickableStoneReturn
+        {
+            get { return pickableStoneReturn.Value; }
+        }
+        internal int PickableFlintCost
+        {
+            get { return pickableFlintCost.Value; }
+        }
+        internal int PickableFlintReturn
+        {
+            get { return pickableFlintReturn.Value; }
+        }
         internal int MushroomCost
         {
             get { return mushroomCost.Value; }
@@ -981,18 +1042,6 @@ namespace Advize_PlantEverything.Configuration
         {
             get { return dandelionReturn.Value; }
         }
-        //internal int BirchCost
-        //{
-        //    get { return birchCost.Value; }
-        //}
-        //internal int OakCost
-        //{
-        //    get { return oakCost.Value; }
-        //}
-        //internal int AncientCost
-        //{
-        //    get { return ancientCost.Value; }
-        //}
         internal float BirchMinScale
         {
             get { return birchMinScale.Value; }
