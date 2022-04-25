@@ -101,7 +101,6 @@
     <Compile Include="Patches.cs" />
     <Compile Include="PlantEverything.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UnityExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\BlueberryBushPieceIcon.png" />
