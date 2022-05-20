@@ -814,7 +814,7 @@ namespace Advize_PlantEverything
                 {
                     key = "sapling_onion",
                     resourceCost = enableCropOverrides ? config.OnionCost : 1,
-                    resourceReturn = enableCropOverrides ? config.OnionCost : 1
+                    resourceReturn = enableCropOverrides ? config.OnionReturn : 1
                 },
                 new PrefabDB
                 {
