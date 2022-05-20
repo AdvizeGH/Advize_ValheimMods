@@ -175,9 +175,8 @@ namespace Advize_PlantEverything
 
         private static Texture2D LoadTexture(string fileName)
         {
-            bool textureLoaded = cachedTextures.ContainsKey(fileName);
             Texture2D result;
-            if (textureLoaded)
+            if (cachedTextures.ContainsKey(fileName))
             {
                 result = cachedTextures[fileName];
             }
@@ -600,11 +599,12 @@ namespace Advize_PlantEverything
                             {
                                 t.SetParent(pdb.Prefab.transform);
                                 t.gameObject.GetComponent<MeshRenderer>().sharedMaterials = pdb.key.Equals("Pickable_Thistle") ?
-                                    pdb.Prefab.transform.Find("visual").Find("default").GetComponent<MeshRenderer>().sharedMaterials : pdb.Prefab.transform.Find("visual").GetComponent<MeshRenderer>().sharedMaterials;
+                                    pdb.Prefab.transform.Find("visual").Find("default").GetComponent<MeshRenderer>().sharedMaterials :
+                                    pdb.Prefab.transform.Find("visual").GetComponent<MeshRenderer>().sharedMaterials;
                                 if (pdb.key.Contains("Dandelion"))
                                 {
-                                    Material[] m = pdb.Prefab.transform.Find("visual").GetComponent<MeshRenderer>().sharedMaterials;
-                                    t.gameObject.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { m[0], m[0] };
+                                    Material m = pdb.Prefab.transform.Find("visual").GetComponent<MeshRenderer>().sharedMaterials[0];
+                                    t.gameObject.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { m, m };
                                 }
                             }
                         }
