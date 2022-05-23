@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using ServerSync;
+using UnityEngine;
 
 namespace Advize_PlantEverything.Configuration
 {
@@ -880,11 +881,11 @@ namespace Advize_PlantEverything.Configuration
         }
         internal float CropGrowTimeMin
         {
-            get { return cropGrowTimeMin.Value; }
+            get { return Mathf.Max(cropGrowTimeMin.Value, 10); }
         }
         internal float CropGrowTimeMax
         {
-            get { return cropGrowTimeMax.Value; }
+            get { return Mathf.Max(cropGrowTimeMax.Value, 10); }
         }
         internal float CropGrowRadius
         {
@@ -1068,15 +1069,15 @@ namespace Advize_PlantEverything.Configuration
         }
         internal float BirchGrowthTime
         {
-            get { return birchGrowthTime.Value; }
+            get { return Mathf.Max(birchGrowthTime.Value, 10); }
         }
         internal float OakGrowthTime
         {
-            get { return oakGrowthTime.Value; }
+            get { return Mathf.Max(oakGrowthTime.Value, 10); }
         }
         internal float AncientGrowthTime
         {
-            get { return ancientGrowthTime.Value; }
+            get { return Mathf.Max(ancientGrowthTime.Value, 10); }
         }
         internal float BirchGrowRadius
         {
@@ -1092,15 +1093,15 @@ namespace Advize_PlantEverything.Configuration
         }
         internal float BeechGrowthTime
         {
-            get { return beechGrowthTime.Value; }
+            get { return Mathf.Max(beechGrowthTime.Value, 10); }
         }
         internal float PineGrowthTime
         {
-            get { return pineGrowthTime.Value; }
+            get { return Mathf.Max(pineGrowthTime.Value, 10); }
         }
         internal float FirGrowthTime
         {
-            get { return firGrowthTime.Value; }
+            get { return Mathf.Max(firGrowthTime.Value, 10); }
         }
         internal float BeechMinScale
         {
