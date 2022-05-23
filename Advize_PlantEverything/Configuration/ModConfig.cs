@@ -222,7 +222,7 @@ namespace Advize_PlantEverything.Configuration
                 "Difficulty",
                 "ResourcesSpawnEmpty",
                 false,
-                "Specifies whether resources should spawn empty or full. Currently only applies to berry bushes");
+                "Specifies whether resources should spawn empty or full. Applies to berry bushes, mushrooms, flowers, and debris");
 
             //Berries
             raspberryCost = config(

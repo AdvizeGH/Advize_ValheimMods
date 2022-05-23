@@ -133,7 +133,7 @@ namespace Advize_PlantEverything
             {
                 if (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling"))
                 {
-                    if (config.ResourcesSpawnEmpty && __instance.m_name.Contains("berryBush"))
+                    if (config.ResourcesSpawnEmpty && (__instance.m_name.Contains("berryBush") || (__instance.m_name.Contains("Pickable") && !__instance.m_name.Contains("Stone"))))
                     {
                         __instance.GetComponent<ZNetView>().InvokeRPC(ZNetView.Everybody, "SetPicked", true);
                     }
