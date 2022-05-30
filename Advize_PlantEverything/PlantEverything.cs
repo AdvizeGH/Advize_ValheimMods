@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.11.3";
+        public const string Version = "1.11.4";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -37,7 +37,7 @@ namespace Advize_PlantEverything
             { "RaspberryBushName", "Raspberry Bush" },
             { "RaspberryBushDescription", "Plant raspberries to grow raspberry bushes." },
             { "BlueberryBushName", "Blueberry Bush" },
-            { "BlueBerryBushDescription", "Plant blueberries to grow blueberry bushes." },
+            { "BlueberryBushDescription", "Plant blueberries to grow blueberry bushes." },
             { "CloudberryBushName", "Cloudberry Bush" },
             { "CloudberryBushDescription", "Plant cloudberries to grow cloudberry bushes." },
             { "PickableMushroomName", "Pickable Mushrooms" },
