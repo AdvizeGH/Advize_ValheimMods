@@ -254,14 +254,12 @@ namespace Advize_PlantEverything
                     Dbgl("ModifyGrow not executed, reference is null", logError : true);
                     return;
                 }
-                
                 if (!plant.GetComponent<ZNetView>())
                 {
                     Dbgl("ModifyGrow not executed, ZNetView component reference is null", logError: true);
                     return;
                 }
-
-                if (plant.GetComponent<ZNetView>().GetZDO().GetBool("pe_placeAnywhere"))
+                if (plant.GetComponent<ZNetView>().GetZDO().GetBool("pe_placeAnywhere") && treeBase.GetComponent<StaticPhysics>())
                 {
                     treeBase.GetComponent<StaticPhysics>().m_fall = false;
                     treeBase.GetComponent<ZNetView>().GetZDO().Set("pe_placeAnywhere", true);
