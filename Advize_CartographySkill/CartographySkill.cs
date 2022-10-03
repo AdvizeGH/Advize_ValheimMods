@@ -14,7 +14,7 @@ namespace Advize_CartographySkill
     {
         public const string PluginID = "advize.CartographySkill";
         public const string PluginName = "CartographySkill";
-        public const string Version = "2.1.2";
+        public const string Version = "2.1.1";
         public const int SKILL_TYPE = 1337;
 
         private readonly Harmony harmony = new(PluginID);
@@ -46,7 +46,7 @@ namespace Advize_CartographySkill
         private void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(CSLogger);
-            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "2.1.2" });
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "2.1.1" });
             LoadLocalizedStrings();
             customSkill = new CustomSkill();
             harmony.PatchAll();
