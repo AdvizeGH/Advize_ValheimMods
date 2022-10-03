@@ -40,7 +40,9 @@ namespace Advize_CartographySkill
         private static readonly Dictionary<string, string> stringDictionary = new()
         {
             { "SpyglassName", "Spyglass" },
-            { "SpyglassDescription", "See further into the distance, or bash your enemies with it." }
+            { "SpyglassDescription", "See further into the distance, or bash your enemies with it." },
+            { "SkillName", "Cartography" },
+            { "SkillDescription", "Increases map explore radius." }
         };
 
         private void Awake()
@@ -83,7 +85,7 @@ namespace Advize_CartographySkill
         {
             string filePath = Path.Combine(modDirectory, $"Advize_{PluginName}.json");
 
-            LocalizedStrings localizedStrings = new LocalizedStrings();
+            LocalizedStrings localizedStrings = new();
             foreach (KeyValuePair<string, string> kvp in stringDictionary)
             {
                 localizedStrings.localizedStrings.Add($"{kvp.Key}:{kvp.Value}");
@@ -299,10 +301,10 @@ namespace Advize_CartographySkill
 
         private class CustomSkill
         {
-            public string name = "Cartography";
+            public string name = "$csSkillName";
             public Skills.SkillDef skillDef = new()
             {
-                m_description = "Increases map explore radius.",
+                m_description = "$csSkillDescription",
                 m_icon = CreateSprite("cartographyicon.png", new Rect(0, 0, 32, 32)),
                 m_increseStep = 1.0f,
                 m_skill = (Skills.SkillType)SKILL_TYPE

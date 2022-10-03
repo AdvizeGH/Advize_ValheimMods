@@ -203,7 +203,7 @@ namespace Advize_CartographySkill
                 {
                     if ((int)type == SKILL_TYPE)
                     {
-                        Traverse.Create(Localization.instance).Method("AddWord", "skill_" + SKILL_TYPE, customSkill.name).GetValue("skill_" + SKILL_TYPE, customSkill.name);
+                        Traverse.Create(Localization.instance).Method("AddWord", "skill_" + SKILL_TYPE, Localization.instance.Localize(customSkill.name)).GetValue("skill_" + SKILL_TYPE, Localization.instance.Localize(customSkill.name));
                         ___m_skills.Add(customSkill.skillDef);
                         __result = customSkill.skillDef;
                     }
