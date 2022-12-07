@@ -38,9 +38,11 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<int> blueberryReturn;
         private readonly ConfigEntry<int> cloudberryReturn;
 
-        //Crops 23
+        //Crops 29
         private readonly ConfigEntry<bool> enableCropOverrides;
         private readonly ConfigEntry<bool> cropRequireCultivation;
+        private readonly ConfigEntry<bool> cropRequireSunlight;
+        private readonly ConfigEntry<bool> cropRequireGrowthSpace;
         private readonly ConfigEntry<float> cropMinScale;
         private readonly ConfigEntry<float> cropMaxScale;
         private readonly ConfigEntry<float> cropGrowTimeMin;
@@ -62,6 +64,10 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<int> seedTurnipReturn;
         private readonly ConfigEntry<int> turnipCost;
         private readonly ConfigEntry<int> turnipReturn;
+        private readonly ConfigEntry<int> magecapCost;
+        private readonly ConfigEntry<int> magecapReturn;
+        private readonly ConfigEntry<int> jotunPuffsCost;
+        private readonly ConfigEntry<int> jotunPuffsReturn;
 
         //Debris 6
         private readonly ConfigEntry<int> pickableBranchCost;
@@ -276,7 +282,7 @@ namespace Advize_PlantEverything.Configuration
                 "Crops",
                 "EnableCropOverrides",
                 false,
-                new ConfigDescription("Enables the [Crops] section of this config", null, new ConfigurationManagerAttributes { Order = 25 }));
+                new ConfigDescription("Enables the [Crops] section of this config", null, new ConfigurationManagerAttributes { Order = 27 }));
             cropMinScale = config(
                 "Crops",
                 "CropMinScale",
@@ -306,7 +312,17 @@ namespace Advize_PlantEverything.Configuration
                 "Crops",
                 "CropsRequireCultivation",
                 true,
-                new ConfigDescription("Crops can only be planted on cultivated ground", null, new ConfigurationManagerAttributes { Order = 24 }));
+                new ConfigDescription("Crops can only be planted on cultivated ground", null, new ConfigurationManagerAttributes { Order = 26 }));
+            cropRequireSunlight = config(
+                "Crops",
+                "CropsRequireSunlight",
+                true,
+                new ConfigDescription("Crops can only grow under an open sky", null, new ConfigurationManagerAttributes { Order = 25 }));
+            cropRequireGrowthSpace = config(
+                "Crops",
+                "CropsRequireGrowthSpace",
+                true,
+                new ConfigDescription("Crops require space to grow. This setting overrides the CropGrowRadius setting but without altering it, allowing grid spacing mods to continue functioning", null, new ConfigurationManagerAttributes { Order = 24 }));
             barleyCost = config(
                 "Crops",
                 "BarleyCost",
@@ -387,6 +403,26 @@ namespace Advize_PlantEverything.Configuration
                 "TurnipReturn",
                 1,
                 "Resources gained upon harvesting turnips");
+            magecapCost = config(
+                "Crops",
+                "MagecapCost",
+                1,
+                "Resource cost of planting magecap");
+            magecapReturn = config(
+                "Crops",
+                "MagecapReturn",
+                3,
+                "Resources gained upon harvesting magecap");
+            jotunPuffsCost = config(
+                "Crops",
+                "JotunPuffsCost",
+                1,
+                "Resource cost of planting Jotun puffs");
+            jotunPuffsReturn = config(
+                "Crops",
+                "JotunPuffsReturn",
+                3,
+                "Resources gained upon harvesting Jotun puffs");
 
             //Debris
             pickableBranchCost = config(
@@ -895,6 +931,14 @@ namespace Advize_PlantEverything.Configuration
         {
             get { return cropRequireCultivation.Value; }
         }
+        internal bool CropRequireSunlight
+        {
+            get { return cropRequireSunlight.Value; }
+        }
+        internal bool CropRequireGrowthSpace
+        {
+            get { return cropRequireGrowthSpace.Value; }
+        }
         internal int BarleyCost
         {
             get { return barleyCost.Value; }
@@ -958,6 +1002,22 @@ namespace Advize_PlantEverything.Configuration
         internal int TurnipReturn
         {
             get { return turnipReturn.Value; }
+        }
+        internal int MagecapCost
+        {
+            get { return magecapCost.Value; }
+        }
+        internal int MagecapReturn
+        {
+            get { return magecapReturn.Value; }
+        }
+        internal int JotunPuffsCost
+        {
+            get { return jotunPuffsCost.Value; }
+        }
+        internal int JotunPuffsReturn
+        {
+            get { return jotunPuffsReturn.Value; }
         }
         internal int PickableBranchCost
         {

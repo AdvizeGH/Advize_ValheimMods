@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.11.7";
+        public const string Version = "1.12.0";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -66,6 +66,8 @@ namespace Advize_PlantEverything
             { "Shrub01Description", "Plant a small shrub." },
             { "Shrub02Name", "Small Shrub 2" },
             { "Shrub02Description", "Plant a small shrub." },
+            { "YggaShootName", "Small Ygga Shoot" },
+            { "YggaShootDescription", "Plant a small ygga shoot." },
             { "VinesName", "Vines" },
             { "VinesDescription", "Plant vines." },
             { "GlowingMushroomName", "Glowing Mushroom" },
@@ -75,13 +77,19 @@ namespace Advize_PlantEverything
             { "PickableStoneName", "Pickable Stone" },
             { "PickableStoneDescription", "Plant pickable stone." },
             { "PickableFlintName", "Pickable Flint" },
-            { "PickableFlintDescription", "Plant respawning pickable flint." }
+            { "PickableFlintDescription", "Plant respawning pickable flint." }/*,
+            { "YggaShoot1Name", "Ygga Shoot 1" },
+            { "YggaShoot1Description", "Plant a ygga shoot." },
+            { "YggaShoot2Name", "Ygga Shoot 2" },
+            { "YggaShoot2Description", "Plant a ygga shoot." },
+            { "YggaShoot3Name", "Ygga Shoot 3" },
+            { "YggaShoot3Description", "Plant a ygga shoot." }*/
         };
 
         private void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
-            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.11.7" });
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.12.0" });
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
             harmony.PatchAll();
@@ -218,6 +226,7 @@ namespace Advize_PlantEverything
             prefabRefs.Add("GlowingMushroom", null);
             prefabRefs.Add("Pinetree_01", null);
             prefabRefs.Add("FirTree", null);
+            prefabRefs.Add("YggaShoot_small1", null);
             prefabRefs.Add("Beech_small1", null);
             prefabRefs.Add("FirTree_small_dead", null);
             prefabRefs.Add("FirTree_small", null);
@@ -226,6 +235,7 @@ namespace Advize_PlantEverything
             prefabRefs.Add("vines", null);
             prefabRefs.Add("Cultivator", null);
             prefabRefs.Add("SwampTree1", null);
+            //prefabRefs.Add("YggaShoot1", null);
             prefabRefs.Add("Beech1", null);
             prefabRefs.Add("Birch2", null);
             prefabRefs.Add("Oak1", null);
@@ -257,13 +267,17 @@ namespace Advize_PlantEverything
             prefabRefs.Add("sapling_turnip", null);
             prefabRefs.Add("Oak_Sapling", null);
             prefabRefs.Add("sapling_barley", null);
+            prefabRefs.Add("sapling_jotunpuffs", null);
             prefabRefs.Add("Birch_Sapling", null);
             prefabRefs.Add("sapling_carrot", null);
             prefabRefs.Add("sapling_seedcarrot", null);
             prefabRefs.Add("sapling_flax", null);
+            prefabRefs.Add("sapling_magecap", null);
             prefabRefs.Add("sapling_seedturnip", null);
             prefabRefs.Add("vfx_Place_wood_pole", null);
             prefabRefs.Add("sfx_build_cultivator", null);
+            //prefabRefs.Add("YggaShoot3", null);
+            //prefabRefs.Add("YggaShoot2", null);
 
             Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
             for (int i = 0; i < array.Length; i++)
@@ -283,7 +297,7 @@ namespace Advize_PlantEverything
                         continue;
                     }
                 }
-
+                //Debug.Log($"{gameObject.name}");
                 prefabRefs[gameObject.name] = gameObject;
 
                 bool nullValue = false;
@@ -483,6 +497,13 @@ namespace Advize_PlantEverything
                 },
                 new PieceDB
                 {
+                    key = "YggaShoot_small1",
+                    Resources = new Dictionary<string, int>() { { "YggdrasilWood", 1 }, { "Wood", 2 } },
+                    icon = true,
+                    piece = CreatePiece("YggaShoot", GetOrAddPieceComponent(prefabRefs["YggaShoot_small1"]), canBeRemoved: false)
+                },
+                new PieceDB
+                {
                     key = "vines",
                     Resource = new KeyValuePair<string, int>("Wood", 2),
                     icon = true,
@@ -530,7 +551,25 @@ namespace Advize_PlantEverything
                     respawnTime = 240,
                     recover = config.RecoverResources,
                     piece = CreatePiece("PickableFlint", GetOrAddPieceComponent(prefabRefs["Pickable_Flint"]), isGrounded: true)
-                }
+                }/*,
+                new PieceDB
+                {
+                    key = "YggaShoot1",
+                    Resource = new KeyValuePair<string, int>("Wood", 2),
+                    piece = CreatePiece("YggaShoot1", GetOrAddPieceComponent(prefabRefs["YggaShoot1"]), canBeRemoved: false)
+                },
+                new PieceDB
+                {
+                    key = "YggaShoot2",
+                    Resource = new KeyValuePair<string, int>("Wood", 2),
+                    piece = CreatePiece("YggaShoot2", GetOrAddPieceComponent(prefabRefs["YggaShoot2"]), canBeRemoved: false)
+                },
+                new PieceDB
+                {
+                    key = "YggaShoot3",
+                    Resource = new KeyValuePair<string, int>("Wood", 2),
+                    piece = CreatePiece("YggaShoot3", GetOrAddPieceComponent(prefabRefs["YggaShoot3"]), canBeRemoved: false)
+                }*/
             });
             return newList;
         }
@@ -839,6 +878,20 @@ namespace Advize_PlantEverything
                     key = "sapling_turnip",
                     resourceCost = enableCropOverrides ? config.TurnipCost : 1,
                     resourceReturn = enableCropOverrides ? config.TurnipReturn : 1
+                },
+                new PrefabDB
+                {
+                    key = "sapling_magecap",
+                    resourceCost = enableCropOverrides ? config.MagecapCost : 1,
+                    resourceReturn = enableCropOverrides ? config.MagecapReturn : 1,
+                    extraDrops = true
+                },
+                new PrefabDB
+                {
+                    key = "sapling_jotunpuffs",
+                    resourceCost = enableCropOverrides ? config.JotunPuffsCost : 1,
+                    resourceReturn = enableCropOverrides ? config.JotunPuffsReturn : 1,
+                    extraDrops = true
                 }
             };
 
@@ -863,6 +916,13 @@ namespace Advize_PlantEverything
                 plant.m_needCultivatedGround = piece.m_cultivatedGroundOnly = !enableCropOverrides || config.CropRequireCultivation;
 
                 pickable.m_amount = pdb.resourceReturn;
+
+                //For jotun puffs and magecap
+                pickable.m_extraDrops.m_drops.Clear();
+                if (pdb.extraDrops & !enableCropOverrides)
+                {
+                    pickable.m_extraDrops.m_drops.Add(new DropTable.DropData{m_item = pickable.m_itemPrefab, m_stackMin = 1, m_stackMax = 1, m_weight = 0});
+                }
             }
         }
 
@@ -1009,6 +1069,7 @@ namespace Advize_PlantEverything
             internal int biome = (int)Heightmap.Biome.Meadows;
             internal int resourceCost;
             internal int resourceReturn;
+            internal bool extraDrops;
 
             internal GameObject Prefab
             {

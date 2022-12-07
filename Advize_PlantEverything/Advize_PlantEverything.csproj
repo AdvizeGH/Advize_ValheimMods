@@ -132,6 +132,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\YggaShoot_small1PieceIcon.png" />
     <Content Include="Libraries\ServerSync.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
