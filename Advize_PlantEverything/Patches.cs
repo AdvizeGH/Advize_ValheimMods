@@ -207,6 +207,12 @@ namespace Advize_PlantEverything
         {
             public static bool Prefix(Plant __instance, ref bool __result)
             {
+                if (!config.CropRequireSunlight && __instance.m_name.StartsWith("$piece_sapling"))
+                {
+                    __result = false;
+                    return false;
+                }
+
                 if (config.PlaceAnywhere && (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling")))
                 {
                     __result = false;
@@ -221,6 +227,12 @@ namespace Advize_PlantEverything
         {
             public static bool Prefix(Plant __instance, ref bool __result)
             {
+                if (!config.CropRequireGrowthSpace && __instance.m_name.StartsWith("$piece_sapling"))
+                {
+                    __result = true;
+                    return false;
+                }
+
                 if (config.PlaceAnywhere && (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling")))
                 {
                     __result = true;
@@ -341,5 +353,19 @@ namespace Advize_PlantEverything
 
             return formattedString;
         }
+
+
+        //Replace this... possibly with separate config option and hopefully with different entry point and implementation
+        //[HarmonyPatch(typeof(Player), "UpdatePlacementGhost")]
+        //public class PlayerUpdatePlacementGhost
+        //{
+        //    public static void Postfix(ref GameObject ___m_placementGhost)
+        //    {
+        //        if (!config.CropRequireCultivation && ___m_placementGhost && ___m_placementGhost.GetComponent<Plant>())
+        //        {
+        //            ___m_placementGhost.GetComponent<Piece>().m_groundOnly = false;
+        //        }
+        //    }
+        //}
     }
 }
