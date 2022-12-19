@@ -122,10 +122,12 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<float> pineGrowRadius;
         private readonly ConfigEntry<float> firGrowRadius;
 
-        //Seeds 5
+        //Seeds 7
         private readonly ConfigEntry<bool> enableSeedOverrides;
         private readonly ConfigEntry<int> seedDropMin;
         private readonly ConfigEntry<int> seedDropMax;
+        private readonly ConfigEntry<int> treeDropMin;
+        private readonly ConfigEntry<int> treeDropMax;
         private readonly ConfigEntry<float> dropChance;
         private readonly ConfigEntry<bool> oneOfEach;
 
@@ -673,16 +675,26 @@ namespace Advize_PlantEverything.Configuration
                 "seedDropMax",
                 2,
                 "Determines maximum amount of seeds that can drop when trees drop seeds");
+            treeDropMin = config(
+                "Seeds",
+                "treeDropMin",
+                1,
+                "Determines minimum amount of times a destroyed tree will attempt to select a drop from its drop table");
+            treeDropMax = config(
+                "Seeds",
+                "treeDropMax",
+                3,
+                "Determines (maximum amount of times - 1) a destroyed tree will attempt to select a drop from its drop table");
             dropChance = config(
                 "Seeds",
                 "dropChance",
                 0.5f,
-                "Chance that items will drop from trees when destroyed. Default value 0.5f (50%), will only drop one or two items on loot table unless oneOfEach is set to true. Set between 0 and 1f");
+                "Chance that items will drop from trees when destroyed. Default value 0.5f (50%). Set between 0 and 1f");
             oneOfEach = config(
                 "Seeds",
                 "oneOfEach",
                 false,
-                "When enabled, destroyed trees will drop every available item on their drop table when loot is dropped. Setting this to true will ensure that seeds are guaranteed to drop whenever the tree drops items (governed by dropChance setting)");
+                "When enabled, destroyed trees will not drop the same item from its drop table more than once");
 
             //UI
             enablePickableTimers = config(
@@ -1210,6 +1222,14 @@ namespace Advize_PlantEverything.Configuration
         internal int SeedDropMax
         {
             get { return seedDropMax.Value; }
+        }
+        internal int TreeDropMin
+        {
+            get { return treeDropMin.Value; }
+        }
+        internal int TreeDropMax
+        {
+            get { return treeDropMax.Value; }
         }
         internal float DropChance
         {

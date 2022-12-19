@@ -1002,8 +1002,8 @@ namespace Advize_PlantEverything
                 itemDrop.m_item = kvp.Value;
                 itemDrop.m_stackMin = config.SeedDropMin;
                 itemDrop.m_stackMax = config.SeedDropMax;
-                target.m_dropWhenDestroyed.m_dropMin = 1;
-                target.m_dropWhenDestroyed.m_dropMax = 3;
+                target.m_dropWhenDestroyed.m_dropMin = config.TreeDropMin;
+                target.m_dropWhenDestroyed.m_dropMax = config.TreeDropMax;
                 target.m_dropWhenDestroyed.m_drops.Add(itemDrop);
                 target.m_dropWhenDestroyed.m_dropChance = Mathf.Clamp(config.DropChance, 0f, 1f);
                 target.m_dropWhenDestroyed.m_oneOfEach = config.OneOfEach;
