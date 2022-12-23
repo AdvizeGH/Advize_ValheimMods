@@ -823,6 +823,8 @@ namespace Advize_PlantEverything.Configuration
             enableSeedOverrides.SettingChanged += PlantEverything.SeedSettingChanged;
             seedDropMin.SettingChanged += PlantEverything.SeedSettingChanged;
             seedDropMax.SettingChanged += PlantEverything.SeedSettingChanged;
+            treeDropMin.SettingChanged += PlantEverything.SeedSettingChanged;
+            treeDropMax.SettingChanged += PlantEverything.SeedSettingChanged;
             dropChance.SettingChanged += PlantEverything.SeedSettingChanged;
             oneOfEach.SettingChanged += PlantEverything.SeedSettingChanged;
 
