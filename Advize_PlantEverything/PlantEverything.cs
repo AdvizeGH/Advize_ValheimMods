@@ -226,6 +226,7 @@ namespace Advize_PlantEverything
             prefabRefs.Add("FirTree_small_dead", null);
             prefabRefs.Add("FirTree_small", null);
             prefabRefs.Add("Pickable_Dandelion", null);
+            prefabRefs.Add("Sap", null);
             prefabRefs.Add("CloudberryBush", null);
             prefabRefs.Add("vines", null);
             prefabRefs.Add("Cultivator", null);
@@ -705,7 +706,7 @@ namespace Advize_PlantEverything
                 {
                     key = "Ygga_Sapling",
                     source = "YggaShoot_small1",
-                    resource = "AncientSeed",
+                    resource = "Sap",
                     resourceCost = 1,
                     biome = (int)Heightmap.Biome.Mistlands,
                     icon = true,
