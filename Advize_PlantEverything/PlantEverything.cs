@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.12.0";
+        public const string Version = "1.13.0";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -34,6 +34,7 @@ namespace Advize_PlantEverything
 
         private static readonly Dictionary<string, string> stringDictionary = new() {
             { "AncientSapling", "Ancient Sapling" },
+            { "YggaSapling", "Ygga Sapling" },
             { "RaspberryBushName", "Raspberry Bush" },
             { "RaspberryBushDescription", "Plant raspberries to grow raspberry bushes." },
             { "BlueberryBushName", "Blueberry Bush" },
@@ -77,19 +78,13 @@ namespace Advize_PlantEverything
             { "PickableStoneName", "Pickable Stone" },
             { "PickableStoneDescription", "Plant pickable stone." },
             { "PickableFlintName", "Pickable Flint" },
-            { "PickableFlintDescription", "Plant respawning pickable flint." }/*,
-            { "YggaShoot1Name", "Ygga Shoot 1" },
-            { "YggaShoot1Description", "Plant a ygga shoot." },
-            { "YggaShoot2Name", "Ygga Shoot 2" },
-            { "YggaShoot2Description", "Plant a ygga shoot." },
-            { "YggaShoot3Name", "Ygga Shoot 3" },
-            { "YggaShoot3Description", "Plant a ygga shoot." }*/
+            { "PickableFlintDescription", "Plant respawning pickable flint." }
         };
 
         private void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
-            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.12.0" });
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.13.0" });
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
             harmony.PatchAll();
@@ -235,7 +230,7 @@ namespace Advize_PlantEverything
             prefabRefs.Add("vines", null);
             prefabRefs.Add("Cultivator", null);
             prefabRefs.Add("SwampTree1", null);
-            //prefabRefs.Add("YggaShoot1", null);
+            prefabRefs.Add("YggaShoot1", null);
             prefabRefs.Add("Beech1", null);
             prefabRefs.Add("Birch2", null);
             prefabRefs.Add("Oak1", null);
@@ -276,8 +271,8 @@ namespace Advize_PlantEverything
             prefabRefs.Add("sapling_seedturnip", null);
             prefabRefs.Add("vfx_Place_wood_pole", null);
             prefabRefs.Add("sfx_build_cultivator", null);
-            //prefabRefs.Add("YggaShoot3", null);
-            //prefabRefs.Add("YggaShoot2", null);
+            prefabRefs.Add("YggaShoot3", null);
+            prefabRefs.Add("YggaShoot2", null);
 
             Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
             for (int i = 0; i < array.Length; i++)
@@ -314,6 +309,7 @@ namespace Advize_PlantEverything
             }
 
             prefabRefs.Add("Ancient_Sapling", CreatePrefab("Ancient_Sapling"));
+            prefabRefs.Add("Ygga_Sapling", CreatePrefab("Ygga_Sapling"));
             prefabRefs.Add("Pickable_Dandelion_Picked", CreatePrefab("Pickable_Dandelion_Picked"));
             prefabRefs.Add("Pickable_Thistle_Picked", CreatePrefab("Pickable_Thistle_Picked"));
             prefabRefs.Add("Pickable_Mushroom_Picked", CreatePrefab("Pickable_Mushroom_Picked"));
@@ -551,26 +547,9 @@ namespace Advize_PlantEverything
                     respawnTime = 240,
                     recover = config.RecoverResources,
                     piece = CreatePiece("PickableFlint", GetOrAddPieceComponent(prefabRefs["Pickable_Flint"]), isGrounded: true)
-                }/*,
-                new PieceDB
-                {
-                    key = "YggaShoot1",
-                    Resource = new KeyValuePair<string, int>("Wood", 2),
-                    piece = CreatePiece("YggaShoot1", GetOrAddPieceComponent(prefabRefs["YggaShoot1"]), canBeRemoved: false)
-                },
-                new PieceDB
-                {
-                    key = "YggaShoot2",
-                    Resource = new KeyValuePair<string, int>("Wood", 2),
-                    piece = CreatePiece("YggaShoot2", GetOrAddPieceComponent(prefabRefs["YggaShoot2"]), canBeRemoved: false)
-                },
-                new PieceDB
-                {
-                    key = "YggaShoot3",
-                    Resource = new KeyValuePair<string, int>("Wood", 2),
-                    piece = CreatePiece("YggaShoot3", GetOrAddPieceComponent(prefabRefs["YggaShoot3"]), canBeRemoved: false)
-                }*/
+                }
             });
+
             return newList;
         }
 
@@ -711,16 +690,32 @@ namespace Advize_PlantEverything
                 new SaplingDB
                 {
                     key = "Ancient_Sapling",
-                    source = "PineTree_Sapling",
+                    source = "SwampTree1",
                     resource = "AncientSeed",
                     resourceCost = 1,
                     biome = (int)Heightmap.Biome.Swamp,
+                    icon = true,
                     growTime = config.AncientGrowthTime,
                     growRadius = config.AncientGrowRadius,
                     minScale = config.AncientMinScale,
                     maxScale = config.AncientMaxScale,
                     grownPrefabs = new GameObject[] { prefabRefs["SwampTree1"] }
+                },
+                new SaplingDB
+                {
+                    key = "Ygga_Sapling",
+                    source = "YggaShoot_small1",
+                    resource = "AncientSeed",
+                    resourceCost = 1,
+                    biome = (int)Heightmap.Biome.Mistlands,
+                    icon = true,
+                    growTime = config.YggaGrowthTime,
+                    growRadius = config.YggaGrowRadius,
+                    minScale = config.YggaMinScale,
+                    maxScale = config.YggaMaxScale,
+                    grownPrefabs = new GameObject[] { prefabRefs["YggaShoot1"], prefabRefs["YggaShoot2"], prefabRefs["YggaShoot3"] }
                 }
+                // Maybe add plains birch variant
             };
 
             return newList;
@@ -808,16 +803,45 @@ namespace Advize_PlantEverything
 
                 if (isInitialized) continue;
 
-                sdb.Prefab.transform.Find("healthy").gameObject.GetComponent<MeshFilter>().mesh = prefabRefs[sdb.source].transform.Find("healthy").gameObject.GetComponent<MeshFilter>().mesh;
-                sdb.Prefab.transform.Find("healthy").gameObject.GetComponent<MeshRenderer>().sharedMaterials = prefabRefs[sdb.source].transform.Find("healthy").gameObject.GetComponent<MeshRenderer>().sharedMaterials;
-                sdb.Prefab.transform.Find("unhealthy").gameObject.GetComponent<MeshFilter>().mesh = prefabRefs[sdb.source].transform.Find("unhealthy").gameObject.GetComponent<MeshFilter>().mesh;
-                sdb.Prefab.transform.Find("unhealthy").gameObject.GetComponent<MeshRenderer>().sharedMaterials = prefabRefs[sdb.source].transform.Find("unhealthy").gameObject.GetComponent<MeshRenderer>().sharedMaterials;
-                //sdb.Prefab.GetComponent<Piece>().m_icon = source.GetComponent<Piece>().m_icon;
-                piece.m_icon = piece.m_resources[0].m_resItem.m_itemData.GetIcon();
+                string[] p = { "healthy", "unhealthy"};
+                Transform t = prefabRefs["Birch_Sapling"].transform.Find(p[0]);
+
+                foreach (string parent in p)
+                    sdb.Prefab.transform.Find(parent).gameObject.GetComponent<MeshFilter>().mesh = t.Find("Birch_Sapling").gameObject.GetComponent<MeshFilter>().mesh;
+
+                if (sdb.source.StartsWith("Swamp"))
+                {
+                    Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("swamptree1").gameObject.GetComponent<MeshRenderer>().sharedMaterials[0] };
+                    m[0].shader = Shader.Find("Custom/Piece");
+
+                    foreach (string parent in p)
+                        sdb.Prefab.transform.Find(parent).gameObject.GetComponent<MeshRenderer>().sharedMaterials = m;
+                }
+                else if(sdb.source.StartsWith("Ygga"))
+                {
+                    string[] foliage = { "birchleafs002", "birchleafs003", "birchleafs008", "birchleafs009", "birchleafs010", "birchleafs011" };
+                    Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("beech").gameObject.GetComponent<MeshRenderer>().sharedMaterials[0] };
+                    Material[] m2 = new Material[] { prefabRefs[sdb.source].transform.Find("beech").gameObject.GetComponent<MeshRenderer>().sharedMaterials[1] };
+
+                    foreach(string parent in p)
+                        sdb.Prefab.transform.Find(parent).gameObject.GetComponent<MeshRenderer>().sharedMaterials = m2;
+
+                    foreach (string child in foliage)
+                    {
+                        foreach (string parent in p)
+                        {
+                            sdb.Prefab.transform.Find(parent).transform.Find(child).gameObject.GetComponent<MeshFilter>().mesh = t.Find(child).gameObject.GetComponent<MeshFilter>().mesh;
+                            sdb.Prefab.transform.Find(parent).transform.Find(child).gameObject.GetComponent<MeshRenderer>().sharedMaterials = m;
+                        }
+                    }
+                }
+                
+                piece.m_icon = sdb.icon ? CreateSprite($"{sdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : piece.m_resources[0].m_resItem.m_itemData.GetIcon();
+
                 piece.m_placeEffect.m_effectPrefabs[0].m_prefab = prefabRefs["vfx_Place_wood_pole"];
                 piece.m_placeEffect.m_effectPrefabs[1].m_prefab = prefabRefs["sfx_build_cultivator"];
-                sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[0].m_prefab = prefabRefs[sdb.source].GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[0].m_prefab;
-                sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab = prefabRefs[sdb.source].GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab;
+                sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[0].m_prefab = prefabRefs["Birch_Sapling"].GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[0].m_prefab;
+                sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab = prefabRefs["Birch_Sapling"].GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab;
             }
 
             isInitialized = true;
@@ -962,6 +986,8 @@ namespace Advize_PlantEverything
 
             if (!__instance.m_prefabs.Contains(prefabRefs["Ancient_Sapling"]))
                 __instance.m_prefabs.Add(prefabRefs["Ancient_Sapling"]);
+            if (!__instance.m_prefabs.Contains(prefabRefs["Ygga_Sapling"]))
+                __instance.m_prefabs.Add(prefabRefs["Ygga_Sapling"]);
         }
 
         private static void ModifyTreeDrops()
@@ -1002,6 +1028,7 @@ namespace Advize_PlantEverything
                 itemDrop.m_item = kvp.Value;
                 itemDrop.m_stackMin = config.SeedDropMin;
                 itemDrop.m_stackMax = config.SeedDropMax;
+                itemDrop.m_weight = 1;
                 target.m_dropWhenDestroyed.m_dropMin = config.TreeDropMin;
                 target.m_dropWhenDestroyed.m_dropMax = config.TreeDropMax;
                 target.m_dropWhenDestroyed.m_drops.Add(itemDrop);
@@ -1070,6 +1097,7 @@ namespace Advize_PlantEverything
             internal int resourceCost;
             internal int resourceReturn;
             internal bool extraDrops;
+            internal bool icon;
 
             internal GameObject Prefab
             {
@@ -1081,7 +1109,6 @@ namespace Advize_PlantEverything
         {
             private Dictionary<string, int> resources;
             internal int respawnTime;
-            internal bool icon;
             internal bool recover;
             internal bool enabled;
             internal Piece piece;
@@ -1116,12 +1143,5 @@ namespace Advize_PlantEverything
             internal float maxScale;
             internal GameObject[] grownPrefabs;
         }
-
-        /* TODO: * = Incomplete, ** = Partly Complete, *** = Complete, *~ = Skipped for now
-         ** Double check config options and descriptions (including old ones that have been reorganized). Normalize them all.
-         *~ Update all localization files to remove ancient seeds
-         *~ Double check seed drop related fields
-         ** Clean up PrefabDB usage, remove any duplicate code
-         * */
     }
 }

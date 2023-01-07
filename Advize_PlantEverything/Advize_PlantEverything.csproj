@@ -103,19 +103,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\BlueberryBushPieceIcon.png" />
-    <EmbeddedResource Include="Assets\CloudberryBushPieceIcon.png" />
-    <EmbeddedResource Include="Assets\RaspberryBushPieceIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Assets\planteverything" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\ancientSeedsItemIcon.png" />
-    <EmbeddedResource Include="Assets\birchConeItemIcon.png" />
-    <EmbeddedResource Include="Assets\oakSeedsItemIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
+	<EmbeddedResource Include="Assets\BlueberryBushPieceIcon.png" />
+    <EmbeddedResource Include="Assets\CloudberryBushPieceIcon.png" />
+    <EmbeddedResource Include="Assets\RaspberryBushPieceIcon.png" />
     <EmbeddedResource Include="Assets\Beech_small1PieceIcon.png" />
     <EmbeddedResource Include="Assets\Bush01PieceIcon.png" />
     <EmbeddedResource Include="Assets\Bush01_heathPieceIcon.png" />
@@ -126,13 +119,15 @@
     <EmbeddedResource Include="Assets\shrub_2_heathPieceIcon.png" />
     <EmbeddedResource Include="Assets\vinesPieceIcon.png" />
     <EmbeddedResource Include="Assets\GlowingMushroomPieceIcon.png" />
+	<EmbeddedResource Include="Assets\YggaShoot_small1PieceIcon.png" />
+    <EmbeddedResource Include="Assets\Ancient_SaplingPieceIcon.png" />
+    <EmbeddedResource Include="Assets\Ygga_SaplingPieceIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ILRepack.targets" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\YggaShoot_small1PieceIcon.png" />
     <Content Include="Libraries\ServerSync.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

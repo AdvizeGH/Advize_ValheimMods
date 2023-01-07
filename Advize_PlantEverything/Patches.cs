@@ -39,6 +39,8 @@ namespace Advize_PlantEverything
                 {
                     if (hash == __instance.GetPrefabHash(prefabRefs["Ancient_Sapling"]))
                         __result = prefabRefs["Ancient_Sapling"];
+                    if (hash == __instance.GetPrefabHash(prefabRefs["Ygga_Sapling"]))
+                        __result = prefabRefs["Ygga_Sapling"];
                 }
             }
         }
@@ -305,7 +307,7 @@ namespace Advize_PlantEverything
             [HarmonyPostfix]
             public static void Postfix(Plant __instance, ZNetView ___m_nview, int ___m_status, ref string __result)
             {
-                if (config.EnablePlantTimers && ___m_status == 0)
+                if (config.EnablePlantTimers && ___m_status == 0 && ___m_nview.GetZDO() != null)
                 {
                     float growthTime = GetGrowTime(__instance, ___m_nview);
                     DateTime plantTime = new(___m_nview.GetZDO().GetLong("plantTime", ZNet.instance.GetTime().Ticks));

@@ -96,7 +96,7 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<int> thistleReturn;
         private readonly ConfigEntry<int> dandelionReturn;
 
-        //Saplings 24
+        //Saplings 28
         private readonly ConfigEntry<float> birchMinScale;
         private readonly ConfigEntry<float> birchMaxScale;
         private readonly ConfigEntry<float> oakMinScale;
@@ -121,6 +121,10 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<float> beechGrowRadius;
         private readonly ConfigEntry<float> pineGrowRadius;
         private readonly ConfigEntry<float> firGrowRadius;
+        private readonly ConfigEntry<float> yggaMinScale;
+        private readonly ConfigEntry<float> yggaMaxScale;
+        private readonly ConfigEntry<float> yggaGrowthTime;
+        private readonly ConfigEntry<float> yggaGrowRadius;
 
         //Seeds 7
         private readonly ConfigEntry<bool> enableSeedOverrides;
@@ -131,7 +135,7 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<float> dropChance;
         private readonly ConfigEntry<bool> oneOfEach;
 
-        //UI 3
+        //UI 0
         private readonly ConfigEntry<bool> enablePickableTimers; //local
         private readonly ConfigEntry<bool> enablePlantTimers; //local
         private readonly ConfigEntry<bool> growthAsPercentage; //local
@@ -658,6 +662,26 @@ namespace Advize_PlantEverything.Configuration
                 "FirGrowRadius",
                 2f,
                 "Radius of free space required for a fir sapling to grow");
+            yggaMinScale = config(
+                "Saplings",
+                "YggaMinScale",
+                0.5f,
+                "The minimum scaling factor used to scale a ygga tree upon growth");
+            yggaMaxScale = config(
+                "Saplings",
+                "YggaMaxScale",
+                2f,
+                "The minimum scaling factor used to scale a ygga tree upon growth");
+            yggaGrowthTime = config(
+                "Saplings",
+                "YggaGrowthTime",
+                3000f,
+                "Number of seconds it takes for a ygga tree to grow from a ygga sapling (will take at least 10 seconds after planting to grow)");
+            yggaGrowRadius = config(
+                "Saplings",
+                "YggaGrowRadius",
+                2f,
+                "Radius of free space required for a ygga sapling to grow");
 
             //Seeds
             enableSeedOverrides = config(
@@ -818,6 +842,10 @@ namespace Advize_PlantEverything.Configuration
             oakGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
             oakMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
             oakMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
+            yggaGrowRadius.SettingChanged += PlantEverything.SaplingSettingChanged;
+            yggaGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
+            yggaMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
+            yggaMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
 
             //Seeds
             enableSeedOverrides.SettingChanged += PlantEverything.SeedSettingChanged;
@@ -1212,6 +1240,22 @@ namespace Advize_PlantEverything.Configuration
         internal float FirGrowRadius
         {
             get { return firGrowRadius.Value; }
+        }
+        internal float YggaMinScale
+        {
+            get { return yggaMinScale.Value; }
+        }
+        internal float YggaMaxScale
+        {
+            get { return yggaMaxScale.Value; }
+        }
+        internal float YggaGrowthTime
+        {
+            get { return yggaGrowthTime.Value; }
+        }
+        internal float YggaGrowRadius
+        {
+            get { return yggaGrowRadius.Value; }
         }
         internal bool EnableSeedOverrides
         {
