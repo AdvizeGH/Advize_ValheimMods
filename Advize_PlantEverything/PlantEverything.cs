@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using Advize_PlantEverything.Configuration;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
-using Advize_PlantEverything.Configuration;
 
 namespace Advize_PlantEverything
 {
@@ -27,7 +27,7 @@ namespace Advize_PlantEverything
         private static bool isInitialized = false;
 
         private static readonly string modDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        private static readonly AssetBundle assetBundle = LoadAssetBundle("planteverything");
+        private static AssetBundle assetBundle;
         private static readonly Dictionary<string, Texture2D> cachedTextures = new();
 
         private static ModConfig config;
@@ -88,6 +88,7 @@ namespace Advize_PlantEverything
 
         private void Awake()
         {
+            assetBundle = LoadAssetBundle("planteverything");
             BepInEx.Logging.Logger.Sources.Add(PELogger);
             config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.12.0" });
             if (config.EnableLocalization)
@@ -921,7 +922,7 @@ namespace Advize_PlantEverything
                 pickable.m_extraDrops.m_drops.Clear();
                 if (pdb.extraDrops & !enableCropOverrides)
                 {
-                    pickable.m_extraDrops.m_drops.Add(new DropTable.DropData{m_item = pickable.m_itemPrefab, m_stackMin = 1, m_stackMax = 1, m_weight = 0});
+                    pickable.m_extraDrops.m_drops.Add(new DropTable.DropData { m_item = pickable.m_itemPrefab, m_stackMin = 1, m_stackMax = 1, m_weight = 0 });
                 }
             }
         }
