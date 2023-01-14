@@ -106,7 +106,7 @@
     <EmbeddedResource Include="Assets\planteverything" />
   </ItemGroup>
   <ItemGroup>
-	<EmbeddedResource Include="Assets\BlueberryBushPieceIcon.png" />
+    <EmbeddedResource Include="Assets\BlueberryBushPieceIcon.png" />
     <EmbeddedResource Include="Assets\CloudberryBushPieceIcon.png" />
     <EmbeddedResource Include="Assets\RaspberryBushPieceIcon.png" />
     <EmbeddedResource Include="Assets\Beech_small1PieceIcon.png" />
@@ -119,7 +119,7 @@
     <EmbeddedResource Include="Assets\shrub_2_heathPieceIcon.png" />
     <EmbeddedResource Include="Assets\vinesPieceIcon.png" />
     <EmbeddedResource Include="Assets\GlowingMushroomPieceIcon.png" />
-	<EmbeddedResource Include="Assets\YggaShoot_small1PieceIcon.png" />
+    <EmbeddedResource Include="Assets\YggaShoot_small1PieceIcon.png" />
     <EmbeddedResource Include="Assets\Ancient_SaplingPieceIcon.png" />
     <EmbeddedResource Include="Assets\Ygga_SaplingPieceIcon.png" />
   </ItemGroup>
