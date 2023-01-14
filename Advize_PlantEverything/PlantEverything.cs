@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.13.0";
+        public const string Version = "1.13.1";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -347,6 +347,7 @@ namespace Advize_PlantEverything
 
         private static List<PieceDB> GeneratePieceRefs()
         {
+            bool enforceBiomes = config.EnforceBiomes;
             List<PieceDB> newList = new()
             {
                 new PieceDB
@@ -355,6 +356,7 @@ namespace Advize_PlantEverything
                     ResourceCost = config.RaspberryCost,
                     resourceReturn = config.RaspberryReturn,
                     respawnTime = config.RaspberryRespawnTime,
+                    biome = enforceBiomes ? (int)Heightmap.Biome.Meadows : 0,
                     icon = true,
                     recover = config.RecoverResources,
                     piece = CreatePiece("RaspberryBush", GetOrAddPieceComponent(prefabRefs["RaspberryBush"]))
@@ -365,7 +367,7 @@ namespace Advize_PlantEverything
                     ResourceCost = config.BlueberryCost,
                     resourceReturn = config.BlueberryReturn,
                     respawnTime = config.BlueberryRespawnTime,
-                    biome = (int)Heightmap.Biome.BlackForest,
+                    biome = enforceBiomes ? (int)Heightmap.Biome.BlackForest : 0,
                     icon = true,
                     recover = config.RecoverResources,
                     piece = CreatePiece("BlueberryBush", GetOrAddPieceComponent(prefabRefs["BlueberryBush"]))
@@ -376,7 +378,7 @@ namespace Advize_PlantEverything
                     ResourceCost = config.CloudberryCost,
                     resourceReturn = config.CloudberryReturn,
                     respawnTime = config.CloudberryRespawnTime,
-                    biome = (int)Heightmap.Biome.Plains,
+                    biome = enforceBiomes ? (int)Heightmap.Biome.Plains : 0,
                     icon = true,
                     recover = config.RecoverResources,
                     piece = CreatePiece("CloudberryBush", GetOrAddPieceComponent(prefabRefs["CloudberryBush"]))
@@ -387,7 +389,6 @@ namespace Advize_PlantEverything
                     ResourceCost = config.MushroomCost,
                     resourceReturn = config.MushroomReturn,
                     respawnTime = config.MushroomRespawnTime,
-                    biome = 9,
                     recover = config.RecoverResources,
                     piece = CreatePiece("PickableMushroom", GetOrAddPieceComponent(prefabRefs["Pickable_Mushroom"]), isGrounded: true)
                 },
@@ -397,7 +398,6 @@ namespace Advize_PlantEverything
                     ResourceCost = config.YellowMushroomCost,
                     resourceReturn = config.YellowMushroomReturn,
                     respawnTime = config.YellowMushroomRespawnTime,
-                    biome = 10,
                     recover = config.RecoverResources,
                     piece = CreatePiece("PickableYellowMushroom", GetOrAddPieceComponent(prefabRefs["Pickable_Mushroom_yellow"]), isGrounded: true)
                 },
@@ -407,7 +407,6 @@ namespace Advize_PlantEverything
                     ResourceCost = config.BlueMushroomCost,
                     resourceReturn = config.BlueMushroomReturn,
                     respawnTime = config.BlueMushroomRespawnTime,
-                    biome = 10,
                     recover = config.RecoverResources,
                     piece = CreatePiece("PickableBlueMushroom", GetOrAddPieceComponent(prefabRefs["Pickable_Mushroom_blue"]), isGrounded: true)
                 },
@@ -417,7 +416,7 @@ namespace Advize_PlantEverything
                     ResourceCost = config.ThistleCost,
                     resourceReturn = config.ThistleReturn,
                     respawnTime = config.ThistleRespawnTime,
-                    biome = 10,
+                    biome = enforceBiomes ? (int)Heightmap.Biome.BlackForest : 0,
                     recover = config.RecoverResources,
                     piece = CreatePiece("PickableThistle", GetOrAddPieceComponent(prefabRefs["Pickable_Thistle"]), isGrounded: true)
                 },
@@ -427,6 +426,7 @@ namespace Advize_PlantEverything
                     ResourceCost = config.DandelionCost,
                     resourceReturn = config.DandelionReturn,
                     respawnTime = config.DandelionRespawnTime,
+                    biome = enforceBiomes ? (int)Heightmap.Biome.Meadows : 0,
                     recover = config.RecoverResources,
                     piece = CreatePiece("PickableDandelion", GetOrAddPieceComponent(prefabRefs["Pickable_Dandelion"]), isGrounded: true)
                 }
@@ -608,6 +608,7 @@ namespace Advize_PlantEverything
                 {
                     pickable.m_respawnTimeMinutes = pdb.respawnTime;
                     pickable.m_amount = pdb.resourceReturn;
+                    pdb.piece.m_onlyInBiome = (Heightmap.Biome)pdb.biome;
 
                     if (pdb.Prefab.transform.Find("visual") != null)
                     {
@@ -665,11 +666,6 @@ namespace Advize_PlantEverything
                     }
                 }
 
-                if (config.EnforceBiomes)
-                {
-                    pdb.piece.m_onlyInBiome = (Heightmap.Biome)pdb.biome;
-                }
-
                 pdb.piece.m_icon = pdb.icon ? CreateSprite($"{pdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : resource.m_itemData.GetIcon();
             }
         }
@@ -694,7 +690,7 @@ namespace Advize_PlantEverything
                     source = "SwampTree1",
                     resource = "AncientSeed",
                     resourceCost = 1,
-                    biome = (int)Heightmap.Biome.Swamp,
+                    biome = config.EnforceBiomes ? (int)Heightmap.Biome.Swamp : 0,
                     icon = true,
                     growTime = config.AncientGrowthTime,
                     growRadius = config.AncientGrowRadius,
@@ -708,7 +704,7 @@ namespace Advize_PlantEverything
                     source = "YggaShoot_small1",
                     resource = "Sap",
                     resourceCost = 1,
-                    biome = (int)Heightmap.Biome.Mistlands,
+                    biome = config.EnforceBiomes ? (int)Heightmap.Biome.Mistlands : 0,
                     icon = true,
                     growTime = config.YggaGrowthTime,
                     growRadius = config.YggaGrowRadius,
@@ -796,15 +792,12 @@ namespace Advize_PlantEverything
                 piece.m_resources[0].m_resItem = prefabRefs[sdb.resource].GetComponent<ItemDrop>();
                 piece.m_resources[0].m_amount = sdb.resourceCost;
 
-                if (config.EnforceBiomes)
-                {
-                    piece.m_onlyInBiome = plant.m_biome = (Heightmap.Biome)sdb.biome;
-                }
+                piece.m_onlyInBiome = plant.m_biome = (Heightmap.Biome)sdb.biome;
                 plant.m_destroyIfCantGrow = piece.m_groundOnly = !config.PlaceAnywhere;
 
                 if (isInitialized) continue;
 
-                string[] p = { "healthy", "unhealthy"};
+                string[] p = { "healthy", "unhealthy" };
                 Transform t = prefabRefs["Birch_Sapling"].transform.Find(p[0]);
 
                 foreach (string parent in p)
@@ -1094,7 +1087,7 @@ namespace Advize_PlantEverything
         internal class PrefabDB
         {
             internal string key;
-            internal int biome = (int)Heightmap.Biome.Meadows;
+            internal int biome;
             internal int resourceCost;
             internal int resourceReturn;
             internal bool extraDrops;
