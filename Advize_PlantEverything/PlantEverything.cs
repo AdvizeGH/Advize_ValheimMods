@@ -84,6 +84,7 @@ namespace Advize_PlantEverything
         private void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
+            assetBundle = LoadAssetBundle("planteverything");
             config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.13.0" });
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
