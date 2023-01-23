@@ -27,7 +27,7 @@ namespace Advize_PlantEverything
         private static bool isInitialized = false;
 
         private static readonly string modDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        private static readonly AssetBundle assetBundle = LoadAssetBundle("planteverything");
+        private static readonly AssetBundle assetBundle;
         private static readonly Dictionary<string, Texture2D> cachedTextures = new();
 
         private static ModConfig config;
