@@ -27,7 +27,7 @@ namespace Advize_PlantEverything
         private static bool isInitialized = false;
 
         private static readonly string modDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        private static readonly AssetBundle assetBundle = LoadAssetBundle("planteverything");
+        private static AssetBundle assetBundle;
         private static readonly Dictionary<string, Texture2D> cachedTextures = new();
 
         private static ModConfig config;
@@ -84,6 +84,7 @@ namespace Advize_PlantEverything
         private void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
+            assetBundle = LoadAssetBundle("planteverything");
             config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.13.0" });
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
