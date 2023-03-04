@@ -967,7 +967,7 @@ namespace Advize_PlantEverything
             cultivator.m_itemData.m_shared.m_buildPieces.m_canRemovePieces = true;
         }
 
-        private static void FinalInit(ZNetScene __instance)
+        private static void FinalInit(ZNetScene instance, Dictionary<int, GameObject> m_namedPrefabs)
         {
             InitPieceRefs();
             InitPieces();
@@ -979,10 +979,15 @@ namespace Advize_PlantEverything
             if (stringDictionary.Count > 0)
                 InitLocalization();
 
-            if (!__instance.m_prefabs.Contains(prefabRefs["Ancient_Sapling"]))
-                __instance.m_prefabs.Add(prefabRefs["Ancient_Sapling"]);
-            if (!__instance.m_prefabs.Contains(prefabRefs["Ygga_Sapling"]))
-                __instance.m_prefabs.Add(prefabRefs["Ygga_Sapling"]);
+            List<GameObject> customPrefabs = new() { prefabRefs["Ancient_Sapling"], prefabRefs["Ygga_Sapling"] };
+            foreach (GameObject go in customPrefabs)
+            {
+                if (!instance.m_prefabs.Contains(go))
+                {
+                    instance.m_prefabs.Add(go);
+                    m_namedPrefabs.Add(instance.GetPrefabHash(go), go);
+                }
+            }
         }
 
         private static void ModifyTreeDrops()

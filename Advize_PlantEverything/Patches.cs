@@ -22,26 +22,11 @@ namespace Advize_PlantEverything
         [HarmonyPatch(typeof(ZNetScene), "Awake")]
         public static class ZNetSceneAwake
         {
-            public static void Postfix(ZNetScene __instance)
+            public static void Postfix(ZNetScene __instance, Dictionary<int, GameObject> ___m_namedPrefabs)
             {
                 Dbgl("ZNetSceneAwake");
                 Dbgl("Performing final mod initialization");
-                FinalInit(__instance);
-            }
-        }
-
-        [HarmonyPatch(typeof(ZNetScene), "GetPrefab", new Type[] { typeof(int) })]
-        public static class ZNetSceneGetPrefab
-        {
-            public static void Postfix(int hash, ref GameObject __result, ZNetScene __instance)
-            {
-                if (__result == null)
-                {
-                    if (hash == __instance.GetPrefabHash(prefabRefs["Ancient_Sapling"]))
-                        __result = prefabRefs["Ancient_Sapling"];
-                    if (hash == __instance.GetPrefabHash(prefabRefs["Ygga_Sapling"]))
-                        __result = prefabRefs["Ygga_Sapling"];
-                }
+                FinalInit(__instance, ___m_namedPrefabs);
             }
         }
 
