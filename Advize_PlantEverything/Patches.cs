@@ -274,7 +274,7 @@ namespace Advize_PlantEverything
             {
                 if (___m_picked && config.EnablePickableTimers && ___m_nview.GetZDO() != null)
                 {
-                    if (__instance.name.ToLower().Contains("surt"))
+                    if (__instance.name.ToLower().Contains("core"))
                         return;
 
                     float growthTime = ___m_respawnTimeMinutes * 60;
