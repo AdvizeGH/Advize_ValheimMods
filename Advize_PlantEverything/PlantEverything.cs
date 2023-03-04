@@ -321,7 +321,7 @@ namespace Advize_PlantEverything
 
         private static void InitPieceRefs()
         {
-            Dbgl($"InitPieceRefs");
+            Dbgl("InitPieceRefs");
 
             if (pieceRefs.Count > 0)
             {
@@ -1039,7 +1039,7 @@ namespace Advize_PlantEverything
 
         internal static void CoreSettingChanged(object o, System.EventArgs e)
         {
-            Dbgl($"Config setting changed, re-initializing mod");
+            Dbgl("Config setting changed, re-initializing mod");
             InitPieceRefs();
             InitPieces();
             InitSaplingRefs();
@@ -1050,7 +1050,7 @@ namespace Advize_PlantEverything
 
         internal static void PickableSettingChanged(object o, System.EventArgs e)
         {
-            Dbgl($"Config setting changed, re-initializing pieces");
+            Dbgl("Config setting changed, re-initializing pieces");
             InitPieceRefs();
             InitPieces();
             InitCultivator();
@@ -1058,20 +1058,20 @@ namespace Advize_PlantEverything
 
         internal static void SaplingSettingChanged(object o, System.EventArgs e)
         {
-            Dbgl($"Config setting changed, re-initializing saplings");
+            Dbgl("Config setting changed, re-initializing saplings");
             InitSaplingRefs();
             InitSaplings();
         }
 
         internal static void SeedSettingChanged(object o, System.EventArgs e)
         {
-            Dbgl($"Config setting changed, modifying TreeBase drop tables");
+            Dbgl("Config setting changed, modifying TreeBase drop tables");
             ModifyTreeDrops();
         }
 
         internal static void CropSettingChanged(object o, System.EventArgs e)
         {
-            Dbgl($"Config setting changed, re-initializing crops");
+            Dbgl("Config setting changed, re-initializing crops");
             InitCrops();
         }
 
