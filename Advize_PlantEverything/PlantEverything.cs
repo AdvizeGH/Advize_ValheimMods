@@ -730,7 +730,6 @@ namespace Advize_PlantEverything
                 new SaplingDB
                 {
                     key = "Beech_Sapling",
-                    biome = config.EnforceBiomesVanilla ? 0 : 895,
                     growTime = config.BeechGrowthTime,
                     growRadius = config.BeechGrowRadius,
                     minScale = config.BeechMinScale,
@@ -739,7 +738,6 @@ namespace Advize_PlantEverything
                 new SaplingDB
                 {
                     key = "PineTree_Sapling",
-                    biome = config.EnforceBiomesVanilla ? 0 : 895,
                     growTime = config.PineGrowthTime,
                     growRadius = config.PineGrowRadius,
                     minScale = config.PineMinScale,
@@ -748,7 +746,6 @@ namespace Advize_PlantEverything
                 new SaplingDB
                 {
                     key = "FirTree_Sapling",
-                    biome = config.EnforceBiomesVanilla ? 0 : 895,
                     growTime = config.FirGrowthTime,
                     growRadius = config.FirGrowRadius,
                     minScale = config.FirMinScale,
@@ -757,7 +754,6 @@ namespace Advize_PlantEverything
                 new SaplingDB
                 {
                     key = "Birch_Sapling",
-                    biome = config.EnforceBiomesVanilla ? 0 : 895,
                     growTime = config.BirchGrowthTime,
                     growRadius = config.BirchGrowRadius,
                     minScale = config.BirchMinScale,
@@ -766,7 +762,6 @@ namespace Advize_PlantEverything
                 new SaplingDB
                 {
                     key = "Oak_Sapling",
-                    biome = config.EnforceBiomesVanilla ? 0 : 895,
                     growTime = config.OakGrowthTime,
                     growRadius = config.OakGrowRadius,
                     minScale = config.OakMinScale,
