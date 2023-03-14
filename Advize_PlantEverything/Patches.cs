@@ -323,9 +323,9 @@ namespace Advize_PlantEverything
 
             string color = "red";
             if (remainingRatio < 0)
-                color = "cyan";
+                color = "#00FFFF"; // cyan
             else if (remainingRatio < 0.25)
-                color = "lime";
+                color = "#32CD32"; // lime
             else if (remainingRatio < 0.5)
                 color = "yellow";
             else if (remainingRatio < 0.75)
