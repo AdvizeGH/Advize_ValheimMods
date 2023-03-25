@@ -181,14 +181,14 @@ namespace Advize_PlantEasily
 
 									rowDirection = baseRotation * rowDirection * pieceSpacing;
 									columnDirection = baseRotation * columnDirection * pieceSpacing;
-
-                                    snapPoints.Add(collider.transform.position + rowDirection);
-                                    snapPoints.Add(collider.transform.position + columnDirection);
-                                    snapPoints.Add(collider.transform.position - rowDirection);
-                                    snapPoints.Add(collider.transform.position - columnDirection);
-
-                                    foundSnaps = true;
-                                    //continue;
+									
+									snapPoints.Add(collider.transform.position + rowDirection);
+									snapPoints.Add(collider.transform.position + columnDirection);
+									snapPoints.Add(collider.transform.position - rowDirection);
+									snapPoints.Add(collider.transform.position - columnDirection);
+									
+									foundSnaps = true;
+									//continue;
 									break;
 								}
 							}
@@ -207,7 +207,7 @@ namespace Advize_PlantEasily
 								
 								foundSnaps = true;
 								//continue;
-								//break;
+								break;
 							}
 						}
 
@@ -216,11 +216,11 @@ namespace Advize_PlantEasily
 							Vector3 firstSnapPos = snapPoints.OrderBy(o => snapPoints.Where(w => w != o).Min(m => Utils.DistanceXZ(m, o)) + (o - basePosition).magnitude).First();
 							basePosition = ___m_placementGhost.transform.position = firstSnapPos;
 						}
-                    }
+					}
 				}
 
 				if (!foundSnaps)
-                {
+				{
 					rowDirection *= pieceSpacing;
 					columnDirection *= pieceSpacing;
 				}
@@ -263,7 +263,7 @@ namespace Advize_PlantEasily
 		public class PlayerPlacePiece
 		{
 			public static bool Prefix(Piece piece, bool ___m_noPlacementCost, ref bool __result/*, out bool __state*/)
-            {
+			{
 				Dbgl("Player.PlacePiece Prefix");
 				if (!piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>())/* || ___m_noPlacementCost*/)
 					return true;
@@ -275,9 +275,9 @@ namespace Advize_PlantEasily
 						if (i != 0)
 						{
 							if (i == 1 && ___m_noPlacementCost)
-                            {
+							{
 								continue;
-                            }
+							}
 							Dbgl("Preventing partially valid placements, returning");
 							for (int j = 0; j < ghostPlacementStatus.Count; j++)
 								ghostPlacementStatus[j] = 1;
