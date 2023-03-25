@@ -76,20 +76,20 @@ namespace Advize_PlantEasily
 						ghostPlacementStatus.Add(0);
 						continue;
 					}
-
-                    ZNetView.m_forceDisableInit = true;
+					
+					ZNetView.m_forceDisableInit = true;
 					GameObject newGhost = Instantiate(rootGhost);
 					ZNetView.m_forceDisableInit = false;
 					newGhost.name = rootGhost.name;
-
-                    foreach (Transform t in newGhost.GetComponentsInChildren<Transform>())
-                    {
-                        t.gameObject.layer = LayerMask.NameToLayer("ghost");
-                    }
-
-                    newGhost.transform.position = rootGhost.transform.position;
+					
+					foreach (Transform t in newGhost.GetComponentsInChildren<Transform>())
+					{
+						t.gameObject.layer = LayerMask.NameToLayer("ghost");
+					}
+					
+					newGhost.transform.position = rootGhost.transform.position;
 					newGhost.transform.localScale = rootGhost.transform.localScale;
-
+					
 					extraGhosts.Add(newGhost);
 					ghostPlacementStatus.Add(0);
 				}

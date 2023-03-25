@@ -86,9 +86,9 @@ namespace Advize_PlantEasily
 				placementGhost = ___m_placementGhost;
 
 				if (!(config.Rows == 1 && config.Columns == 1))
-                {
+				{
 					CreateGhosts(___m_placementGhost);
-                }
+				}
 			}
 		}
 		
@@ -162,9 +162,9 @@ namespace Advize_PlantEasily
 
 							Collider[] secondaryObstructions = Physics.OverlapSphere(collider.transform.position, pieceSpacing, snapCollisionMask);
 							if (secondaryObstructions?.Length > 0)
-                            {
+							{
 								foreach (Collider secondaryCollider in secondaryObstructions)
-                                {
+								{
 									if (!secondaryCollider.GetComponent<Plant>() && !secondaryCollider.GetComponentInParent<Pickable>()) continue;
 									if (secondaryCollider.transform.root == collider.transform.root) continue;
 
@@ -216,7 +216,7 @@ namespace Advize_PlantEasily
                                     foundSnaps = true;
                                     //continue;
 									break;
-                                }
+								}
 							}
 							if (!foundSnaps)
 							{
