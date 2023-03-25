@@ -550,17 +550,17 @@ namespace Advize_PlantEverything.Configuration
             birchMaxScale = config(
                 "Saplings",
                 "BirchMaxScale",
-                2f,
+                1f,
                 "The maximum scaling factor used to scale a birch tree upon growth");
             oakMinScale = config(
                 "Saplings",
                 "OakMinScale",
-                0.5f,
+                0.7f,
                 "The minimum scaling factor used to scale an oak tree upon growth");
             oakMaxScale = config(
                 "Saplings",
                 "OakMaxScale",
-                2f,
+                0.9f,
                 "The maximum scaling factor used to scale an oak tree upon growth");
             ancientMinScale = config(
                 "Saplings",
@@ -595,7 +595,7 @@ namespace Advize_PlantEverything.Configuration
             oakGrowRadius = config(
                 "Saplings",
                 "OakGrowRadius",
-                2f,
+                3f,
                 "Radius of free space required for an oak sapling to grow");
             ancientGrowRadius = config(
                 "Saplings",
@@ -620,32 +620,32 @@ namespace Advize_PlantEverything.Configuration
             beechMinScale = config(
                 "Saplings",
                 "BeechMinScale",
-                0.5f,
+                0.8f,
                 "The minimum scaling factor used to scale a beech tree upon growth");
             beechMaxScale = config(
                 "Saplings",
                 "BeechMaxScale",
-                2f,
+                1.5f,
                 "The maximum scaling factor used to scale a beech tree upon growth");
             pineMinScale = config(
                 "Saplings",
                 "PineMinScale",
-                0.5f,
+                1.5f,
                 "The minimum scaling factor used to scale a pine tree upon growth");
             pineMaxScale = config(
                 "Saplings",
                 "PineMaxScale",
-                2f,
+                2.5f,
                 "The maximum scaling factor used to scale a pine tree upon growth");
             firMinScale = config(
                 "Saplings",
                 "FirMinScale",
-                0.5f,
+                1f,
                 "The minimum scaling factor used to scale a fir tree upon growth");
             firMaxScale = config(
                 "Saplings",
                 "FirMaxScale",
-                2f,
+                2.5f,
                 "The maximum scaling factor used to scale a fir tree upon growth");
             beechGrowRadius = config(
                 "Saplings",
