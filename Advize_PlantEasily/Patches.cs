@@ -288,6 +288,7 @@ namespace Advize_PlantEasily
 				}
 				return true;
 			}
+
 			public static void Postfix(Player __instance, Piece piece, bool ___m_noPlacementCost, int ___m_placementStatus)
 			{
 				Dbgl("Player.PlacePiece Postfix");
@@ -307,7 +308,7 @@ namespace Advize_PlantEasily
 							Dbgl($"extraGhost[{i}] placementStatus is invalid. Skipping placement.");
 							count--;
 							continue;
-                        }
+						}
 						Vector3 position = extraGhosts[i].transform.position;
 						Quaternion rotation = config.RandomizeRotation ? Quaternion.Euler(0f, 22.5f * Random.Range(0, 16), 0f) : extraGhosts[i].transform.rotation;
 						GameObject gameObject = piece.gameObject;
