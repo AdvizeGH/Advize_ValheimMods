@@ -72,10 +72,10 @@ namespace Advize_PlantEasily
 				for (int column = 0; column < config.Columns; column++)
 				{
 					if (row == 0 && column == 0)
-                    {
+					{
 						ghostPlacementStatus.Add(0);
 						continue;
-                    }
+					}
 
                     ZNetView.m_forceDisableInit = true;
 					GameObject newGhost = Instantiate(rootGhost);
@@ -102,7 +102,7 @@ namespace Advize_PlantEasily
 		}
 
 		private static float PickableSnapRadius(string name)
-        {
+		{
 			// Find a new route, constant string operations for each game tick should be avoided.
 			if (name.EndsWith("berryBush"))
 				return config.BerryBushSnapRadius;
@@ -114,20 +114,20 @@ namespace Advize_PlantEasily
 				return config.FlowerSnapRadius;
 
 			return 2.0f;//config.PickableSnapRadius;
-        }
-
+		}
+		
 		private static void SetPlacementGhostStatus(GameObject ghost, int index, int placementStatus)
 		{
 			ghost.GetComponent<Piece>().SetInvalidPlacementHeightlight(placementStatus != 0);
 
 			if (ghostPlacementStatus.Count > index)
-            {
+			{
 				ghostPlacementStatus[index] = placementStatus;
 			}
 		}
 
 		private static int CheckPlacementStatus(GameObject ghost, Vector3 position, Heightmap heightmap)
-        {
+		{
 			Piece piece = ghost.GetComponent<Piece>();
 			int placementStatus = 0;
 			//Heightmap heightmap = Heightmap.FindHeightmap(position);
@@ -155,8 +155,8 @@ namespace Advize_PlantEasily
 
 			return placementStatus;
 		}
-
-        internal static void Dbgl(string message, bool forceLog = false, bool logError = false)
+		
+		internal static void Dbgl(string message, bool forceLog = false, bool logError = false)
 		{
 			if (forceLog || config.EnableDebugMessages)
 			{

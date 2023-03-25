@@ -29,7 +29,7 @@ namespace Advize_PlantEasily
 				}
 
 				if (Input.GetKey(config.KeyboardModifierKey) || Input.GetKey(config.GamepadModifierKey))
-                {
+				{
 					if (Input.GetKeyUp(config.IncreaseXKey) || ZInput.GetButtonDown("JoyDPadRight"))
 						config.Columns += 1;
 
@@ -104,7 +104,7 @@ namespace Advize_PlantEasily
 					typeof(Player).GetMethod("SetupPlacementGhost", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(__instance, new object[0]);
 
 				for (int i = 0; i < extraGhosts.Count; i++)
-                {
+				{
 					//Dbgl($"Calling SetPlacementGhostStatus index is: {i} extraGhosts.Count is: {extraGhosts.Count}");
 					GameObject extraGhost = extraGhosts[i];
 					extraGhost.SetActive(___m_placementGhost.activeSelf);
@@ -120,13 +120,13 @@ namespace Advize_PlantEasily
 				//Find collider with largest radius within the piece to be placed.
 				//Include grownPrefabs just in case. Still doesn't seem to work on saplings even when multiplied against max growth scale of the tree.
 				if (plant)
-                {
+				{
 					List<GameObject> colliderRoots = new();
 					colliderRoots.Add(___m_placementGhost);
 					colliderRoots.AddRange(plant.m_grownPrefabs);
 
 					for (int i = 0; i < colliderRoots.Count; i++)
-                    {
+					{
 						foreach (CapsuleCollider collider in colliderRoots[i].GetComponentsInChildren<CapsuleCollider>())
 						{
 							//Dbgl($"colliderRadius was: {colliderRadius}");
@@ -154,9 +154,9 @@ namespace Advize_PlantEasily
 					Collider[] obstructions = Physics.OverlapSphere(___m_placementGhost.transform.position, pieceSpacing, snapCollisionMask);
 					
 					if (obstructions?.Length > 0)
-                    {
+					{
 						foreach (Collider collider in obstructions)
-                        {
+						{
 							if (foundSnaps) break;
 							if (!collider.GetComponent<Plant>() && !collider.GetComponentInParent<Pickable>()) continue;
 
@@ -238,7 +238,7 @@ namespace Advize_PlantEasily
 						}
 
 						if (foundSnaps)
-                        {
+						{
 							Vector3 firstSnapPos = snapPoints.OrderBy(o => snapPoints.Where(w => w != o).Min(m => Utils.DistanceXZ(m, o)) + (o - basePosition).magnitude).First();
 							basePosition = ___m_placementGhost.transform.position = firstSnapPos;
 						}
