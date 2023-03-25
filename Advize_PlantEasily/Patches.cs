@@ -168,12 +168,10 @@ namespace Advize_PlantEasily
 									if (!secondaryCollider.GetComponent<Plant>() && !secondaryCollider.GetComponentInParent<Pickable>()) continue;
 									if (secondaryCollider.transform.root == collider.transform.root) continue;
 
-
 									// Note to self:
 									// Make rows and columns consistant
 									// Determine whether row or column should be the cross vector based on position relative to the player (rows should extend away from or towards player).
 									// Consider whether this could be more easily facilitated by adjusting snap point priority
-
 
 									Vector3 normalizedVector = (secondaryCollider.transform.position - collider.transform.position).normalized;
 									if (normalizedVector.magnitude == 0) continue;
@@ -183,30 +181,6 @@ namespace Advize_PlantEasily
 
 									rowDirection = baseRotation * rowDirection * pieceSpacing;
 									columnDirection = baseRotation * columnDirection * pieceSpacing;
-
-									//Vector3 colliderPosition = collider.transform.position;
-
-                                    //Vector3[] snapPositions =
-                                    //{
-                                    //	colliderPosition + rowDirection,
-                                    //	colliderPosition  + columnDirection,
-                                    //	colliderPosition - rowDirection,
-                                    //	colliderPosition - columnDirection
-                                    //};
-
-                                    //foreach (Vector3 position in snapPositions)
-                                    //                           {
-                                    //	if (CheckPlacementStatus(___m_placementGhost, position, Heightmap.FindHeightmap(position)) == 0)
-                                    //	{
-                                    //		snapPoints.Add(position);
-                                    //		foundSnaps = true;
-                                    //	}
-                                    //                           }
-
-                                    //Vector3 plusRow = colliderPosition + rowDirection;
-                                    //Vector3 plusColumn = colliderPosition + columnDirection;
-                                    //Vector3 minusRow = colliderPosition - rowDirection;
-                                    //Vector3 minusColumn = colliderPosition - columnDirection;
 
                                     snapPoints.Add(collider.transform.position + rowDirection);
                                     snapPoints.Add(collider.transform.position + columnDirection);
@@ -225,15 +199,15 @@ namespace Advize_PlantEasily
 
 								rowDirection = normalizedVector;
 								columnDirection = baseRotation * columnDirection * pieceSpacing;
-
+								
 								snapPoints.Add(collider.transform.position + rowDirection);
 								snapPoints.Add(collider.transform.position + columnDirection);
 								snapPoints.Add(collider.transform.position - rowDirection);
 								snapPoints.Add(collider.transform.position - columnDirection);
-
+								
 								foundSnaps = true;
 								//continue;
-								break;
+								//break;
 							}
 						}
 
@@ -278,8 +252,8 @@ namespace Advize_PlantEasily
 
 						if (__instance.GetInventory().CountItems(resource.m_resItem.m_itemData.m_shared.m_name) < currentCost)
 						{
-                            SetPlacementGhostStatus(ghost, ghostIndex, 1);
-                        }
+							SetPlacementGhostStatus(ghost, ghostIndex, 1);
+						}
 					}
 				}
 			}
