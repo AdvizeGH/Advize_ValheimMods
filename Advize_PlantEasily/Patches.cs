@@ -6,8 +6,8 @@ using UnityEngine;
 
 namespace Advize_PlantEasily
 {
-    public partial class PlantEasily
-    {
+	public partial class PlantEasily
+	{
 		[HarmonyPatch(typeof(Player), "UpdateBuildGuiInput")]
 		public class PlayerUpdateBuildGuiInput
 		{
