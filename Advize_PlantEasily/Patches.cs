@@ -83,24 +83,19 @@ namespace Advize_PlantEasily
                 if (!___m_placementGhost.GetComponent<Plant>() && !___m_placementGhost.GetComponent<Pickable>())
                     return;
                 
-                placementGhost = ___m_placementGhost;
-                
-                if (!(config.Rows == 1 && config.Columns == 1))
-                {
-                    CreateGhosts(___m_placementGhost);
-                }
+                CreateGhosts(___m_placementGhost);
             }
         }
         
         [HarmonyPatch(typeof(Player), "UpdatePlacementGhost")]
         public class PlayerUpdatePlacementGhost
         {
-            public static void Postfix(Player __instance, ref GameObject ___m_placementGhost)
+            public static void Postfix(Player __instance, bool ___m_noPlacementCost, ref GameObject ___m_placementGhost)
             {
                 if (!modActive || !___m_placementGhost || (!___m_placementGhost.GetComponent<Plant>() && !___m_placementGhost.GetComponent<Pickable>()))
                     return;
                 
-                if (extraGhosts.Count == 0 && !(config.Rows == 1 && config.Columns == 1)) //If there are no extra ghosts but there is supposed to be
+                if (ghostPlacementStatus.Count == 0 || (extraGhosts.Count == 0 && !(config.Rows == 1 && config.Columns == 1))) //If there are no extra ghosts but there is supposed to be
                     typeof(Player).GetMethod("SetupPlacementGhost", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(__instance, new object[0]);
                 
                 for (int i = 0; i < extraGhosts.Count; i++)
@@ -247,7 +242,7 @@ namespace Advize_PlantEasily
                         ghost.transform.position = ghostPosition;
                         ghost.transform.rotation = ___m_placementGhost.transform.rotation;
 
-                        if (__instance.GetInventory().CountItems(resource.m_resItem.m_itemData.m_shared.m_name) < currentCost)
+                        if (!___m_noPlacementCost && __instance.GetInventory().CountItems(resource.m_resItem.m_itemData.m_shared.m_name) < currentCost)
                         {
                             SetPlacementGhostStatus(ghost, ghostIndex, 1);
                         }
@@ -271,7 +266,7 @@ namespace Advize_PlantEasily
                 {
                     if (CheckPlacementStatus(___m_placementGhost) > 1)
                     {
-                        ghostPlacementStatus[0] = -1;
+                        SetPlacementGhostStatus(___m_placementGhost, 0, -1);
                         __result = false;
                         return false;
                     }
@@ -286,7 +281,7 @@ namespace Advize_PlantEasily
                             if (i == 1 && ___m_noPlacementCost)
                                 continue;
 
-                            ghostPlacementStatus[0] = -1;
+                            SetPlacementGhostStatus(___m_placementGhost, 0, -1);
                             __result = false;
                             return false;
                         }

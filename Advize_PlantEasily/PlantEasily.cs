@@ -73,6 +73,7 @@ namespace Advize_PlantEasily
                 {
                     if (row == 0 && column == 0)
                     {
+                        placementGhost = rootGhost;
                         ghostPlacementStatus.Add(0);
                         continue;
                     }
