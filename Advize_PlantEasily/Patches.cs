@@ -15,8 +15,8 @@ namespace Advize_PlantEasily
             {
                 if (Input.GetKeyUp(config.EnableModKey))
                 {
-                    modActive = !modActive;
-                    Dbgl($"modActive was {!modActive} setting to {modActive}");
+                    config.ModActive = !config.ModActive;
+                    Dbgl($"modActive was {!config.ModActive} setting to {config.ModActive}");
                     if (__instance.GetRightItem()?.m_shared.m_name == "$item_cultivator")
                     {
                         typeof(Player).GetMethod("SetupPlacementGhost", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(__instance, new object[0]);
@@ -24,8 +24,8 @@ namespace Advize_PlantEasily
                 }
                 if (Input.GetKeyUp(config.EnableSnappingKey))
                 {
-                    snapActive = !snapActive;
-                    Dbgl($"snapActive was {!snapActive} setting to {snapActive}");
+                    config.SnapActive = !config.SnapActive;
+                    Dbgl($"snapActive was {!config.SnapActive} setting to {config.SnapActive}");
                 }
                 
                 if (Input.GetKey(config.KeyboardModifierKey) || Input.GetKey(config.GamepadModifierKey))
@@ -74,7 +74,7 @@ namespace Advize_PlantEasily
                 //Dbgl("SetupPlacementGhost");
                 DestroyGhosts();
                 
-                if (!modActive || !___m_placementGhost)
+                if (!config.ModActive || !___m_placementGhost)
                     return;
                 
                 if (___m_placementGhost.GetComponent<Piece>().m_repairPiece)
@@ -92,7 +92,7 @@ namespace Advize_PlantEasily
         {
             public static void Postfix(Player __instance, bool ___m_noPlacementCost, ref GameObject ___m_placementGhost)
             {
-                if (!modActive || !___m_placementGhost || (!___m_placementGhost.GetComponent<Plant>() && !___m_placementGhost.GetComponent<Pickable>()))
+                if (!config.ModActive || !___m_placementGhost || (!___m_placementGhost.GetComponent<Plant>() && !___m_placementGhost.GetComponent<Pickable>()))
                     return;
                 
                 if (ghostPlacementStatus.Count == 0 || (extraGhosts.Count == 0 && !(config.Rows == 1 && config.Columns == 1))) //If there are no extra ghosts but there is supposed to be
@@ -144,7 +144,7 @@ namespace Advize_PlantEasily
                 Vector3 columnDirection = Vector3.Cross(Vector3.up, rowDirection);
                 
                 bool foundSnaps = false;
-                if (snapActive)
+                if (config.SnapActive)
                 {
                     List<Vector3> snapPoints = new();
                     Collider[] obstructions = Physics.OverlapSphere(___m_placementGhost.transform.position, pieceSpacing, snapCollisionMask);

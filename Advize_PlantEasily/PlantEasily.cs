@@ -19,10 +19,7 @@ namespace Advize_PlantEasily
         public static ManualLogSource PELogger = new($" {PluginName}");
         
         private static ModConfig config;
-        
-        private static bool modActive = true;
-        private static bool snapActive = true;
-        
+
         private static GameObject placementGhost;
         private static List<GameObject> extraGhosts = new();
         private static List<int> ghostPlacementStatus = new();
@@ -129,7 +126,6 @@ namespace Advize_PlantEasily
             Piece piece = ghost.GetComponent<Piece>();
             Vector3 position = ghost.transform.position;
             Heightmap heightmap = Heightmap.FindHeightmap(position);
-            //int placementStatus = 0;
 
             if (piece.m_cultivatedGroundOnly && heightmap && !heightmap.IsCultivated(position))
                 placementStatus = 9;
