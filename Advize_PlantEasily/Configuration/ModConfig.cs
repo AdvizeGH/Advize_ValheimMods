@@ -7,11 +7,12 @@ namespace Advize_PlantEasily.Configuration
     {
         private ConfigFile Config;
 
-        //private readonly ConfigEntry<int> nexusID;
         private readonly ConfigEntry<bool> enableDebugMessages;
 
         private readonly ConfigEntry<int> rows;
         private readonly ConfigEntry<int> columns;
+        private readonly ConfigEntry<bool> modActive;
+        private readonly ConfigEntry<bool> snapActive;
 
         //Pickables
         //private readonly ConfigEntry<float> pickableSnapRadius;
@@ -42,11 +43,11 @@ namespace Advize_PlantEasily.Configuration
             Config = configFile;
 
             //General
-            //nexusID = Config.Bind("General", "NexusID", 9999, new ConfigDescription("Nexus mod ID for updates.", null, new ConfigurationManagerAttributes { Category = "Internal", ReadOnly = true }));
             enableDebugMessages = Config.Bind("General", "EnableDebugMessages", false, "Enable mod debug messages in console.");
-
             rows = Config.Bind("General", "Rows", 2, "Number of rows for planting grid aka height.");
             columns = Config.Bind("General", "Columns", 2, "Number of columns for planting grid aka width.");
+            modActive = Config.Bind("General", "ModActive", true, "Enables all mod features.");
+            snapActive = Config.Bind("General", "SnapActive", true, "Enables grid snapping feature.");
             preventPartialPlanting = Config.Bind("General", "PreventPartialPlanting", true, "Prevents placement of resources when any placement ghosts are invalid for any reason.");
             preventInvalidPlanting = Config.Bind("General", "PreventInvalidPlanting", true, "Prevents plants from being placed where they will be unable to grow.");
             randomizeRotation = Config.Bind("General", "RandomizeRotation", true, "Randomizes rotation of pieces once placed.");
@@ -111,7 +112,6 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return enableDebugMessages.Value; }
         }
-        
         internal int Rows
         {
             get { return Mathf.Max(rows.Value, 1); }
@@ -121,6 +121,16 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return Mathf.Max(columns.Value, 1); }
             set { columns.BoxedValue = Mathf.Max(value, 1); }
+        }
+        internal bool ModActive
+        {
+            get { return modActive.Value; }
+            set { modActive.BoxedValue = value; }
+        }
+        internal bool SnapActive
+        {
+            get { return snapActive.Value; }
+            set { snapActive.BoxedValue = value; }
         }
         //internal float PickableSnapRadius
         //{
