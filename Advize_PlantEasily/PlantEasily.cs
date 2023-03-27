@@ -36,6 +36,7 @@ namespace Advize_PlantEasily
             config = new ModConfig(Config);
             Harmony.PatchAll();
         }
+
         //public static void ConfigSettingChanged(object o, BepInEx.Configuration.SettingChangedEventArgs e)
         //{
         //	Dbgl($"Config setting changed: {e.ChangedSetting.Definition.Section}:{e.ChangedSetting.Definition.Key}");
@@ -122,32 +123,21 @@ namespace Advize_PlantEasily
             }
         }
         
-        private static int CheckPlacementStatus(GameObject ghost, Vector3 position, Heightmap heightmap)
+        private static int CheckPlacementStatus(GameObject ghost, int placementStatus = 0)
         {
             Piece piece = ghost.GetComponent<Piece>();
-            int placementStatus = 0;
-            //Heightmap heightmap = Heightmap.FindHeightmap(position);
-            
-            //Heightmap.GetHeight(position, out float height);
-            //position.y = height;
-            
-            //Heightmap.GetHeight(position, out float height);
-            //Heightmap heightmap = Heightmap.FindHeightmap(ghostPosition);
-            
+            Vector3 position = ghost.transform.position;
+            Heightmap heightmap = Heightmap.FindHeightmap(position);
+            //int placementStatus = 0;
+
             if (piece.m_cultivatedGroundOnly && heightmap && !heightmap.IsCultivated(position))
-            {
                 placementStatus = 9;
-            }
+
             if (piece.m_onlyInBiome != 0 && (Heightmap.FindBiome(position) & piece.m_onlyInBiome) == 0)
-            {
                 placementStatus = 8;
-            }
-            //ghost.transform.position = position;
-            //ghost.transform.rotation = ___m_placementGhost.transform.rotation;
+
             if (ghost.GetComponent<Plant>() && !HasGrowSpace(ghost))
-            {
                 placementStatus = 4;
-            }
             
             return placementStatus;
         }

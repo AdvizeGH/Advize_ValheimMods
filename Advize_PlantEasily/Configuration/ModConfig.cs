@@ -19,8 +19,8 @@ namespace Advize_PlantEasily.Configuration
         private readonly ConfigEntry<float> mushroomSnapRadius;
         private readonly ConfigEntry<float> flowerSnapRadius;
 
-        private readonly ConfigEntry<bool> preventPartialPlanting; //No longer correctly implemented
-        private readonly ConfigEntry<bool> preventInvalidPlanting; //Not yet implemented
+        private readonly ConfigEntry<bool> preventPartialPlanting;
+        private readonly ConfigEntry<bool> preventInvalidPlanting;
         private readonly ConfigEntry<bool> randomizeRotation;
         //private readonly ConfigEntry<bool> useStamina; // not yet implemented
         private readonly ConfigEntry<bool> useDurability;
@@ -51,7 +51,7 @@ namespace Advize_PlantEasily.Configuration
             preventInvalidPlanting = Config.Bind("General", "PreventInvalidPlanting", true, "Prevents plants from being placed where they will be unable to grow.");
             randomizeRotation = Config.Bind("General", "RandomizeRotation", true, "Randomizes rotation of pieces once placed.");
             //useStamina = Config.Bind("General", "UseStamina", true, "PLACEHOLDER");
-            useDurability = Config.Bind("General", "UseDurability", true, "PLACEHOLDER");
+            useDurability = Config.Bind("General", "UseDurability", true, "Decrease durability of cultivator for every piece placed.");
 
             //Pickables
             //pickableSnapRadius = Config.Bind("Pickables", "PickableSnapRadius", 1.0f, "Determines distance/spacing between pickable resources when planting.");

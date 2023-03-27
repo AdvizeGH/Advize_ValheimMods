@@ -110,7 +110,8 @@ namespace Advize_PlantEasily
                     extraGhost.SetActive(___m_placementGhost.activeSelf);
                     SetPlacementGhostStatus(extraGhost, i + 1, 0);
                 }
-                
+                SetPlacementGhostStatus(___m_placementGhost, 0, 0);
+
                 Vector3 basePosition = ___m_placementGhost.transform.position;
                 Quaternion baseRotation = ___m_placementGhost.transform.rotation;
                 
@@ -240,20 +241,18 @@ namespace Advize_PlantEasily
                         
                         Vector3 ghostPosition = isRoot ? basePosition : basePosition + rowDirection * row + columnDirection * column;
                         
-                        Heightmap heightmap = Heightmap.FindHeightmap(ghostPosition);
-                        
                         Heightmap.GetHeight(ghostPosition, out float height);
                         ghostPosition.y = height;
                         
                         ghost.transform.position = ghostPosition;
                         ghost.transform.rotation = ___m_placementGhost.transform.rotation;
-                        
-                        SetPlacementGhostStatus(ghost, ghostIndex, CheckPlacementStatus(ghost, ghostPosition, heightmap));
-                        
+
                         if (__instance.GetInventory().CountItems(resource.m_resItem.m_itemData.m_shared.m_name) < currentCost)
                         {
                             SetPlacementGhostStatus(ghost, ghostIndex, 1);
                         }
+
+                        SetPlacementGhostStatus(ghost, ghostIndex, CheckPlacementStatus(ghost, ghostPlacementStatus[ghostIndex]));
                     }
                 }
             }
@@ -262,11 +261,21 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(Player), "PlacePiece")]
         public class PlayerPlacePiece
         {
-            public static bool Prefix(Piece piece, bool ___m_noPlacementCost, ref bool __result/*, out bool __state*/)
+            public static bool Prefix(Piece piece, bool ___m_noPlacementCost, GameObject ___m_placementGhost, ref bool __result)
             {
                 Dbgl("Player.PlacePiece Prefix");
-                if (!piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>())/* || ___m_noPlacementCost*/)
+                if (!piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>()))
                     return true;
+
+                if (config.PreventInvalidPlanting)
+                {
+                    if (CheckPlacementStatus(___m_placementGhost) > 1)
+                    {
+                        ghostPlacementStatus[0] = -1;
+                        __result = false;
+                        return false;
+                    }
+                }
                 
                 if (config.PreventPartialPlanting)
                 {
@@ -275,12 +284,9 @@ namespace Advize_PlantEasily
                         if (i != 0)
                         {
                             if (i == 1 && ___m_noPlacementCost)
-                            {
                                 continue;
-                            }
-                            Dbgl("Preventing partially valid placements, returning");
-                            for (int j = 0; j < ghostPlacementStatus.Count; j++)
-                                ghostPlacementStatus[j] = 1;
+
+                            ghostPlacementStatus[0] = -1;
                             __result = false;
                             return false;
                         }
@@ -289,44 +295,42 @@ namespace Advize_PlantEasily
                 return true;
             }
             
-            public static void Postfix(Player __instance, Piece piece, bool ___m_noPlacementCost, int ___m_placementStatus)
+            public static void Postfix(Player __instance, Piece piece, bool ___m_noPlacementCost/*, int ___m_placementStatus*/)
             {
                 Dbgl("Player.PlacePiece Postfix");
                 if (!piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>()))
                     return;
                 
                 //This doesn't apply to the root placement ghost.
-                if (___m_placementStatus == 0) // With this, root Ghost must be valid (can be fixed)
+                if (ghostPlacementStatus[0] == 0) // With this, root Ghost must be valid (can be fixed)
                 {
                     ItemDrop.ItemData rightItem = __instance.GetRightItem();
                     int count = extraGhosts.Count;
-                    
+
                     for (int i = 0; i < extraGhosts.Count; i++)
                     {
-                        if (ghostPlacementStatus[i + 1] != 0 && (!___m_noPlacementCost && ghostPlacementStatus[i + 1] == 1))
+                        if (ghostPlacementStatus[i + 1] != 0)
                         {
-                            Dbgl($"extraGhost[{i}] placementStatus is invalid. Skipping placement.");
-                            count--;
-                            continue;
+                            if (ghostPlacementStatus[i + 1] == 1 && ___m_noPlacementCost)
+                                count--;
+                            else
+                                continue;
                         }
+
                         Vector3 position = extraGhosts[i].transform.position;
                         Quaternion rotation = config.RandomizeRotation ? Quaternion.Euler(0f, 22.5f * Random.Range(0, 16), 0f) : extraGhosts[i].transform.rotation;
                         GameObject gameObject = piece.gameObject;
+
                         TerrainModifier.SetTriggerOnPlaced(trigger: true);
                         GameObject gameObject2 = Instantiate(gameObject, position, rotation);
                         TerrainModifier.SetTriggerOnPlaced(trigger: false);
-                        Piece component = gameObject2.GetComponent<Piece>();
-                        if (component)
-                        {
-                            component.SetCreator(__instance.GetPlayerID());
-                        }
-                        PrivateArea component2 = gameObject2.GetComponent<PrivateArea>();
-                        if (component2)
-                        {
-                            component2.Setup(Game.instance.GetPlayerProfile().GetName());
-                        }
+
+                        gameObject2.GetComponent<Piece>()?.SetCreator(__instance.GetPlayerID());
+                        gameObject2.GetComponent<PrivateArea>()?.Setup(Game.instance.GetPlayerProfile().GetName());
+
                         piece.m_placeEffect.Create(position, rotation, gameObject2.transform, 1f);
                         __instance.AddNoise(50f);
+
                         Game.instance.GetPlayerProfile().m_playerStats.m_builds++;
                         ZLog.Log("Placed " + gameObject.name);
                         Gogan.LogEvent("Game", "PlacedPiece", gameObject.name, 0L);
