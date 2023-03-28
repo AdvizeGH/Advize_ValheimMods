@@ -15,7 +15,7 @@ namespace Advize_PlantEasily.Configuration
         private readonly ConfigEntry<bool> snapActive;
 
         //Pickables
-        //private readonly ConfigEntry<float> pickableSnapRadius;
+        private readonly ConfigEntry<float> pickableSnapRadius;
         private readonly ConfigEntry<float> berryBushSnapRadius;
         private readonly ConfigEntry<float> mushroomSnapRadius;
         private readonly ConfigEntry<float> flowerSnapRadius;
@@ -55,7 +55,7 @@ namespace Advize_PlantEasily.Configuration
             useDurability = Config.Bind("General", "UseDurability", true, "Decrease durability of cultivator for every piece placed.");
 
             //Pickables
-            //pickableSnapRadius = Config.Bind("Pickables", "PickableSnapRadius", 1.0f, "Determines distance/spacing between pickable resources when planting.");
+            pickableSnapRadius = Config.Bind("Pickables", "PickableSnapRadius", 1.0f, "Determines default distance/spacing between pickable resources when planting.");
             berryBushSnapRadius = Config.Bind("Pickables", "BerryBushSnapRadius", 1.5f, "Determines distance/spacing between berry bushes when planting.");
             mushroomSnapRadius = Config.Bind("Pickables", "MushroomSnapRadius", 0.5f, "Determines distance/spacing between mushrooms when planting.");
             flowerSnapRadius = Config.Bind("Pickables", "FlowerSnapRadius", 1.0f, "Determines distance/spacing between flowers when planting.");
@@ -132,10 +132,10 @@ namespace Advize_PlantEasily.Configuration
             get { return snapActive.Value; }
             set { snapActive.BoxedValue = value; }
         }
-        //internal float PickableSnapRadius
-        //{
-        //    get { return pickableSnapRadius.Value; }
-        //}
+        internal float PickableSnapRadius
+        {
+            get { return pickableSnapRadius.Value; }
+        }
         internal float BerryBushSnapRadius
         {
             get { return berryBushSnapRadius.Value; }

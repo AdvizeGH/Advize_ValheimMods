@@ -114,7 +114,7 @@ namespace Advize_PlantEasily
             if (name.Contains("Dandelion") || name.Contains("Thistle"))
                 return config.FlowerSnapRadius;
             
-            return 2.0f; //config.PickableSnapRadius;
+            return config.PickableSnapRadius;
         }
         
         private static void SetPlacementGhostStatus(GameObject ghost, int index, Status placementStatus)

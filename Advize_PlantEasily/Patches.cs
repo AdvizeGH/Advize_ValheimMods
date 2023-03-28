@@ -108,12 +108,12 @@ namespace Advize_PlantEasily
 
                 Vector3 basePosition = ___m_placementGhost.transform.position;
                 Quaternion baseRotation = ___m_placementGhost.transform.rotation;
-                
+
                 float colliderRadius = 0f;
                 Plant plant = ___m_placementGhost.GetComponent<Plant>();
-
+                
                 //Find collider with largest radius within the piece to be placed.
-                //Include grownPrefabs just in case. Still doesn't seem to work on saplings even when multiplied against max growth scale of the tree.
+                //Include grownPrefabs just in case. Still doesn't seem to work on saplings even when multiplied against max growth scale of the tree. (Cause might be Status.NoSun)
                 if (plant)
                 {
                     List<GameObject> colliderRoots = new();
