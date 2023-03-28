@@ -100,12 +100,11 @@ namespace Advize_PlantEasily
                 
                 for (int i = 0; i < extraGhosts.Count; i++)
                 {
-                    //Dbgl($"Calling SetPlacementGhostStatus index is: {i} extraGhosts.Count is: {extraGhosts.Count}");
                     GameObject extraGhost = extraGhosts[i];
                     extraGhost.SetActive(___m_placementGhost.activeSelf);
-                    SetPlacementGhostStatus(extraGhost, i + 1, 0);
+                    SetPlacementGhostStatus(extraGhost, i + 1, Status.Healthy);
                 }
-                SetPlacementGhostStatus(___m_placementGhost, 0, 0);
+                SetPlacementGhostStatus(___m_placementGhost, 0, Status.Healthy);
 
                 Vector3 basePosition = ___m_placementGhost.transform.position;
                 Quaternion baseRotation = ___m_placementGhost.transform.rotation;
@@ -131,15 +130,16 @@ namespace Advize_PlantEasily
                         }
                     }
                     // Add 10% to that radius because for some reason some crops or saplings still collide and wither without it
-                    // ~~~~This may no longer be required, test this when time allows~~~~
-                    colliderRadius *= 1.1f; // Maybe edit this later, see what works best
+                    //colliderRadius *= 1.1f;
                 }
                 
                 float growRadius = plant?.m_growRadius ?? PickableSnapRadius(___m_placementGhost.name);
                 float pieceSpacing = growRadius + colliderRadius;
                 
                 // Takes position of ghost, subtracts position of player to get vector between the two and facing out from the player, normalizes that vector to have a magnitude of 1.0f
+                // This is bugged currently when player height far exceeds the ground level. Normalized vectors may end up with magnitude of 0f
                 Vector3 rowDirection = (basePosition - __instance.transform.position).normalized;
+                    
                 // Cross product of a vertical vector and the forward facing normalized vector, producing a perpendicular lateral vector
                 Vector3 columnDirection = Vector3.Cross(Vector3.up, rowDirection);
                 
@@ -244,7 +244,7 @@ namespace Advize_PlantEasily
 
                         if (!___m_noPlacementCost && __instance.GetInventory().CountItems(resource.m_resItem.m_itemData.m_shared.m_name) < currentCost)
                         {
-                            SetPlacementGhostStatus(ghost, ghostIndex, 1);
+                            SetPlacementGhostStatus(ghost, ghostIndex, Status.InsufficientResources);
                         }
 
                         SetPlacementGhostStatus(ghost, ghostIndex, CheckPlacementStatus(ghost, ghostPlacementStatus[ghostIndex]));
@@ -258,15 +258,15 @@ namespace Advize_PlantEasily
         {
             public static bool Prefix(Piece piece, bool ___m_noPlacementCost, GameObject ___m_placementGhost, ref bool __result)
             {
-                Dbgl("Player.PlacePiece Prefix");
+                //Dbgl("Player.PlacePiece Prefix");
                 if (!piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>()))
                     return true;
 
                 if (config.PreventInvalidPlanting)
                 {
-                    if (CheckPlacementStatus(___m_placementGhost) > 1)
+                    if ((int)CheckPlacementStatus(___m_placementGhost) > 1)
                     {
-                        SetPlacementGhostStatus(___m_placementGhost, 0, -1);
+                        SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid);
                         __result = false;
                         return false;
                     }
@@ -281,7 +281,7 @@ namespace Advize_PlantEasily
                             if (i == 1 && ___m_noPlacementCost)
                                 continue;
 
-                            SetPlacementGhostStatus(___m_placementGhost, 0, -1);
+                            SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid);
                             __result = false;
                             return false;
                         }
@@ -290,23 +290,23 @@ namespace Advize_PlantEasily
                 return true;
             }
             
-            public static void Postfix(Player __instance, Piece piece, bool ___m_noPlacementCost/*, int ___m_placementStatus*/)
+            public static void Postfix(Player __instance, Piece piece, bool ___m_noPlacementCost)
             {
-                Dbgl("Player.PlacePiece Postfix");
+                //Dbgl("Player.PlacePiece Postfix");
                 if (!piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>()))
                     return;
                 
                 //This doesn't apply to the root placement ghost.
-                if (ghostPlacementStatus[0] == 0) // With this, root Ghost must be valid (can be fixed)
+                if (ghostPlacementStatus[0] == Status.Healthy) // With this, root Ghost must be valid (can be fixed)
                 {
                     ItemDrop.ItemData rightItem = __instance.GetRightItem();
                     int count = extraGhosts.Count;
 
                     for (int i = 0; i < extraGhosts.Count; i++)
                     {
-                        if (ghostPlacementStatus[i + 1] != 0)
+                        if (ghostPlacementStatus[i + 1] != Status.Healthy)
                         {
-                            if (ghostPlacementStatus[i + 1] == 1 && ___m_noPlacementCost)
+                            if (ghostPlacementStatus[i + 1] == Status.InsufficientResources && ___m_noPlacementCost)
                                 count--;
                             else
                                 continue;

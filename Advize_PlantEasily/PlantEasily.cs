@@ -13,7 +13,7 @@ namespace Advize_PlantEasily
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "1.0.0";
+        public const string Version = "0.9.1";
         
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -22,9 +22,8 @@ namespace Advize_PlantEasily
 
         private static GameObject placementGhost;
         private static List<GameObject> extraGhosts = new();
-        private static List<int> ghostPlacementStatus = new();
+        private static List<Status> ghostPlacementStatus = new();
         
-        private static int plantCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid");
         private static int snapCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid", "item");
         
         public void Awake()
@@ -71,7 +70,7 @@ namespace Advize_PlantEasily
                     if (row == 0 && column == 0)
                     {
                         placementGhost = rootGhost;
-                        ghostPlacementStatus.Add(0);
+                        ghostPlacementStatus.Add(Status.Healthy);
                         continue;
                     }
                     
@@ -88,16 +87,23 @@ namespace Advize_PlantEasily
                     newGhost.transform.position = rootGhost.transform.position;
                     newGhost.transform.localScale = rootGhost.transform.localScale;
                     extraGhosts.Add(newGhost);
-                    ghostPlacementStatus.Add(0);
+                    ghostPlacementStatus.Add(Status.Healthy);
                 }
             }
         }
         
         private static bool HasGrowSpace(GameObject ghost)
         {
+            int plantCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid");
             return Physics.OverlapSphere(ghost.transform.position, ghost.GetComponent<Plant>().m_growRadius, plantCollisionMask).Length == 0;
         }
-        
+
+        private static bool HasRoof(GameObject ghost)
+        {
+            int roofMask = LayerMask.GetMask("Default", "static_solid", "piece");
+            return Physics.Raycast(ghost.transform.position, Vector3.up, 100f, roofMask);
+        }
+
         private static float PickableSnapRadius(string name)
         {
             // Find a new route, constant string operations for each game tick should be avoided.
@@ -111,7 +117,7 @@ namespace Advize_PlantEasily
             return 2.0f; //config.PickableSnapRadius;
         }
         
-        private static void SetPlacementGhostStatus(GameObject ghost, int index, int placementStatus)
+        private static void SetPlacementGhostStatus(GameObject ghost, int index, Status placementStatus)
         {
             ghost.GetComponent<Piece>().SetInvalidPlacementHeightlight(placementStatus != 0);
             
@@ -121,24 +127,49 @@ namespace Advize_PlantEasily
             }
         }
         
-        private static int CheckPlacementStatus(GameObject ghost, int placementStatus = 0)
+        private static Status CheckPlacementStatus(GameObject ghost, Status placementStatus = Status.Healthy)
         {
             Piece piece = ghost.GetComponent<Piece>();
             Vector3 position = ghost.transform.position;
             Heightmap heightmap = Heightmap.FindHeightmap(position);
 
             if (piece.m_cultivatedGroundOnly && heightmap && !heightmap.IsCultivated(position))
-                placementStatus = 9;
+                placementStatus = Status.NotCultivated;
 
             if (piece.m_onlyInBiome != 0 && (Heightmap.FindBiome(position) & piece.m_onlyInBiome) == 0)
-                placementStatus = 8;
+                placementStatus = Status.WrongBiome;
 
             if (ghost.GetComponent<Plant>() && !HasGrowSpace(ghost))
-                placementStatus = 4;
+                placementStatus = Status.NoSpace;
+
+            if (ghost.GetComponent<Plant>() && HasRoof(ghost))
+                placementStatus = Status.NoSun;
             
             return placementStatus;
         }
-        
+
+        private static void FindResourcesInRadius()
+        {
+
+        }
+
+        private static void FindConnectedResources()
+        {
+
+        }
+
+        // PlacementStatus
+        private enum Status
+        {
+            Healthy,                // 0
+            InsufficientResources,  // 1
+            NotCultivated,          // 2
+            WrongBiome,             // 3
+            NoSpace,                // 4
+            NoSun,                  // 5
+            Invalid                 // 6
+        }
+
         internal static void Dbgl(string message, bool forceLog = false, bool logError = false)
         {
             if (forceLog || config.EnableDebugMessages)
