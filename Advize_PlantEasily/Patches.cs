@@ -125,20 +125,20 @@ namespace Advize_PlantEasily
                         foreach (CapsuleCollider collider in colliderRoots[i].GetComponentsInChildren<CapsuleCollider>())
                         {
                             //Dbgl($"colliderRadius was: {colliderRadius}");
-                            colliderRadius = Mathf.Max(colliderRadius, collider.radius/* * plant.m_maxScale*/);
+                            colliderRadius = Mathf.Max(colliderRadius, collider.radius);
                             //Dbgl($"colliderRadius is now: {colliderRadius}");
                         }
                     }
                     // Add 10% to that radius because for some reason some crops or saplings still collide and wither without it
+                    // No longer needed. Issue was due to player height relative to ground level. Higher altitudes led to wildly different vector magnitudes.
                     //colliderRadius *= 1.1f;
                 }
-                
+
                 float growRadius = plant?.m_growRadius ?? PickableSnapRadius(___m_placementGhost.name);
                 float pieceSpacing = growRadius + colliderRadius;
-                
+
                 // Takes position of ghost, subtracts position of player to get vector between the two and facing out from the player, normalizes that vector to have a magnitude of 1.0f
-                // This is bugged currently when player height far exceeds the ground level. Normalized vectors may end up with magnitude of 0f
-                Vector3 rowDirection = (basePosition - __instance.transform.position).normalized;
+                Vector3 rowDirection = Utils.DirectionXZ((basePosition - __instance.transform.position));
                     
                 // Cross product of a vertical vector and the forward facing normalized vector, producing a perpendicular lateral vector
                 Vector3 columnDirection = Vector3.Cross(Vector3.up, rowDirection);
