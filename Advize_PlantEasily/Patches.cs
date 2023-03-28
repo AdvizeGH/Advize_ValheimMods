@@ -244,7 +244,7 @@ namespace Advize_PlantEasily
 
                         if (!___m_noPlacementCost && __instance.GetInventory().CountItems(resource.m_resItem.m_itemData.m_shared.m_name) < currentCost)
                         {
-                            SetPlacementGhostStatus(ghost, ghostIndex, Status.InsufficientResources);
+                            SetPlacementGhostStatus(ghost, ghostIndex, Status.LackResources);
                         }
 
                         SetPlacementGhostStatus(ghost, ghostIndex, CheckPlacementStatus(ghost, ghostPlacementStatus[ghostIndex]));
@@ -306,7 +306,7 @@ namespace Advize_PlantEasily
                     {
                         if (ghostPlacementStatus[i + 1] != Status.Healthy)
                         {
-                            if (ghostPlacementStatus[i + 1] == Status.InsufficientResources && ___m_noPlacementCost)
+                            if (ghostPlacementStatus[i + 1] == Status.LackResources && ___m_noPlacementCost)
                                 count--;
                             else
                                 continue;

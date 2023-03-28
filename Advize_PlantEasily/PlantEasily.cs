@@ -119,7 +119,7 @@ namespace Advize_PlantEasily
         
         private static void SetPlacementGhostStatus(GameObject ghost, int index, Status placementStatus)
         {
-            ghost.GetComponent<Piece>().SetInvalidPlacementHeightlight(placementStatus != 0);
+            ghost.GetComponent<Piece>().SetInvalidPlacementHeightlight(placementStatus != Status.Healthy);
             
             if (ghostPlacementStatus.Count > index)
             {
@@ -162,7 +162,7 @@ namespace Advize_PlantEasily
         private enum Status
         {
             Healthy,                // 0
-            InsufficientResources,  // 1
+            LackResources,          // 1
             NotCultivated,          // 2
             WrongBiome,             // 3
             NoSpace,                // 4
