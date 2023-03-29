@@ -55,10 +55,7 @@ namespace Advize_PlantEasily
                 }
                 extraGhosts.Clear();
             }
-            if (ghostPlacementStatus.Count > 0)
-            {
-                ghostPlacementStatus.Clear();
-            }
+            ghostPlacementStatus.Clear();
         }
         
         private static void CreateGhosts(GameObject rootGhost)
@@ -161,13 +158,13 @@ namespace Advize_PlantEasily
         // PlacementStatus
         private enum Status
         {
-            Healthy,                // 0
-            LackResources,          // 1
-            NotCultivated,          // 2
-            WrongBiome,             // 3
-            NoSpace,                // 4
-            NoSun,                  // 5
-            Invalid                 // 6
+            Healthy,        // 0
+            LackResources,  // 1
+            NotCultivated,  // 2
+            WrongBiome,     // 3
+            NoSpace,        // 4
+            NoSun,          // 5
+            Invalid         // 6
         }
 
         internal static void Dbgl(string message, bool forceLog = false, bool logError = false)

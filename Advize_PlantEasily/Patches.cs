@@ -163,16 +163,13 @@ namespace Advize_PlantEasily
                                 {
                                     if (!secondaryCollider.GetComponent<Plant>() && !secondaryCollider.GetComponentInParent<Pickable>()) continue;
                                     if (secondaryCollider.transform.root == collider.transform.root) continue;
-                                    
+
                                     // Note to self:
                                     // Make rows and columns consistant
                                     // Determine whether row or column should be the cross vector based on position relative to the player (rows should extend away from or towards player).
                                     // Consider whether this could be more easily facilitated by adjusting snap point priority
-                                    
-                                    Vector3 normalizedVector = (secondaryCollider.transform.position - collider.transform.position).normalized;
-                                    if (normalizedVector.magnitude == 0) continue;
-                                    
-                                    rowDirection = normalizedVector;
+
+                                    rowDirection = Utils.DirectionXZ((secondaryCollider.transform.position - collider.transform.position));
                                     columnDirection = Vector3.Cross(Vector3.up, rowDirection);
                                     
                                     rowDirection = baseRotation * rowDirection * pieceSpacing;
@@ -190,10 +187,7 @@ namespace Advize_PlantEasily
                             }
                             if (!foundSnaps)
                             {
-                                Vector3 normalizedVector = baseRotation * rowDirection * pieceSpacing;
-                                if (normalizedVector.magnitude == 0) continue;
-                                
-                                rowDirection = normalizedVector;
+                                rowDirection = baseRotation * rowDirection * pieceSpacing;
                                 columnDirection = baseRotation * columnDirection * pieceSpacing;
                                 
                                 snapPoints.Add(collider.transform.position + rowDirection);
