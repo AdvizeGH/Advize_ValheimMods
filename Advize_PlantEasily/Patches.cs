@@ -174,15 +174,23 @@ namespace Advize_PlantEasily
                                     
                                     rowDirection = baseRotation * rowDirection * pieceSpacing;
                                     columnDirection = baseRotation * columnDirection * pieceSpacing;
-                                    
-                                    snapPoints.Add(collider.transform.position + rowDirection);
-                                    snapPoints.Add(collider.transform.position + columnDirection);
-                                    snapPoints.Add(collider.transform.position - rowDirection);
-                                    snapPoints.Add(collider.transform.position - columnDirection);
-                                    
-                                    foundSnaps = true;
-                                    //continue;
-                                    break;
+
+                                    List<Vector3> positions = new()
+                                    {
+                                        collider.transform.position + rowDirection,
+                                        collider.transform.position + columnDirection,
+                                        collider.transform.position - rowDirection,
+                                        collider.transform.position - columnDirection
+                                    };
+
+                                    foreach (Vector3 pos in positions)
+                                    {
+                                        if (!Physics.CheckSphere(pos, 0f, snapCollisionMask))
+                                        {
+                                            snapPoints.Add(pos);
+                                            foundSnaps = true;
+                                        }
+                                    }
                                 }
                             }
                             if (!foundSnaps)
@@ -196,14 +204,14 @@ namespace Advize_PlantEasily
                                 snapPoints.Add(collider.transform.position - columnDirection);
                                 
                                 foundSnaps = true;
-                                //continue;
                                 break;
                             }
                         }
                         
                         if (foundSnaps)
                         {
-                            Vector3 firstSnapPos = snapPoints.OrderBy(o => snapPoints.Where(w => w != o).Min(m => Utils.DistanceXZ(m, o)) + (o - basePosition).magnitude).First();
+                            Vector3 firstSnapPos = snapPoints.OrderBy(o => snapPoints.Min(m => Utils.DistanceXZ(m, o)) + (o - basePosition).magnitude).First();
+                            //Vector3 firstSnapPos = snapPoints.OrderBy(o => snapPoints.Where(w => w != o).Min(m => Utils.DistanceXZ(m, o)) + (o - basePosition).magnitude).First();
                             basePosition = ___m_placementGhost.transform.position = firstSnapPos;
                         }
                     }
