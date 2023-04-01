@@ -151,10 +151,12 @@ namespace Advize_PlantEasily
                     
                     if (obstructions?.Length > 0)
                     {
+                        int primaryColliderLimit = 0;
                         foreach (Collider collider in obstructions)
                         {
                             if (!collider.GetComponent<Plant>() && !collider.GetComponentInParent<Pickable>()) continue;
-                            
+                            primaryColliderLimit++;
+                            if (primaryColliderLimit > 8) break;
                             Collider[] secondaryObstructions = Physics.OverlapSphere(collider.transform.position, pieceSpacing, snapCollisionMask);
                             if (secondaryObstructions?.Length > 0)
                             {
