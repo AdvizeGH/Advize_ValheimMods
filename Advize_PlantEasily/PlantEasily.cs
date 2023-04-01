@@ -5,6 +5,7 @@ using HarmonyLib;
 using UnityEngine;
 using Advize_PlantEasily.Configuration;
 using System;
+using System.Reflection;
 
 namespace Advize_PlantEasily
 {
@@ -13,7 +14,7 @@ namespace Advize_PlantEasily
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "0.9.2";
+        public const string Version = "0.9.3";
         
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -88,11 +89,11 @@ namespace Advize_PlantEasily
                 }
             }
         }
-        
-        private static bool HasGrowSpace(GameObject ghost)
+
+        private static bool HasGrowSpace(Plant plant, Vector3 position)
         {
             int plantCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid");
-            return Physics.OverlapSphere(ghost.transform.position, ghost.GetComponent<Plant>().m_growRadius, plantCollisionMask).Length == 0;
+            return Physics.OverlapSphere(position, plant.m_growRadius, plantCollisionMask).Length == 0;
         }
 
         private static bool HasRoof(GameObject ghost)
@@ -114,13 +115,17 @@ namespace Advize_PlantEasily
             return config.PickableSnapRadius;
         }
         
-        private static void SetPlacementGhostStatus(GameObject ghost, int index, Status placementStatus)
+        private static void SetPlacementGhostStatus(ref int m_placementStatus, GameObject ghost, int index, Status placementStatus)
         {
             ghost.GetComponent<Piece>().SetInvalidPlacementHeightlight(placementStatus != Status.Healthy);
             
             if (ghostPlacementStatus.Count > index)
             {
                 ghostPlacementStatus[index] = placementStatus;
+                if (index == 0 && placementStatus == Status.Healthy)
+                {
+                    m_placementStatus = 0;
+                }
             }
         }
         
@@ -136,7 +141,7 @@ namespace Advize_PlantEasily
             if (piece.m_onlyInBiome != 0 && (Heightmap.FindBiome(position) & piece.m_onlyInBiome) == 0)
                 placementStatus = Status.WrongBiome;
 
-            if (ghost.GetComponent<Plant>() && !HasGrowSpace(ghost))
+            if (ghost.GetComponent<Plant>() && !HasGrowSpace(ghost.GetComponent<Plant>(), ghost.transform.position))
                 placementStatus = Status.NoSpace;
 
             if (ghost.GetComponent<Plant>() && HasRoof(ghost))

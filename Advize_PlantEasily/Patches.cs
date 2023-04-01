@@ -90,7 +90,7 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(Player), "UpdatePlacementGhost")]
         public class PlayerUpdatePlacementGhost
         {
-            public static void Postfix(Player __instance, bool ___m_noPlacementCost, ref GameObject ___m_placementGhost)
+            public static void Postfix(Player __instance, ref int ___m_placementStatus, bool ___m_noPlacementCost, ref GameObject ___m_placementGhost)
             {
                 if (!config.ModActive || !___m_placementGhost || (!___m_placementGhost.GetComponent<Plant>() && !___m_placementGhost.GetComponent<Pickable>()))
                     return;
@@ -102,9 +102,9 @@ namespace Advize_PlantEasily
                 {
                     GameObject extraGhost = extraGhosts[i];
                     extraGhost.SetActive(___m_placementGhost.activeSelf);
-                    SetPlacementGhostStatus(extraGhost, i + 1, Status.Healthy);
+                    SetPlacementGhostStatus(ref ___m_placementStatus, extraGhost, i + 1, Status.Healthy);
                 }
-                SetPlacementGhostStatus(___m_placementGhost, 0, Status.Healthy);
+                SetPlacementGhostStatus(ref ___m_placementStatus, ___m_placementGhost, 0, Status.Healthy);
 
                 Vector3 basePosition = ___m_placementGhost.transform.position;
                 Quaternion baseRotation = ___m_placementGhost.transform.rotation;
@@ -138,8 +138,8 @@ namespace Advize_PlantEasily
                 float pieceSpacing = growRadius + colliderRadius;
 
                 // Takes position of ghost, subtracts position of player to get vector between the two and facing out from the player, normalizes that vector to have a magnitude of 1.0f
-                Vector3 rowDirection = Utils.DirectionXZ((basePosition - __instance.transform.position));
-                    
+                Vector3 rowDirection = Utils.DirectionXZ(basePosition - __instance.transform.position);
+
                 // Cross product of a vertical vector and the forward facing normalized vector, producing a perpendicular lateral vector
                 Vector3 columnDirection = Vector3.Cross(Vector3.up, rowDirection);
                 
@@ -153,7 +153,6 @@ namespace Advize_PlantEasily
                     {
                         foreach (Collider collider in obstructions)
                         {
-                            if (foundSnaps) break;
                             if (!collider.GetComponent<Plant>() && !collider.GetComponentInParent<Pickable>()) continue;
                             
                             Collider[] secondaryObstructions = Physics.OverlapSphere(collider.transform.position, pieceSpacing, snapCollisionMask);
@@ -187,6 +186,9 @@ namespace Advize_PlantEasily
                                     {
                                         if (!Physics.CheckSphere(pos, 0f, snapCollisionMask))
                                         {
+                                            if (plant && !HasGrowSpace(plant, pos))
+                                                continue;
+
                                             snapPoints.Add(pos);
                                             foundSnaps = true;
                                         }
@@ -195,23 +197,35 @@ namespace Advize_PlantEasily
                             }
                             if (!foundSnaps)
                             {
+                                
                                 rowDirection = baseRotation * rowDirection * pieceSpacing;
                                 columnDirection = baseRotation * columnDirection * pieceSpacing;
-                                
-                                snapPoints.Add(collider.transform.position + rowDirection);
-                                snapPoints.Add(collider.transform.position + columnDirection);
-                                snapPoints.Add(collider.transform.position - rowDirection);
-                                snapPoints.Add(collider.transform.position - columnDirection);
-                                
-                                foundSnaps = true;
-                                break;
+
+                                List<Vector3> positions = new()
+                                {
+                                    collider.transform.position + rowDirection,
+                                    collider.transform.position + columnDirection,
+                                    collider.transform.position - rowDirection,
+                                    collider.transform.position - columnDirection
+                                };
+
+                                foreach (Vector3 pos in positions)
+                                {
+                                    if (!Physics.CheckSphere(pos, 0f, snapCollisionMask))
+                                    {
+                                        if (plant && !HasGrowSpace(plant, pos))
+                                            continue;
+
+                                        snapPoints.Add(pos);
+                                        foundSnaps = true;
+                                    }
+                                }
                             }
                         }
                         
                         if (foundSnaps)
                         {
                             Vector3 firstSnapPos = snapPoints.OrderBy(o => snapPoints.Min(m => Utils.DistanceXZ(m, o)) + (o - basePosition).magnitude).First();
-                            //Vector3 firstSnapPos = snapPoints.OrderBy(o => snapPoints.Where(w => w != o).Min(m => Utils.DistanceXZ(m, o)) + (o - basePosition).magnitude).First();
                             basePosition = ___m_placementGhost.transform.position = firstSnapPos;
                         }
                     }
@@ -219,6 +233,9 @@ namespace Advize_PlantEasily
                 
                 if (!foundSnaps)
                 {
+                    rowDirection = Utils.DirectionXZ(basePosition - __instance.transform.position);
+                    columnDirection = Vector3.Cross(Vector3.up, rowDirection);
+                    // Can't do this all on one line it bugs and I can't understand why
                     rowDirection *= pieceSpacing;
                     columnDirection *= pieceSpacing;
                 }
@@ -246,10 +263,10 @@ namespace Advize_PlantEasily
 
                         if (!___m_noPlacementCost && __instance.GetInventory().CountItems(resource.m_resItem.m_itemData.m_shared.m_name) < currentCost)
                         {
-                            SetPlacementGhostStatus(ghost, ghostIndex, Status.LackResources);
+                            SetPlacementGhostStatus(ref ___m_placementStatus, ghost, ghostIndex, Status.LackResources);
                         }
 
-                        SetPlacementGhostStatus(ghost, ghostIndex, CheckPlacementStatus(ghost, ghostPlacementStatus[ghostIndex]));
+                        SetPlacementGhostStatus(ref ___m_placementStatus, ghost, ghostIndex, CheckPlacementStatus(ghost, ghostPlacementStatus[ghostIndex]));
                     }
                 }
             }
@@ -258,17 +275,17 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(Player), "PlacePiece")]
         public class PlayerPlacePiece
         {
-            public static bool Prefix(Piece piece, bool ___m_noPlacementCost, GameObject ___m_placementGhost, ref bool __result)
+            public static bool Prefix(Player __instance, Piece piece, bool ___m_noPlacementCost, GameObject ___m_placementGhost, ref int ___m_placementStatus, ref bool __result)
             {
                 //Dbgl("Player.PlacePiece Prefix");
-                if (!piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>()))
+                if (!config.ModActive || !piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>()))
                     return true;
 
                 if (config.PreventInvalidPlanting)
                 {
                     if ((int)CheckPlacementStatus(___m_placementGhost) > 1)
                     {
-                        SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid);
+                        SetPlacementGhostStatus(ref ___m_placementStatus, ___m_placementGhost, 0, Status.Invalid);
                         __result = false;
                         return false;
                     }
@@ -283,7 +300,7 @@ namespace Advize_PlantEasily
                             if (i == 1 && ___m_noPlacementCost)
                                 continue;
 
-                            SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid);
+                            SetPlacementGhostStatus(ref ___m_placementStatus, ___m_placementGhost, 0, Status.Invalid);
                             __result = false;
                             return false;
                         }
@@ -295,7 +312,7 @@ namespace Advize_PlantEasily
             public static void Postfix(Player __instance, Piece piece, bool ___m_noPlacementCost)
             {
                 //Dbgl("Player.PlacePiece Postfix");
-                if (!piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>()))
+                if (!config.ModActive || !piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>()))
                     return;
                 
                 //This doesn't apply to the root placement ghost.
