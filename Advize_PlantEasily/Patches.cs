@@ -145,26 +145,25 @@ namespace Advize_PlantEasily
                     
                     if (obstructions?.Length > 0)
                     {
-                        int primaryColliderLimit = 0;
+                        int validFirstOrderCollisions = 0;
                         foreach (Collider collider in obstructions)
                         {
                             if (!collider.GetComponent<Plant>() && !collider.GetComponentInParent<Pickable>()) continue;
-                            primaryColliderLimit++;
-                            if (primaryColliderLimit > 8) break;
+                            validFirstOrderCollisions++;
+                            if (validFirstOrderCollisions > 8) break;
+                            
                             Collider[] secondaryObstructions = Physics.OverlapSphere(collider.transform.position, pieceSpacing, snapCollisionMask);
                             if (secondaryObstructions?.Length > 0)
                             {
+                                int validSecondOrderCollisions = 0;
                                 foreach (Collider secondaryCollider in secondaryObstructions)
                                 {
                                     if (!secondaryCollider.GetComponent<Plant>() && !secondaryCollider.GetComponentInParent<Pickable>()) continue;
                                     if (secondaryCollider.transform.root == collider.transform.root) continue;
-
-                                    /* Note to self:
-                                       Make rows and columns consistant
-                                       Determine whether row or column should be the cross vector based on position relative to the player (rows should extend away from or towards player).
-                                       Consider whether this could be more easily facilitated by adjusting snap point priority*/
-
-                                    rowDirection = Utils.DirectionXZ((secondaryCollider.transform.position - collider.transform.position));
+                                    validSecondOrderCollisions++;
+                                    if (validSecondOrderCollisions > 8) break;
+                                    
+                                    rowDirection = Utils.DirectionXZ(secondaryCollider.transform.position - collider.transform.position);
                                     columnDirection = Vector3.Cross(Vector3.up, rowDirection);
                                     
                                     rowDirection = baseRotation * rowDirection * pieceSpacing;
