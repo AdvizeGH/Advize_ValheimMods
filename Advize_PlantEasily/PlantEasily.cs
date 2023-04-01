@@ -33,11 +33,6 @@ namespace Advize_PlantEasily
             config = new ModConfig(Config);
             Harmony.PatchAll();
         }
-
-        //public static void ConfigSettingChanged(object o, BepInEx.Configuration.SettingChangedEventArgs e)
-        //{
-        //	Dbgl($"Config setting changed: {e.ChangedSetting.Definition.Section}:{e.ChangedSetting.Definition.Key}");
-        //}
         
         private static bool OverrideGamepadInput() => placementGhost && Input.GetKey(config.GamepadModifierKey);
         
@@ -115,7 +110,7 @@ namespace Advize_PlantEasily
             return config.PickableSnapRadius;
         }
         
-        private static void SetPlacementGhostStatus(ref int m_placementStatus, GameObject ghost, int index, Status placementStatus)
+        private static void SetPlacementGhostStatus(GameObject ghost, int index, Status placementStatus, ref int m_placementStatus)
         {
             ghost.GetComponent<Piece>().SetInvalidPlacementHeightlight(placementStatus != Status.Healthy);
             

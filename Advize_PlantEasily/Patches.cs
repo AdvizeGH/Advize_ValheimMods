@@ -90,7 +90,7 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(Player), "UpdatePlacementGhost")]
         public class PlayerUpdatePlacementGhost
         {
-            public static void Postfix(Player __instance, ref int ___m_placementStatus, bool ___m_noPlacementCost, ref GameObject ___m_placementGhost)
+            public static void Postfix(Player __instance, bool ___m_noPlacementCost, ref GameObject ___m_placementGhost, ref int ___m_placementStatus)
             {
                 if (!config.ModActive || !___m_placementGhost || (!___m_placementGhost.GetComponent<Plant>() && !___m_placementGhost.GetComponent<Pickable>()))
                     return;
@@ -102,9 +102,9 @@ namespace Advize_PlantEasily
                 {
                     GameObject extraGhost = extraGhosts[i];
                     extraGhost.SetActive(___m_placementGhost.activeSelf);
-                    SetPlacementGhostStatus(ref ___m_placementStatus, extraGhost, i + 1, Status.Healthy);
+                    SetPlacementGhostStatus(extraGhost, i + 1, Status.Healthy, ref ___m_placementStatus);
                 }
-                SetPlacementGhostStatus(ref ___m_placementStatus, ___m_placementGhost, 0, Status.Healthy);
+                SetPlacementGhostStatus(___m_placementGhost, 0, Status.Healthy, ref ___m_placementStatus);
 
                 Vector3 basePosition = ___m_placementGhost.transform.position;
                 Quaternion baseRotation = ___m_placementGhost.transform.rotation;
@@ -124,14 +124,9 @@ namespace Advize_PlantEasily
                     {
                         foreach (CapsuleCollider collider in colliderRoots[i].GetComponentsInChildren<CapsuleCollider>())
                         {
-                            //Dbgl($"colliderRadius was: {colliderRadius}");
                             colliderRadius = Mathf.Max(colliderRadius, collider.radius);
-                            //Dbgl($"colliderRadius is now: {colliderRadius}");
                         }
                     }
-                    // Add 10% to that radius because for some reason some crops or saplings still collide and wither without it
-                    // No longer needed. Issue was due to player height relative to ground level. Higher altitudes led to wildly different vector magnitudes.
-                    //colliderRadius *= 1.1f;
                 }
 
                 float growRadius = plant?.m_growRadius ?? PickableSnapRadius(___m_placementGhost.name);
@@ -139,7 +134,6 @@ namespace Advize_PlantEasily
 
                 // Takes position of ghost, subtracts position of player to get vector between the two and facing out from the player, normalizes that vector to have a magnitude of 1.0f
                 Vector3 rowDirection = Utils.DirectionXZ(basePosition - __instance.transform.position);
-
                 // Cross product of a vertical vector and the forward facing normalized vector, producing a perpendicular lateral vector
                 Vector3 columnDirection = Vector3.Cross(Vector3.up, rowDirection);
                 
@@ -165,10 +159,10 @@ namespace Advize_PlantEasily
                                     if (!secondaryCollider.GetComponent<Plant>() && !secondaryCollider.GetComponentInParent<Pickable>()) continue;
                                     if (secondaryCollider.transform.root == collider.transform.root) continue;
 
-                                    // Note to self:
-                                    // Make rows and columns consistant
-                                    // Determine whether row or column should be the cross vector based on position relative to the player (rows should extend away from or towards player).
-                                    // Consider whether this could be more easily facilitated by adjusting snap point priority
+                                    /* Note to self:
+                                       Make rows and columns consistant
+                                       Determine whether row or column should be the cross vector based on position relative to the player (rows should extend away from or towards player).
+                                       Consider whether this could be more easily facilitated by adjusting snap point priority*/
 
                                     rowDirection = Utils.DirectionXZ((secondaryCollider.transform.position - collider.transform.position));
                                     columnDirection = Vector3.Cross(Vector3.up, rowDirection);
@@ -188,8 +182,7 @@ namespace Advize_PlantEasily
                                     {
                                         if (!Physics.CheckSphere(pos, 0f, snapCollisionMask))
                                         {
-                                            if (plant && !HasGrowSpace(plant, pos))
-                                                continue;
+                                            if (plant && !HasGrowSpace(plant, pos)) continue;
 
                                             snapPoints.Add(pos);
                                             foundSnaps = true;
@@ -199,7 +192,6 @@ namespace Advize_PlantEasily
                             }
                             if (!foundSnaps)
                             {
-                                
                                 rowDirection = baseRotation * rowDirection * pieceSpacing;
                                 columnDirection = baseRotation * columnDirection * pieceSpacing;
 
@@ -215,8 +207,7 @@ namespace Advize_PlantEasily
                                 {
                                     if (!Physics.CheckSphere(pos, 0f, snapCollisionMask))
                                     {
-                                        if (plant && !HasGrowSpace(plant, pos))
-                                            continue;
+                                        if (plant && !HasGrowSpace(plant, pos)) continue;
 
                                         snapPoints.Add(pos);
                                         foundSnaps = true;
@@ -265,10 +256,10 @@ namespace Advize_PlantEasily
 
                         if (!___m_noPlacementCost && __instance.GetInventory().CountItems(resource.m_resItem.m_itemData.m_shared.m_name) < currentCost)
                         {
-                            SetPlacementGhostStatus(ref ___m_placementStatus, ghost, ghostIndex, Status.LackResources);
+                            SetPlacementGhostStatus(ghost, ghostIndex, Status.LackResources, ref ___m_placementStatus);
                         }
 
-                        SetPlacementGhostStatus(ref ___m_placementStatus, ghost, ghostIndex, CheckPlacementStatus(ghost, ghostPlacementStatus[ghostIndex]));
+                        SetPlacementGhostStatus(ghost, ghostIndex, CheckPlacementStatus(ghost, ghostPlacementStatus[ghostIndex]), ref ___m_placementStatus);
                     }
                 }
             }
@@ -277,7 +268,7 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(Player), "PlacePiece")]
         public class PlayerPlacePiece
         {
-            public static bool Prefix(Player __instance, Piece piece, bool ___m_noPlacementCost, GameObject ___m_placementGhost, ref int ___m_placementStatus, ref bool __result)
+            public static bool Prefix(Piece piece, bool ___m_noPlacementCost, GameObject ___m_placementGhost, ref int ___m_placementStatus, ref bool __result)
             {
                 //Dbgl("Player.PlacePiece Prefix");
                 if (!config.ModActive || !piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>()))
@@ -287,7 +278,7 @@ namespace Advize_PlantEasily
                 {
                     if ((int)CheckPlacementStatus(___m_placementGhost) > 1)
                     {
-                        SetPlacementGhostStatus(ref ___m_placementStatus, ___m_placementGhost, 0, Status.Invalid);
+                        SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
                         __result = false;
                         return false;
                     }
@@ -302,7 +293,7 @@ namespace Advize_PlantEasily
                             if (i == 1 && ___m_noPlacementCost)
                                 continue;
 
-                            SetPlacementGhostStatus(ref ___m_placementStatus, ___m_placementGhost, 0, Status.Invalid);
+                            SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
                             __result = false;
                             return false;
                         }
