@@ -14,7 +14,7 @@ namespace Advize_PlantEasily
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "1.0.1";
+        public const string Version = "1.0.2";
         
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -127,19 +127,24 @@ namespace Advize_PlantEasily
         private static Status CheckPlacementStatus(GameObject ghost, Status placementStatus = Status.Healthy)
         {
             Piece piece = ghost.GetComponent<Piece>();
+            Plant plant = ghost.GetComponent<Plant>();
             Vector3 position = ghost.transform.position;
             Heightmap heightmap = Heightmap.FindHeightmap(position);
 
-            if (piece.m_cultivatedGroundOnly && heightmap && !heightmap.IsCultivated(position))
+            bool cultivatedGroundOnly = plant?.m_needCultivatedGround ?? piece.m_cultivatedGroundOnly;
+            Heightmap.Biome biome = plant?.m_biome ?? piece.m_onlyInBiome;
+
+
+            if (cultivatedGroundOnly && heightmap && !heightmap.IsCultivated(position))
                 placementStatus = Status.NotCultivated;
 
-            if (piece.m_onlyInBiome != 0 && (Heightmap.FindBiome(position) & piece.m_onlyInBiome) == 0)
+            if (biome != 0 && (Heightmap.FindBiome(position) & biome) == 0)
                 placementStatus = Status.WrongBiome;
 
-            if (ghost.GetComponent<Plant>() && !HasGrowSpace(ghost.GetComponent<Plant>(), ghost.transform.position))
+            if (plant && !HasGrowSpace(plant, ghost.transform.position))
                 placementStatus = Status.NoSpace;
 
-            if (ghost.GetComponent<Plant>() && HasRoof(ghost))
+            if (plant && HasRoof(ghost))
                 placementStatus = Status.NoSun;
             
             return placementStatus;
