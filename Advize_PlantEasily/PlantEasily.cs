@@ -172,6 +172,16 @@ namespace Advize_PlantEasily
             Invalid         // 6
         }
 
+        private static Dictionary<int, string> statusMessage = new()
+        {
+            { 1, "$msg_missingrequirement" },
+            { 2, "$piece_plant_notcultivated" },
+            { 3, "$piece_plant_wrongbiome" },
+            { 4, "$piece_plant_nospace" },
+            { 5, "$piece_plant_nosun" },
+            { 6, "$msg_invalidplacement" }
+        };
+
         internal static void Dbgl(string message, bool forceLog = false, bool logError = false)
         {
             if (forceLog || config.EnableDebugMessages)

@@ -277,6 +277,7 @@ namespace Advize_PlantEasily
                 {
                     if ((int)CheckPlacementStatus(___m_placementGhost) > 1)
                     {
+                        Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[6]);
                         SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
                         __result = false;
                         return false;
@@ -292,6 +293,7 @@ namespace Advize_PlantEasily
                             if (i == 1 && ___m_noPlacementCost)
                                 continue;
 
+                            Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[i]);
                             SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
                             __result = false;
                             return false;
