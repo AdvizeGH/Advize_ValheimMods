@@ -134,7 +134,6 @@ namespace Advize_PlantEasily
             bool cultivatedGroundOnly = plant?.m_needCultivatedGround ?? piece.m_cultivatedGroundOnly;
             Heightmap.Biome biome = plant?.m_biome ?? piece.m_onlyInBiome;
 
-
             if (cultivatedGroundOnly && heightmap && !heightmap.IsCultivated(position))
                 placementStatus = Status.NotCultivated;
 
@@ -160,7 +159,6 @@ namespace Advize_PlantEasily
 
         }
 
-        // PlacementStatus
         private enum Status
         {
             Healthy,        // 0

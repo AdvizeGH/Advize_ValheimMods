@@ -275,9 +275,10 @@ namespace Advize_PlantEasily
 
                 if (config.PreventInvalidPlanting)
                 {
-                    if ((int)CheckPlacementStatus(___m_placementGhost) > 1)
+                    int rootPlacementStatus = (int)CheckPlacementStatus(___m_placementGhost);
+                    if (rootPlacementStatus > 1)
                     {
-                        Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[6]);
+                        Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[rootPlacementStatus]);
                         SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
                         __result = false;
                         return false;
