@@ -19,6 +19,7 @@ namespace Advize_PlantEasily.Configuration
         private readonly ConfigEntry<float> berryBushSnapRadius;
         private readonly ConfigEntry<float> mushroomSnapRadius;
         private readonly ConfigEntry<float> flowerSnapRadius;
+        private readonly ConfigEntry<bool> preventOverlappingPlacements;
 
         private readonly ConfigEntry<bool> preventPartialPlanting;
         private readonly ConfigEntry<bool> preventInvalidPlanting;
@@ -59,6 +60,7 @@ namespace Advize_PlantEasily.Configuration
             berryBushSnapRadius = Config.Bind("Pickables", "BerryBushSnapRadius", 1.5f, "Determines distance/spacing between berry bushes when planting.");
             mushroomSnapRadius = Config.Bind("Pickables", "MushroomSnapRadius", 0.5f, "Determines distance/spacing between mushrooms when planting.");
             flowerSnapRadius = Config.Bind("Pickables", "FlowerSnapRadius", 1.0f, "Determines distance/spacing between flowers when planting.");
+            preventOverlappingPlacements = Config.Bind("Pickables", "PreventOverlappingPlacements", true, "Prevents placement of pickable resources on top of colliding obstructions.");
 
             //Controls
             enableModKey = Config.Bind("Controls", "EnableModKey", new KeyboardShortcut(KeyCode.F8),
@@ -145,6 +147,10 @@ namespace Advize_PlantEasily.Configuration
         internal float FlowerSnapRadius
         {
             get { return flowerSnapRadius.Value; }
+        }
+        internal bool PreventOverlappingPlacements
+        {
+            get { return preventOverlappingPlacements.Value; }
         }
         internal bool PreventPartialPlanting
         {

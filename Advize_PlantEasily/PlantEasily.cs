@@ -14,7 +14,7 @@ namespace Advize_PlantEasily
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "1.0.2";
+        public const string Version = "1.0.3";
         
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -145,6 +145,9 @@ namespace Advize_PlantEasily
 
             if (plant && HasRoof(ghost))
                 placementStatus = Status.NoSun;
+
+            if (!plant && config.PreventOverlappingPlacements && Physics.CheckSphere(position, 0.025f, snapCollisionMask))
+                placementStatus = Status.NoSpace;
             
             return placementStatus;
         }
