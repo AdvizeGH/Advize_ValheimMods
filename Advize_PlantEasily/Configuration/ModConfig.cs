@@ -66,7 +66,7 @@ namespace Advize_PlantEasily.Configuration
                     "Key to toggle on/off all mod features. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
                     new ConfigurationManagerAttributes { Description = "Key to toggle on/off all mod features." }));
-            enableSnappingKey = Config.Bind("Controls", "EnableSnappingKey", new KeyboardShortcut(KeyCode.F9),
+            enableSnappingKey = Config.Bind("Controls", "EnableSnappingKey", new KeyboardShortcut(KeyCode.F10),
                 new ConfigDescription(
                     "Key to toggle on/off piece snapping functionality. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
@@ -104,8 +104,6 @@ namespace Advize_PlantEasily.Configuration
 
             rows.SettingChanged += PlantEasily.GridSizeChanged;
             columns.SettingChanged += PlantEasily.GridSizeChanged;
-
-            //Config.SettingChanged += PlantEasily.ConfigSettingChanged;
         }
 
         internal bool EnableDebugMessages
