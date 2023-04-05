@@ -5,7 +5,6 @@ using HarmonyLib;
 using UnityEngine;
 using Advize_PlantEasily.Configuration;
 using System;
-using System.Reflection;
 
 namespace Advize_PlantEasily
 {
@@ -89,12 +88,6 @@ namespace Advize_PlantEasily
         {
             int plantCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid");
             return Physics.OverlapSphere(position, plant.m_growRadius, plantCollisionMask).Length == 0;
-        }
-
-        private static bool HasRoof(GameObject ghost)
-        {
-            int roofMask = LayerMask.GetMask("Default", "static_solid", "piece");
-            return Physics.Raycast(ghost.transform.position, Vector3.up, 100f, roofMask);
         }
 
         private static float PickableSnapRadius(string name)
