@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using UnityEngine;
+using Attributes = Advize_PlantEasily.Configuration.ModConfig.ConfigurationManagerAttributes;
 
 namespace Advize_PlantEasily.Configuration
 {
@@ -54,10 +55,10 @@ namespace Advize_PlantEasily.Configuration
             //new ConfigDescription("Enables the [Crops] section of this config", null, new ConfigurationManagerAttributes { Order = 27 }));
             //General
             enableDebugMessages = Config.Bind("General", "EnableDebugMessages", false, "Enable mod debug messages in console.");
-            rows = Config.Bind("General", "Rows", 2, new ConfigDescription("Number of rows for planting grid aka height.", null, new ConfigurationManagerAttributes { Order = 8 }));
-            columns = Config.Bind("General", "Columns", 2, new ConfigDescription("Number of columns for planting grid aka width.", null, new ConfigurationManagerAttributes { Order = 7 }));
-            modActive = Config.Bind("General", "ModActive", true, new ConfigDescription("Enables all mod features.", null, new ConfigurationManagerAttributes { Order = 10 }));
-            snapActive = Config.Bind("General", "SnapActive", true, new ConfigDescription("Enables grid snapping feature.", null, new ConfigurationManagerAttributes { Order = 9 }));
+            rows = Config.Bind("General", "Rows", 2, new ConfigDescription("Number of rows for planting grid aka height.", null, new Attributes { Order = 8 }));
+            columns = Config.Bind("General", "Columns", 2, new ConfigDescription("Number of columns for planting grid aka width.", null, new Attributes { Order = 7 }));
+            modActive = Config.Bind("General", "ModActive", true, new ConfigDescription("Enables all mod features.", null, new Attributes { Order = 10 }));
+            snapActive = Config.Bind("General", "SnapActive", true, new ConfigDescription("Enables grid snapping feature.", null, new Attributes { Order = 9 }));
             preventPartialPlanting = Config.Bind("General", "PreventPartialPlanting", true, "Prevents placement of resources when any placement ghosts are invalid for any reason.");
             preventInvalidPlanting = Config.Bind("General", "PreventInvalidPlanting", true, "Prevents plants from being placed where they will be unable to grow.");
             randomizeRotation = Config.Bind("General", "RandomizeRotation", true, "Randomizes rotation of pieces once placed.");
@@ -69,7 +70,7 @@ namespace Advize_PlantEasily.Configuration
             berryBushSnapRadius = Config.Bind("Pickables", "BerryBushSnapRadius", 1.5f, "Determines distance/spacing between berry bushes when planting.");
             mushroomSnapRadius = Config.Bind("Pickables", "MushroomSnapRadius", 0.5f, "Determines distance/spacing between mushrooms when planting.");
             flowerSnapRadius = Config.Bind("Pickables", "FlowerSnapRadius", 1.0f, "Determines distance/spacing between flowers when planting.");
-            preventOverlappingPlacements = Config.Bind("Pickables", "PreventOverlappingPlacements", true, new ConfigDescription("Prevents placement of pickable resources on top of colliding obstructions.", null, new ConfigurationManagerAttributes { Order = 5 }));
+            preventOverlappingPlacements = Config.Bind("Pickables", "PreventOverlappingPlacements", true, new ConfigDescription("Prevents placement of pickable resources on top of colliding obstructions.", null, new Attributes { Order = 5 }));
 
             //Harvesting
             enableMassHarvest = Config.Bind("Harvesting", "EnableMassHarvest", true, "Enables the ability to harvest multiple resources at once.");
@@ -83,47 +84,47 @@ namespace Advize_PlantEasily.Configuration
                 new ConfigDescription(
                     "Key to toggle on/off all mod features. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new ConfigurationManagerAttributes { Description = "Key to toggle on/off all mod features." }));
+                    new Attributes { Description = "Key to toggle on/off all mod features." }));
             enableSnappingKey = Config.Bind("Controls", "EnableSnappingKey", new KeyboardShortcut(KeyCode.F10),
                 new ConfigDescription(
                     "Key to toggle on/off piece snapping functionality. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new ConfigurationManagerAttributes { Description = "Key to toggle on/off piece snapping functionality." }));
+                    new Attributes { Description = "Key to toggle on/off piece snapping functionality." }));
             increaseXKey = Config.Bind("Controls", "IncreaseXKey", new KeyboardShortcut(KeyCode.RightArrow),
                 new ConfigDescription(
                     "Key to increase number of grid columns. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new ConfigurationManagerAttributes { Description = "Key to increase number of grid columns." }));
+                    new Attributes { Description = "Key to increase number of grid columns." }));
             increaseYKey = Config.Bind("Controls", "IncreaseYKey", new KeyboardShortcut(KeyCode.UpArrow),
                 new ConfigDescription(
                     "Key to increase number of grid rows. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new ConfigurationManagerAttributes { Description = "Key to increase number of grid rows." }));
+                    new Attributes { Description = "Key to increase number of grid rows." }));
             decreaseXKey = Config.Bind("Controls", "DecreaseXKey", new KeyboardShortcut(KeyCode.LeftArrow),
                 new ConfigDescription(
                     "Key to decrease number of grid columns. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new ConfigurationManagerAttributes { Description = "Key to decrease number of grid columns." }));
+                    new Attributes { Description = "Key to decrease number of grid columns." }));
             decreaseYKey = Config.Bind("Controls", "DecreaseYKey", new KeyboardShortcut(KeyCode.DownArrow),
                 new ConfigDescription(
                     "Key to decrease number of grid rows. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new ConfigurationManagerAttributes { Description = "Key to decrease number of grid rows." }));
+                    new Attributes { Description = "Key to decrease number of grid rows." }));
             keyboardModifierKey = Config.Bind("Controls", "KeyboardModifierKey", new KeyboardShortcut(KeyCode.RightControl),
                 new ConfigDescription(
                     "Modifier key when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new ConfigurationManagerAttributes { Description = "Modifier key when using keyboard controls." }));
+                    new Attributes { Description = "Modifier key when using keyboard controls." }));
             gamepadModifierKey = Config.Bind("Controls", "GamepadModifierKey", new KeyboardShortcut(KeyCode.JoystickButton4),
                 new ConfigDescription(
                     "Modifier key when using gamepad controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new ConfigurationManagerAttributes { Description = "Modifier key when using gamepad controls." }));
+                    new Attributes { Description = "Modifier key when using gamepad controls." }));
             keyboardHarvestModifierKey = Config.Bind("Controls", "KeyboardHarvestModifierKey", new KeyboardShortcut(KeyCode.LeftShift),
                 new ConfigDescription(
                     "Modifier key to enable mass harvest when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new ConfigurationManagerAttributes { Description = "Modifier key to enable mass harvest when using keyboard controls." }));
+                    new Attributes { Description = "Modifier key to enable mass harvest when using keyboard controls." }));
 
             rows.SettingChanged += PlantEasily.GridSizeChanged;
             columns.SettingChanged += PlantEasily.GridSizeChanged;
@@ -249,16 +250,17 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return keyboardHarvestModifierKey.Value.MainKey; }
         }
+
+        internal class ConfigurationManagerAttributes
+        {
+            public string? Description;
+            public int? Order;
+        }
     }
 
     internal enum HarvestStyle
     {
         LikeResources,
         AllResources
-    }
-
-    public class ConfigurationManagerAtrributes
-    {
-        public int? Order;
     }
 }
