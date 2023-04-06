@@ -338,7 +338,7 @@ namespace Advize_PlantEasily
         {
             public static void Prefix(Player __instance, GameObject go, bool hold, bool alt, float ___m_lastHoverInteractTime)
             {
-                if (!config.ModActive || !config.EnableMassHarvest || __instance.InAttack() || __instance.InDodge() || (hold && Time.time - ___m_lastHoverInteractTime < 0.2f))
+                if (!config.ModActive || !config.EnableBulkHarvest || __instance.InAttack() || __instance.InDodge() || (hold && Time.time - ___m_lastHoverInteractTime < 0.2f))
                     return;
 
                 if (!Input.GetKey(config.KeyboardHarvestModifierKey) && !Input.GetKey(config.GamepadModifierKey))

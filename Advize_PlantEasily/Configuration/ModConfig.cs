@@ -30,7 +30,7 @@ namespace Advize_PlantEasily.Configuration
         private readonly ConfigEntry<bool> preventOverlappingPlacements;
         
         //Harvesting
-        private readonly ConfigEntry<bool> enableMassHarvest;
+        private readonly ConfigEntry<bool> enableBulkHarvest;
         private readonly ConfigEntry<HarvestStyle> harvestStyle;
         //private readonly ConfigEntry<bool> harvestResourcesInRadius;
         //private readonly ConfigEntry<bool> harvestConnectedResources;
@@ -73,11 +73,11 @@ namespace Advize_PlantEasily.Configuration
             preventOverlappingPlacements = Config.Bind("Pickables", "PreventOverlappingPlacements", true, new ConfigDescription("Prevents placement of pickable resources on top of colliding obstructions.", null, new Attributes { Order = 5 }));
 
             //Harvesting
-            enableMassHarvest = Config.Bind("Harvesting", "EnableMassHarvest", true, "Enables the ability to harvest multiple resources at once.");
-            harvestStyle = Config.Bind("Harvesting", "HarvestStyle", HarvestStyle.AllResources, "Determines mass harvest style. LikeResources only harvests resources of the type you've interacted with. AllResources harvests all eligible resources.");
+            enableBulkHarvest = Config.Bind("Harvesting", "EnableBulkHarvest", true, "Enables the ability to harvest multiple resources at once.");
+            harvestStyle = Config.Bind("Harvesting", "HarvestStyle", HarvestStyle.AllResources, "Determines bulk harvest style. LikeResources only harvests resources of the type you've interacted with. AllResources harvests all eligible resources.");
             //harvestResourcesInRadius = Config.Bind("Harvesting", "HarvestResourcesInRadius", true, "Harvests resources within a defined radius.");
             //harvestConnectedResources = Config.Bind("Harvesting", "HarvestConnectedResources", false, "Harvests all applicable resources adjacent to the harvested resource.");
-            harvestRadius = Config.Bind("Harvesting", "HarvestRadius", 3.0f, "Determines radius used to search for resources when mass harvesting.");
+            harvestRadius = Config.Bind("Harvesting", "HarvestRadius", 3.0f, "Determines radius used to search for resources when bulk harvesting.");
 
             //Controls
             enableModKey = Config.Bind("Controls", "EnableModKey", new KeyboardShortcut(KeyCode.F8),
@@ -122,9 +122,9 @@ namespace Advize_PlantEasily.Configuration
                     new Attributes { Description = "Modifier key when using gamepad controls." }));
             keyboardHarvestModifierKey = Config.Bind("Controls", "KeyboardHarvestModifierKey", new KeyboardShortcut(KeyCode.LeftShift),
                 new ConfigDescription(
-                    "Modifier key to enable mass harvest when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+                    "Modifier key to enable bulk harvest when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new Attributes { Description = "Modifier key to enable mass harvest when using keyboard controls." }));
+                    new Attributes { Description = "Modifier key to enable bulk harvest when using keyboard controls." }));
 
             rows.SettingChanged += PlantEasily.GridSizeChanged;
             columns.SettingChanged += PlantEasily.GridSizeChanged;
@@ -194,9 +194,9 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return useDurability.Value; }
         }
-        internal bool EnableMassHarvest
+        internal bool EnableBulkHarvest
         {
-            get { return enableMassHarvest.Value; }
+            get { return enableBulkHarvest.Value; }
         }
         internal HarvestStyle HarvestStyle
         {
