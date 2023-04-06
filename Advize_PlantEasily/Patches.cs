@@ -109,28 +109,7 @@ namespace Advize_PlantEasily
                 Vector3 basePosition = ___m_placementGhost.transform.position;
                 Quaternion baseRotation = ___m_placementGhost.transform.rotation;
 
-                float colliderRadius = 0f;
-                Plant plant = ___m_placementGhost.GetComponent<Plant>();
-                
-                //Find collider with largest radius within the piece to be placed.
-                //Include grownPrefabs just in case. Still doesn't seem to work on saplings even when multiplied against max growth scale of the tree. (Cause might be Status.NoSun)
-                if (plant)
-                {
-                    List<GameObject> colliderRoots = new();
-                    colliderRoots.Add(___m_placementGhost);
-                    colliderRoots.AddRange(plant.m_grownPrefabs);
-                    
-                    for (int i = 0; i < colliderRoots.Count; i++)
-                    {
-                        foreach (CapsuleCollider collider in colliderRoots[i].GetComponentsInChildren<CapsuleCollider>())
-                        {
-                            colliderRadius = Mathf.Max(colliderRadius, collider.radius);
-                        }
-                    }
-                }
-
-                float growRadius = plant?.m_growRadius ?? PickableSnapRadius(___m_placementGhost.name);
-                float pieceSpacing = growRadius + colliderRadius;
+                float pieceSpacing = GetPieceSpacing(___m_placementGhost);
 
                 // Takes position of ghost, subtracts position of player to get vector between the two and facing out from the player, normalizes that vector to have a magnitude of 1.0f
                 Vector3 rowDirection = Utils.DirectionXZ(basePosition - __instance.transform.position);
@@ -141,85 +120,83 @@ namespace Advize_PlantEasily
                 if (config.SnapActive)
                 {
                     List<Vector3> snapPoints = new();
+                    Plant plant = ___m_placementGhost.GetComponent<Plant>();
+
                     Collider[] obstructions = Physics.OverlapSphere(___m_placementGhost.transform.position, pieceSpacing, snapCollisionMask);
+                    int validFirstOrderCollisions = 0;
                     
-                    if (obstructions?.Length > 0)
+                    foreach (Collider collider in obstructions)
                     {
-                        int validFirstOrderCollisions = 0;
-                        foreach (Collider collider in obstructions)
-                        {
-                            if (!collider.GetComponent<Plant>() && !collider.GetComponentInParent<Pickable>()) continue;
-                            validFirstOrderCollisions++;
-                            if (validFirstOrderCollisions > 8) break;
-                            
-                            Collider[] secondaryObstructions = Physics.OverlapSphere(collider.transform.position, pieceSpacing, snapCollisionMask);
-                            if (secondaryObstructions?.Length > 0)
-                            {
-                                int validSecondOrderCollisions = 0;
-                                foreach (Collider secondaryCollider in secondaryObstructions)
-                                {
-                                    if (!secondaryCollider.GetComponent<Plant>() && !secondaryCollider.GetComponentInParent<Pickable>()) continue;
-                                    if (secondaryCollider.transform.root == collider.transform.root) continue;
-                                    validSecondOrderCollisions++;
-                                    if (validSecondOrderCollisions > 8) break;
-                                    
-                                    rowDirection = Utils.DirectionXZ(secondaryCollider.transform.position - collider.transform.position);
-                                    columnDirection = Vector3.Cross(Vector3.up, rowDirection);
-                                    
-                                    rowDirection = baseRotation * rowDirection * pieceSpacing;
-                                    columnDirection = baseRotation * columnDirection * pieceSpacing;
-
-                                    List<Vector3> positions = new()
-                                    {
-                                        collider.transform.position + rowDirection,
-                                        collider.transform.position + columnDirection,
-                                        collider.transform.position - rowDirection,
-                                        collider.transform.position - columnDirection
-                                    };
-
-                                    foreach (Vector3 pos in positions)
-                                    {
-                                        if (!Physics.CheckSphere(pos, 0f, snapCollisionMask))
-                                        {
-                                            if (plant && !HasGrowSpace(plant, pos)) continue;
-
-                                            snapPoints.Add(pos);
-                                            foundSnaps = true;
-                                        }
-                                    }
-                                }
-                            }
-                            if (!foundSnaps)
-                            {
-                                rowDirection = baseRotation * rowDirection * pieceSpacing;
-                                columnDirection = baseRotation * columnDirection * pieceSpacing;
-
-                                List<Vector3> positions = new()
-                                {
-                                    collider.transform.position + rowDirection,
-                                    collider.transform.position + columnDirection,
-                                    collider.transform.position - rowDirection,
-                                    collider.transform.position - columnDirection
-                                };
-
-                                foreach (Vector3 pos in positions)
-                                {
-                                    if (!Physics.CheckSphere(pos, 0f, snapCollisionMask))
-                                    {
-                                        if (plant && !HasGrowSpace(plant, pos)) continue;
-
-                                        snapPoints.Add(pos);
-                                        foundSnaps = true;
-                                    }
-                                }
-                            }
-                        }
+                        if (!collider.GetComponent<Plant>() && !collider.GetComponentInParent<Pickable>()) continue;
+                        validFirstOrderCollisions++;
+                        if (validFirstOrderCollisions > 8) break;
                         
-                        if (foundSnaps)
+                        Collider[] secondaryObstructions = Physics.OverlapSphere(collider.transform.position, pieceSpacing, snapCollisionMask);
+                        int validSecondOrderCollisions = 0;
+                        
+                        foreach (Collider secondaryCollider in secondaryObstructions)
                         {
-                            Vector3 firstSnapPos = snapPoints.OrderBy(o => snapPoints.Min(m => Utils.DistanceXZ(m, o)) + (o - basePosition).magnitude).First();
-                            basePosition = ___m_placementGhost.transform.position = firstSnapPos;
+                            if (!secondaryCollider.GetComponent<Plant>() && !secondaryCollider.GetComponentInParent<Pickable>()) continue;
+                            if (secondaryCollider.transform.root == collider.transform.root) continue;
+                            validSecondOrderCollisions++;
+                            if (validSecondOrderCollisions > 8) break;
+                                    
+                            rowDirection = Utils.DirectionXZ(secondaryCollider.transform.position - collider.transform.position);
+                            columnDirection = Vector3.Cross(Vector3.up, rowDirection);
+                                    
+                            rowDirection = baseRotation * rowDirection * pieceSpacing;
+                            columnDirection = baseRotation * columnDirection * pieceSpacing;
+
+                            List<Vector3> positions = new()
+                            {
+                                collider.transform.position + rowDirection,
+                                collider.transform.position + columnDirection,
+                                collider.transform.position - rowDirection,
+                                collider.transform.position - columnDirection
+                            };
+
+                            foreach (Vector3 pos in positions)
+                            {
+                                if (!Physics.CheckSphere(pos, 0f, snapCollisionMask))
+                                {
+                                    if (plant && !HasGrowSpace(plant, pos)) continue;
+
+                                    snapPoints.Add(pos);
+                                    foundSnaps = true;
+                                }
+                            }
                         }
+
+                        if (!foundSnaps)
+                        {
+                            rowDirection = baseRotation * rowDirection * pieceSpacing;
+                            columnDirection = baseRotation * columnDirection * pieceSpacing;
+
+                            List<Vector3> positions = new()
+                            {
+                                collider.transform.position + rowDirection,
+                                collider.transform.position + columnDirection,
+                                collider.transform.position - rowDirection,
+                                collider.transform.position - columnDirection
+                            };
+
+                            foreach (Vector3 pos in positions)
+                            {
+                                if (!Physics.CheckSphere(pos, 0f, snapCollisionMask))
+                                {
+                                    if (plant && !HasGrowSpace(plant, pos)) continue;
+
+                                    snapPoints.Add(pos);
+                                    foundSnaps = true;
+                                }
+                            }
+                        }
+                    }
+                        
+                    if (foundSnaps)
+                    {
+                        Vector3 firstSnapPos = snapPoints.OrderBy(o => snapPoints.Min(m => Utils.DistanceXZ(m, o)) + (o - basePosition).magnitude).First();
+                        basePosition = ___m_placementGhost.transform.position = firstSnapPos;
                     }
                 }
                 
@@ -352,6 +329,30 @@ namespace Advize_PlantEasily
                     {
                         rightItem.m_durability -= rightItem.m_shared.m_useDurabilityDrain * count;
                     }
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(Player), "Interact")]
+        public class PlayerInteract
+        {
+            public static void Prefix(Player __instance, GameObject go, bool hold, bool alt, float ___m_lastHoverInteractTime)
+            {
+                if (!config.ModActive || !config.EnableMassHarvest || __instance.InAttack() || __instance.InDodge() || (hold && Time.time - ___m_lastHoverInteractTime < 0.2f))
+                    return;
+
+                if (!Input.GetKey(config.KeyboardHarvestModifierKey) && !Input.GetKey(config.GamepadModifierKey))
+                    return;
+                
+                Interactable componentInParent = go.GetComponentInParent<Interactable>();
+                Pickable pickable = (Pickable)componentInParent;
+
+                if (pickable)
+                {
+                    //List<Pickable> extraPickables = config.HarvestResourcesInRadius ? FindResourcesInRadius(pickable) : FindConnectedResources(pickable);
+                    
+                    foreach (Pickable extraPickable in FindResourcesInRadius(pickable))
+                        extraPickable.Interact(__instance, hold, alt);
                 }
             }
         }

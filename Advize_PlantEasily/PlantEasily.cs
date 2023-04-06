@@ -13,7 +13,7 @@ namespace Advize_PlantEasily
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "1.0.4";
+        public const string Version = "1.1.0";
         
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -90,9 +90,33 @@ namespace Advize_PlantEasily
             return Physics.OverlapSphere(position, plant.m_growRadius, plantCollisionMask).Length == 0;
         }
 
+        private static float GetPieceSpacing(GameObject go)
+        {
+            float colliderRadius = 0f;
+            Plant plant = go.GetComponent<Plant>();
+            
+            if (plant)
+            {
+                List<GameObject> colliderRoots = new();
+                colliderRoots.Add(go);
+                colliderRoots.AddRange(plant.m_grownPrefabs);
+
+                for (int i = 0; i < colliderRoots.Count; i++)
+                {
+                    foreach (CapsuleCollider collider in colliderRoots[i].GetComponentsInChildren<CapsuleCollider>())
+                    {
+                        colliderRadius = Mathf.Max(colliderRadius, collider.radius);
+                    }
+                }
+            }
+
+            float growRadius = plant?.m_growRadius ?? PickableSnapRadius(go.name);
+
+            return growRadius + colliderRadius;
+        }
+
         private static float PickableSnapRadius(string name)
         {
-            // Find a new route, constant string operations for each game tick should be avoided.
             if (name.EndsWith("berryBush"))
                 return config.BerryBushSnapRadius;
             if (name.StartsWith("Pickable_Mushroom"))
@@ -145,15 +169,34 @@ namespace Advize_PlantEasily
             return placementStatus;
         }
 
-        private static void FindResourcesInRadius()
+        private static List<Pickable> FindResourcesInRadius(Pickable rootPickable)
         {
+            List<Pickable> extraPickables = new();
+            Collider[] obstructions = Physics.OverlapSphere(rootPickable.transform.root.position, config.HarvestRadius, snapCollisionMask);
+            
+            foreach (Collider obstruction in obstructions)
+            {
+                Pickable collidingPickable = obstruction.GetComponentInParent<Pickable>();
 
+                if (collidingPickable && collidingPickable != rootPickable)
+                {
+                    if (config.HarvestStyle == HarvestStyle.LikeResources  && collidingPickable.name != rootPickable.name)
+                        continue;
+
+                    if (!extraPickables.Contains(collidingPickable))
+                        extraPickables.Add(collidingPickable);
+                }
+            }
+
+            return extraPickables;
         }
 
-        private static void FindConnectedResources()
-        {
-
-        }
+        //private static List<Pickable> FindConnectedResources(Pickable rootPickable)
+        //{
+        //    List<Pickable> extraPickables = new();
+        //    // Do recursive collision check here within a radius, also check config.HarvestStyle in this method
+        //    return extraPickables;
+        //}
 
         private enum Status
         {

@@ -7,6 +7,7 @@ namespace Advize_PlantEasily.Configuration
     {
         private ConfigFile Config;
 
+        //General
         private readonly ConfigEntry<bool> enableDebugMessages;
 
         private readonly ConfigEntry<int> rows;
@@ -14,18 +15,25 @@ namespace Advize_PlantEasily.Configuration
         private readonly ConfigEntry<bool> modActive;
         private readonly ConfigEntry<bool> snapActive;
 
+        private readonly ConfigEntry<bool> preventPartialPlanting;
+        private readonly ConfigEntry<bool> preventInvalidPlanting;
+        private readonly ConfigEntry<bool> randomizeRotation;
+        //private readonly ConfigEntry<bool> useStamina; // not yet implemented
+        private readonly ConfigEntry<bool> useDurability;
+
         //Pickables
         private readonly ConfigEntry<float> pickableSnapRadius;
         private readonly ConfigEntry<float> berryBushSnapRadius;
         private readonly ConfigEntry<float> mushroomSnapRadius;
         private readonly ConfigEntry<float> flowerSnapRadius;
         private readonly ConfigEntry<bool> preventOverlappingPlacements;
-
-        private readonly ConfigEntry<bool> preventPartialPlanting;
-        private readonly ConfigEntry<bool> preventInvalidPlanting;
-        private readonly ConfigEntry<bool> randomizeRotation;
-        //private readonly ConfigEntry<bool> useStamina; // not yet implemented
-        private readonly ConfigEntry<bool> useDurability;
+        
+        //Harvesting
+        private readonly ConfigEntry<bool> enableMassHarvest;
+        private readonly ConfigEntry<HarvestStyle> harvestStyle;
+        //private readonly ConfigEntry<bool> harvestResourcesInRadius;
+        //private readonly ConfigEntry<bool> harvestConnectedResources;
+        private readonly ConfigEntry<float> harvestRadius;
 
         //Controls
         private readonly ConfigEntry<KeyboardShortcut> enableModKey;
@@ -38,17 +46,18 @@ namespace Advize_PlantEasily.Configuration
 
         private readonly ConfigEntry<KeyboardShortcut> keyboardModifierKey;
         private readonly ConfigEntry<KeyboardShortcut> gamepadModifierKey;
+        private readonly ConfigEntry<KeyboardShortcut> keyboardHarvestModifierKey;
 
         internal ModConfig(ConfigFile configFile)
         {
             Config = configFile;
-
+            //new ConfigDescription("Enables the [Crops] section of this config", null, new ConfigurationManagerAttributes { Order = 27 }));
             //General
             enableDebugMessages = Config.Bind("General", "EnableDebugMessages", false, "Enable mod debug messages in console.");
-            rows = Config.Bind("General", "Rows", 2, "Number of rows for planting grid aka height.");
-            columns = Config.Bind("General", "Columns", 2, "Number of columns for planting grid aka width.");
-            modActive = Config.Bind("General", "ModActive", true, "Enables all mod features.");
-            snapActive = Config.Bind("General", "SnapActive", true, "Enables grid snapping feature.");
+            rows = Config.Bind("General", "Rows", 2, new ConfigDescription("Number of rows for planting grid aka height.", null, new ConfigurationManagerAttributes { Order = 8 }));
+            columns = Config.Bind("General", "Columns", 2, new ConfigDescription("Number of columns for planting grid aka width.", null, new ConfigurationManagerAttributes { Order = 7 }));
+            modActive = Config.Bind("General", "ModActive", true, new ConfigDescription("Enables all mod features.", null, new ConfigurationManagerAttributes { Order = 10 }));
+            snapActive = Config.Bind("General", "SnapActive", true, new ConfigDescription("Enables grid snapping feature.", null, new ConfigurationManagerAttributes { Order = 9 }));
             preventPartialPlanting = Config.Bind("General", "PreventPartialPlanting", true, "Prevents placement of resources when any placement ghosts are invalid for any reason.");
             preventInvalidPlanting = Config.Bind("General", "PreventInvalidPlanting", true, "Prevents plants from being placed where they will be unable to grow.");
             randomizeRotation = Config.Bind("General", "RandomizeRotation", true, "Randomizes rotation of pieces once placed.");
@@ -60,7 +69,14 @@ namespace Advize_PlantEasily.Configuration
             berryBushSnapRadius = Config.Bind("Pickables", "BerryBushSnapRadius", 1.5f, "Determines distance/spacing between berry bushes when planting.");
             mushroomSnapRadius = Config.Bind("Pickables", "MushroomSnapRadius", 0.5f, "Determines distance/spacing between mushrooms when planting.");
             flowerSnapRadius = Config.Bind("Pickables", "FlowerSnapRadius", 1.0f, "Determines distance/spacing between flowers when planting.");
-            preventOverlappingPlacements = Config.Bind("Pickables", "PreventOverlappingPlacements", true, "Prevents placement of pickable resources on top of colliding obstructions.");
+            preventOverlappingPlacements = Config.Bind("Pickables", "PreventOverlappingPlacements", true, new ConfigDescription("Prevents placement of pickable resources on top of colliding obstructions.", null, new ConfigurationManagerAttributes { Order = 5 }));
+
+            //Harvesting
+            enableMassHarvest = Config.Bind("Harvesting", "EnableMassHarvest", true, "Enables the ability to harvest multiple resources at once.");
+            harvestStyle = Config.Bind("Harvesting", "HarvestStyle", HarvestStyle.AllResources, "Determines mass harvest style. LikeResources only harvests resources of the type you've interacted with. AllResources harvests all eligible resources.");
+            //harvestResourcesInRadius = Config.Bind("Harvesting", "HarvestResourcesInRadius", true, "Harvests resources within a defined radius.");
+            //harvestConnectedResources = Config.Bind("Harvesting", "HarvestConnectedResources", false, "Harvests all applicable resources adjacent to the harvested resource.");
+            harvestRadius = Config.Bind("Harvesting", "HarvestRadius", 3.0f, "Determines radius used to search for resources when mass harvesting.");
 
             //Controls
             enableModKey = Config.Bind("Controls", "EnableModKey", new KeyboardShortcut(KeyCode.F8),
@@ -103,6 +119,11 @@ namespace Advize_PlantEasily.Configuration
                     "Modifier key when using gamepad controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
                     new ConfigurationManagerAttributes { Description = "Modifier key when using gamepad controls." }));
+            keyboardHarvestModifierKey = Config.Bind("Controls", "KeyboardHarvestModifierKey", new KeyboardShortcut(KeyCode.LeftShift),
+                new ConfigDescription(
+                    "Modifier key to enable mass harvest when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+                    null,
+                    new ConfigurationManagerAttributes { Description = "Modifier key to enable mass harvest when using keyboard controls." }));
 
             rows.SettingChanged += PlantEasily.GridSizeChanged;
             columns.SettingChanged += PlantEasily.GridSizeChanged;
@@ -172,6 +193,26 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return useDurability.Value; }
         }
+        internal bool EnableMassHarvest
+        {
+            get { return enableMassHarvest.Value; }
+        }
+        internal HarvestStyle HarvestStyle
+        {
+            get { return harvestStyle.Value; }
+        }
+        //internal bool HarvestResourcesInRadius
+        //{
+        //    get { return harvestResourcesInRadius.Value; }
+        //}
+        //internal bool HarvestConnectedResources
+        //{
+        //    get { return harvestConnectedResources.Value; }
+        //}
+        internal float HarvestRadius
+        {
+            get { return harvestRadius.Value; }
+        }
         internal KeyCode EnableModKey
         {
             get { return enableModKey.Value.MainKey; }
@@ -204,5 +245,20 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return gamepadModifierKey.Value.MainKey; }
         }
+        internal KeyCode KeyboardHarvestModifierKey
+        {
+            get { return keyboardHarvestModifierKey.Value.MainKey; }
+        }
+    }
+
+    internal enum HarvestStyle
+    {
+        LikeResources,
+        AllResources
+    }
+
+    public class ConfigurationManagerAtrributes
+    {
+        public int? Order;
     }
 }
