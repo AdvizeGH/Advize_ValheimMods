@@ -140,10 +140,10 @@ namespace Advize_PlantEasily
                             if (secondaryCollider.transform.root == collider.transform.root) continue;
                             validSecondOrderCollisions++;
                             if (validSecondOrderCollisions > 8) break;
-                                    
+                            
                             rowDirection = Utils.DirectionXZ(secondaryCollider.transform.position - collider.transform.position);
                             columnDirection = Vector3.Cross(Vector3.up, rowDirection);
-                                    
+                            
                             rowDirection = baseRotation * rowDirection * pieceSpacing;
                             columnDirection = baseRotation * columnDirection * pieceSpacing;
 
@@ -325,6 +325,7 @@ namespace Advize_PlantEasily
                     {
                         __instance.ConsumeResources(piece.m_resources, 0);
                     }
+                    //__instance.UseStamina(rightItem.m_shared.m_attack.m_attackStamina);
                     if (rightItem.m_shared.m_useDurability && config.UseDurability)
                     {
                         rightItem.m_durability -= rightItem.m_shared.m_useDurabilityDrain * count;

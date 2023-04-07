@@ -5,6 +5,7 @@ using HarmonyLib;
 using UnityEngine;
 using Advize_PlantEasily.Configuration;
 using System;
+using System.Linq;
 
 namespace Advize_PlantEasily
 {
@@ -93,6 +94,7 @@ namespace Advize_PlantEasily
         private static float GetPieceSpacing(GameObject go)
         {
             float colliderRadius = 0f;
+            bool isSapling = false;
             Plant plant = go.GetComponent<Plant>();
             
             if (plant)
@@ -100,17 +102,23 @@ namespace Advize_PlantEasily
                 List<GameObject> colliderRoots = new();
                 colliderRoots.Add(go);
                 colliderRoots.AddRange(plant.m_grownPrefabs);
+                isSapling = colliderRoots.Any(x => x.GetComponent<TreeBase>());
 
-                for (int i = 0; i < colliderRoots.Count; i++)
+                if (!isSapling)
                 {
-                    foreach (CapsuleCollider collider in colliderRoots[i].GetComponentsInChildren<CapsuleCollider>())
+                    for (int i = 0; i < colliderRoots.Count; i++)
                     {
-                        colliderRadius = Mathf.Max(colliderRadius, collider.radius);
+                        if (colliderRoots[i].GetComponent<TreeBase>()) isSapling = true;
+                        foreach (CapsuleCollider collider in colliderRoots[i].GetComponentsInChildren<CapsuleCollider>())
+                        {
+                            colliderRadius = Mathf.Max(colliderRadius, collider.radius);
+                        }
                     }
                 }
+                colliderRadius += config.ExtraPlantSpacing;
             }
-
-            float growRadius = plant?.m_growRadius ?? PickableSnapRadius(go.name);
+            
+            float growRadius = isSapling ? plant.m_growRadius * 2 : plant?.m_growRadius * 1.1f ?? PickableSnapRadius(go.name);
 
             return growRadius + colliderRadius;
         }
