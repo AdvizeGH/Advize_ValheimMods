@@ -345,7 +345,7 @@ namespace Advize_PlantEasily
                     return;
                 
                 Interactable componentInParent = go.GetComponentInParent<Interactable>();
-                Pickable pickable = (Pickable)componentInParent;
+                Pickable pickable = componentInParent as Pickable;
 
                 if (pickable)
                 {
