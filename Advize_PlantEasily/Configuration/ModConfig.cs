@@ -21,6 +21,7 @@ namespace Advize_PlantEasily.Configuration
         private readonly ConfigEntry<bool> randomizeRotation;
         //private readonly ConfigEntry<bool> useStamina; // not yet implemented
         private readonly ConfigEntry<bool> useDurability;
+        private readonly ConfigEntry<float> extraPlantSpacing;
 
         //Pickables
         private readonly ConfigEntry<float> pickableSnapRadius;
@@ -64,6 +65,7 @@ namespace Advize_PlantEasily.Configuration
             randomizeRotation = Config.Bind("General", "RandomizeRotation", true, "Randomizes rotation of pieces once placed.");
             //useStamina = Config.Bind("General", "UseStamina", true, "PLACEHOLDER");
             useDurability = Config.Bind("General", "UseDurability", true, "Decrease durability of cultivator for every piece placed.");
+            extraPlantSpacing = Config.Bind("General", "ExtraPlantSpacing", 0f, "Adds extra spacing between crops and saplings. Does not apply to berry bushes, flowers, or mushrooms.");
 
             //Pickables
             pickableSnapRadius = Config.Bind("Pickables", "PickableSnapRadius", 1.0f, "Determines default distance/spacing between pickable resources when planting.");
@@ -193,6 +195,10 @@ namespace Advize_PlantEasily.Configuration
         internal bool UseDurability
         {
             get { return useDurability.Value; }
+        }
+        internal float ExtraPlantSpacing
+        {
+            get { return extraPlantSpacing.Value; }
         }
         internal bool EnableBulkHarvest
         {
