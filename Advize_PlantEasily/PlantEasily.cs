@@ -108,7 +108,6 @@ namespace Advize_PlantEasily
                 {
                     for (int i = 0; i < colliderRoots.Count; i++)
                     {
-                        if (colliderRoots[i].GetComponent<TreeBase>()) isSapling = true;
                         foreach (CapsuleCollider collider in colliderRoots[i].GetComponentsInChildren<CapsuleCollider>())
                         {
                             colliderRadius = Mathf.Max(colliderRadius, collider.radius);
