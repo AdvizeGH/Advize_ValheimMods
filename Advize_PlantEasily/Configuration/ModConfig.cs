@@ -19,7 +19,7 @@ namespace Advize_PlantEasily.Configuration
         private readonly ConfigEntry<bool> preventPartialPlanting;
         private readonly ConfigEntry<bool> preventInvalidPlanting;
         private readonly ConfigEntry<bool> randomizeRotation;
-        //private readonly ConfigEntry<bool> useStamina; // not yet implemented
+        private readonly ConfigEntry<bool> useStamina;
         private readonly ConfigEntry<bool> useDurability;
         private readonly ConfigEntry<float> extraPlantSpacing;
 
@@ -66,7 +66,7 @@ namespace Advize_PlantEasily.Configuration
             preventPartialPlanting = Config.Bind("General", "PreventPartialPlanting", true, "Prevents placement of resources when any placement ghosts are invalid for any reason.");
             preventInvalidPlanting = Config.Bind("General", "PreventInvalidPlanting", true, "Prevents plants from being placed where they will be unable to grow.");
             randomizeRotation = Config.Bind("General", "RandomizeRotation", true, "Randomizes rotation of pieces once placed.");
-            //useStamina = Config.Bind("General", "UseStamina", true, "PLACEHOLDER");
+            useStamina = Config.Bind("General", "UseStamina", true, "Consume stamina for every piece placed.");
             useDurability = Config.Bind("General", "UseDurability", true, "Decrease durability of cultivator for every piece placed.");
             extraPlantSpacing = Config.Bind("General", "ExtraPlantSpacing", 0f, "Adds extra spacing between crops and saplings. Does not apply to berry bushes, flowers, or mushrooms.");
 
@@ -194,10 +194,10 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return randomizeRotation.Value; }
         }
-        //internal bool UseStamina
-        //{
-        //    get { return useStamina.Value; }
-        //}
+        internal bool UseStamina
+        {
+            get { return useStamina.Value; }
+        }
         internal bool UseDurability
         {
             get { return useDurability.Value; }

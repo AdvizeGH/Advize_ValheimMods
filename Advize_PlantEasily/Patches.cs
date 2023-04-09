@@ -324,11 +324,15 @@ namespace Advize_PlantEasily
                         ZLog.Log("Placed " + gameObject.name);
                         Gogan.LogEvent("Game", "PlacedPiece", gameObject.name, 0L);
                     }
+                    if (___m_noPlacementCost) count = 0;
                     for (int i = 0; i < count; i++)
                     {
                         __instance.ConsumeResources(piece.m_resources, 0);
                     }
-                    //__instance.UseStamina(rightItem.m_shared.m_attack.m_attackStamina);
+                    if (config.UseStamina)
+                    {
+                        __instance.UseStamina(rightItem.m_shared.m_attack.m_attackStamina * count);
+                    }
                     if (rightItem.m_shared.m_useDurability && config.UseDurability)
                     {
                         rightItem.m_durability -= rightItem.m_shared.m_useDurabilityDrain * count;
