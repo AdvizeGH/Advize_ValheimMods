@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Advize_PlantEasily
 {
@@ -209,8 +210,8 @@ namespace Advize_PlantEasily
                     columnDirection *= pieceSpacing;
                 }
                 
-                Piece.Requirement resource = ___m_placementGhost.GetComponent<Piece>().m_resources[0];
-                int cost = resource.m_amount;
+                Piece piece = ___m_placementGhost.GetComponent<Piece>();
+                int cost = piece.m_resources[0].m_amount;
                 int currentCost = 0;
                 
                 for (int row = 0; row < config.Rows; row++)
@@ -218,6 +219,7 @@ namespace Advize_PlantEasily
                     for (int column = 0; column < config.Columns; column++)
                     {
                         currentCost += cost;
+                        piece.m_resources[0].m_amount = currentCost;
                         bool isRoot = (column == 0 && row == 0);
                         int ghostIndex = row * config.Columns + column;
                         GameObject ghost = isRoot ? ___m_placementGhost : extraGhosts[ghostIndex - 1];
@@ -230,7 +232,7 @@ namespace Advize_PlantEasily
                         ghost.transform.position = ghostPosition;
                         ghost.transform.rotation = ___m_placementGhost.transform.rotation;
 
-                        if (!___m_noPlacementCost && __instance.GetInventory().CountItems(resource.m_resItem.m_itemData.m_shared.m_name) < currentCost)
+                        if (!___m_noPlacementCost && !__instance.HaveRequirements(piece, Player.RequirementMode.CanBuild))
                         {
                             SetPlacementGhostStatus(ghost, ghostIndex, Status.LackResources, ref ___m_placementStatus);
                         }
@@ -238,6 +240,7 @@ namespace Advize_PlantEasily
                         SetPlacementGhostStatus(ghost, ghostIndex, CheckPlacementStatus(ghost, ghostPlacementStatus[ghostIndex]), ref ___m_placementStatus);
                     }
                 }
+                ___m_placementGhost.GetComponent<Piece>().m_resources[0].m_amount = cost;
             }
         }
         
@@ -355,6 +358,18 @@ namespace Advize_PlantEasily
                     foreach (Pickable extraPickable in FindResourcesInRadius(pickable))
                         extraPickable.Interact(__instance, hold, alt);
                 }
+            }
+        }
+        
+        [HarmonyPatch(typeof(InventoryGui), "SetupRequirement")]
+        public class InventoryGuiSetupRequirement
+        {
+            [HarmonyPriority(Priority.Last)]
+            public static void Postfix(Transform elementRoot)
+            {
+                if (extraGhosts.Count < 1 || !config.ShowCost) return;
+                Text component3 = elementRoot.transform.Find("res_amount").GetComponent<Text>();
+                component3.text += $"x{extraGhosts.Count + 1}";
             }
         }
     }

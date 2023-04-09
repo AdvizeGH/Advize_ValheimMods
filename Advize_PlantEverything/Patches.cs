@@ -12,7 +12,7 @@ namespace Advize_PlantEverything
         [HarmonyPatch(typeof(ObjectDB), "Awake")]
         public static class ObjectDBAwake
         {
-            public static void Postfix(ObjectDB __instance)
+            public static void Postfix()
             {
                 Dbgl("ObjectDBAwake");
                 InitPrefabRefs();
