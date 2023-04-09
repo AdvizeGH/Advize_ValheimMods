@@ -50,6 +50,9 @@ namespace Advize_PlantEasily.Configuration
         private readonly ConfigEntry<KeyboardShortcut> gamepadModifierKey;
         private readonly ConfigEntry<KeyboardShortcut> keyboardHarvestModifierKey;
 
+        //UI
+        private readonly ConfigEntry<bool> showCost;
+
         internal ModConfig(ConfigFile configFile)
         {
             Config = configFile;
@@ -127,6 +130,9 @@ namespace Advize_PlantEasily.Configuration
                     "Modifier key to enable bulk harvest when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
                     new Attributes { Description = "Modifier key to enable bulk harvest when using keyboard controls." }));
+
+            //UI
+            showCost = Config.Bind("UI", "ShowCost", true, "Update resource cost in build UI.");
 
             rows.SettingChanged += PlantEasily.GridSizeChanged;
             columns.SettingChanged += PlantEasily.GridSizeChanged;
@@ -255,6 +261,10 @@ namespace Advize_PlantEasily.Configuration
         internal KeyCode KeyboardHarvestModifierKey
         {
             get { return keyboardHarvestModifierKey.Value.MainKey; }
+        }
+        internal bool ShowCost
+        {
+            get { return showCost.Value; }
         }
 
         internal class ConfigurationManagerAttributes
