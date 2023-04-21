@@ -19,20 +19,6 @@ namespace Advize_PlantEasily
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
 
-        private static readonly Dictionary<string, string> pickablesToPlants = new()
-        {
-            { "Pickable_SeedOnion", "sapling_seedonion" },
-            { "Pickable_Onion", "sapling_onion" },
-            { "Pickable_Turnip", "sapling_turnip" },
-            { "Pickable_Barley", "sapling_barley" },
-            { "Pickable_Mushroom_JotunPuffs", "sapling_jotunpuffs" },
-            { "Pickable_Carrot", "sapling_carrot" },
-            { "Pickable_SeedCarrot", "sapling_seedcarrot" },
-            { "Pickable_Flax", "sapling_flax" },
-            { "Pickable_Mushroom_Magecap", "sapling_magecap" },
-            { "Pickable_SeedTurnip", "sapling_seedturnip" }
-        };
-
         private static readonly Dictionary<string, GameObject> prefabRefs = new();
 
         private static ModConfig config;
@@ -49,7 +35,9 @@ namespace Advize_PlantEasily
             config = new ModConfig(Config);
             Harmony.PatchAll();
         }
-        
+
+        private static bool NotPlantOrPickable(GameObject go) => !go.GetComponent<Plant>() && !go.GetComponent<Pickable>();
+
         private static bool OverrideGamepadInput() => placementGhost && Input.GetKey(config.GamepadModifierKey);
         
         internal static void GridSizeChanged(object sender, EventArgs e) => DestroyGhosts();
@@ -263,21 +251,27 @@ namespace Advize_PlantEasily
             { 6, "$msg_invalidplacement" }
         };
 
+        private static readonly Dictionary<string, string> pickablesToPlants = new()
+        {
+            { "Pickable_SeedOnion", "sapling_seedonion" },
+            { "Pickable_Onion", "sapling_onion" },
+            { "Pickable_Turnip", "sapling_turnip" },
+            { "Pickable_Barley", "sapling_barley" },
+            { "Pickable_Mushroom_JotunPuffs", "sapling_jotunpuffs" },
+            { "Pickable_Carrot", "sapling_carrot" },
+            { "Pickable_SeedCarrot", "sapling_seedcarrot" },
+            { "Pickable_Flax", "sapling_flax" },
+            { "Pickable_Mushroom_Magecap", "sapling_magecap" },
+            { "Pickable_SeedTurnip", "sapling_seedturnip" }
+        };
+
         private static void InitPrefabRefs()
         {
             Dbgl("InitPrefabRefs");
             if (prefabRefs.Count > 0) return;
 
-            prefabRefs.Add("sapling_seedonion", null);
-            prefabRefs.Add("sapling_onion", null);
-            prefabRefs.Add("sapling_turnip", null);
-            prefabRefs.Add("sapling_barley", null);
-            prefabRefs.Add("sapling_jotunpuffs", null);
-            prefabRefs.Add("sapling_carrot", null);
-            prefabRefs.Add("sapling_seedcarrot", null);
-            prefabRefs.Add("sapling_flax", null);
-            prefabRefs.Add("sapling_magecap", null);
-            prefabRefs.Add("sapling_seedturnip", null);
+            foreach (string prefabName in pickablesToPlants.Values)
+                prefabRefs.Add(prefabName, null);
 
             UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
             for (int i = 0; i < array.Length; i++)

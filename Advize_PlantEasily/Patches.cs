@@ -75,13 +75,10 @@ namespace Advize_PlantEasily
                 //Dbgl("SetupPlacementGhost");
                 DestroyGhosts();
                 
-                if (!config.ModActive || !___m_placementGhost)
+                if (!config.ModActive || !___m_placementGhost || NotPlantOrPickable(___m_placementGhost))
                     return;
                 
                 if (___m_placementGhost.GetComponent<Piece>().m_repairPiece)
-                    return;
-                
-                if (!___m_placementGhost.GetComponent<Plant>() && !___m_placementGhost.GetComponent<Pickable>())
                     return;
                 
                 CreateGhosts(___m_placementGhost);
@@ -93,10 +90,8 @@ namespace Advize_PlantEasily
         {
             public static void Postfix(Player __instance, bool ___m_noPlacementCost, ref GameObject ___m_placementGhost, ref int ___m_placementStatus)
             {
-                if (!config.ModActive || !___m_placementGhost || (!___m_placementGhost.GetComponent<Plant>() && !___m_placementGhost.GetComponent<Pickable>()))
+                if (!config.ModActive || !___m_placementGhost || NotPlantOrPickable(___m_placementGhost) || __instance.GetRightItem()?.m_shared.m_name != "$item_cultivator")
                     return;
-
-                if (__instance.GetRightItem()?.m_shared.m_name != "$item_cultivator") return;
                 
                 if (ghostPlacementStatus.Count == 0 || (extraGhosts.Count == 0 && !(config.Rows == 1 && config.Columns == 1))) //If there are no extra ghosts but there is supposed to be
                     typeof(Player).GetMethod("SetupPlacementGhost", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(__instance, new object[0]);
@@ -252,7 +247,7 @@ namespace Advize_PlantEasily
             public static bool Prefix(Piece piece, bool ___m_noPlacementCost, GameObject ___m_placementGhost, ref int ___m_placementStatus, ref bool __result)
             {
                 //Dbgl("Player.PlacePiece Prefix");
-                if (!config.ModActive || !piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>()))
+                if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject))
                     return true;
 
                 if (config.PreventInvalidPlanting)
@@ -289,7 +284,7 @@ namespace Advize_PlantEasily
             public static void Postfix(Player __instance, Piece piece, bool ___m_noPlacementCost)
             {
                 //Dbgl("Player.PlacePiece Postfix");
-                if (!config.ModActive || !piece || (!piece.GetComponent<Plant>() && !piece.GetComponent<Pickable>()))
+                if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject))
                     return;
                 
                 //This doesn't apply to the root placement ghost.
