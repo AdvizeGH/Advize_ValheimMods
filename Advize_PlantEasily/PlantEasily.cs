@@ -14,7 +14,6 @@ namespace Advize_PlantEasily
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "1.1.2";
         public const string Version = "1.2.0";
         
         private readonly Harmony Harmony = new(PluginID);
@@ -131,10 +130,10 @@ namespace Advize_PlantEasily
                         }
                     }
                 }
-                colliderRadius += config.ExtraPlantSpacing;
+                colliderRadius += isSapling ? config.ExtraSaplingSpacing : config.ExtraCropSpacing;
             }
             
-            float growRadius = isSapling ? plant.m_growRadius * 2 : plant?.m_growRadius * 1.1f ?? PickableSnapRadius(go.name);
+            float growRadius = isSapling ? plant.m_growRadius * 2.2f : plant?.m_growRadius * 1.1f ?? PickableSnapRadius(go.name);
 
             return growRadius + colliderRadius;
         }
