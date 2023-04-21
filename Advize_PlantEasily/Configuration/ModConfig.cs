@@ -57,7 +57,7 @@ namespace Advize_PlantEasily.Configuration
         internal ModConfig(ConfigFile configFile)
         {
             Config = configFile;
-            //new ConfigDescription("Enables the [Crops] section of this config", null, new ConfigurationManagerAttributes { Order = 27 }));
+
             //General
             enableDebugMessages = Config.Bind("General", "EnableDebugMessages", false, "Enable mod debug messages in console.");
             rows = Config.Bind("General", "Rows", 2, new ConfigDescription("Number of rows for planting grid aka height.", null, new Attributes { Order = 8 }));

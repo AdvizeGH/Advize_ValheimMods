@@ -356,8 +356,10 @@ namespace Advize_PlantEasily
             public static void Postfix(Transform elementRoot)
             {
                 if (extraGhosts.Count < 1 || !config.ShowCost) return;
-                Text component3 = elementRoot.transform.Find("res_amount").GetComponent<Text>();
-                component3.text += $"x{extraGhosts.Count + 1}";
+                Text component = elementRoot.transform.Find("res_amount").GetComponent<Text>();
+                component.text += $"x{extraGhosts.Count + 1}";
+            }
+        }
 
         [HarmonyPatch(typeof(Pickable), "SetPicked")]
         public class PickableSetPicked

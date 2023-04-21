@@ -32,7 +32,8 @@ namespace Advize_PlantEverything
 
         private static ModConfig config;
 
-        private static readonly Dictionary<string, string> stringDictionary = new() {
+        private static readonly Dictionary<string, string> stringDictionary = new()
+        {
             { "AncientSapling", "Ancient Sapling" },
             { "YggaSapling", "Ygga Sapling" },
             { "RaspberryBushName", "Raspberry Bush" },
@@ -297,13 +298,7 @@ namespace Advize_PlantEverything
                 //Debug.Log($"{gameObject.name}");
                 prefabRefs[gameObject.name] = gameObject;
 
-                bool nullValue = false;
-                foreach (KeyValuePair<string, GameObject> kvp in prefabRefs)
-                {
-                    if (kvp.Value == null)
-                        nullValue = true;
-                }
-                if (!nullValue)
+                if (!prefabRefs.Any(key => key.Value == null))
                 {
                     Dbgl("Found all prefab references");
                     break;
