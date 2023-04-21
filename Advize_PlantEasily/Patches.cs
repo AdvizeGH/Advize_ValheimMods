@@ -306,23 +306,7 @@ namespace Advize_PlantEasily
                                 continue;
                         }
 
-                        Vector3 position = extraGhosts[i].transform.position;
-                        Quaternion rotation = config.RandomizeRotation ? Quaternion.Euler(0f, 22.5f * Random.Range(0, 16), 0f) : extraGhosts[i].transform.rotation;
-                        GameObject gameObject = piece.gameObject;
-
-                        TerrainModifier.SetTriggerOnPlaced(trigger: true);
-                        GameObject gameObject2 = Instantiate(gameObject, position, rotation);
-                        TerrainModifier.SetTriggerOnPlaced(trigger: false);
-
-                        gameObject2.GetComponent<Piece>()?.SetCreator(__instance.GetPlayerID());
-                        gameObject2.GetComponent<PrivateArea>()?.Setup(Game.instance.GetPlayerProfile().GetName());
-
-                        piece.m_placeEffect.Create(position, rotation, gameObject2.transform, 1f);
-                        __instance.AddNoise(50f);
-
-                        Game.instance.GetPlayerProfile().m_playerStats.m_builds++;
-                        ZLog.Log("Placed " + gameObject.name);
-                        Gogan.LogEvent("Game", "PlacedPiece", gameObject.name, 0L);
+                        PlacePiece(__instance, extraGhosts[i], piece);
                     }
                     if (___m_noPlacementCost) count = 0;
                     for (int i = 0; i < count; i++)
@@ -374,7 +358,35 @@ namespace Advize_PlantEasily
                 if (extraGhosts.Count < 1 || !config.ShowCost) return;
                 Text component3 = elementRoot.transform.Find("res_amount").GetComponent<Text>();
                 component3.text += $"x{extraGhosts.Count + 1}";
+
+        [HarmonyPatch(typeof(Pickable), "SetPicked")]
+        public class PickableSetPicked
+        {
+            public static void Prefix(Pickable __instance, ZNetView ___m_nview, bool picked)
+            {
+                if (!config.ReplantOnHarvest || !___m_nview.IsOwner() || !picked) return;
+
+                string name = __instance.name.Replace("(Clone)", "");
+
+                if (!pickablesToPlants.ContainsKey(name)) return;
+
+                Player player = Player.m_localPlayer;
+                GameObject plantObject = prefabRefs[pickablesToPlants[name]];
+                Piece piece = plantObject.GetComponent<Piece>();
+
+                if (!player.HaveRequirements(piece, Player.RequirementMode.CanBuild))
+                    return;
+
+                PlacePiece(player, __instance.gameObject, piece);
+                player.ConsumeResources(piece.m_resources, 0);
+                //Dbgl($"Replanted {pickablesToPlants[name]}");
             }
+        }
+
+        [HarmonyPatch(typeof(ObjectDB), "Awake")]
+        public static class ObjectDBAwake
+        {
+            public static void Postfix() => InitPrefabRefs();
         }
     }
 }

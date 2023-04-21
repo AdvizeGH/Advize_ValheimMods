@@ -36,6 +36,7 @@ namespace Advize_PlantEasily.Configuration
         //private readonly ConfigEntry<bool> harvestResourcesInRadius;
         //private readonly ConfigEntry<bool> harvestConnectedResources;
         private readonly ConfigEntry<float> harvestRadius;
+        private readonly ConfigEntry<bool> replantOnHarvest;
 
         //Controls
         private readonly ConfigEntry<KeyboardShortcut> enableModKey;
@@ -83,6 +84,7 @@ namespace Advize_PlantEasily.Configuration
             //harvestResourcesInRadius = Config.Bind("Harvesting", "HarvestResourcesInRadius", true, "Harvests resources within a defined radius.");
             //harvestConnectedResources = Config.Bind("Harvesting", "HarvestConnectedResources", false, "Harvests all applicable resources adjacent to the harvested resource.");
             harvestRadius = Config.Bind("Harvesting", "HarvestRadius", 3.0f, "Determines radius used to search for resources when bulk harvesting.");
+            replantOnHarvest = Config.Bind("Harvesting", "ReplantOnHarvest", false, new ConfigDescription("Enables automatic replanting of crops when harvested, provided you have the resources.", null, new Attributes { Order = 4 }));
 
             //Controls
             enableModKey = Config.Bind("Controls", "EnableModKey", new KeyboardShortcut(KeyCode.F8),
@@ -225,6 +227,10 @@ namespace Advize_PlantEasily.Configuration
         internal float HarvestRadius
         {
             get { return harvestRadius.Value; }
+        }
+        internal bool ReplantOnHarvest
+        {
+            get { return replantOnHarvest.Value; }
         }
         internal KeyCode EnableModKey
         {

@@ -18,7 +18,23 @@ namespace Advize_PlantEasily
         
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
-        
+
+        private static readonly Dictionary<string, string> pickablesToPlants = new()
+        {
+            { "Pickable_SeedOnion", "sapling_seedonion" },
+            { "Pickable_Onion", "sapling_onion" },
+            { "Pickable_Turnip", "sapling_turnip" },
+            { "Pickable_Barley", "sapling_barley" },
+            { "Pickable_Mushroom_JotunPuffs", "sapling_jotunpuffs" },
+            { "Pickable_Carrot", "sapling_carrot" },
+            { "Pickable_SeedCarrot", "sapling_seedcarrot" },
+            { "Pickable_Flax", "sapling_flax" },
+            { "Pickable_Mushroom_Magecap", "sapling_magecap" },
+            { "Pickable_SeedTurnip", "sapling_seedturnip" }
+        };
+
+        private static readonly Dictionary<string, GameObject> prefabRefs = new();
+
         private static ModConfig config;
 
         private static GameObject placementGhost;
@@ -205,6 +221,27 @@ namespace Advize_PlantEasily
         //    return extraPickables;
         //}
 
+        private static void PlacePiece(Player player, GameObject go, Piece piece)
+        {
+            Vector3 position = go.transform.position;
+            Quaternion rotation = config.RandomizeRotation ? Quaternion.Euler(0f, 22.5f * UnityEngine.Random.Range(0, 16), 0f) : go.transform.rotation;
+            GameObject gameObject = piece.gameObject;
+
+            TerrainModifier.SetTriggerOnPlaced(trigger: true);
+            GameObject gameObject2 = Instantiate(gameObject, position, rotation);
+            TerrainModifier.SetTriggerOnPlaced(trigger: false);
+
+            gameObject2.GetComponent<Piece>()?.SetCreator(player.GetPlayerID());
+            gameObject2.GetComponent<PrivateArea>()?.Setup(Game.instance.GetPlayerProfile().GetName());
+
+            gameObject.GetComponent<Piece>().m_placeEffect.Create(position, rotation, gameObject2.transform, 1f);
+            player.AddNoise(50f);
+
+            Game.instance.GetPlayerProfile().m_playerStats.m_builds++;
+            //ZLog.Log("Placed " + gameObject.name);
+            Gogan.LogEvent("Game", "PlacedPiece", gameObject.name, 0L);
+        }
+
         private enum Status
         {
             Healthy,        // 0
@@ -225,6 +262,39 @@ namespace Advize_PlantEasily
             { 5, "$piece_plant_nosun" },
             { 6, "$msg_invalidplacement" }
         };
+
+        private static void InitPrefabRefs()
+        {
+            Dbgl("InitPrefabRefs");
+            if (prefabRefs.Count > 0) return;
+
+            prefabRefs.Add("sapling_seedonion", null);
+            prefabRefs.Add("sapling_onion", null);
+            prefabRefs.Add("sapling_turnip", null);
+            prefabRefs.Add("sapling_barley", null);
+            prefabRefs.Add("sapling_jotunpuffs", null);
+            prefabRefs.Add("sapling_carrot", null);
+            prefabRefs.Add("sapling_seedcarrot", null);
+            prefabRefs.Add("sapling_flax", null);
+            prefabRefs.Add("sapling_magecap", null);
+            prefabRefs.Add("sapling_seedturnip", null);
+
+            UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
+            for (int i = 0; i < array.Length; i++)
+            {
+                GameObject gameObject = (GameObject)array[i];
+
+                if (!prefabRefs.ContainsKey(gameObject.name)) continue;
+
+                prefabRefs[gameObject.name] = gameObject;
+
+                if (!prefabRefs.Any(key => key.Value == null))
+                {
+                    Dbgl("Found all prefab references");
+                    break;
+                }
+            }
+        }
 
         internal static void Dbgl(string message, bool forceLog = false, bool logError = false)
         {
