@@ -95,6 +95,8 @@ namespace Advize_PlantEasily
             {
                 if (!config.ModActive || !___m_placementGhost || (!___m_placementGhost.GetComponent<Plant>() && !___m_placementGhost.GetComponent<Pickable>()))
                     return;
+
+                if (__instance.GetRightItem()?.m_shared.m_name != "$item_cultivator") return;
                 
                 if (ghostPlacementStatus.Count == 0 || (extraGhosts.Count == 0 && !(config.Rows == 1 && config.Columns == 1))) //If there are no extra ghosts but there is supposed to be
                     typeof(Player).GetMethod("SetupPlacementGhost", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(__instance, new object[0]);
