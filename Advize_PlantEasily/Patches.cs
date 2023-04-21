@@ -363,7 +363,7 @@ namespace Advize_PlantEasily
         {
             public static void Prefix(Pickable __instance, ZNetView ___m_nview, bool picked)
             {
-                if (!config.ReplantOnHarvest || !___m_nview.IsOwner() || !picked) return;
+                if (!config.ModActive || !config.ReplantOnHarvest || !___m_nview.IsOwner() || !picked) return;
 
                 string name = __instance.name.Replace("(Clone)", "");
 
