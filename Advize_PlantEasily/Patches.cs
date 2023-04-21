@@ -125,7 +125,7 @@ namespace Advize_PlantEasily
                     
                     foreach (Collider collider in obstructions)
                     {
-                        if (!collider.GetComponent<Plant>() && !collider.GetComponentInParent<Pickable>()) continue;
+                        if (NotPlantOrPickable(collider.transform.root.gameObject)) continue;
                         validFirstOrderCollisions++;
                         if (validFirstOrderCollisions > 8) break;
                         
@@ -134,7 +134,7 @@ namespace Advize_PlantEasily
                         
                         foreach (Collider secondaryCollider in secondaryObstructions)
                         {
-                            if (!secondaryCollider.GetComponent<Plant>() && !secondaryCollider.GetComponentInParent<Pickable>()) continue;
+                            if (NotPlantOrPickable(secondaryCollider.transform.root.gameObject)) continue;
                             if (secondaryCollider.transform.root == collider.transform.root) continue;
                             validSecondOrderCollisions++;
                             if (validSecondOrderCollisions > 8) break;
@@ -155,7 +155,7 @@ namespace Advize_PlantEasily
 
                             foreach (Vector3 pos in positions)
                             {
-                                if (!Physics.CheckSphere(pos, 0f, snapCollisionMask))
+                                if (!PositionHasCollisions(pos))
                                 {
                                     if (plant && !HasGrowSpace(plant, pos)) continue;
 
@@ -180,7 +180,7 @@ namespace Advize_PlantEasily
 
                             foreach (Vector3 pos in positions)
                             {
-                                if (!Physics.CheckSphere(pos, 0f, snapCollisionMask))
+                                if (!PositionHasCollisions(pos))
                                 {
                                     if (plant && !HasGrowSpace(plant, pos)) continue;
 

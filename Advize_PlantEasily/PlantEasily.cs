@@ -28,7 +28,8 @@ namespace Advize_PlantEasily
         private static List<Status> ghostPlacementStatus = new();
         
         private static int snapCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid", "item");
-        
+        private static int plantCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid");
+
         public void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
@@ -89,11 +90,9 @@ namespace Advize_PlantEasily
             }
         }
 
-        private static bool HasGrowSpace(Plant plant, Vector3 position)
-        {
-            int plantCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid");
-            return Physics.OverlapSphere(position, plant.m_growRadius, plantCollisionMask).Length == 0;
-        }
+        private static bool HasGrowSpace(Plant plant, Vector3 position) => Physics.OverlapSphere(position, plant.m_growRadius, plantCollisionMask).Length == 0;
+
+        private static bool PositionHasCollisions(Vector3 position) => Physics.CheckSphere(position, 0.025f, snapCollisionMask);
 
         private static float GetPieceSpacing(GameObject go)
         {
@@ -174,7 +173,7 @@ namespace Advize_PlantEasily
             if (plant && (bool)Traverse.Create(plant).Method("HaveRoof").GetValue())
                 placementStatus = Status.NoSun;
 
-            if (!plant && config.PreventOverlappingPlacements && Physics.CheckSphere(position, 0.025f, snapCollisionMask))
+            if (!plant && config.PreventOverlappingPlacements && PositionHasCollisions(position))
                 placementStatus = Status.NoSpace;
             
             return placementStatus;
