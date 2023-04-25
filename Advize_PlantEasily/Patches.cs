@@ -335,13 +335,12 @@ namespace Advize_PlantEasily
                 
                 Interactable componentInParent = go.GetComponentInParent<Interactable>();
                 Pickable pickable = componentInParent as Pickable;
+                Beehive beehive = componentInParent as Beehive;
 
-                if (pickable)
+                if (pickable || beehive)
                 {
-                    //List<Pickable> extraPickables = config.HarvestResourcesInRadius ? FindResourcesInRadius(pickable) : FindConnectedResources(pickable);
-                    
-                    foreach (Pickable extraPickable in FindResourcesInRadius(pickable))
-                        extraPickable.Interact(__instance, hold, alt);
+                    foreach (Interactable extraInteractable in FindResourcesInRadius(go))
+                        extraInteractable.Interact(__instance, hold, alt);
                 }
             }
         }

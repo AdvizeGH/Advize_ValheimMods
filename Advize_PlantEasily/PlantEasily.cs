@@ -6,6 +6,7 @@ using UnityEngine;
 using Advize_PlantEasily.Configuration;
 using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Advize_PlantEasily
 {
@@ -179,26 +180,35 @@ namespace Advize_PlantEasily
             return placementStatus;
         }
 
-        private static List<Pickable> FindResourcesInRadius(Pickable rootPickable)
+        private static List<Interactable> FindResourcesInRadius(GameObject rootInteractable)
         {
-            List<Pickable> extraPickables = new();
-            Collider[] obstructions = Physics.OverlapSphere(rootPickable.transform.root.position, config.HarvestRadius, snapCollisionMask);
-            
+            List<Interactable> extraInteractables = new();
+            Collider[] obstructions = Physics.OverlapSphere(rootInteractable.transform.root.position, config.HarvestRadius, snapCollisionMask);
+
             foreach (Collider obstruction in obstructions)
             {
                 Pickable collidingPickable = obstruction.GetComponentInParent<Pickable>();
+                Beehive collidingBeehive = obstruction.GetComponentInParent<Beehive>();
 
-                if (collidingPickable && collidingPickable != rootPickable)
+                if (!collidingPickable && !collidingBeehive)
+                    continue;
+                
+                GameObject collidingInteractable = collidingPickable?.gameObject ?? collidingBeehive.gameObject;
+
+                if (collidingInteractable != rootInteractable)
                 {
-                    if (config.HarvestStyle == HarvestStyle.LikeResources  && collidingPickable.name != rootPickable.name)
+                    if (config.HarvestStyle == HarvestStyle.LikeResources && collidingInteractable.name != rootInteractable.name)
+                        continue;
+                    if (collidingBeehive && (int)typeof(Beehive).GetMethod("GetHoneyLevel", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(collidingBeehive, null) < 1)
                         continue;
 
-                    if (!extraPickables.Contains(collidingPickable))
-                        extraPickables.Add(collidingPickable);
+                    Interactable resource = (Interactable) collidingPickable ?? collidingBeehive;
+                    if (!extraInteractables.Contains(resource))
+                        extraInteractables.Add(resource);
                 }
             }
 
-            return extraPickables;
+            return extraInteractables;
         }
 
         //private static List<Pickable> FindConnectedResources(Pickable rootPickable)
