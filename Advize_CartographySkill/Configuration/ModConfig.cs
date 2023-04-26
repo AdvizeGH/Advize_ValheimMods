@@ -182,5 +182,12 @@ namespace Advize_CartographySkill.Configuration
         {
             get { return removeZoomKey.Value.MainKey; }
         }
+
+        internal class ConfigurationManagerAttributes
+        {
+            public string? Category;
+            public string? Description;
+            public bool? ReadOnly;
+        }
     }
 }

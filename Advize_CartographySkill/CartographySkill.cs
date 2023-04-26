@@ -32,7 +32,7 @@ namespace Advize_CartographySkill
         private static int tileCount = 0;
 
         private static readonly string modDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        private static readonly AssetBundle assetBundle = LoadAssetBundle("spyglass");
+        private static AssetBundle assetBundle;
         private static readonly Dictionary<string, Texture2D> cachedTextures = new();
 
         private static ModConfig config;
@@ -48,6 +48,7 @@ namespace Advize_CartographySkill
         private void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(CSLogger);
+            assetBundle = LoadAssetBundle("spyglass");
             config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "2.1.2" });
             LoadLocalizedStrings();
             customSkill = new CustomSkill();
@@ -279,23 +280,16 @@ namespace Advize_CartographySkill
             Dbgl($"StopZoom() fov is now {GameCamera.instance.m_fov}");
         }
 
-        private static bool IsSpyglassEquipped()
-        {
-            return Player.m_localPlayer.GetRightItem() != null && Player.m_localPlayer.GetRightItem().m_shared.m_name == "$csSpyglassName";
-        }
+        private static bool IsSpyglassEquipped() => Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$csSpyglassName";
 
         internal static void Dbgl(string message, bool forceLog = false, bool logError = false)
         {
             if (forceLog || config.EnableDebugMessages)
             {                
-                if (logError)
-                {
-                    CSLogger.LogError(message);
-                }
-                else
-                {
+                if (!logError)
                     CSLogger.LogInfo(message);
-                }
+                else
+                    CSLogger.LogError(message);
             }
         }
 

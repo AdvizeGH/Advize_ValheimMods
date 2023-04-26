@@ -138,14 +138,10 @@ namespace Advize_PlantEverything
         {
             if (forceLog || config.EnableDebugMessages)
             {
-                if (logError)
-                {
-                    PELogger.LogError(message);
-                }
-                else
-                {
+                if (!logError)
                     PELogger.LogInfo(message);
-                }
+                else
+                    PELogger.LogError(message);
             }
         }
 
@@ -213,10 +209,8 @@ namespace Advize_PlantEverything
         private static void InitPrefabRefs()
         {
             Dbgl("InitPrefabRefs");
-            if (prefabRefs.Count > 0)
-            {
-                return;
-            }
+            if (prefabRefs.Count > 0) return;
+
             prefabRefs.Add("Bush02_en", null);
             prefabRefs.Add("Bush01_heath", null);
             prefabRefs.Add("Bush01", null);
@@ -282,23 +276,17 @@ namespace Advize_PlantEverything
             {
                 GameObject gameObject = (GameObject)array[i];
 
-                if (!prefabRefs.ContainsKey(gameObject.name))
-                {
-                    continue;
-                }
+                if (!prefabRefs.ContainsKey(gameObject.name)) continue;
 
                 if (gameObject.name.Equals("FirTree_small"))
                 {
                     Component[] components = gameObject.GetComponents(typeof(Component));
-                    if (components.Length < 2)
-                    {
-                        continue;
-                    }
+                    if (components.Length < 2) continue;
                 }
                 //Debug.Log($"{gameObject.name}");
                 prefabRefs[gameObject.name] = gameObject;
 
-                if (!prefabRefs.Any(key => key.Value == null))
+                if (!prefabRefs.Any(key => !key.Value))
                 {
                     Dbgl("Found all prefab references");
                     break;
@@ -323,11 +311,9 @@ namespace Advize_PlantEverything
                 foreach (PieceDB pdb in pieceRefs)
                 {
                     if (prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pdb.Prefab))
-                    {
                         prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Remove(pdb.Prefab);
-                    }
-                    //Used to prevent null ref if someone is using cultivator
-                    if (Player.m_localPlayer != null && Player.m_localPlayer.GetRightItem() != null && Player.m_localPlayer.GetRightItem().m_shared.m_name == "$item_cultivator")
+
+                    if (Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator")
                     {
                         PELogger.LogWarning("Cultivator updated through config change, unequipping cultivator");
                         Player.m_localPlayer.HideHandItems();
@@ -600,13 +586,13 @@ namespace Advize_PlantEverything
                 };
 
                 Pickable pickable = pdb.Prefab.GetComponent<Pickable>();
-                if (pickable != null)
+                if (pickable)
                 {
                     pickable.m_respawnTimeMinutes = pdb.respawnTime;
                     pickable.m_amount = pdb.resourceReturn;
                     pdb.piece.m_onlyInBiome = (Heightmap.Biome)pdb.biome;
 
-                    if (pdb.Prefab.transform.Find("visual") != null)
+                    if (pdb.Prefab.transform.Find("visual"))
                     {
                         if (config.ShowPickableSpawners)
                         {

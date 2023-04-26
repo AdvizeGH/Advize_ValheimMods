@@ -79,7 +79,7 @@ namespace Advize_PlantEverything
                     instance.Message(MessageHud.MessageType.Center, "$msg_privatezone");
                     canRemove = false;
                 }
-                if (component.GetComponent<ZNetView>() == null) canRemove = false;
+                if (!component.GetComponent<ZNetView>()) canRemove = false;
                 return canRemove;
             }
 

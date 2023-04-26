@@ -24,7 +24,7 @@ namespace Advize_CartographySkill
         {
             public static void Prefix(Minimap __instance)
             {
-                if (Player.m_localPlayer == null || !config.EnableSkill) return;
+                if (!Player.m_localPlayer || !config.EnableSkill) return;
 
                 float skillLevel = Player.m_localPlayer.GetSkillFactor((Skills.SkillType)SKILL_TYPE) * 100;
                 float newExploreRadius = config.BaseExploreRadius + (config.ExploreRadiusIncrease * skillLevel);
@@ -36,9 +36,9 @@ namespace Advize_CartographySkill
                 }
             }
 
-            public static void Postfix(int x, int y, ref bool __result, Minimap __instance)
+            public static void Postfix(ref bool __result)
             {
-                if (Player.m_localPlayer == null || !config.EnableSkill) return;
+                if (!Player.m_localPlayer || !config.EnableSkill) return;
 
                 //if Explore(int,int) returns true, it means we have discovered more of the world map
                 if (__result)
@@ -67,7 +67,7 @@ namespace Advize_CartographySkill
             public static void Postfix(ObjectDB __instance)
             {
                 PrefabInit();
-                if (!config.EnableSpyglass || ZNetScene.instance == null) return;
+                if (!config.EnableSpyglass || !ZNetScene.instance) return;
                 ItemRecipeInit(__instance);
             }
         }
@@ -92,13 +92,10 @@ namespace Advize_CartographySkill
                 PrefabInit();
                 if (!config.EnableSpyglass) return;
                 if (stringDictionary.Count > 0)
-                {
                     InitLocalization();
-                }
 
-                if (__instance.m_prefabs.Contains(prefab)) return;
-
-                __instance.m_prefabs.Add(prefab);
+                if (!__instance.m_prefabs.Contains(prefab))
+                    __instance.m_prefabs.Add(prefab);
             }
         }
 

@@ -102,7 +102,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CartographySkill.cs" />
-    <Compile Include="Configuration\ConfigurationManagerAttributes.cs" />
     <Compile Include="Configuration\ModConfig.cs" />
     <Compile Include="Patches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

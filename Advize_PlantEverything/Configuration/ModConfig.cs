@@ -1297,5 +1297,13 @@ namespace Advize_PlantEverything.Configuration
         {
             get { return growthAsPercentage.Value; }
         }
+
+        internal class ConfigurationManagerAttributes
+        {
+            public string? Category;
+            public string? Description;
+            public int? Order;
+            public bool? ReadOnly;
+        }
     }
 }

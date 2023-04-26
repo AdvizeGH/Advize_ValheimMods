@@ -283,7 +283,7 @@ namespace Advize_PlantEasily
 
                 prefabRefs[gameObject.name] = gameObject;
 
-                if (!prefabRefs.Any(key => key.Value == null))
+                if (!prefabRefs.Any(key => !key.Value))
                 {
                     Dbgl("Found all prefab references");
                     break;
@@ -295,14 +295,10 @@ namespace Advize_PlantEasily
         {
             if (forceLog || config.EnableDebugMessages)
             {
-                if (logError)
-                {
-                    PELogger.LogError(message);
-                }
-                else
-                {
+                if (!logError)
                     PELogger.LogInfo(message);
-                }
+                else
+                    PELogger.LogError(message);
             }
         }
     }
