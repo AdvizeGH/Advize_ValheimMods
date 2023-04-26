@@ -34,8 +34,6 @@ namespace Advize_PlantEasily.Configuration
         //Harvesting
         private readonly ConfigEntry<bool> enableBulkHarvest;
         private readonly ConfigEntry<HarvestStyle> harvestStyle;
-        //private readonly ConfigEntry<bool> harvestResourcesInRadius;
-        //private readonly ConfigEntry<bool> harvestConnectedResources;
         private readonly ConfigEntry<float> harvestRadius;
         private readonly ConfigEntry<bool> replantOnHarvest;
 
@@ -83,8 +81,6 @@ namespace Advize_PlantEasily.Configuration
             //Harvesting
             enableBulkHarvest = Config.Bind("Harvesting", "EnableBulkHarvest", true, "Enables the ability to harvest multiple resources at once.");
             harvestStyle = Config.Bind("Harvesting", "HarvestStyle", HarvestStyle.AllResources, "Determines bulk harvest style. LikeResources only harvests resources of the type you've interacted with. AllResources harvests all eligible resources.");
-            //harvestResourcesInRadius = Config.Bind("Harvesting", "HarvestResourcesInRadius", true, "Harvests resources within a defined radius.");
-            //harvestConnectedResources = Config.Bind("Harvesting", "HarvestConnectedResources", false, "Harvests all applicable resources adjacent to the harvested resource.");
             harvestRadius = Config.Bind("Harvesting", "HarvestRadius", 3.0f, "Determines radius used to search for resources when bulk harvesting.");
             replantOnHarvest = Config.Bind("Harvesting", "ReplantOnHarvest", false, new ConfigDescription("Enables automatic replanting of crops when harvested, provided you have the resources.", null, new Attributes { Order = 4 }));
 
@@ -222,14 +218,6 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return harvestStyle.Value; }
         }
-        //internal bool HarvestResourcesInRadius
-        //{
-        //    get { return harvestResourcesInRadius.Value; }
-        //}
-        //internal bool HarvestConnectedResources
-        //{
-        //    get { return harvestConnectedResources.Value; }
-        //}
         internal float HarvestRadius
         {
             get { return harvestRadius.Value; }

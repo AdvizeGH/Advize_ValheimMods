@@ -211,13 +211,6 @@ namespace Advize_PlantEasily
             return extraInteractables;
         }
 
-        //private static List<Pickable> FindConnectedResources(Pickable rootPickable)
-        //{
-        //    List<Pickable> extraPickables = new();
-        //    // Do recursive collision check here within a radius, also check config.HarvestStyle in this method
-        //    return extraPickables;
-        //}
-
         private static void PlacePiece(Player player, GameObject go, Piece piece)
         {
             Vector3 position = go.transform.position;
@@ -235,7 +228,6 @@ namespace Advize_PlantEasily
             player.AddNoise(50f);
 
             Game.instance.GetPlayerProfile().m_playerStats.m_builds++;
-            //ZLog.Log("Placed " + gameObject.name);
             Gogan.LogEvent("Game", "PlacedPiece", gameObject.name, 0L);
         }
 

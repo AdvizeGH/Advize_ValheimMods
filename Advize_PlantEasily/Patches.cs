@@ -202,7 +202,7 @@ namespace Advize_PlantEasily
                 {
                     rowDirection = Utils.DirectionXZ(basePosition - __instance.transform.position);
                     columnDirection = Vector3.Cross(Vector3.up, rowDirection);
-                    // Can't do this all on one line it bugs and I can't understand why
+                    
                     rowDirection *= pieceSpacing;
                     columnDirection *= pieceSpacing;
                 }
