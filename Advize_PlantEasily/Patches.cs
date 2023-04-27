@@ -78,9 +78,6 @@ namespace Advize_PlantEasily
                 if (!config.ModActive || !___m_placementGhost || NotPlantOrPickable(___m_placementGhost))
                     return;
                 
-                if (___m_placementGhost.GetComponent<Piece>().m_repairPiece)
-                    return;
-                
                 CreateGhosts(___m_placementGhost);
             }
         }
@@ -230,9 +227,7 @@ namespace Advize_PlantEasily
                         ghost.transform.rotation = ___m_placementGhost.transform.rotation;
 
                         if (!___m_noPlacementCost && !__instance.HaveRequirements(piece, Player.RequirementMode.CanBuild))
-                        {
                             SetPlacementGhostStatus(ghost, ghostIndex, Status.LackResources, ref ___m_placementStatus);
-                        }
 
                         SetPlacementGhostStatus(ghost, ghostIndex, CheckPlacementStatus(ghost, ghostPlacementStatus[ghostIndex]), ref ___m_placementStatus);
                     }
@@ -268,13 +263,13 @@ namespace Advize_PlantEasily
                     {
                         if (i != 0)
                         {
-                            if (i == 1 && ___m_noPlacementCost)
-                                continue;
-
-                            Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[i]);
-                            SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
-                            __result = false;
-                            return false;
+                            if (!(i == 1 && ___m_noPlacementCost))
+                            {
+                                Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[i]);
+                                SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
+                                __result = false;
+                                return false;
+                            }
                         }
                     }
                 }
@@ -291,33 +286,25 @@ namespace Advize_PlantEasily
                 if (ghostPlacementStatus[0] == Status.Healthy) // With this, root Ghost must be valid (can be fixed)
                 {
                     ItemDrop.ItemData rightItem = __instance.GetRightItem();
-                    int count = extraGhosts.Count;
+                    int count = ___m_noPlacementCost ? 0 : extraGhosts.Count;
 
                     for (int i = 0; i < extraGhosts.Count; i++)
                     {
                         if (ghostPlacementStatus[i + 1] != Status.Healthy)
-                        {
-                            if (ghostPlacementStatus[i + 1] == Status.LackResources && ___m_noPlacementCost)
-                                count--;
-                            else
+                            if (!(___m_noPlacementCost && ghostPlacementStatus[i + 1] == Status.LackResources))
                                 continue;
-                        }
 
                         PlacePiece(__instance, extraGhosts[i], piece);
                     }
-                    if (___m_noPlacementCost) count = 0;
+
                     for (int i = 0; i < count; i++)
-                    {
                         __instance.ConsumeResources(piece.m_resources, 0);
-                    }
+
                     if (config.UseStamina)
-                    {
                         __instance.UseStamina(rightItem.m_shared.m_attack.m_attackStamina * count);
-                    }
+
                     if (rightItem.m_shared.m_useDurability && config.UseDurability)
-                    {
                         rightItem.m_durability -= rightItem.m_shared.m_useDurabilityDrain * count;
-                    }
                 }
             }
         }
@@ -352,8 +339,8 @@ namespace Advize_PlantEasily
             public static void Postfix(Transform elementRoot)
             {
                 if (extraGhosts.Count < 1 || !config.ShowCost) return;
-                Text component = elementRoot.transform.Find("res_amount").GetComponent<Text>();
-                component.text += $"x{extraGhosts.Count + 1}";
+
+                elementRoot.transform.Find("res_amount").GetComponent<Text>().text += $"x{extraGhosts.Count + 1}";
             }
         }
 
@@ -372,12 +359,10 @@ namespace Advize_PlantEasily
                 GameObject plantObject = prefabRefs[pickablesToPlants[name]];
                 Piece piece = plantObject.GetComponent<Piece>();
 
-                if (!player.HaveRequirements(piece, Player.RequirementMode.CanBuild))
-                    return;
+                if (!player.HaveRequirements(piece, Player.RequirementMode.CanBuild)) return;
 
                 PlacePiece(player, __instance.gameObject, piece);
                 player.ConsumeResources(piece.m_resources, 0);
-                //Dbgl($"Replanted {pickablesToPlants[name]}");
             }
         }
 
