@@ -4,6 +4,7 @@ using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
+using Advize_PlantEasily.Configuration;
 
 namespace Advize_PlantEasily
 {
@@ -341,11 +342,17 @@ namespace Advize_PlantEasily
         public class InventoryGuiSetupRequirement
         {
             [HarmonyPriority(Priority.Last)]
-            public static void Postfix(Transform elementRoot)
+            public static void Postfix(Transform elementRoot, Piece.Requirement req)
             {
                 if (extraGhosts.Count < 1 || !config.ShowCost) return;
 
-                elementRoot.transform.Find("res_amount").GetComponent<Text>().text += $"x{extraGhosts.Count + 1}";
+                Text component = elementRoot.transform.Find("res_amount").GetComponent<Text>();
+                int totalGhosts = ghostPlacementStatus.Count;
+
+                string formattedCost = config.CostDisplayStyle == 0 ? config.CostDisplayLocation == 0 ? 
+                    $"{totalGhosts}x" : $"x{totalGhosts}" : $"({req.m_amount * totalGhosts})";
+
+                component.text = config.CostDisplayLocation == 0 ? formattedCost + component.text : component.text + formattedCost;
             }
         }
 

@@ -52,6 +52,8 @@ namespace Advize_PlantEasily.Configuration
 
         //UI
         private readonly ConfigEntry<bool> showCost;
+        private readonly ConfigEntry<CostDisplayStyle> costDisplayStyle;
+        private readonly ConfigEntry<CostDisplayLocation> costDisplayLocation;
 
         internal ModConfig(ConfigFile configFile)
         {
@@ -132,7 +134,9 @@ namespace Advize_PlantEasily.Configuration
                     new Attributes { Description = "Modifier key to enable bulk harvest when using keyboard controls." }));
 
             //UI
-            showCost = Config.Bind("UI", "ShowCost", true, "Update resource cost in build UI.");
+            showCost = Config.Bind("UI", "ShowCost", true, new ConfigDescription("Update resource cost in build UI.", null, new Attributes { Order = 3 }));
+            costDisplayStyle = Config.Bind("UI", "CostDisplayStyle", CostDisplayStyle.TotalCount, "Determines display style of the ShowCost setting. TotalCount shows total number of pieces to be placed. FullCost shows combined resoure cost of all pieces.");
+            costDisplayLocation = Config.Bind("UI", "CostDisplayLocation", CostDisplayLocation.RightSide, "Determines whether to prepend or append text to the resource cost in build UI. LeftSide or RightSide will prepend or append respectively.");
 
             rows.SettingChanged += PlantEasily.GridSizeChanged;
             columns.SettingChanged += PlantEasily.GridSizeChanged;
@@ -266,6 +270,14 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return showCost.Value; }
         }
+        internal CostDisplayStyle CostDisplayStyle
+        {
+            get { return costDisplayStyle.Value; }
+        }
+        internal CostDisplayLocation CostDisplayLocation
+        {
+            get { return costDisplayLocation.Value; }
+        }
 
         internal class ConfigurationManagerAttributes
         {
@@ -278,5 +290,15 @@ namespace Advize_PlantEasily.Configuration
     {
         LikeResources,
         AllResources
+    }
+    internal enum CostDisplayStyle
+    {
+        TotalCount,
+        FullCost
+    }
+    internal enum CostDisplayLocation
+    {
+        LeftSide,
+        RightSide
     }
 }
