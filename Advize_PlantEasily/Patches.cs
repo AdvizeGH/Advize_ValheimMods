@@ -286,16 +286,21 @@ namespace Advize_PlantEasily
                 if (ghostPlacementStatus[0] == Status.Healthy) // With this, root Ghost must be valid (can be fixed)
                 {
                     ItemDrop.ItemData rightItem = __instance.GetRightItem();
-                    int count = ___m_noPlacementCost ? 0 : extraGhosts.Count;
+                    int count = extraGhosts.Count;
 
                     for (int i = 0; i < extraGhosts.Count; i++)
                     {
                         if (ghostPlacementStatus[i + 1] != Status.Healthy)
+                        {
+                            count--;
                             if (!(___m_noPlacementCost && ghostPlacementStatus[i + 1] == Status.LackResources))
                                 continue;
+                        }
 
                         PlacePiece(__instance, extraGhosts[i], piece);
                     }
+
+                    count = ___m_noPlacementCost ? 0 : count;
 
                     for (int i = 0; i < count; i++)
                         __instance.ConsumeResources(piece.m_resources, 0);
