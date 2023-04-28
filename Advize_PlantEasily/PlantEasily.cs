@@ -195,7 +195,7 @@ namespace Advize_PlantEasily
                 
                 GameObject collidingInteractable = collidingPickable?.gameObject ?? collidingBeehive.gameObject;
 
-                if (collidingInteractable != rootInteractable)
+                if (collidingInteractable.transform.root != rootInteractable.transform.root)
                 {
                     if (config.HarvestStyle == HarvestStyle.LikeResources && collidingInteractable.name != rootInteractable.name)
                         continue;
