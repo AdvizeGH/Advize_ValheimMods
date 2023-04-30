@@ -4,7 +4,6 @@ using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
-using Advize_PlantEasily.Configuration;
 
 namespace Advize_PlantEasily
 {
@@ -141,7 +140,7 @@ namespace Advize_PlantEasily
                             rowDirection = baseRotation * rowDirection * pieceSpacing;
                             columnDirection = baseRotation * columnDirection * pieceSpacing;
 
-                            List<Vector3> positions = new()
+                            Vector3[] positions = new Vector3[]
                             {
                                 collider.transform.position + rowDirection,
                                 collider.transform.position + columnDirection,
@@ -166,7 +165,7 @@ namespace Advize_PlantEasily
                             rowDirection = baseRotation * rowDirection * pieceSpacing;
                             columnDirection = baseRotation * columnDirection * pieceSpacing;
 
-                            List<Vector3> positions = new()
+                            Vector3[] positions = new Vector3[]
                             {
                                 collider.transform.position + rowDirection,
                                 collider.transform.position + columnDirection,
@@ -186,7 +185,7 @@ namespace Advize_PlantEasily
                             }
                         }
                     }
-                        
+                    
                     if (foundSnaps)
                     {
                         Vector3 firstSnapPos = snapPoints.OrderBy(o => snapPoints.Min(m => Utils.DistanceXZ(m, o)) + (o - basePosition).magnitude).First();
@@ -196,8 +195,11 @@ namespace Advize_PlantEasily
                 
                 if (!foundSnaps)
                 {
-                    rowDirection = Utils.DirectionXZ(basePosition - __instance.transform.position);
-                    columnDirection = Vector3.Cross(Vector3.up, rowDirection);
+                    if (config.SnapActive)
+                    {
+                        rowDirection = Utils.DirectionXZ(basePosition - __instance.transform.position);
+                        columnDirection = Vector3.Cross(Vector3.up, rowDirection);
+                    }
                     
                     rowDirection *= pieceSpacing;
                     columnDirection *= pieceSpacing;

@@ -15,7 +15,7 @@ namespace Advize_PlantEasily
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "1.3.0";
+        public const string Version = "1.3.1";
         
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -50,10 +50,7 @@ namespace Advize_PlantEasily
             {
                 foreach (GameObject placementGhost in extraGhosts)
                 {
-                    if (placementGhost)
-                    {
-                        DestroyImmediate(placementGhost);
-                    }
+                    Destroy(placementGhost);
                 }
                 extraGhosts.Clear();
             }
@@ -242,7 +239,7 @@ namespace Advize_PlantEasily
             Invalid         // 6
         }
 
-        private static Dictionary<int, string> statusMessage = new()
+        private static readonly Dictionary<int, string> statusMessage = new()
         {
             { 1, "$msg_missingrequirement" },
             { 2, "$piece_plant_notcultivated" },
