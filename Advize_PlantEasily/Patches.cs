@@ -98,9 +98,7 @@ namespace Advize_PlantEasily
                 {
                     GameObject extraGhost = extraGhosts[i];
                     extraGhost.SetActive(___m_placementGhost.activeSelf);
-                    SetPlacementGhostStatus(extraGhost, i + 1, Status.Healthy, ref ___m_placementStatus);
                 }
-                SetPlacementGhostStatus(___m_placementGhost, 0, Status.Healthy, ref ___m_placementStatus);
 
                 Vector3 basePosition = ___m_placementGhost.transform.position;
                 Quaternion baseRotation = ___m_placementGhost.transform.rotation;
@@ -227,10 +225,11 @@ namespace Advize_PlantEasily
                         ghost.transform.position = ghostPosition;
                         ghost.transform.rotation = ___m_placementGhost.transform.rotation;
 
+                        Status status = Status.Healthy;
                         if (!___m_noPlacementCost && !__instance.HaveRequirements(piece, Player.RequirementMode.CanBuild))
-                            SetPlacementGhostStatus(ghost, ghostIndex, Status.LackResources, ref ___m_placementStatus);
+                            status = Status.LackResources;
 
-                        SetPlacementGhostStatus(ghost, ghostIndex, CheckPlacementStatus(ghost, ghostPlacementStatus[ghostIndex]), ref ___m_placementStatus);
+                        SetPlacementGhostStatus(ghost, ghostIndex, CheckPlacementStatus(ghost, status), ref ___m_placementStatus);
                     }
                 }
                 ___m_placementGhost.GetComponent<Piece>().m_resources[0].m_amount = cost;
