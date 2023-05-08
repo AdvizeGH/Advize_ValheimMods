@@ -85,6 +85,20 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(Player), "UpdatePlacementGhost")]
         public class PlayerUpdatePlacementGhost
         {
+            private class SnapPosition
+            {
+                internal Vector3 rowDirection;
+                internal Vector3 columnDirection;
+                internal Vector3 position;
+
+                internal SnapPosition(Vector3 rd, Vector3 cd, Vector3 p)
+                {
+                    rowDirection = rd;
+                    columnDirection = cd;
+                    position = p;
+                }
+            }
+
             public static void Postfix(Player __instance, bool ___m_noPlacementCost, ref GameObject ___m_placementGhost, ref int ___m_placementStatus)
             {
                 if (!config.ModActive || !___m_placementGhost || NotPlantOrPickable(___m_placementGhost) || __instance.GetRightItem()?.m_shared.m_name != "$item_cultivator")
@@ -112,7 +126,7 @@ namespace Advize_PlantEasily
                 bool foundSnaps = false;
                 if (config.SnapActive)
                 {
-                    List<Vector3> snapPoints = new();
+                    List<SnapPosition> snapPoints = new();
                     Plant plant = ___m_placementGhost.GetComponent<Plant>();
 
                     Collider[] obstructions = Physics.OverlapSphere(___m_placementGhost.transform.position, pieceSpacing, snapCollisionMask);
@@ -150,11 +164,20 @@ namespace Advize_PlantEasily
 
                             foreach (Vector3 pos in positions)
                             {
+                                bool invertRowDirection = false;
+                                bool invertColumnDirection = false;
                                 if (!PositionHasCollisions(pos))
                                 {
                                     if (plant && !HasGrowSpace(plant, pos)) continue;
+                                    if (config.GridSnappingStyle == 0)
+                                    {
+                                        if (config.Rows > 1 && PositionHasCollisions(pos + rowDirection))
+                                            invertRowDirection = true;
+                                        if (config.Columns > 1 && PositionHasCollisions(pos + columnDirection))
+                                            invertColumnDirection = true;
+                                    }
 
-                                    snapPoints.Add(pos);
+                                    snapPoints.Add(new SnapPosition(!invertRowDirection ? rowDirection : -rowDirection, !invertColumnDirection ? columnDirection : -columnDirection, pos));
                                     foundSnaps = true;
                                 }
                             }
@@ -175,11 +198,20 @@ namespace Advize_PlantEasily
 
                             foreach (Vector3 pos in positions)
                             {
+                                bool invertRowDirection = false;
+                                bool invertColumnDirection = false;
                                 if (!PositionHasCollisions(pos))
                                 {
                                     if (plant && !HasGrowSpace(plant, pos)) continue;
+                                    if (config.GridSnappingStyle == 0)
+                                    {
+                                        if (config.Rows > 1 && PositionHasCollisions(pos + rowDirection))
+                                            invertRowDirection = true;
+                                        if (config.Columns > 1 && PositionHasCollisions(pos + columnDirection))
+                                            invertColumnDirection = true;
+                                    }
 
-                                    snapPoints.Add(pos);
+                                    snapPoints.Add(new SnapPosition(!invertRowDirection ? rowDirection : -rowDirection, !invertColumnDirection ? columnDirection : -columnDirection, pos));
                                     foundSnaps = true;
                                 }
                             }
@@ -188,8 +220,13 @@ namespace Advize_PlantEasily
                     
                     if (foundSnaps)
                     {
-                        Vector3 firstSnapPos = snapPoints.OrderBy(o => snapPoints.Min(m => Utils.DistanceXZ(m, o)) + (o - basePosition).magnitude).First();
-                        basePosition = ___m_placementGhost.transform.position = firstSnapPos;
+                        SnapPosition firstSnapPos = snapPoints.OrderBy(o => snapPoints.Min(m => Utils.DistanceXZ(m.position, o.position)) + (o.position - basePosition).magnitude).First();
+                        basePosition = ___m_placementGhost.transform.position = firstSnapPos.position;
+                        if (config.GridSnappingStyle == 0)
+                        {
+                            rowDirection = firstSnapPos.rowDirection;
+                            columnDirection = firstSnapPos.columnDirection;
+                        }
                     }
                 }
                 

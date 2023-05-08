@@ -23,6 +23,7 @@ namespace Advize_PlantEasily.Configuration
         private readonly ConfigEntry<bool> useDurability;
         private readonly ConfigEntry<float> extraCropSpacing;
         private readonly ConfigEntry<float> extraSaplingSpacing;
+        private readonly ConfigEntry<GridSnappingStyle> gridSnappingStyle;
 
         //Pickables
         private readonly ConfigEntry<float> pickableSnapRadius;
@@ -72,6 +73,7 @@ namespace Advize_PlantEasily.Configuration
             useDurability = Config.Bind("General", "UseDurability", true, "Decrease durability of cultivator for every piece placed.");
             extraCropSpacing = Config.Bind("General", "ExtraCropSpacing", 0f, "Adds extra spacing between crops. Accepts negative values to decrease spacing (not recommended).");
             extraSaplingSpacing = Config.Bind("General", "ExtraSaplingSpacing", 0f, "Adds extra spacing between saplings. Accepts negative values to decrease spacing (not recommended).");
+            gridSnappingStyle = Config.Bind("General", "GridSnappingStyle", GridSnappingStyle.Intelligent, "PLACEHOLDER");
 
             //Pickables
             pickableSnapRadius = Config.Bind("Pickables", "PickableSnapRadius", 1.0f, "Determines default distance/spacing between pickable resources when planting.");
@@ -214,6 +216,10 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return extraSaplingSpacing.Value; }
         }
+        internal GridSnappingStyle GridSnappingStyle
+        {
+            get { return gridSnappingStyle.Value; }
+        }
         internal bool EnableBulkHarvest
         {
             get { return enableBulkHarvest.Value; }
@@ -286,6 +292,11 @@ namespace Advize_PlantEasily.Configuration
         }
     }
 
+    internal enum GridSnappingStyle
+    {
+        Intelligent,
+        Legacy
+    }
     internal enum HarvestStyle
     {
         LikeResources,
