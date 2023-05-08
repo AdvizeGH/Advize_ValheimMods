@@ -114,7 +114,17 @@ namespace Advize_PlantEasily
                 }
 
                 Vector3 basePosition = ___m_placementGhost.transform.position;
-                Quaternion baseRotation = ___m_placementGhost.transform.rotation;
+                Quaternion baseRotation, fixedRotation;
+                baseRotation = fixedRotation = ___m_placementGhost.transform.rotation;
+
+                if (config.StandardizeGridRotations)
+                {
+                    Vector3 vec = fixedRotation.eulerAngles;
+                    vec.x = Mathf.Round(vec.x / 90) * 90;
+                    vec.y = Mathf.Round(vec.y / 90) * 90;
+                    vec.z = Mathf.Round(vec.z / 90) * 90;
+                    fixedRotation.eulerAngles = vec;
+                }
 
                 float pieceSpacing = GetPieceSpacing(___m_placementGhost);
 
@@ -151,8 +161,8 @@ namespace Advize_PlantEasily
                             rowDirection = Utils.DirectionXZ(secondaryCollider.transform.position - collider.transform.position);
                             columnDirection = Vector3.Cross(Vector3.up, rowDirection);
                             
-                            rowDirection = baseRotation * rowDirection * pieceSpacing;
-                            columnDirection = baseRotation * columnDirection * pieceSpacing;
+                            rowDirection = (config.StandardizeGridRotations ? fixedRotation : baseRotation) * rowDirection * pieceSpacing;
+                            columnDirection = (config.StandardizeGridRotations ? fixedRotation : baseRotation) * columnDirection * pieceSpacing;
 
                             Vector3[] positions = new Vector3[]
                             {

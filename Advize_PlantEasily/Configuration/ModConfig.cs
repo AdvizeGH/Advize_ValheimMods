@@ -24,6 +24,7 @@ namespace Advize_PlantEasily.Configuration
         private readonly ConfigEntry<float> extraCropSpacing;
         private readonly ConfigEntry<float> extraSaplingSpacing;
         private readonly ConfigEntry<GridSnappingStyle> gridSnappingStyle;
+        private readonly ConfigEntry<bool> standardizeGridRotations;
 
         //Pickables
         private readonly ConfigEntry<float> pickableSnapRadius;
@@ -74,6 +75,7 @@ namespace Advize_PlantEasily.Configuration
             extraCropSpacing = Config.Bind("General", "ExtraCropSpacing", 0f, "Adds extra spacing between crops. Accepts negative values to decrease spacing (not recommended).");
             extraSaplingSpacing = Config.Bind("General", "ExtraSaplingSpacing", 0f, "Adds extra spacing between saplings. Accepts negative values to decrease spacing (not recommended).");
             gridSnappingStyle = Config.Bind("General", "GridSnappingStyle", GridSnappingStyle.Intelligent, "PLACEHOLDER");
+            standardizeGridRotations = Config.Bind("General", "StandardizeGridRotations", true, "When set to true, this setting will prevent the diagonal snapping of new grids to existing grids.");
 
             //Pickables
             pickableSnapRadius = Config.Bind("Pickables", "PickableSnapRadius", 1.0f, "Determines default distance/spacing between pickable resources when planting.");
@@ -219,6 +221,10 @@ namespace Advize_PlantEasily.Configuration
         internal GridSnappingStyle GridSnappingStyle
         {
             get { return gridSnappingStyle.Value; }
+        }
+        internal bool StandardizeGridRotations
+        {
+            get { return standardizeGridRotations.Value; }
         }
         internal bool EnableBulkHarvest
         {
