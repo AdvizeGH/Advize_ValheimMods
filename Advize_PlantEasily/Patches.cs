@@ -368,20 +368,32 @@ namespace Advize_PlantEasily
         {
             public static void Prefix(Player __instance, GameObject go, bool hold, bool alt, float ___m_lastHoverInteractTime)
             {
-                if (!config.ModActive || !config.EnableBulkHarvest || __instance.InAttack() || __instance.InDodge() || (hold && Time.time - ___m_lastHoverInteractTime < 0.2f))
+                if (!config.ModActive || (!config.EnableBulkHarvest && !config.ReplantOnHarvest) || __instance.InAttack() || __instance.InDodge() || (hold && Time.time - ___m_lastHoverInteractTime < 0.2f))
                     return;
 
-                if (!Input.GetKey(config.KeyboardHarvestModifierKey) && !Input.GetKey(config.GamepadModifierKey))
-                    return;
-                
                 Interactable componentInParent = go.GetComponentInParent<Interactable>();
                 Pickable pickable = componentInParent as Pickable;
+
+                if (config.ReplantOnHarvest && pickablesToPlants.ContainsKey(pickable?.name.Replace("(Clone)", "") ?? ""))
+                    instanceIDS.Add(pickable.GetInstanceID());
+
+                if (!config.EnableBulkHarvest || (!Input.GetKey(config.KeyboardHarvestModifierKey) && !Input.GetKey(config.GamepadModifierKey)))
+                    return;
+                
                 Beehive beehive = componentInParent as Beehive;
 
                 if (pickable || beehive)
                 {
                     foreach (Interactable extraInteractable in FindResourcesInRadius(go))
+                    {
+                        if (config.ReplantOnHarvest)
+                        {
+                            pickable = extraInteractable as Pickable;
+                            if (pickablesToPlants.ContainsKey(pickable?.name.Replace("(Clone)", "") ?? ""))
+                                instanceIDS.Add(pickable.GetInstanceID());
+                        }
                         extraInteractable.Interact(__instance, hold, alt);
+                    }
                 }
             }
         }
@@ -407,16 +419,17 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(Pickable), "SetPicked")]
         public class PickableSetPicked
         {
-            public static void Prefix(Pickable __instance, ZNetView ___m_nview, bool picked)
+            public static void Prefix(Pickable __instance, bool picked)
             {
-                if (!config.ModActive || !config.ReplantOnHarvest || !___m_nview.IsOwner() || !picked) return;
+                if (!config.ModActive || !config.ReplantOnHarvest || !picked) return;
 
-                string name = __instance.name.Replace("(Clone)", "");
+                int instanceID = __instance.GetInstanceID();
+                if (!instanceIDS.Contains(instanceID)) return;
 
-                if (!pickablesToPlants.ContainsKey(name)) return;
+                instanceIDS.Remove(instanceID);
 
                 Player player = Player.m_localPlayer;
-                GameObject plantObject = prefabRefs[pickablesToPlants[name]];
+                GameObject plantObject = prefabRefs[pickablesToPlants[__instance.name.Replace("(Clone)", "")]];
                 Piece piece = plantObject.GetComponent<Piece>();
 
                 if (!player.HaveRequirements(piece, Player.RequirementMode.CanBuild)) return;
