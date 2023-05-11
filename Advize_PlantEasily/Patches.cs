@@ -374,8 +374,8 @@ namespace Advize_PlantEasily
                 Interactable interactable = go.GetComponentInParent<Interactable>();
                 if (interactable == null) return;
 
-                if (config.ReplantOnHarvest && pickablesToPlants.ContainsKey(interactable.ToString().Replace("(Clone) (Pickable)", "")))
-                    instanceIDS.Add((interactable as Pickable).GetInstanceID());
+                if (interactable as Pickable && config.ReplantOnHarvest && pickablesToPlants.ContainsKey(interactable.ToString().Replace("(Clone) (Pickable)", "")))
+                    instanceIDS.Add(((Pickable)interactable).GetInstanceID());
 
                 if (!config.EnableBulkHarvest || (!Input.GetKey(config.KeyboardHarvestModifierKey) && !Input.GetKey(config.GamepadModifierKey)))
                     return;
@@ -387,7 +387,7 @@ namespace Advize_PlantEasily
                         if (config.ReplantOnHarvest)
                         {
                             if (pickablesToPlants.ContainsKey(extraInteractable.ToString().Replace("(Clone) (Pickable)", "")))
-                                instanceIDS.Add((extraInteractable as Pickable).GetInstanceID());
+                                instanceIDS.Add(((Pickable)extraInteractable).GetInstanceID());
                         }
                         extraInteractable.Interact(__instance, hold, alt);
                     }
@@ -418,7 +418,7 @@ namespace Advize_PlantEasily
         {
             public static void Prefix(Pickable __instance, bool picked)
             {
-                if (!config.ModActive || !config.ReplantOnHarvest || !picked) return;
+                if (!config.ModActive || !config.ReplantOnHarvest || instanceIDS.Count == 0 || !picked) return;
 
                 int instanceID = __instance.GetInstanceID();
                 if (!instanceIDS.Contains(instanceID)) return;

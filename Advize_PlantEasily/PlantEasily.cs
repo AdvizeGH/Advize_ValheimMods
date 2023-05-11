@@ -50,9 +50,7 @@ namespace Advize_PlantEasily
             if (extraGhosts.Count > 0)
             {
                 foreach (GameObject placementGhost in extraGhosts)
-                {
                     Destroy(placementGhost);
-                }
                 extraGhosts.Clear();
             }
             ghostPlacementStatus.Clear();
@@ -77,9 +75,7 @@ namespace Advize_PlantEasily
                     newGhost.name = rootGhost.name;
                     
                     foreach (Transform t in newGhost.GetComponentsInChildren<Transform>())
-                    {
                         t.gameObject.layer = LayerMask.NameToLayer("ghost");
-                    }
                     
                     newGhost.transform.position = rootGhost.transform.position;
                     newGhost.transform.localScale = rootGhost.transform.localScale;
