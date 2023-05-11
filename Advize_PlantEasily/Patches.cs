@@ -371,26 +371,23 @@ namespace Advize_PlantEasily
                 if (!config.ModActive || (!config.EnableBulkHarvest && !config.ReplantOnHarvest) || __instance.InAttack() || __instance.InDodge() || (hold && Time.time - ___m_lastHoverInteractTime < 0.2f))
                     return;
 
-                Interactable componentInParent = go.GetComponentInParent<Interactable>();
-                Pickable pickable = componentInParent as Pickable;
+                Interactable interactable = go.GetComponentInParent<Interactable>();
+                if (interactable == null) return;
 
-                if (config.ReplantOnHarvest && pickablesToPlants.ContainsKey(pickable?.name.Replace("(Clone)", "") ?? ""))
-                    instanceIDS.Add(pickable.GetInstanceID());
+                if (config.ReplantOnHarvest && pickablesToPlants.ContainsKey(interactable.ToString().Replace("(Clone) (Pickable)", "")))
+                    instanceIDS.Add((interactable as Pickable).GetInstanceID());
 
                 if (!config.EnableBulkHarvest || (!Input.GetKey(config.KeyboardHarvestModifierKey) && !Input.GetKey(config.GamepadModifierKey)))
                     return;
-                
-                Beehive beehive = componentInParent as Beehive;
 
-                if (pickable || beehive)
+                if (interactable as Pickable || interactable as Beehive)
                 {
                     foreach (Interactable extraInteractable in FindResourcesInRadius(go))
                     {
                         if (config.ReplantOnHarvest)
                         {
-                            pickable = extraInteractable as Pickable;
-                            if (pickablesToPlants.ContainsKey(pickable?.name.Replace("(Clone)", "") ?? ""))
-                                instanceIDS.Add(pickable.GetInstanceID());
+                            if (pickablesToPlants.ContainsKey(extraInteractable.ToString().Replace("(Clone) (Pickable)", "")))
+                                instanceIDS.Add((extraInteractable as Pickable).GetInstanceID());
                         }
                         extraInteractable.Interact(__instance, hold, alt);
                     }
