@@ -1,5 +1,9 @@
 ﻿using BepInEx.Configuration;
 using ServerSync;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace Advize_PlantEverything.Configuration
@@ -152,6 +156,15 @@ namespace Advize_PlantEverything.Configuration
 
         private ConfigEntry<T> config<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => config(group, name, value, new ConfigDescription(description), synchronizedSetting);
 
+        private readonly ConfigurationManagerAttributes seedSettingAtrributes = new();
+        private readonly List<ConfigurationManagerAttributes> cropSettingAttributes = new()
+        {
+            { new() },
+            { new ConfigurationManagerAttributes { Order = 26 } },
+            { new ConfigurationManagerAttributes { Order = 25 } },
+            { new ConfigurationManagerAttributes { Order = 24 } }
+        };
+
         internal ModConfig(ConfigFile configFile, ConfigSync configSync)
         {
             Config = configFile; ConfigSync = configSync;
@@ -293,142 +306,142 @@ namespace Advize_PlantEverything.Configuration
                 "Crops",
                 "CropMinScale",
                 0.9f,
-                "The minimum scaling factor used to scale crops upon growth");
+                new ConfigDescription("The minimum scaling factor used to scale crops upon growth", null, cropSettingAttributes[0]));
             cropMaxScale = config(
                 "Crops",
                 "CropMaxScale",
                 1.1f,
-                "The maximum scaling factor used to scale crops upon growth");
+                new ConfigDescription("The maximum scaling factor used to scale crops upon growth", null, cropSettingAttributes[0]));
             cropGrowTimeMin = config(
                 "Crops",
                 "CropGrowTimeMin",
                 4000f,
-                "Minimum number of seconds it takes for crops to grow (will take at least 10 seconds after planting to grow)");
+                new ConfigDescription("Minimum number of seconds it takes for crops to grow (will take at least 10 seconds after planting to grow)", null, cropSettingAttributes[0]));
             cropGrowTimeMax = config(
                 "Crops",
                 "CropGrowTimeMax",
                 5000f,
-                "Maximum number of seconds it takes for crops to grow (will take at least 10 seconds after planting to grow)");
+                new ConfigDescription("Maximum number of seconds it takes for crops to grow (will take at least 10 seconds after planting to grow)", null, cropSettingAttributes[0]));
             cropGrowRadius = config(
                 "Crops",
                 "CropGrowRadius",
                 0.5f,
-                "Radius of free space required for crops to grow");
+                new ConfigDescription("Radius of free space required for crops to grow", null, cropSettingAttributes[0]));
             cropRequireCultivation = config(
                 "Crops",
                 "CropsRequireCultivation",
                 true,
-                new ConfigDescription("Crops can only be planted on cultivated ground", null, new ConfigurationManagerAttributes { Order = 26 }));
+                new ConfigDescription("Crops can only be planted on cultivated ground", null, cropSettingAttributes[1]));
             cropRequireSunlight = config(
                 "Crops",
                 "CropsRequireSunlight",
                 true,
-                new ConfigDescription("Crops can only grow under an open sky", null, new ConfigurationManagerAttributes { Order = 25 }));
+                new ConfigDescription("Crops can only grow under an open sky", null, cropSettingAttributes[2]));
             cropRequireGrowthSpace = config(
                 "Crops",
                 "CropsRequireGrowthSpace",
                 true,
-                new ConfigDescription("Crops require space to grow. This setting overrides the CropGrowRadius setting but without altering it, allowing grid spacing mods to continue functioning", null, new ConfigurationManagerAttributes { Order = 24 }));
+                new ConfigDescription("Crops require space to grow. This setting overrides the CropGrowRadius setting but without altering it, allowing grid spacing mods to continue functioning", null, cropSettingAttributes[3]));
             barleyCost = config(
                 "Crops",
                 "BarleyCost",
                 1,
-                "Resource cost of planting barley");
+                new ConfigDescription("Resource cost of planting barley", null, cropSettingAttributes[0]));
             barleyReturn = config(
                 "Crops",
                 "BarleyReturn",
                 2,
-                "Resources gained upon harvesting barley (does not apply to wild barley)");
+                new ConfigDescription("Resources gained upon harvesting barley (does not apply to wild barley)", null, cropSettingAttributes[0]));
             carrotCost = config(
                 "Crops",
                 "CarrotCost",
                 1,
-                "Resource cost of planting carrots");
+                new ConfigDescription("Resource cost of planting carrots", null, cropSettingAttributes[0]));
             carrotReturn = config(
                 "Crops",
                 "CarrotReturn",
                 1,
-                "Resources gained upon harvesting carrots");
+                new ConfigDescription("Resources gained upon harvesting carrots", null, cropSettingAttributes[0]));
             flaxCost = config(
                 "Crops",
                 "FlaxCost",
                 1,
-                "Resource cost of planting flax");
+                new ConfigDescription("Resource cost of planting flax", null, cropSettingAttributes[0]));
             flaxReturn = config(
                 "Crops",
                 "FlaxReturn",
                 2,
-                "Resources gained upon harvesting flax (does not apply to wild flax)");
+                new ConfigDescription("Resources gained upon harvesting flax (does not apply to wild flax)", null, cropSettingAttributes[0]));
             onionCost = config(
                 "Crops",
                 "OnionCost",
                 1,
-                "Resource cost of planting onions");
+                new ConfigDescription("Resource cost of planting onions", null, cropSettingAttributes[0]));
             onionReturn = config(
                 "Crops",
                 "OnionReturn",
                 1,
-                "Resources gained upon harvesting onions");
+                new ConfigDescription("Resources gained upon harvesting onions", null, cropSettingAttributes[0]));
             seedCarrotCost = config(
                 "Crops",
                 "SeedCarrotCost",
                 1,
-                "Resource cost of planting seed carrots");
+                new ConfigDescription("Resource cost of planting seed carrots", null, cropSettingAttributes[0]));
             seedCarrotReturn = config(
                 "Crops",
                 "SeedCarrotReturn",
                 3,
-                "Resources gained upon harvesting seed carrots");
+                new ConfigDescription("Resources gained upon harvesting seed carrots", null, cropSettingAttributes[0]));
             seedOnionCost = config(
                 "Crops",
                 "SeedOnionCost",
                 1,
-                "Resource cost of planting seed onions");
+                new ConfigDescription("Resource cost of planting seed onions", null, cropSettingAttributes[0]));
             seedOnionReturn = config(
                 "Crops",
                 "SeedOnionReturn",
                 3,
-                "Resources gained upon harvesting seed onions");
+                new ConfigDescription("Resources gained upon harvesting seed onions", null, cropSettingAttributes[0]));
             seedTurnipCost = config(
                 "Crops",
                 "SeedTurnipCost",
                 1,
-                "Resource cost of planting seed turnips");
+                new ConfigDescription("Resource cost of planting seed turnips", null, cropSettingAttributes[0]));
             seedTurnipReturn = config(
                 "Crops",
                 "SeedTurnipReturn",
                 3,
-                "Resources gained upon harvesting seed turnips");
+                new ConfigDescription("Resources gained upon harvesting seed turnips", null, cropSettingAttributes[0]));
             turnipCost = config(
                 "Crops",
                 "TurnipCost",
                 1,
-                "Resource cost of planting turnips");
+                new ConfigDescription("Resource cost of planting turnips", null, cropSettingAttributes[0]));
             turnipReturn = config(
                 "Crops",
                 "TurnipReturn",
                 1,
-                "Resources gained upon harvesting turnips");
+                new ConfigDescription("Resources gained upon harvesting turnips", null, cropSettingAttributes[0]));
             magecapCost = config(
                 "Crops",
                 "MagecapCost",
                 1,
-                "Resource cost of planting magecap");
+                new ConfigDescription("Resource cost of planting magecap", null, cropSettingAttributes[0]));
             magecapReturn = config(
                 "Crops",
                 "MagecapReturn",
                 3,
-                "Resources gained upon harvesting magecap");
+                new ConfigDescription("Resources gained upon harvesting magecap", null, cropSettingAttributes[0]));
             jotunPuffsCost = config(
                 "Crops",
                 "JotunPuffsCost",
                 1,
-                "Resource cost of planting Jotun puffs");
+                new ConfigDescription("Resource cost of planting Jotun puffs", null, cropSettingAttributes[0]));
             jotunPuffsReturn = config(
                 "Crops",
                 "JotunPuffsReturn",
                 3,
-                "Resources gained upon harvesting Jotun puffs");
+                new ConfigDescription("Resources gained upon harvesting Jotun puffs", null, cropSettingAttributes[0]));
 
             //Debris
             pickableBranchCost = config(
@@ -693,32 +706,32 @@ namespace Advize_PlantEverything.Configuration
                 "Seeds",
                 "seedDropMin",
                 1,
-                "Determines minimum amount of seeds that can drop when trees drop seeds");
+                new ConfigDescription("Determines minimum amount of seeds that can drop when trees drop seeds", null, seedSettingAtrributes));
             seedDropMax = config(
                 "Seeds",
                 "seedDropMax",
                 2,
-                "Determines maximum amount of seeds that can drop when trees drop seeds");
+                new ConfigDescription("Determines maximum amount of seeds that can drop when trees drop seeds", null, seedSettingAtrributes));
             treeDropMin = config(
                 "Seeds",
                 "treeDropMin",
                 1,
-                "Determines minimum amount of times a destroyed tree will attempt to select a drop from its drop table");
+                new ConfigDescription("Determines minimum amount of times a destroyed tree will attempt to select a drop from its drop table", null, seedSettingAtrributes));
             treeDropMax = config(
                 "Seeds",
                 "treeDropMax",
                 3,
-                "Determines (maximum amount of times - 1) a destroyed tree will attempt to select a drop from its drop table");
+                new ConfigDescription("Determines (maximum amount of times - 1) a destroyed tree will attempt to select a drop from its drop table", null, seedSettingAtrributes));
             dropChance = config(
                 "Seeds",
                 "dropChance",
                 0.5f,
-                "Chance that items will drop from trees when destroyed. Default value 0.5f (50%). Set between 0 and 1f");
+                new ConfigDescription("Chance that items will drop from trees when destroyed. Default value 0.5f (50%). Set between 0 and 1f", null, seedSettingAtrributes));
             oneOfEach = config(
                 "Seeds",
                 "oneOfEach",
                 false,
-                "When enabled, destroyed trees will not drop the same item from its drop table more than once");
+                new ConfigDescription("When enabled, destroyed trees will not drop the same item from its drop table more than once", null, seedSettingAtrributes));
 
             //UI
             enablePickableTimers = config(
@@ -857,6 +870,22 @@ namespace Advize_PlantEverything.Configuration
             oneOfEach.SettingChanged += PlantEverything.SeedSettingChanged;
 
             configSync.AddLockingConfigEntry(serverConfigLocked);
+
+            foreach (ConfigurationManagerAttributes attributes in cropSettingAttributes)
+                attributes.Browsable = enableCropOverrides.Value;
+            seedSettingAtrributes.Browsable = enableSeedOverrides.Value;
+
+            enableCropOverrides.SettingChanged += (_, _) =>
+            {
+                foreach (ConfigurationManagerAttributes attributes in cropSettingAttributes)
+                    attributes.Browsable = enableCropOverrides.Value;
+                ConfigManagerHelper.ReloadConfigDisplay();
+            };
+            enableSeedOverrides.SettingChanged += (_, _) =>
+            {
+                seedSettingAtrributes.Browsable = enableSeedOverrides.Value;
+                ConfigManagerHelper.ReloadConfigDisplay();
+            };
 
             //Config.SettingChanged += PlantEverything.ConfigSettingChanged;
         }
@@ -1300,10 +1329,18 @@ namespace Advize_PlantEverything.Configuration
 
         internal class ConfigurationManagerAttributes
         {
+            public bool? Browsable;
             public string? Category;
-            public string? Description;
             public int? Order;
             public bool? ReadOnly;
+        }
+
+        internal class ConfigManagerHelper
+        {
+            private static Assembly? bepinexConfigManager => AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "ConfigurationManager");
+            private static Type? configManagerType => bepinexConfigManager?.GetType("ConfigurationManager.ConfigurationManager");
+            private static object? configManager => configManagerType == null ? null : BepInEx.Bootstrap.Chainloader.ManagerObject.GetComponent(configManagerType);
+            internal static void ReloadConfigDisplay() => configManager?.GetType().GetMethod("BuildSettingList")!.Invoke(configManager, Array.Empty<object>());
         }
     }
 }
