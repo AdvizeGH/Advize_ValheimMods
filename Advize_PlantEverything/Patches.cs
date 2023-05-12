@@ -184,7 +184,7 @@ namespace Advize_PlantEverything
                     __instance.m_growTimeMax = config.CropGrowTimeMax;
                     __instance.m_growRadius = config.CropGrowRadius;
                     __instance.m_needCultivatedGround = config.CropRequireCultivation;
-                    (__instance.GetComponentInParent(typeof(Piece)) as Piece).m_cultivatedGroundOnly = config.CropRequireCultivation;
+                    __instance.GetComponentInParent<Piece>().m_cultivatedGroundOnly = config.CropRequireCultivation;
                 }
             }
         }
