@@ -82,7 +82,7 @@ namespace Advize_PlantEverything
             { "PickableFlintDescription", "Plant respawning pickable flint." }
         };
 
-        private void Awake()
+        public void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
             assetBundle = LoadAssetBundle("planteverything");

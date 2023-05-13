@@ -6,7 +6,7 @@ namespace Advize_PlantEasily.Configuration
 {
     class ModConfig
     {
-        private ConfigFile Config;
+        private readonly ConfigFile Config;
 
         //General
         private readonly ConfigEntry<bool> enableDebugMessages;
@@ -290,12 +290,13 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return costDisplayLocation.Value; }
         }
-
+#nullable enable
         internal class ConfigurationManagerAttributes
         {
             public string? Description;
             public int? Order;
         }
+#nullable disable
     }
 
     internal enum GridSnappingStyle

@@ -25,12 +25,12 @@ namespace Advize_PlantEasily
         private static ModConfig config;
 
         private static GameObject placementGhost;
-        private static List<GameObject> extraGhosts = new();
-        private static List<Status> ghostPlacementStatus = new();
-        private static List<int> instanceIDS = new();
+        private static readonly List<GameObject> extraGhosts = new();
+        private static readonly List<Status> ghostPlacementStatus = new();
+        private static readonly List<int> instanceIDS = new();
         
-        private static int snapCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid", "item");
-        private static int plantCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid");
+        private static readonly int snapCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid", "item");
+        private static readonly int plantCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid");
 
         public void Awake()
         {

@@ -341,7 +341,6 @@ namespace Advize_PlantEverything
             return formattedString;
         }
 
-
         //Replace this... possibly with separate config option and hopefully with different entry point and implementation
         //[HarmonyPatch(typeof(Player), "UpdatePlacementGhost")]
         //public class PlayerUpdatePlacementGhost

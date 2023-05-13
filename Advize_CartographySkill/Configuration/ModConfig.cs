@@ -6,14 +6,14 @@ namespace Advize_CartographySkill.Configuration
 {
     class ModConfig
     {
-        private ConfigFile Config;
-        private ConfigSync ConfigSync;
+        private readonly ConfigFile ConfigFile;
+        private readonly ConfigSync ConfigSync;
 
         //General
         private readonly ConfigEntry<bool> serverConfigLocked;
         private readonly ConfigEntry<float> exploreRadiusIncrease;
         private readonly ConfigEntry<float> baseExploreRadius;
-        private readonly ConfigEntry<int> nexusID;
+        internal readonly ConfigEntry<int> nexusID;
         //Progression
         private readonly ConfigEntry<bool> enableSkill;
         private readonly ConfigEntry<float> skillIncrease;
@@ -29,9 +29,9 @@ namespace Advize_CartographySkill.Configuration
         //Troubleshooting
         private readonly ConfigEntry<bool> enableDebugMessages;
 
-        private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true)
+        private ConfigEntry<T> Config<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true)
         {
-            ConfigEntry<T> configEntry = Config.Bind(group, name, value, description);
+            ConfigEntry<T> configEntry = ConfigFile.Bind(group, name, value, description);
 
             SyncedConfigEntry<T> syncedConfigEntry = ConfigSync.AddConfigEntry(configEntry);
             syncedConfigEntry.SynchronizedConfig = synchronizedSetting;
@@ -39,66 +39,66 @@ namespace Advize_CartographySkill.Configuration
             return configEntry;
         }
 
-        private ConfigEntry<T> config<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => config(group, name, value, new ConfigDescription(description), synchronizedSetting);
+        private ConfigEntry<T> Config<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => Config(group, name, value, new ConfigDescription(description), synchronizedSetting);
 
         internal ModConfig(ConfigFile configFile, ConfigSync configSync)
         {
-            Config = configFile; ConfigSync = configSync;
+            ConfigFile = configFile; ConfigSync = configSync;
 
-            serverConfigLocked = config(
+            serverConfigLocked = Config(
                 "General",
                 "Lock Configuration",
                 false,
                 "If on, the configuration is locked and can be changed by server admins only.");
-            nexusID = config(
+            nexusID = Config(
                 "General",
                 "NexusID",
                 394,
                 new ConfigDescription("Nexus mod ID for updates.", null, new ConfigurationManagerAttributes{ Category = "Internal", ReadOnly = true }),
                 false);
-            exploreRadiusIncrease = config(
+            exploreRadiusIncrease = Config(
                 "General",
                 "RadiusIncreasePerLevel",
                 1f,
                 "Amount to increase base explore radius by per skill level");
-            baseExploreRadius = config(
+            baseExploreRadius = Config(
                 "General",
                 "BaseExploreRadius",
                 100f,
                 "BaseExploreRadius (Vanilla value is 100)");
-            enableSkill = config(
+            enableSkill = Config(
                 "Progression",
                 "EnableSkill",
                 true,
                 "Enables the cartography skill",
                 false);
-            skillIncrease = config(
+            skillIncrease = Config(
                 "Progression",
                 "LevelingIncrement",
                 0.5f,
                 "Experience gain when cartography skill XP is awarded");
-            tilesDiscoveredForXPGain = config(
+            tilesDiscoveredForXPGain = Config(
                 "Progression",
                 "TileDiscoveryRequirement",
                 100,
                 "Amount of map tiles that need to be discovered before XP is awarded (influences BetterUI xp gain spam)");
-            enableSpyglass = config(
+            enableSpyglass = Config(
                 "Spyglass",
                 "EnableSpyglass",
                 true,
                 "Enables the spyglass item",
                 false);
-            fovReductionFactor = config(
+            fovReductionFactor = Config(
                 "Spyglass",
                 "FovReductionFactor",
                 5f,
                 "Influences field of view when zoomed, recommended range is 0 (disabled) to 5");
-            zoomMultiplier = config(
+            zoomMultiplier = Config(
                 "Spyglass",
                 "ZoomMultiplier",
                 5f,
                 "Increase/Decrease camera zoom distance");
-            increaseZoomKey = config(
+            increaseZoomKey = Config(
                 "Controls",
                 "IncreaseZoomKey",
                 new KeyboardShortcut(KeyCode.Mouse1),
@@ -107,7 +107,7 @@ namespace Advize_CartographySkill.Configuration
                     null,
                     new ConfigurationManagerAttributes { Description = "Key to increase zoom level." }),
                 false);
-            decreaseZoomModifierKey = config(
+            decreaseZoomModifierKey = Config(
                 "Controls",
                 "DecreaseZoomModifierKey",
                 new KeyboardShortcut(KeyCode.LeftShift),
@@ -116,7 +116,7 @@ namespace Advize_CartographySkill.Configuration
                     null,
                     new ConfigurationManagerAttributes { Description = "Hold this key while pressing IncreaseZoomKey to decrease zoom level." }),
                 false);
-            removeZoomKey = config(
+            removeZoomKey = Config(
                 "Controls",
                 "RemoveZoomKey",
                 new KeyboardShortcut(),
@@ -125,7 +125,7 @@ namespace Advize_CartographySkill.Configuration
                     null,
                     new ConfigurationManagerAttributes { Description = "Optional key to fully zoom out." }),
                 false);
-            enableDebugMessages = config(
+            enableDebugMessages = Config(
                 "Troubleshooting",
                 "EnableDebugMessages",
                 false,
@@ -182,12 +182,13 @@ namespace Advize_CartographySkill.Configuration
         {
             get { return removeZoomKey.Value.MainKey; }
         }
-
+#nullable enable
         internal class ConfigurationManagerAttributes
         {
             public string? Category;
             public string? Description;
             public bool? ReadOnly;
         }
+#nullable disable
     }
 }
