@@ -948,7 +948,7 @@ namespace Advize_PlantEverything
             cultivator.m_itemData.m_shared.m_buildPieces.m_canRemovePieces = true;
         }
 
-        private static void FinalInit(ZNetScene instance, Dictionary<int, GameObject> m_namedPrefabs)
+        private static void FinalInit(ZNetScene instance)
         {
             InitPieceRefs();
             InitPieces();
@@ -966,7 +966,7 @@ namespace Advize_PlantEverything
                 if (!instance.m_prefabs.Contains(go))
                 {
                     instance.m_prefabs.Add(go);
-                    m_namedPrefabs.Add(instance.GetPrefabHash(go), go);
+                    instance.m_namedPrefabs.Add(instance.GetPrefabHash(go), go);
                 }
             }
         }

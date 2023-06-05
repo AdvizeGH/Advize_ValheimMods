@@ -22,18 +22,18 @@ namespace Advize_PlantEverything
         [HarmonyPatch(typeof(ZNetScene), "Awake")]
         public static class ZNetSceneAwake
         {
-            public static void Postfix(ZNetScene __instance, Dictionary<int, GameObject> ___m_namedPrefabs)
+            public static void Postfix(ZNetScene __instance)
             {
                 Dbgl("ZNetSceneAwake");
                 Dbgl("Performing final mod initialization");
-                FinalInit(__instance, ___m_namedPrefabs);
+                FinalInit(__instance);
             }
         }
 
         [HarmonyPatch(typeof(Player), "RemovePiece")]
         public static class PlayerRemovePiece
         {
-            public static bool Prefix(Player __instance, ZSyncAnimation ___m_zanim, ref bool __result)
+            public static bool Prefix(Player __instance, ref bool __result)
             {
                 if (__instance.GetRightItem().m_shared.m_name == "$item_cultivator")
                 {
@@ -46,7 +46,7 @@ namespace Advize_PlantEverything
                             {
                                 if (!CanRemove(piece.gameObject, __instance, true)) break;
 
-                                RemoveObject(piece.gameObject, __instance, ___m_zanim, true);
+                                RemoveObject(piece.gameObject, __instance, true);
                                 __result = true;
                                 break;
                             }
@@ -56,7 +56,7 @@ namespace Advize_PlantEverything
                             {
                                 if (!CanRemove(pickable.gameObject, __instance, false)) break;
 
-                                RemoveObject(pickable.gameObject, __instance, ___m_zanim, false);
+                                RemoveObject(pickable.gameObject, __instance, false);
                                 __result = true;
                                 break;
                             }
@@ -83,7 +83,7 @@ namespace Advize_PlantEverything
                 return canRemove;
             }
 
-            private static void RemoveObject(GameObject component, Player player, ZSyncAnimation m_zanim, bool isPiece)
+            private static void RemoveObject(GameObject component, Player player, bool isPiece)
             {
                 ZNetView component2 = component.GetComponent<ZNetView>();
                 WearNTear component3 = component.GetComponent<WearNTear>();
@@ -109,7 +109,7 @@ namespace Advize_PlantEverything
                     ZNetScene.instance.Destroy(component.gameObject);
                 }
                 player.FaceLookDirection();
-                m_zanim.SetTrigger(player.GetRightItem().m_shared.m_attack.m_attackAnimation);
+                player.m_zanim.SetTrigger(player.GetRightItem().m_shared.m_attack.m_attackAnimation);
             }
         }
 
@@ -270,15 +270,15 @@ namespace Advize_PlantEverything
         public static class PickableGetHoverText
         {
             [HarmonyPostfix]
-            public static void Postfix(Pickable __instance, bool ___m_picked, ZNetView ___m_nview, int ___m_respawnTimeMinutes, ref string __result)
+            public static void Postfix(Pickable __instance, ref string __result)
             {
-                if (___m_picked && config.EnablePickableTimers && ___m_nview.GetZDO() != null)
+                if (__instance.m_picked && config.EnablePickableTimers && __instance.m_nview.GetZDO() != null)
                 {
                     if (__instance.name.ToLower().Contains("core"))
                         return;
 
-                    float growthTime = ___m_respawnTimeMinutes * 60;
-                    DateTime pickedTime = new(___m_nview.GetZDO().GetLong("picked_time", 0L));
+                    float growthTime = __instance.m_respawnTimeMinutes * 60;
+                    DateTime pickedTime = new(__instance.m_nview.GetZDO().GetLong("picked_time", 0L));
                     string timeString = FormatTimeString(growthTime, pickedTime);
 
                     __result = Localization.instance.Localize(__instance.GetHoverName()) + $"\n{timeString}";
@@ -290,25 +290,16 @@ namespace Advize_PlantEverything
         public static class PlantGetHoverText
         {
             [HarmonyPostfix]
-            public static void Postfix(Plant __instance, ZNetView ___m_nview, int ___m_status, ref string __result)
+            public static void Postfix(Plant __instance, ref string __result)
             {
-                if (config.EnablePlantTimers && ___m_status == 0 && ___m_nview.GetZDO() != null)
+                if (config.EnablePlantTimers && __instance.m_status == 0 && __instance.m_nview.GetZDO() != null)
                 {
-                    float growthTime = GetGrowTime(__instance, ___m_nview);
-                    DateTime plantTime = new(___m_nview.GetZDO().GetLong("plantTime", ZNet.instance.GetTime().Ticks));
+                    float growthTime = __instance.GetGrowTime();
+                    DateTime plantTime = new(__instance.m_nview.GetZDO().GetLong("plantTime", ZNet.instance.GetTime().Ticks));
                     string timeString = FormatTimeString(growthTime, plantTime);
 
                     __result += $"\n{timeString}";
                 }
-            }
-
-            public static float GetGrowTime(Plant plant, ZNetView m_nview)
-            {
-                UnityEngine.Random.State state = UnityEngine.Random.state;
-                UnityEngine.Random.InitState((int)(m_nview.GetZDO().m_uid.id + m_nview.GetZDO().m_uid.userID));
-                float value = UnityEngine.Random.value;
-                UnityEngine.Random.state = state;
-                return Mathf.Lerp(plant.m_growTime, plant.m_growTimeMax, value);
             }
         }
 
