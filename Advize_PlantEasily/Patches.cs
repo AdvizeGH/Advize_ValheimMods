@@ -99,7 +99,7 @@ namespace Advize_PlantEasily
                 }
             }
 
-            public static void Postfix(Player __instance, bool ___m_noPlacementCost, ref GameObject ___m_placementGhost, ref int ___m_placementStatus)
+            public static void Postfix(Player __instance, ref GameObject ___m_placementGhost, ref int ___m_placementStatus)
             {
                 if (!config.ModActive || !___m_placementGhost || NotPlantOrPickable(___m_placementGhost) || __instance.GetRightItem()?.m_shared.m_name != "$item_cultivator")
                     return;
