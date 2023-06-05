@@ -275,7 +275,7 @@ namespace Advize_PlantEasily
                         ghost.transform.rotation = ___m_placementGhost.transform.rotation;
 
                         Status status = Status.Healthy;
-                        if (!___m_noPlacementCost && !__instance.HaveRequirements(piece, Player.RequirementMode.CanBuild))
+                        if (!__instance.m_noPlacementCost && !__instance.HaveRequirements(piece, Player.RequirementMode.CanBuild))
                             status = Status.LackResources;
 
                         SetPlacementGhostStatus(ghost, ghostIndex, CheckPlacementStatus(ghost, status), ref ___m_placementStatus);
@@ -288,7 +288,7 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(Player), "PlacePiece")]
         public class PlayerPlacePiece
         {
-            public static bool Prefix(Piece piece, bool ___m_noPlacementCost, GameObject ___m_placementGhost, ref int ___m_placementStatus, ref bool __result)
+            public static bool Prefix(Player __instance, Piece piece, ref int ___m_placementStatus, ref bool __result)
             {
                 //Dbgl("Player.PlacePiece Prefix");
                 if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject))
@@ -296,11 +296,11 @@ namespace Advize_PlantEasily
 
                 if (config.PreventInvalidPlanting)
                 {
-                    int rootPlacementStatus = (int)CheckPlacementStatus(___m_placementGhost);
+                    int rootPlacementStatus = (int)CheckPlacementStatus(__instance.m_placementGhost);
                     if (rootPlacementStatus > 1)
                     {
                         Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[rootPlacementStatus]);
-                        SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
+                        SetPlacementGhostStatus(__instance.m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
                         __result = false;
                         return false;
                     }
@@ -312,10 +312,10 @@ namespace Advize_PlantEasily
                     {
                         if (i != 0)
                         {
-                            if (!(i == 1 && ___m_noPlacementCost))
+                            if (!(i == 1 && __instance.m_noPlacementCost))
                             {
                                 Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[i]);
-                                SetPlacementGhostStatus(___m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
+                                SetPlacementGhostStatus(__instance.m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
                                 __result = false;
                                 return false;
                             }
@@ -325,7 +325,7 @@ namespace Advize_PlantEasily
                 return true;
             }
             
-            public static void Postfix(Player __instance, Piece piece, bool ___m_noPlacementCost)
+            public static void Postfix(Player __instance, Piece piece)
             {
                 //Dbgl("Player.PlacePiece Postfix");
                 if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject))
@@ -342,14 +342,14 @@ namespace Advize_PlantEasily
                         if (ghostPlacementStatus[i + 1] != Status.Healthy)
                         {
                             count--;
-                            if (!(___m_noPlacementCost && ghostPlacementStatus[i + 1] == Status.LackResources))
+                            if (!(__instance.m_noPlacementCost && ghostPlacementStatus[i + 1] == Status.LackResources))
                                 continue;
                         }
 
                         PlacePiece(__instance, extraGhosts[i], piece);
                     }
 
-                    count = ___m_noPlacementCost ? 0 : count;
+                    count = __instance.m_noPlacementCost ? 0 : count;
 
                     for (int i = 0; i < count; i++)
                         __instance.ConsumeResources(piece.m_resources, 0);
@@ -366,9 +366,9 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(Player), "Interact")]
         public class PlayerInteract
         {
-            public static void Prefix(Player __instance, GameObject go, bool hold, bool alt, float ___m_lastHoverInteractTime)
+            public static void Prefix(Player __instance, GameObject go, bool hold, bool alt)
             {
-                if (!config.ModActive || (!config.EnableBulkHarvest && !config.ReplantOnHarvest) || __instance.InAttack() || __instance.InDodge() || (hold && Time.time - ___m_lastHoverInteractTime < 0.2f))
+                if (!config.ModActive || (!config.EnableBulkHarvest && !config.ReplantOnHarvest) || __instance.InAttack() || __instance.InDodge() || (hold && Time.time - __instance.m_lastHoverInteractTime < 0.2f))
                     return;
 
                 Interactable interactable = go.GetComponentInParent<Interactable>();
