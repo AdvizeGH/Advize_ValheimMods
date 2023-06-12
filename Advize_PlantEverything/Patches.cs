@@ -39,28 +39,14 @@ namespace Advize_PlantEverything
                 {
                     if (Physics.Raycast(GameCamera.instance.transform.position, GameCamera.instance.transform.forward, out var hitInfo, 50f, LayerMask.GetMask("item", "piece_nonsolid", "Default_small", "Default")) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
                     {
-                        do
+                        Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
+                        if (piece && piece.m_name.StartsWith("$pe"))
                         {
-                            Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
-                            if (piece && piece.m_name.StartsWith("$pe"))
-                            {
-                                if (!CanRemove(piece.gameObject, __instance, true)) break;
+                            if (!CanRemove(piece.gameObject, __instance, true)) return false;
 
-                                RemoveObject(piece.gameObject, __instance, true);
-                                __result = true;
-                                break;
-                            }
-
-                            Pickable pickable = hitInfo.collider.GetComponentInParent<Pickable>();
-                            if (pickable && (pickable.name.Contains("Branch") || pickable.name.Contains("Stone") || pickable.name.Contains("Flint")))
-                            {
-                                if (!CanRemove(pickable.gameObject, __instance, false)) break;
-
-                                RemoveObject(pickable.gameObject, __instance, false);
-                                __result = true;
-                                break;
-                            }
-                        } while (false);
+                            RemoveObject(piece.gameObject, __instance);
+                            __result = true;
+                        }
                     }
                     return false;
                 }
@@ -83,7 +69,7 @@ namespace Advize_PlantEverything
                 return canRemove;
             }
 
-            private static void RemoveObject(GameObject component, Player player, bool isPiece)
+            private static void RemoveObject(GameObject component, Player player)
             {
                 ZNetView component2 = component.GetComponent<ZNetView>();
                 WearNTear component3 = component.GetComponent<WearNTear>();
@@ -95,17 +81,13 @@ namespace Advize_PlantEverything
                 else
                 {
                     component2.ClaimOwnership();
-                    if (isPiece)
+                    Piece piece = component.GetComponent<Piece>();
+                    piece.DropResources();
+                    piece.m_placeEffect.Create(piece.transform.position, piece.transform.rotation);
+                    if (component.GetComponentInParent<Pickable>())
                     {
-                        Piece piece = component.GetComponent<Piece>();
-                        piece.DropResources();
-                        piece.m_placeEffect.Create(piece.transform.position, piece.transform.rotation);
+                        component2.InvokeRPC("Pick");
                     }
-                    else
-                    {
-                        component2.InvokeRPC("Pick"); ;
-                    }
-                    player.m_removeEffects.Create(component.transform.position, Quaternion.identity);
                     ZNetScene.instance.Destroy(component.gameObject);
                 }
                 player.FaceLookDirection();
@@ -278,7 +260,7 @@ namespace Advize_PlantEverything
                         return;
 
                     float growthTime = __instance.m_respawnTimeMinutes * 60;
-                    DateTime pickedTime = new(__instance.m_nview.GetZDO().GetLong("picked_time", 0L));
+                    DateTime pickedTime = new(__instance.m_nview.GetZDO().GetLong(ZDOVars.s_pickedTime, 0L));
                     string timeString = FormatTimeString(growthTime, pickedTime);
 
                     __result = Localization.instance.Localize(__instance.GetHoverName()) + $"\n{timeString}";
@@ -295,7 +277,7 @@ namespace Advize_PlantEverything
                 if (config.EnablePlantTimers && __instance.m_status == 0 && __instance.m_nview.GetZDO() != null)
                 {
                     float growthTime = __instance.GetGrowTime();
-                    DateTime plantTime = new(__instance.m_nview.GetZDO().GetLong("plantTime", ZNet.instance.GetTime().Ticks));
+                    DateTime plantTime = new(__instance.m_nview.GetZDO().GetLong(ZDOVars.s_plantTime, ZNet.instance.GetTime().Ticks));
                     string timeString = FormatTimeString(growthTime, plantTime);
 
                     __result += $"\n{timeString}";

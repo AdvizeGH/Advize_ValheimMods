@@ -15,7 +15,7 @@ namespace Advize_PlantEasily
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "1.4.1";
+        public const string Version = "1.4.2";
         
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -193,7 +193,7 @@ namespace Advize_PlantEasily
                 {
                     if (config.HarvestStyle == HarvestStyle.LikeResources && collidingInteractable.transform.root.name != rootInteractable.transform.root.name)
                         continue;
-                    if (collidingBeehive && (int)typeof(Beehive).GetMethod("GetHoneyLevel", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(collidingBeehive, null) < 1)
+                    if (collidingBeehive && collidingBeehive.GetHoneyLevel() < 1)
                         continue;
 
                     Interactable resource = (Interactable) collidingPickable ?? collidingBeehive;
