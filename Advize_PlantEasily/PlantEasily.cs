@@ -15,7 +15,7 @@ namespace Advize_PlantEasily
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "1.4.2";
+        public const string Version = "1.4.3";
         
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -222,6 +222,7 @@ namespace Advize_PlantEasily
             player.AddNoise(50f);
 
             Game.instance.GetPlayerProfile().m_playerStats.m_builds++;
+            //Game.instance.IncrementPlayerStat(PlayerStatType.Builds);
             Gogan.LogEvent("Game", "PlacedPiece", gameObject.name, 0L);
         }
 

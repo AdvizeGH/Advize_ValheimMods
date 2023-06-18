@@ -51,7 +51,7 @@ namespace Advize_PlantEasily
         {
             public static void Prefix(ref bool __runOriginal)
             {
-                if (OverrideGamepadInput() && Player.m_localPlayer && !InventoryGui.IsVisible() && !Menu.IsVisible() && !GameCamera.InFreeFly() && !Minimap.IsOpen())
+                if (OverrideGamepadInput() && Player.m_localPlayer && !InventoryGui.IsVisible() && !Menu.IsVisible() && !GameCamera.InFreeFly() && !Minimap.IsOpen() && !Hud.IsPieceSelectionVisible() && !StoreGui.IsVisible() && !Console.IsVisible() && !Chat.instance.HasFocus()/* && !PlayerCustomizaton.IsBarberGuiVisible()*/)
                 {
                     __runOriginal = false;
                 }
@@ -75,7 +75,7 @@ namespace Advize_PlantEasily
                 //Dbgl("SetupPlacementGhost");
                 DestroyGhosts();
                 
-                if (!config.ModActive || !___m_placementGhost || NotPlantOrPickable(___m_placementGhost))
+                if (!config.ModActive || !___m_placementGhost || NotPlantOrPickable(___m_placementGhost) || Player.m_localPlayer?.GetRightItem()?.m_shared.m_name != "$item_cultivator")
                     return;
                 
                 CreateGhosts(___m_placementGhost);
