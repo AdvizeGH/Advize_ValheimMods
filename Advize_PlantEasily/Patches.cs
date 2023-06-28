@@ -129,7 +129,7 @@ namespace Advize_PlantEasily
                 float pieceSpacing = GetPieceSpacing(___m_placementGhost);
 
                 // Takes position of ghost, subtracts position of player to get vector between the two and facing out from the player, normalizes that vector to have a magnitude of 1.0f
-                Vector3 rowDirection = Utils.DirectionXZ(basePosition - __instance.transform.position);
+                Vector3 rowDirection = config.GloballyAlignGridDirections ? basePosition + Vector3.forward - basePosition : Utils.DirectionXZ(basePosition - __instance.transform.position);
                 // Cross product of a vertical vector and the forward facing normalized vector, producing a perpendicular lateral vector
                 Vector3 columnDirection = Vector3.Cross(Vector3.up, rowDirection);
                 
@@ -244,7 +244,7 @@ namespace Advize_PlantEasily
                 {
                     if (config.SnapActive)
                     {
-                        rowDirection = Utils.DirectionXZ(basePosition - __instance.transform.position);
+                        rowDirection = config.GloballyAlignGridDirections ? basePosition + Vector3.forward - basePosition : Utils.DirectionXZ(basePosition - __instance.transform.position);
                         columnDirection = Vector3.Cross(Vector3.up, rowDirection);
                     }
 
