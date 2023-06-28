@@ -54,6 +54,8 @@ namespace Advize_PlantEasily.Configuration
         private readonly ConfigEntry<KeyboardShortcut> gamepadModifierKey;
         private readonly ConfigEntry<KeyboardShortcut> keyboardHarvestModifierKey;
 
+        private readonly ConfigEntry<KeyboardShortcut> toggleAutoReplantKey;
+
         //UI
         private readonly ConfigEntry<bool> showCost;
         private readonly ConfigEntry<CostDisplayStyle> costDisplayStyle;
@@ -140,6 +142,11 @@ namespace Advize_PlantEasily.Configuration
                     "Modifier key to enable bulk harvest when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
                     new Attributes { Description = "Modifier key to enable bulk harvest when using keyboard controls." }));
+            toggleAutoReplantKey = Config.Bind("Controls", "ToggleAutoReplantKey", new KeyboardShortcut(KeyCode.None),
+                new ConfigDescription(
+                    "Key to toggle on/off the [Harvesting]ReplantOnHarvest setting. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+                    null,
+                    new Attributes { Description = "Key to toggle on/off the [Harvesting]ReplantOnHarvest setting." }));
 
             //UI
             showCost = Config.Bind("UI", "ShowCost", true, new ConfigDescription("Update resource cost in build UI.", null, new Attributes { Order = 3 }));
@@ -253,6 +260,7 @@ namespace Advize_PlantEasily.Configuration
         internal bool ReplantOnHarvest
         {
             get { return replantOnHarvest.Value; }
+            set { replantOnHarvest.BoxedValue = value; }
         }
         internal KeyCode EnableModKey
         {
@@ -289,6 +297,10 @@ namespace Advize_PlantEasily.Configuration
         internal KeyCode KeyboardHarvestModifierKey
         {
             get { return keyboardHarvestModifierKey.Value.MainKey; }
+        }
+        internal KeyCode ToggleAutoReplantKey
+        {
+            get { return toggleAutoReplantKey.Value.MainKey; }
         }
         internal bool ShowCost
         {

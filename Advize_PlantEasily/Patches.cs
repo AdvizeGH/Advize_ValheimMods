@@ -28,7 +28,12 @@ namespace Advize_PlantEasily
                     config.SnapActive = !config.SnapActive;
                     Dbgl($"snapActive was {!config.SnapActive} setting to {config.SnapActive}");
                 }
-                
+                if (Input.GetKeyUp(config.ToggleAutoReplantKey))
+                {
+                    config.ReplantOnHarvest = !config.ReplantOnHarvest;
+                    Dbgl($"replantOnHarvest was {!config.ReplantOnHarvest} setting to {config.ReplantOnHarvest}");
+                }
+
                 if (Input.GetKey(config.KeyboardModifierKey) || Input.GetKey(config.GamepadModifierKey))
                 {
                     if (Input.GetKeyUp(config.IncreaseXKey) || ZInput.GetButtonDown("JoyDPadRight"))
