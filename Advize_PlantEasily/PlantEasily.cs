@@ -101,7 +101,7 @@ namespace Advize_PlantEasily
                 colliderRoots.AddRange(plant.m_grownPrefabs);
                 isSapling = colliderRoots.Any(x => x.GetComponent<TreeBase>());
 
-                if (!isSapling)
+                if (!config.StandardizeGridSpacing && !isSapling)
                 {
                     for (int i = 0; i < colliderRoots.Count; i++)
                     {
@@ -114,7 +114,7 @@ namespace Advize_PlantEasily
                 colliderRadius += isSapling ? config.ExtraSaplingSpacing : config.ExtraCropSpacing;
             }
             
-            float growRadius = isSapling ? plant.m_growRadius * 2.2f : plant?.m_growRadius * 1.1f ?? PickableSnapRadius(go.name);
+            float growRadius = isSapling ? plant.m_growRadius * 2.2f : plant?.m_growRadius * (config.StandardizeGridSpacing ? 2f : 1.1f) ?? PickableSnapRadius(go.name);
 
             return growRadius + colliderRadius;
         }
