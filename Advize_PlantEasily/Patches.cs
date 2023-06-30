@@ -296,7 +296,7 @@ namespace Advize_PlantEasily
             public static bool Prefix(Player __instance, Piece piece, ref int ___m_placementStatus, ref bool __result)
             {
                 //Dbgl("Player.PlacePiece Prefix");
-                if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject))
+                if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject) || __instance.GetRightItem()?.m_shared.m_name != "$item_cultivator")
                     return true;
 
                 if (config.PreventInvalidPlanting)
@@ -333,7 +333,7 @@ namespace Advize_PlantEasily
             public static void Postfix(Player __instance, Piece piece)
             {
                 //Dbgl("Player.PlacePiece Postfix");
-                if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject))
+                if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject) || __instance.GetRightItem()?.m_shared.m_name != "$item_cultivator")
                     return;
                 
                 //This doesn't apply to the root placement ghost.
