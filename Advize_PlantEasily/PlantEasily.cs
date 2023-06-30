@@ -85,8 +85,8 @@ namespace Advize_PlantEasily
         }
 
         private static bool HasGrowSpace(Plant plant, Vector3 position) => Physics.OverlapSphere(position, plant.m_growRadius, plantCollisionMask).Length == 0;
-
-        private static bool PositionHasCollisions(Vector3 position) => Physics.CheckSphere(position, 0.025f, snapCollisionMask);
+        
+        private static bool PositionHasCollisions(Vector3 position) => Physics.CheckCapsule(position, position + (Vector3.up / 2), 0.0001f, snapCollisionMask);
 
         private static float GetPieceSpacing(GameObject go)
         {
