@@ -18,6 +18,7 @@ namespace Advize_PlantEasily
                 {
                     config.ModActive = !config.ModActive;
                     Dbgl($"modActive was {!config.ModActive} setting to {config.ModActive}");
+                    Player.m_localPlayer.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.ModActive: {config.ModActive}");
                     if (__instance.GetRightItem()?.m_shared.m_name == "$item_cultivator")
                     {
                         typeof(Player).GetMethod("SetupPlacementGhost", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(__instance, new object[0]);
@@ -27,11 +28,13 @@ namespace Advize_PlantEasily
                 {
                     config.SnapActive = !config.SnapActive;
                     Dbgl($"snapActive was {!config.SnapActive} setting to {config.SnapActive}");
+                    Player.m_localPlayer.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.SnapActive: {config.SnapActive}");
                 }
                 if (Input.GetKeyUp(config.ToggleAutoReplantKey))
                 {
                     config.ReplantOnHarvest = !config.ReplantOnHarvest;
                     Dbgl($"replantOnHarvest was {!config.ReplantOnHarvest} setting to {config.ReplantOnHarvest}");
+                    Player.m_localPlayer.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.ReplantOnHarvest: {config.ReplantOnHarvest}");
                 }
 
                 if (Input.GetKey(config.KeyboardModifierKey) || Input.GetKey(config.GamepadModifierKey))
