@@ -10,6 +10,7 @@ using Advize_PlantEasily.Configuration;
 namespace Advize_PlantEasily
 {
     [BepInPlugin(PluginID, PluginName, Version)]
+    [BepInProcess("valheim.exe")] // This mod shouldn't be run on the server... yet
     public partial class PlantEasily : BaseUnityPlugin
     {
         public const string PluginID = "advize.PlantEasily";
