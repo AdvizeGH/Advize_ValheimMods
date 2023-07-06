@@ -289,18 +289,20 @@ namespace Advize_PlantEasily
                         SetPlacementGhostStatus(ghost, ghostIndex, CheckPlacementStatus(ghost, status), ref ___m_placementStatus);
                     }
                 }
-                ___m_placementGhost.GetComponent<Piece>().m_resources[0].m_amount = cost;
+                piece.m_resources[0].m_amount = cost;
             }
         }
         
         [HarmonyPatch(typeof(Player), "PlacePiece")]
         public class PlayerPlacePiece
         {
-            public static bool Prefix(Player __instance, Piece piece, ref int ___m_placementStatus, ref bool __result)
+            public static bool Prefix(Player __instance, Piece piece, ref bool __result, ref bool __state)
             {
                 //Dbgl("Player.PlacePiece Prefix");
                 if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject) || __instance.GetRightItem()?.m_shared.m_name != "$item_cultivator")
                     return true;
+
+                __state = true;
 
                 if (config.PreventInvalidPlanting)
                 {
@@ -308,9 +310,7 @@ namespace Advize_PlantEasily
                     if (rootPlacementStatus > 1)
                     {
                         Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[rootPlacementStatus]);
-                        SetPlacementGhostStatus(__instance.m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
-                        __result = false;
-                        return false;
+                        return __state = __result = false;
                     }
                 }
                 
@@ -318,29 +318,24 @@ namespace Advize_PlantEasily
                 {
                     foreach (int i in ghostPlacementStatus)
                     {
-                        if (i != 0)
+                        if (i != 0 && !(i == 1 && __instance.m_noPlacementCost))
                         {
-                            if (!(i == 1 && __instance.m_noPlacementCost))
-                            {
-                                Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[i]);
-                                SetPlacementGhostStatus(__instance.m_placementGhost, 0, Status.Invalid, ref ___m_placementStatus);
-                                __result = false;
-                                return false;
-                            }
+                            Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[i]);
+                            return __state = __result = false;
                         }
                     }
                 }
                 return true;
             }
             
-            public static void Postfix(Player __instance, Piece piece)
+            public static void Postfix(Player __instance, Piece piece, bool __state)
             {
-                //Dbgl("Player.PlacePiece Postfix");
+                //Dbgl("Player.PlacePiece Postfix"); Dbgl($"__state is {__state}");
                 if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject) || __instance.GetRightItem()?.m_shared.m_name != "$item_cultivator")
                     return;
                 
                 //This doesn't apply to the root placement ghost.
-                if (ghostPlacementStatus[0] == Status.Healthy) // With this, root Ghost must be valid (can be fixed)
+                if (__state)
                 {
                     ItemDrop.ItemData rightItem = __instance.GetRightItem();
                     int count = extraGhosts.Count;
@@ -349,9 +344,9 @@ namespace Advize_PlantEasily
                     {
                         if (ghostPlacementStatus[i + 1] != Status.Healthy)
                         {
-                            count--;
-                            if (!(__instance.m_noPlacementCost && ghostPlacementStatus[i + 1] == Status.LackResources))
-                                continue;
+                            bool canPlant = (ghostPlacementStatus[i + 1] == Status.LackResources && __instance.m_noPlacementCost) || (!config.PreventInvalidPlanting && (int)ghostPlacementStatus[i + 1] > 1);
+                            if (!canPlant)
+                                count--; continue;
                         }
 
                         PlacePiece(__instance, extraGhosts[i], piece);
