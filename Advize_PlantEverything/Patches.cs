@@ -219,11 +219,11 @@ namespace Advize_PlantEverything
             public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
             {
                 return new CodeMatcher(instructions)
-                .MatchForward(true, new CodeMatch(OpCodes.Stloc_2))
+                .MatchForward(true, new CodeMatch(OpCodes.Stloc_3))
                 .MatchForward(false, new CodeMatch(OpCodes.Callvirt))
                 .Advance(-1)
                 .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0))
-                .InsertAndAdvance(new CodeInstruction(OpCodes.Ldloc_2))
+                .InsertAndAdvance(new CodeInstruction(OpCodes.Ldloc_3))
                 .InsertAndAdvance(new CodeInstruction(OpCodes.Call, ModifyGrowMethod))
                 .InstructionEnumeration();
             }
