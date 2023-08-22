@@ -18,7 +18,7 @@ namespace Advize_PlantEasily
                 {
                     config.ModActive = !config.ModActive;
                     Dbgl($"modActive was {!config.ModActive} setting to {config.ModActive}");
-                    Player.m_localPlayer.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.ModActive: {config.ModActive}");
+                    __instance.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.ModActive: {config.ModActive}");
                     if (__instance.GetRightItem()?.m_shared.m_name == "$item_cultivator")
                     {
                         typeof(Player).GetMethod("SetupPlacementGhost", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(__instance, new object[0]);
@@ -28,13 +28,13 @@ namespace Advize_PlantEasily
                 {
                     config.SnapActive = !config.SnapActive;
                     Dbgl($"snapActive was {!config.SnapActive} setting to {config.SnapActive}");
-                    Player.m_localPlayer.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.SnapActive: {config.SnapActive}");
+                    __instance.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.SnapActive: {config.SnapActive}");
                 }
                 if (Input.GetKeyUp(config.ToggleAutoReplantKey))
                 {
                     config.ReplantOnHarvest = !config.ReplantOnHarvest;
                     Dbgl($"replantOnHarvest was {!config.ReplantOnHarvest} setting to {config.ReplantOnHarvest}");
-                    Player.m_localPlayer.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.ReplantOnHarvest: {config.ReplantOnHarvest}");
+                    __instance.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.ReplantOnHarvest: {config.ReplantOnHarvest}");
                 }
 
                 if (Input.GetKey(config.KeyboardModifierKey) || Input.GetKey(config.GamepadModifierKey))
@@ -309,7 +309,7 @@ namespace Advize_PlantEasily
                     int rootPlacementStatus = (int)CheckPlacementStatus(__instance.m_placementGhost);
                     if (rootPlacementStatus > 1)
                     {
-                        Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[rootPlacementStatus]);
+                        __instance.Message(MessageHud.MessageType.Center, statusMessage[rootPlacementStatus]);
                         return __state = __result = false;
                     }
                 }
@@ -320,7 +320,7 @@ namespace Advize_PlantEasily
                     {
                         if (i != 0 && !(i == 1 && __instance.m_noPlacementCost))
                         {
-                            Player.m_localPlayer.Message(MessageHud.MessageType.Center, statusMessage[i]);
+                            __instance.Message(MessageHud.MessageType.Center, statusMessage[i]);
                             return __state = __result = false;
                         }
                     }
@@ -330,7 +330,7 @@ namespace Advize_PlantEasily
             
             public static void Postfix(Player __instance, Piece piece, bool __state)
             {
-                //Dbgl("Player.PlacePiece Postfix"); Dbgl($"__state is {__state}");
+                //Dbgl("Player.PlacePiece Postfix" + $"\n __state is {__state}");
                 if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject) || __instance.GetRightItem()?.m_shared.m_name != "$item_cultivator")
                     return;
                 
@@ -346,7 +346,10 @@ namespace Advize_PlantEasily
                         {
                             bool canPlant = (ghostPlacementStatus[i + 1] == Status.LackResources && __instance.m_noPlacementCost) || (!config.PreventInvalidPlanting && (int)ghostPlacementStatus[i + 1] > 1);
                             if (!canPlant)
-                                count--; continue;
+                            {
+                                count--;
+                                continue;
+                            }
                         }
 
                         PlacePiece(__instance, extraGhosts[i], piece);
@@ -358,7 +361,7 @@ namespace Advize_PlantEasily
                         __instance.ConsumeResources(piece.m_resources, 0);
 
                     if (config.UseStamina)
-                        __instance.UseStamina(rightItem.m_shared.m_attack.m_attackStamina * count);
+                        __instance.UseStamina(rightItem.m_shared.m_attack.m_attackStamina * count, true);
 
                     if (rightItem.m_shared.m_useDurability && config.UseDurability)
                         rightItem.m_durability -= rightItem.m_shared.m_useDurabilityDrain * count;
