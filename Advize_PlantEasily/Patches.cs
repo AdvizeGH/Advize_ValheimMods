@@ -78,7 +78,27 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(Player), "SetupPlacementGhost")]
         public class PlayerSetupPlacementGhost
         {
-            public static void Postfix(ref GameObject ___m_placementGhost)
+            public static int placementRotation;
+            public static void Prefix()
+            {
+                if (!config.ModActive || Player.m_localPlayer?.GetRightItem()?.m_shared.m_name != "$item_cultivator")
+                    return;
+
+                placementRotation = Player.m_localPlayer.m_placeRotation;
+            }
+
+            //public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+            //{
+            //    var unityRandomRange = AccessTools.DeclaredMethod(typeof(UnityEngine.Random), "Range", new[] { typeof(int), typeof(int) });
+
+            //    return new CodeMatcher(instructions)
+            //    .MatchForward(true, new CodeMatch(OpCodes.Call, unityRandomRange))
+            //    .Advance(-3)
+            //    .RemoveInstructions(5)
+            //    .InstructionEnumeration();
+            //}
+
+            public static void Postfix(GameObject ___m_placementGhost, ref int ___m_placeRotation)
             {
                 //Dbgl("SetupPlacementGhost");
                 DestroyGhosts();
@@ -86,6 +106,7 @@ namespace Advize_PlantEasily
                 if (!config.ModActive || !___m_placementGhost || NotPlantOrPickable(___m_placementGhost) || Player.m_localPlayer?.GetRightItem()?.m_shared.m_name != "$item_cultivator")
                     return;
                 
+                ___m_placeRotation = placementRotation;
                 CreateGhosts(___m_placementGhost);
             }
         }
@@ -296,6 +317,8 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(Player), "PlacePiece")]
         public class PlayerPlacePiece
         {
+            public static int placementRotation;
+
             public static bool Prefix(Player __instance, Piece piece, ref bool __result, ref bool __state)
             {
                 //Dbgl("Player.PlacePiece Prefix");
@@ -303,6 +326,7 @@ namespace Advize_PlantEasily
                     return true;
 
                 __state = true;
+                placementRotation = __instance.m_placeRotation;
 
                 if (config.PreventInvalidPlanting)
                 {
@@ -333,10 +357,10 @@ namespace Advize_PlantEasily
                 //Dbgl("Player.PlacePiece Postfix" + $"\n __state is {__state}");
                 if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject) || __instance.GetRightItem()?.m_shared.m_name != "$item_cultivator")
                     return;
-                
                 //This doesn't apply to the root placement ghost.
                 if (__state)
                 {
+                    __instance.m_placeRotation = placementRotation;
                     ItemDrop.ItemData rightItem = __instance.GetRightItem();
                     int count = extraGhosts.Count;
 
