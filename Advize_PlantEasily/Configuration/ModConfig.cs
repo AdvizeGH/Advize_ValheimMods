@@ -262,13 +262,13 @@ namespace Advize_PlantEasily.Configuration
             get { return replantOnHarvest.Value; }
             set { replantOnHarvest.BoxedValue = value; }
         }
-        internal KeyCode EnableModKey
+        internal KeyboardShortcut EnableModKey
         {
-            get { return enableModKey.Value.MainKey; }
+            get { return enableModKey.Value; }
         }
-        internal KeyCode EnableSnappingKey
+        internal KeyboardShortcut EnableSnappingKey
         {
-            get { return enableSnappingKey.Value.MainKey; }
+            get { return enableSnappingKey.Value; }
         }
         internal KeyCode IncreaseXKey
         {
@@ -298,9 +298,9 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return keyboardHarvestModifierKey.Value.MainKey; }
         }
-        internal KeyCode ToggleAutoReplantKey
+        internal KeyboardShortcut ToggleAutoReplantKey
         {
-            get { return toggleAutoReplantKey.Value.MainKey; }
+            get { return toggleAutoReplantKey.Value; }
         }
         internal bool ShowCost
         {

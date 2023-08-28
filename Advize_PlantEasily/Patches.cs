@@ -14,7 +14,7 @@ namespace Advize_PlantEasily
         {
             public static void Prefix(Player __instance)
             {
-                if (Input.GetKeyUp(config.EnableModKey))
+                if (config.EnableModKey.IsDown())
                 {
                     config.ModActive = !config.ModActive;
                     Dbgl($"modActive was {!config.ModActive} setting to {config.ModActive}");
@@ -24,13 +24,13 @@ namespace Advize_PlantEasily
                         typeof(Player).GetMethod("SetupPlacementGhost", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(__instance, new object[0]);
                     }
                 }
-                if (Input.GetKeyUp(config.EnableSnappingKey))
+                if (config.EnableSnappingKey.IsDown())
                 {
                     config.SnapActive = !config.SnapActive;
                     Dbgl($"snapActive was {!config.SnapActive} setting to {config.SnapActive}");
                     __instance.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.SnapActive: {config.SnapActive}");
                 }
-                if (Input.GetKeyUp(config.ToggleAutoReplantKey))
+                if (config.ToggleAutoReplantKey.IsDown())
                 {
                     config.ReplantOnHarvest = !config.ReplantOnHarvest;
                     Dbgl($"replantOnHarvest was {!config.ReplantOnHarvest} setting to {config.ReplantOnHarvest}");
