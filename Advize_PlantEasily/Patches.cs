@@ -106,6 +106,7 @@ namespace Advize_PlantEasily
             }
 
             private static bool FindSnapPoints(List<SnapPosition> snapPoints, Collider collider, Vector3 rowDirection, Vector3 columnDirection, Plant plant)
+            {
                 Vector3[] positions = new Vector3[]
                 {
                     collider.transform.position + rowDirection,
