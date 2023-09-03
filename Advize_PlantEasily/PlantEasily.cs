@@ -32,6 +32,10 @@ namespace Advize_PlantEasily
         private static readonly int snapCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid", "item");
         private static readonly int plantCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid");
 
+        private static bool HoldingCultivator => Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator";
+
+        private static bool OverrideGamepadInput => placementGhost && Input.GetKey(config.GamepadModifierKey);
+
         public void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
@@ -39,10 +43,8 @@ namespace Advize_PlantEasily
             Harmony.PatchAll();
         }
 
-        private static bool NotPlantOrPickable(GameObject go) => !go.GetComponent<Plant>() && !go.GetComponent<Pickable>();
+        private static bool IsPlantOrPickable(GameObject go) => go.GetComponent<Plant>() || go.GetComponent<Pickable>();
 
-        private static bool OverrideGamepadInput() => placementGhost && Input.GetKey(config.GamepadModifierKey);
-        
         internal static void GridSizeChanged(object sender, EventArgs e) => DestroyGhosts();
         
         private static void DestroyGhosts()

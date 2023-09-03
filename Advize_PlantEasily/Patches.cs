@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,10 +18,8 @@ namespace Advize_PlantEasily
                     config.ModActive = !config.ModActive;
                     Dbgl($"modActive was {!config.ModActive} setting to {config.ModActive}");
                     __instance.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.ModActive: {config.ModActive}");
-                    if (__instance.GetRightItem()?.m_shared.m_name == "$item_cultivator")
-                    {
-                        typeof(Player).GetMethod("SetupPlacementGhost", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(__instance, new object[0]);
-                    }
+                    if (HoldingCultivator)
+                        __instance.SetupPlacementGhost();
                 }
                 if (config.EnableSnappingKey.IsDown())
                 {
@@ -57,22 +54,13 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(HotkeyBar), "Update")]
         public class HotKeyBarUpdate
         {
-            public static void Prefix(ref bool __runOriginal)
-            {
-                if (OverrideGamepadInput() && Player.m_localPlayer && !InventoryGui.IsVisible() && !Menu.IsVisible() && !GameCamera.InFreeFly() && !Minimap.IsOpen() && !Hud.IsPieceSelectionVisible() && !StoreGui.IsVisible() && !Console.IsVisible() && !Chat.instance.HasFocus()/* && !PlayerCustomizaton.IsBarberGuiVisible()*/)
-                {
-                    __runOriginal = false;
-                }
-            }
+            public static void Prefix(ref bool __runOriginal) => __runOriginal = !OverrideGamepadInput;
         }
         
         [HarmonyPatch(typeof(Player), "StartGuardianPower")]
         public class PlayerStartGuardianPower
         {
-            public static void Prefix(ref bool __runOriginal)
-            {
-                __runOriginal = !OverrideGamepadInput();
-            }
+            public static void Prefix(ref bool __runOriginal) => __runOriginal = !OverrideGamepadInput;
         }
         
         [HarmonyPatch(typeof(Player), "SetupPlacementGhost")]
@@ -81,29 +69,18 @@ namespace Advize_PlantEasily
             public static int placementRotation;
             public static void Prefix()
             {
-                if (!config.ModActive || Player.m_localPlayer?.GetRightItem()?.m_shared.m_name != "$item_cultivator")
+                if (!config.ModActive || !HoldingCultivator)
                     return;
 
                 placementRotation = Player.m_localPlayer.m_placeRotation;
             }
-
-            //public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-            //{
-            //    var unityRandomRange = AccessTools.DeclaredMethod(typeof(UnityEngine.Random), "Range", new[] { typeof(int), typeof(int) });
-
-            //    return new CodeMatcher(instructions)
-            //    .MatchForward(true, new CodeMatch(OpCodes.Call, unityRandomRange))
-            //    .Advance(-3)
-            //    .RemoveInstructions(5)
-            //    .InstructionEnumeration();
-            //}
 
             public static void Postfix(GameObject ___m_placementGhost, ref int ___m_placeRotation)
             {
                 //Dbgl("SetupPlacementGhost");
                 DestroyGhosts();
                 
-                if (!config.ModActive || !___m_placementGhost || NotPlantOrPickable(___m_placementGhost) || Player.m_localPlayer?.GetRightItem()?.m_shared.m_name != "$item_cultivator")
+                if (!config.ModActive || !___m_placementGhost || !IsPlantOrPickable(___m_placementGhost) || !HoldingCultivator)
                     return;
                 
                 ___m_placeRotation = placementRotation;
@@ -128,13 +105,46 @@ namespace Advize_PlantEasily
                 }
             }
 
+            private static bool FindSnapPoints(List<SnapPosition> snapPoints, Collider collider, Vector3 rowDirection, Vector3 columnDirection, Plant plant)
+                Vector3[] positions = new Vector3[]
+                {
+                    collider.transform.position + rowDirection,
+                    collider.transform.position + columnDirection,
+                    collider.transform.position - rowDirection,
+                    collider.transform.position - columnDirection
+                };
+
+                foreach (Vector3 pos in positions)
+                {
+                    bool invertRowDirection = false;
+                    bool invertColumnDirection = false;
+
+                    if (!PositionHasCollisions(pos))
+                    {
+                        if (plant && !HasGrowSpace(plant, pos)) continue;
+
+                        if (config.GridSnappingStyle == 0)
+                        {
+                            if (config.Rows > 1 && PositionHasCollisions(pos + rowDirection))
+                                invertRowDirection = true;
+                            if (config.Columns > 1 && PositionHasCollisions(pos + columnDirection))
+                                invertColumnDirection = true;
+                        }
+
+                        snapPoints.Add(new SnapPosition(!invertRowDirection ? rowDirection : -rowDirection, !invertColumnDirection ? columnDirection : -columnDirection, pos));
+                    }
+                }
+
+                return snapPoints.Count > 0;
+            }
+
             public static void Postfix(Player __instance, ref GameObject ___m_placementGhost, ref int ___m_placementStatus)
             {
-                if (!config.ModActive || !___m_placementGhost || NotPlantOrPickable(___m_placementGhost) || __instance.GetRightItem()?.m_shared.m_name != "$item_cultivator")
+                if (!config.ModActive || !___m_placementGhost || !IsPlantOrPickable(___m_placementGhost) || !HoldingCultivator)
                     return;
                 
                 if (ghostPlacementStatus.Count == 0 || (extraGhosts.Count == 0 && !(config.Rows == 1 && config.Columns == 1))) //If there are no extra ghosts but there is supposed to be
-                    typeof(Player).GetMethod("SetupPlacementGhost", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(__instance, new object[0]);
+                    __instance.SetupPlacementGhost();
                 
                 for (int i = 0; i < extraGhosts.Count; i++)
                 {
@@ -158,7 +168,7 @@ namespace Advize_PlantEasily
                 float pieceSpacing = GetPieceSpacing(___m_placementGhost);
 
                 // Takes position of ghost, subtracts position of player to get vector between the two and facing out from the player, normalizes that vector to have a magnitude of 1.0f
-                Vector3 rowDirection = config.GloballyAlignGridDirections ? basePosition + Vector3.forward - basePosition : Utils.DirectionXZ(basePosition - __instance.transform.position);
+                Vector3 rowDirection = config.GloballyAlignGridDirections ? Vector3.forward : Utils.DirectionXZ(basePosition - __instance.transform.position);
                 // Cross product of a vertical vector and the forward facing normalized vector, producing a perpendicular lateral vector
                 Vector3 columnDirection = Vector3.Cross(Vector3.up, rowDirection);
                 
@@ -173,7 +183,7 @@ namespace Advize_PlantEasily
                     
                     foreach (Collider collider in obstructions)
                     {
-                        if (NotPlantOrPickable(collider.transform.root.gameObject)) continue;
+                        if (!IsPlantOrPickable(collider.transform.root.gameObject)) continue;
                         validFirstOrderCollisions++;
                         if (validFirstOrderCollisions > 8) break;
                         
@@ -182,7 +192,7 @@ namespace Advize_PlantEasily
                         
                         foreach (Collider secondaryCollider in secondaryObstructions)
                         {
-                            if (NotPlantOrPickable(secondaryCollider.transform.root.gameObject)) continue;
+                            if (!IsPlantOrPickable(secondaryCollider.transform.root.gameObject)) continue;
                             if (secondaryCollider.transform.root == collider.transform.root) continue;
                             validSecondOrderCollisions++;
                             if (validSecondOrderCollisions > 8) break;
@@ -193,33 +203,7 @@ namespace Advize_PlantEasily
                             rowDirection = (config.StandardizeGridRotations ? fixedRotation : baseRotation) * rowDirection * pieceSpacing;
                             columnDirection = (config.StandardizeGridRotations ? fixedRotation : baseRotation) * columnDirection * pieceSpacing;
 
-                            Vector3[] positions = new Vector3[]
-                            {
-                                collider.transform.position + rowDirection,
-                                collider.transform.position + columnDirection,
-                                collider.transform.position - rowDirection,
-                                collider.transform.position - columnDirection
-                            };
-
-                            foreach (Vector3 pos in positions)
-                            {
-                                bool invertRowDirection = false;
-                                bool invertColumnDirection = false;
-                                if (!PositionHasCollisions(pos))
-                                {
-                                    if (plant && !HasGrowSpace(plant, pos)) continue;
-                                    if (config.GridSnappingStyle == 0)
-                                    {
-                                        if (config.Rows > 1 && PositionHasCollisions(pos + rowDirection))
-                                            invertRowDirection = true;
-                                        if (config.Columns > 1 && PositionHasCollisions(pos + columnDirection))
-                                            invertColumnDirection = true;
-                                    }
-
-                                    snapPoints.Add(new SnapPosition(!invertRowDirection ? rowDirection : -rowDirection, !invertColumnDirection ? columnDirection : -columnDirection, pos));
-                                    foundSnaps = true;
-                                }
-                            }
+                            foundSnaps = FindSnapPoints(snapPoints, collider, rowDirection, columnDirection, plant);
                         }
 
                         if (!foundSnaps)
@@ -227,33 +211,7 @@ namespace Advize_PlantEasily
                             rowDirection = baseRotation * rowDirection * pieceSpacing;
                             columnDirection = baseRotation * columnDirection * pieceSpacing;
 
-                            Vector3[] positions = new Vector3[]
-                            {
-                                collider.transform.position + rowDirection,
-                                collider.transform.position + columnDirection,
-                                collider.transform.position - rowDirection,
-                                collider.transform.position - columnDirection
-                            };
-
-                            foreach (Vector3 pos in positions)
-                            {
-                                bool invertRowDirection = false;
-                                bool invertColumnDirection = false;
-                                if (!PositionHasCollisions(pos))
-                                {
-                                    if (plant && !HasGrowSpace(plant, pos)) continue;
-                                    if (config.GridSnappingStyle == 0)
-                                    {
-                                        if (config.Rows > 1 && PositionHasCollisions(pos + rowDirection))
-                                            invertRowDirection = true;
-                                        if (config.Columns > 1 && PositionHasCollisions(pos + columnDirection))
-                                            invertColumnDirection = true;
-                                    }
-
-                                    snapPoints.Add(new SnapPosition(!invertRowDirection ? rowDirection : -rowDirection, !invertColumnDirection ? columnDirection : -columnDirection, pos));
-                                    foundSnaps = true;
-                                }
-                            }
+                            foundSnaps = FindSnapPoints(snapPoints, collider, rowDirection, columnDirection, plant);
                         }
                     }
                     
@@ -273,7 +231,7 @@ namespace Advize_PlantEasily
                 {
                     if (config.SnapActive)
                     {
-                        rowDirection = config.GloballyAlignGridDirections ? basePosition + Vector3.forward - basePosition : Utils.DirectionXZ(basePosition - __instance.transform.position);
+                        rowDirection = config.GloballyAlignGridDirections ? Vector3.forward : Utils.DirectionXZ(basePosition - __instance.transform.position);
                         columnDirection = Vector3.Cross(Vector3.up, rowDirection);
                     }
 
@@ -322,7 +280,7 @@ namespace Advize_PlantEasily
             public static bool Prefix(Player __instance, Piece piece, ref bool __result, ref bool __state)
             {
                 //Dbgl("Player.PlacePiece Prefix");
-                if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject) || __instance.GetRightItem()?.m_shared.m_name != "$item_cultivator")
+                if (!config.ModActive || !piece || !IsPlantOrPickable(piece.gameObject) || !HoldingCultivator)
                     return true;
 
                 __state = true;
@@ -355,7 +313,7 @@ namespace Advize_PlantEasily
             public static void Postfix(Player __instance, Piece piece, bool __state)
             {
                 //Dbgl("Player.PlacePiece Postfix" + $"\n __state is {__state}");
-                if (!config.ModActive || !piece || NotPlantOrPickable(piece.gameObject) || __instance.GetRightItem()?.m_shared.m_name != "$item_cultivator")
+                if (!config.ModActive || !piece || !IsPlantOrPickable(piece.gameObject) || !HoldingCultivator)
                     return;
                 //This doesn't apply to the root placement ghost.
                 if (__state)
