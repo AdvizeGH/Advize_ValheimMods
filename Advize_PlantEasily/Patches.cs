@@ -418,7 +418,7 @@ namespace Advize_PlantEasily
                 GameObject plantObject = prefabRefs[pickablesToPlants[__instance.name.Replace("(Clone)", "")]];
                 Piece piece = plantObject.GetComponent<Piece>();
 
-                if (!player.HaveRequirements(piece, Player.RequirementMode.CanBuild)) return;
+                if (!player.HaveRequirements(piece, Player.RequirementMode.CanBuild) && !Player.m_localPlayer.m_noPlacementCost) return;
 
                 PlacePiece(player, __instance.gameObject, piece);
                 player.ConsumeResources(piece.m_resources, 0);
