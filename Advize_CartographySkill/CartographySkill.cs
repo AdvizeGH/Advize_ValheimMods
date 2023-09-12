@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
@@ -14,12 +15,13 @@ namespace Advize_CartographySkill
     {
         public const string PluginID = "advize.CartographySkill";
         public const string PluginName = "CartographySkill";
-        public const string Version = "2.1.2";
+        public const string Version = "3.0.0";
         public const int SKILL_TYPE = 1337;
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource CSLogger = new($" {PluginName}");
 
+        private static readonly Dictionary<string, GameObject> prefabRefs = new();
         private static GameObject prefab;
         private static Recipe recipe;
         private static CustomSkill customSkill;
@@ -45,12 +47,13 @@ namespace Advize_CartographySkill
             { "SkillDescription", "Increases map explore radius." }
         };
 
-        private void Awake()
+        public void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(CSLogger);
             assetBundle = LoadAssetBundle("spyglass");
-            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "2.1.2" });
-            LoadLocalizedStrings();
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.0.0" });
+            if (config.EnableLocalization)
+                LoadLocalizedStrings();
             customSkill = new CustomSkill();
             harmony.PatchAll();
         }
@@ -102,7 +105,7 @@ namespace Advize_CartographySkill
             Dbgl("InitLocalization");
             foreach (KeyValuePair<string, string> kvp in stringDictionary)
             {
-                Traverse.Create(Localization.instance).Method("AddWord", $"cs{kvp.Key}", kvp.Value).GetValue($"cs{kvp.Key}", kvp.Value);
+                Localization.instance.AddWord($"cs{kvp.Key}", kvp.Value);
             }
             stringDictionary.Clear();
         }
@@ -157,31 +160,7 @@ namespace Advize_CartographySkill
                 return loadedPrefab;
         }
 
-        private static void AddItem()
-        {
-            ItemDrop item = prefab.GetComponent<ItemDrop>();
-            ItemDrop itemClub = ObjectDB.instance.GetItemPrefab("Club").GetComponent<ItemDrop>();
-
-            //Assign the item texture via code because I can't figure out Sprites in Unity
-            item.m_itemData.m_shared.m_icons[0] = CreateSprite("spyglassicon.png", new Rect(0, 0, 64, 64));
-
-            //Fixup some stuff I didn't want to replicate in the assetbundle, could probably do more through code and save on resources
-            item.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[0];
-            item.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[1] = itemClub.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[1];
-            item.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[2] = itemClub.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[2];
-
-            item.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[0];
-            item.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[1] = itemClub.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[1];
-            item.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[2] = itemClub.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[2];
-
-            item.m_itemData.m_shared.m_triggerEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_triggerEffect.m_effectPrefabs[0];
-            item.m_itemData.m_shared.m_trailStartEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_trailStartEffect.m_effectPrefabs[0];
-
-            //Add the prefab to the list of items
-            ObjectDB.instance.m_items.Add(prefab);
-        }
-
-        private static void AddRecipe()
+        private static void AddRecipe(ObjectDB instance)
         {
             recipe = ScriptableObject.CreateInstance<Recipe>();
             recipe.name = "recipe_spyglass";
@@ -191,7 +170,8 @@ namespace Advize_CartographySkill
             recipe.m_enabled = true;
 
             //Surely there is a more efficient way of doing this
-            foreach (Recipe rec in ObjectDB.instance.m_recipes)
+
+            foreach (Recipe rec in instance.m_recipes)
             {
                 if (rec.m_craftingStation != null && rec.m_craftingStation.m_name == "$piece_workbench")
                 {
@@ -205,43 +185,64 @@ namespace Advize_CartographySkill
                 new Piece.Requirement
                 {
                     m_amount = 1,
-                    m_resItem = ObjectDB.instance.GetItemPrefab("Crystal").GetComponent<ItemDrop>(),
+                    m_resItem = instance.GetItemPrefab("Crystal").GetComponent<ItemDrop>(),
                     m_recover = true
                 },
                 new Piece.Requirement
                 {
                     m_amount = 2,
-                    m_resItem = ObjectDB.instance.GetItemPrefab("Obsidian").GetComponent<ItemDrop>(),
+                    m_resItem = instance.GetItemPrefab("Obsidian").GetComponent<ItemDrop>(),
                     m_recover = true
                 },
                 new Piece.Requirement
                 {
                     m_amount = 2,
-                    m_resItem = ObjectDB.instance.GetItemPrefab("Bronze").GetComponent<ItemDrop>(),
+                    m_resItem = instance.GetItemPrefab("Bronze").GetComponent<ItemDrop>(),
                     m_recover = true
                 }
             };
             recipe.m_resources = requirements.ToArray();
 
-            ObjectDB.instance.m_recipes.Add(recipe);
+            instance.m_recipes.Add(recipe);
         }
 
         private static void PrefabInit()
         {
             if (!prefab) prefab = CreatePrefab("AdvizeSpyglass");
-        }
+            if (prefabRefs.Count > 0) return;
 
-        private static void ItemRecipeInit(ObjectDB instance)
-        {
-            if (!instance.m_items.Contains(prefab)) AddItem();
-            if (!instance.m_recipes.Contains(recipe)) AddRecipe();
+            //prefabRefs.Add("AdvizeSpyglass", CreatePrefab("AdvizeSpyglass"));
+            prefabRefs.Add("Club", Resources.FindObjectsOfTypeAll<GameObject>().ToList().Find(x => x.name == "Club"));
+
+            ItemDrop item = prefab.GetComponent<ItemDrop>();
+            ItemDrop itemClub = prefabRefs["Club"].GetComponent<ItemDrop>();
+
+            prefab.transform.Find("attach").transform.Find("equiped").Find("trail").gameObject.GetComponent<MeleeWeaponTrail>()._material =
+            prefabRefs["Club"].transform.Find("attach").transform.Find("equiped").Find("trail").gameObject.GetComponent<MeleeWeaponTrail>()._material;
+
+            prefab.GetComponent<ParticleSystemRenderer>().sharedMaterials = prefabRefs["Club"].GetComponent<ParticleSystemRenderer>().sharedMaterials;
+
+            item.m_itemData.m_shared.m_icons[0] = CreateSprite("spyglassicon.png", new Rect(0, 0, 64, 64));
+
+            item.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[0];
+            item.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[1] = itemClub.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[1];
+            item.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[2] = itemClub.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[2];
+
+            item.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[0];
+            item.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[1] = itemClub.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[1];
+            item.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[2] = itemClub.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[2];
+
+            item.m_itemData.m_shared.m_triggerEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_triggerEffect.m_effectPrefabs[0];
+            item.m_itemData.m_shared.m_trailStartEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_trailStartEffect.m_effectPrefabs[0];
+
+            item.m_itemData.m_shared.m_trailStartEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_trailStartEffect.m_effectPrefabs[0];
         }
 
         private static void ChangeZoom(int delta)
         {
             if (zoomLevel == 1)
             {
-                startingFov = currentFov = GameCamera.instance.m_fov;
+                startingFov = currentFov = GameCamera.m_instance.m_fov;
                 Dbgl($"ChangeZoom() starting fov was {startingFov}");
             }
 
@@ -275,9 +276,9 @@ namespace Advize_CartographySkill
         private static void StopZoom()
         {
             zoomLevel = 1;
-            GameCamera.instance.m_fov = currentFov = startingFov;
+            GameCamera.m_instance.m_fov = currentFov = startingFov;
             isZooming = false;
-            Dbgl($"StopZoom() fov is now {GameCamera.instance.m_fov}");
+            Dbgl($"StopZoom() fov is now {GameCamera.m_instance.m_fov}");
         }
 
         private static bool IsSpyglassEquipped() => Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$csSpyglassName";

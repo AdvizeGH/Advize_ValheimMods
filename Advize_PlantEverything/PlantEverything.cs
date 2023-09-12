@@ -278,7 +278,7 @@ namespace Advize_PlantEverything
 
                 if (!prefabRefs.ContainsKey(gameObject.name)) continue;
 
-                if (gameObject.name.Equals("FirTree_small"))
+                if (gameObject.name == "FirTree_small")
                 {
                     Component[] components = gameObject.GetComponents(typeof(Component));
                     if (components.Length < 2) continue;
@@ -600,7 +600,7 @@ namespace Advize_PlantEverything
                             if (t)
                             {
                                 t.SetParent(pdb.Prefab.transform);
-                                t.gameObject.GetComponent<MeshRenderer>().sharedMaterials = pdb.key.Equals("Pickable_Thistle") ?
+                                t.gameObject.GetComponent<MeshRenderer>().sharedMaterials = pdb.key == "Pickable_Thistle" ?
                                     pdb.Prefab.transform.Find("visual").Find("default").GetComponent<MeshRenderer>().sharedMaterials :
                                     pdb.Prefab.transform.Find("visual").GetComponent<MeshRenderer>().sharedMaterials;
                                 if (pdb.key.Contains("Dandelion"))
@@ -1061,7 +1061,7 @@ namespace Advize_PlantEverything
             Dbgl("InitLocalization");
             foreach (KeyValuePair<string, string> kvp in stringDictionary)
             {
-                Traverse.Create(Localization.instance).Method("AddWord", $"pe{kvp.Key}", kvp.Value).GetValue($"pe{kvp.Key}", kvp.Value);
+                Localization.instance.AddWord($"pe{kvp.Key}", kvp.Value);
             }
             stringDictionary.Clear();
         }

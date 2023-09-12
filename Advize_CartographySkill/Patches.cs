@@ -64,11 +64,20 @@ namespace Advize_CartographySkill
         [HarmonyPatch(typeof(ObjectDB), "Awake")]
         public static class ObjectDBAwake
         {
-            public static void Postfix(ObjectDB __instance)
+            public static void Prefix(ObjectDB __instance)
             {
+                //Dbgl("ObjectDB.Awake() Prefix");
                 PrefabInit();
                 if (!config.EnableSpyglass || !ZNetScene.instance) return;
-                ItemRecipeInit(__instance);
+                
+                if (!__instance.m_items.Contains(prefab)) __instance.m_items.Add(prefab);
+            }
+            public static void Postfix(ObjectDB __instance)
+            {
+                //Dbgl("ObjectDB.Awake() Postfix");
+                if (!config.EnableSpyglass || !ZNetScene.instance) return;
+
+                if (!__instance.m_recipes.Contains(recipe)) AddRecipe(__instance);
             }
         }
 
@@ -78,9 +87,15 @@ namespace Advize_CartographySkill
         {
             public static void Postfix(ObjectDB __instance)
             {
-                PrefabInit();
+                //Dbgl("ObjectDB.CopyOtherDB() Postfix");
                 if (!config.EnableSpyglass) return;
-                ItemRecipeInit(__instance);
+
+                if (!__instance.m_items.Contains(prefab))
+                {
+                    __instance.m_items.Add(prefab);
+                    __instance.UpdateItemHashes();
+                }
+                if (!__instance.m_recipes.Contains(recipe)) AddRecipe(__instance);
             }
         }
 
@@ -89,45 +104,17 @@ namespace Advize_CartographySkill
         {
             public static void Postfix(ZNetScene __instance)
             {
-                PrefabInit();
-                if (!config.EnableSpyglass) return;
+                Dbgl("ZNetScene.Awake() Postfix");
+                //PrefabInit();
                 if (stringDictionary.Count > 0)
                     InitLocalization();
+                if (!config.EnableSpyglass) return;
 
                 if (!__instance.m_prefabs.Contains(prefab))
-                    __instance.m_prefabs.Add(prefab);
-            }
-        }
-
-        //Hack to render item when held or sheathed, should probably just look into updating the hash dictionary
-        [HarmonyPatch(typeof(ObjectDB), "GetItemPrefab", new Type[] { typeof(int) })]
-        public static class ObjectDBGetItemPrefab
-        {
-            public static void Postfix(int hash, ref GameObject __result)
-            {
-                if (!config.EnableSpyglass) return;
-                if (__result == null && prefab)
                 {
-                    int spyglassHash = ObjectDB.instance.GetPrefabHash(prefab);
-                    if (hash == spyglassHash)
-                    {
-                        __result = prefab;
-                    }
+                    __instance.m_prefabs.Add(prefab);
+                    __instance.m_namedPrefabs.Add(__instance.GetPrefabHash(prefab), prefab);
                 }
-            }
-        }
-
-        //Hack to allow console to spawn the item, should probably just look into updating the hash dictionary
-        [HarmonyPatch(typeof(ZNetScene), "GetPrefab", new Type[] { typeof(int) })]
-        public static class ZNetSceneGetPrefab
-        {
-            public static void Postfix(int hash, ref GameObject __result)
-            {
-                if (__result != null || !config.EnableSpyglass || !prefab || !ZNetScene.instance) return;
-
-                int spyglassHash = ZNetScene.instance.GetPrefabHash(prefab);
-                if (hash == spyglassHash)
-                    __result = prefab;
             }
         }
 
@@ -136,7 +123,7 @@ namespace Advize_CartographySkill
         {
             public static void Postfix()
             {
-                if (!config.EnableSpyglass || !GameCamera.instance) return;
+                if (!config.EnableSpyglass || !GameCamera.m_instance) return;
 
                 if (isZooming && (!IsSpyglassEquipped() || ZInput.GetButtonDown("Attack") || (config.RemoveZoomKey != KeyCode.None && Input.GetKeyDown(config.RemoveZoomKey))))
                 {
@@ -173,16 +160,28 @@ namespace Advize_CartographySkill
                 if (isZooming)
                 {
                     Vector3 scopeLevel = Vector3.zero;
-                    scopeLevel += (Vector3.forward * zoomLevel * config.ZoomMultiplier);
-
+                    scopeLevel += Vector3.forward * zoomLevel * config.ZoomMultiplier;
                     Vector3 difference = __instance.transform.TransformVector(scopeLevel);
-                    __instance.transform.position += difference;
+
+                    //Try to prevent zooming through things? Needs lots of work still
+                    if (!Physics.Raycast(__instance.transform.position, __instance.transform.forward, out var hitInfo, difference.magnitude, __instance.m_blockCameraMask))
+                    {
+                        __instance.transform.position += difference;
+                    }
+                    else
+                    {
+                        scopeLevel = Vector3.zero;
+                        scopeLevel += Vector3.forward * Vector3.Distance(hitInfo.point, __instance.transform.position);
+                        difference = __instance.transform.TransformVector(scopeLevel);
+
+                        __instance.transform.position += difference;
+                    }
 
                     //Keep camera above the ground hopefully
-                    if (ZoneSystem.instance.GetGroundHeight(__instance.transform.position, out float num) && __instance.transform.position.y < num)
+                    if (ZoneSystem.instance.GetGroundHeight(__instance.transform.position, out float num) && __instance.transform.position.y < num +1f)
                     {
                         Vector3 position = __instance.transform.position;
-                        position.y = num;
+                        position.y = num + 1f;
                         __instance.transform.position = position;
                     }
                 }
@@ -200,7 +199,8 @@ namespace Advize_CartographySkill
                 {
                     if ((int)type == SKILL_TYPE)
                     {
-                        Traverse.Create(Localization.instance).Method("AddWord", "skill_" + SKILL_TYPE, Localization.instance.Localize(customSkill.name)).GetValue("skill_" + SKILL_TYPE, Localization.instance.Localize(customSkill.name));
+                        //Traverse.Create(Localization.instance).Method("AddWord", "skill_" + SKILL_TYPE, Localization.instance.Localize(customSkill.name)).GetValue("skill_" + SKILL_TYPE, Localization.instance.Localize(customSkill.name));
+                        Localization.instance.AddWord("skill_" + SKILL_TYPE, Localization.instance.Localize(customSkill.name));
                         ___m_skills.Add(customSkill.skillDef);
                         __result = customSkill.skillDef;
                     }

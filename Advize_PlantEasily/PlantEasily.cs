@@ -217,10 +217,9 @@ namespace Advize_PlantEasily
             GameObject gameObject2 = Instantiate(gameObject, position, rotation);
             TerrainModifier.SetTriggerOnPlaced(trigger: false);
 
-            gameObject2.GetComponent<Piece>()?.SetCreator(player.GetPlayerID());
-            gameObject2.GetComponent<PrivateArea>()?.Setup(Game.instance.GetPlayerProfile().GetName());
+            gameObject2.GetComponent<Piece>().SetCreator(player.GetPlayerID());
 
-            gameObject.GetComponent<Piece>().m_placeEffect.Create(position, rotation, gameObject2.transform, 1f);
+            piece.m_placeEffect.Create(position, rotation, gameObject2.transform, 1f);
             player.AddNoise(50f);
 
             Game.instance.IncrementPlayerStat(PlayerStatType.Builds);

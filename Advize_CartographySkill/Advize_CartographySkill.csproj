@@ -38,8 +38,8 @@
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\BepInEx\core\0Harmony.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="assembly_guiutils">
-      <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\valheim_Data\Managed\assembly_guiutils.dll</HintPath>
+    <Reference Include="assembly_guiutils_publicized">
+      <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\valheim_Data\Managed\publicized_assemblies\assembly_guiutils_publicized.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="assembly_utils">
@@ -54,8 +54,7 @@
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\BepInEx\core\BepInEx.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ServerSync, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="ServerSync">
       <HintPath>bin\Release\ServerSync.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -88,6 +87,10 @@
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\unstripped_corlib\UnityEngine.JSONSerializeModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\unstripped_corlib\UnityEngine.ParticleSystemModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">

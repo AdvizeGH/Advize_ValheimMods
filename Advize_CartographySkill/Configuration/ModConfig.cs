@@ -13,6 +13,7 @@ namespace Advize_CartographySkill.Configuration
         private readonly ConfigEntry<bool> serverConfigLocked;
         private readonly ConfigEntry<float> exploreRadiusIncrease;
         private readonly ConfigEntry<float> baseExploreRadius;
+        private readonly ConfigEntry<bool> enableLocalization;
         internal readonly ConfigEntry<int> nexusID;
         //Progression
         private readonly ConfigEntry<bool> enableSkill;
@@ -66,6 +67,12 @@ namespace Advize_CartographySkill.Configuration
                 "BaseExploreRadius",
                 100f,
                 "BaseExploreRadius (Vanilla value is 100)");
+            enableLocalization = Config(
+                "General",
+                "EnableLocalization",
+                false,
+                "Enable this to attempt to load localized text",
+                false);
             enableSkill = Config(
                 "Progression",
                 "EnableSkill",
@@ -153,6 +160,10 @@ namespace Advize_CartographySkill.Configuration
         internal float BaseExploreRadius
         {
             get { return baseExploreRadius.Value; }
+        }
+        internal bool EnableLocalization
+        {
+            get { return enableLocalization.Value; }
         }
         internal bool EnableDebugMessages
         {
