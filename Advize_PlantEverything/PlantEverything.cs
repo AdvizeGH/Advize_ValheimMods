@@ -600,13 +600,13 @@ namespace Advize_PlantEverything
                             if (t)
                             {
                                 t.SetParent(pdb.Prefab.transform);
-                                t.gameObject.GetComponent<MeshRenderer>().sharedMaterials = pdb.key == "Pickable_Thistle" ?
+                                t.GetComponent<MeshRenderer>().sharedMaterials = pdb.key == "Pickable_Thistle" ?
                                     pdb.Prefab.transform.Find("visual").Find("default").GetComponent<MeshRenderer>().sharedMaterials :
                                     pdb.Prefab.transform.Find("visual").GetComponent<MeshRenderer>().sharedMaterials;
                                 if (pdb.key.Contains("Dandelion"))
                                 {
                                     Material m = pdb.Prefab.transform.Find("visual").GetComponent<MeshRenderer>().sharedMaterials[0];
-                                    t.gameObject.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { m, m };
+                                    t.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { m, m };
                                 }
                             }
                         }
@@ -783,31 +783,31 @@ namespace Advize_PlantEverything
                 Transform t = prefabRefs["Birch_Sapling"].transform.Find(p[0]);
 
                 foreach (string parent in p)
-                    sdb.Prefab.transform.Find(parent).gameObject.GetComponent<MeshFilter>().mesh = t.Find("Birch_Sapling").gameObject.GetComponent<MeshFilter>().mesh;
+                    sdb.Prefab.transform.Find(parent).GetComponent<MeshFilter>().mesh = t.Find("Birch_Sapling").GetComponent<MeshFilter>().mesh;
 
                 if (sdb.source.StartsWith("Swamp"))
                 {
-                    Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("swamptree1").gameObject.GetComponent<MeshRenderer>().sharedMaterials[0] };
+                    Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("swamptree1").GetComponent<MeshRenderer>().sharedMaterials[0] };
                     m[0].shader = Shader.Find("Custom/Piece");
 
                     foreach (string parent in p)
-                        sdb.Prefab.transform.Find(parent).gameObject.GetComponent<MeshRenderer>().sharedMaterials = m;
+                        sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m;
                 }
                 else if(sdb.source.StartsWith("Ygga"))
                 {
                     string[] foliage = { "birchleafs002", "birchleafs003", "birchleafs008", "birchleafs009", "birchleafs010", "birchleafs011" };
-                    Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("beech").gameObject.GetComponent<MeshRenderer>().sharedMaterials[0] };
-                    Material[] m2 = new Material[] { prefabRefs[sdb.source].transform.Find("beech").gameObject.GetComponent<MeshRenderer>().sharedMaterials[1] };
+                    Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("beech").GetComponent<MeshRenderer>().sharedMaterials[0] };
+                    Material[] m2 = new Material[] { prefabRefs[sdb.source].transform.Find("beech").GetComponent<MeshRenderer>().sharedMaterials[1] };
 
                     foreach(string parent in p)
-                        sdb.Prefab.transform.Find(parent).gameObject.GetComponent<MeshRenderer>().sharedMaterials = m2;
+                        sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m2;
 
                     foreach (string child in foliage)
                     {
                         foreach (string parent in p)
                         {
-                            sdb.Prefab.transform.Find(parent).transform.Find(child).gameObject.GetComponent<MeshFilter>().mesh = t.Find(child).gameObject.GetComponent<MeshFilter>().mesh;
-                            sdb.Prefab.transform.Find(parent).transform.Find(child).gameObject.GetComponent<MeshRenderer>().sharedMaterials = m;
+                            sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshFilter>().mesh = t.Find(child).GetComponent<MeshFilter>().mesh;
+                            sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshRenderer>().sharedMaterials = m;
                         }
                     }
                 }

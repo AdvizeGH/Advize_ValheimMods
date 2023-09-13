@@ -173,7 +173,7 @@ namespace Advize_CartographySkill
 
             foreach (Recipe rec in instance.m_recipes)
             {
-                if (rec.m_craftingStation != null && rec.m_craftingStation.m_name == "$piece_workbench")
+                if (rec.m_craftingStation?.m_name == "$piece_workbench")
                 {
                     recipe.m_craftingStation = rec.m_craftingStation;
                     break;
@@ -210,31 +210,40 @@ namespace Advize_CartographySkill
         {
             if (!prefab) prefab = CreatePrefab("AdvizeSpyglass");
             if (prefabRefs.Count > 0) return;
-
+            /* Fix References */
             //prefabRefs.Add("AdvizeSpyglass", CreatePrefab("AdvizeSpyglass"));
-            prefabRefs.Add("Club", Resources.FindObjectsOfTypeAll<GameObject>().ToList().Find(x => x.name == "Club"));
+            prefabRefs.Add("Club", null/*Resources.FindObjectsOfTypeAll<GameObject>().ToList().Find(x => x.name == "Club")*/);
+            prefabRefs.Add("BronzeNails", null);
+
+            Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
+            for (int i = 0; i < array.Length; i++)
+            {
+                GameObject gameObject = (GameObject)array[i];
+
+                if (!prefabRefs.ContainsKey(gameObject.name)) continue;
+
+                prefabRefs[gameObject.name] = gameObject;
+
+                if (!prefabRefs.Any(key => !key.Value))
+                {
+                    Dbgl("Found all prefab references");
+                    break;
+                }
+            }
 
             ItemDrop item = prefab.GetComponent<ItemDrop>();
             ItemDrop itemClub = prefabRefs["Club"].GetComponent<ItemDrop>();
 
-            prefab.transform.Find("attach").transform.Find("equiped").Find("trail").gameObject.GetComponent<MeleeWeaponTrail>()._material =
-            prefabRefs["Club"].transform.Find("attach").transform.Find("equiped").Find("trail").gameObject.GetComponent<MeleeWeaponTrail>()._material;
+            prefab.transform.Find("attach").Find("model").GetComponent<MeshRenderer>().sharedMaterials = prefabRefs["BronzeNails"].transform.Find("model").GetComponent<MeshRenderer>().sharedMaterials;
+            prefab.transform.Find("attach").transform.Find("equiped").Find("trail").GetComponent<MeleeWeaponTrail>()._material = prefabRefs["Club"].transform.Find("attach").transform.Find("equiped").Find("trail").GetComponent<MeleeWeaponTrail>()._material;
 
             prefab.GetComponent<ParticleSystemRenderer>().sharedMaterials = prefabRefs["Club"].GetComponent<ParticleSystemRenderer>().sharedMaterials;
 
             item.m_itemData.m_shared.m_icons[0] = CreateSprite("spyglassicon.png", new Rect(0, 0, 64, 64));
 
-            item.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[0];
-            item.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[1] = itemClub.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[1];
-            item.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[2] = itemClub.m_itemData.m_shared.m_hitEffect.m_effectPrefabs[2];
-
-            item.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[0];
-            item.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[1] = itemClub.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[1];
-            item.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[2] = itemClub.m_itemData.m_shared.m_blockEffect.m_effectPrefabs[2];
-
+            item.m_itemData.m_shared.m_hitEffect.m_effectPrefabs = itemClub.m_itemData.m_shared.m_hitEffect.m_effectPrefabs;
+            item.m_itemData.m_shared.m_blockEffect.m_effectPrefabs = itemClub.m_itemData.m_shared.m_blockEffect.m_effectPrefabs;
             item.m_itemData.m_shared.m_triggerEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_triggerEffect.m_effectPrefabs[0];
-            item.m_itemData.m_shared.m_trailStartEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_trailStartEffect.m_effectPrefabs[0];
-
             item.m_itemData.m_shared.m_trailStartEffect.m_effectPrefabs[0] = itemClub.m_itemData.m_shared.m_trailStartEffect.m_effectPrefabs[0];
         }
 
