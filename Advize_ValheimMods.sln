@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Advize_PlantEverything", "A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Advize_PlantEasily", "Advize_PlantEasily\Advize_PlantEasily.csproj", "{5EAFF7D4-7661-4152-A841-ED19BA3B36F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Advize_Spyglass", "Advize_Spyglass\Advize_Spyglass.csproj", "{7F463189-40A2-45A2-AD71-6F771B2C483F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{5EAFF7D4-7661-4152-A841-ED19BA3B36F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EAFF7D4-7661-4152-A841-ED19BA3B36F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EAFF7D4-7661-4152-A841-ED19BA3B36F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F463189-40A2-45A2-AD71-6F771B2C483F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F463189-40A2-45A2-AD71-6F771B2C483F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F463189-40A2-45A2-AD71-6F771B2C483F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F463189-40A2-45A2-AD71-6F771B2C483F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

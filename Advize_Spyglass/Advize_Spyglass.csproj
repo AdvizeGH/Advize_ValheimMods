@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6C9AC920-ED49-4F9B-81B2-F0400F3C01E8}</ProjectGuid>
+    <ProjectGuid>{7F463189-40A2-45A2-AD71-6F771B2C483F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Advize_CartographySkill</RootNamespace>
-    <AssemblyName>Advize_CartographySkill</AssemblyName>
+    <RootNamespace>Advize_Spyglass</RootNamespace>
+    <AssemblyName>Advize_Spyglass</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,22 +35,18 @@
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\BepInEx\core\0Harmony.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="assembly_guiutils_publicized">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\valheim_Data\Managed\publicized_assemblies\assembly_guiutils_publicized.dll</HintPath>
-      <Private>False</Private>
+    </Reference>
+    <Reference Include="assembly_utils">
+      <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\valheim_Data\Managed\assembly_utils.dll</HintPath>
     </Reference>
     <Reference Include="assembly_valheim_publicized">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\valheim_Data\Managed\publicized_assemblies\assembly_valheim_publicized.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\BepInEx\core\BepInEx.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ServerSync">
-      <HintPath>bin\Release\ServerSync.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -63,47 +58,37 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\unstripped_corlib\UnityEngine.dll</HintPath>
-      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\unstripped_corlib\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\unstripped_corlib\UnityEngine.CoreModule.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\unstripped_corlib\UnityEngine.ImageConversionModule.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule">
       <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\unstripped_corlib\UnityEngine.JSONSerializeModule.dll</HintPath>
-      <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\valheim_Data\Managed\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\unstripped_corlib\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>..\..\..\..\Games\SteamLibrary\steamapps\common\Valheim\unstripped_corlib\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CartographySkill.cs" />
     <Compile Include="Configuration\ModConfig.cs" />
     <Compile Include="Patches.cs" />
+    <Compile Include="Spyglass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\cartographyicon.png" />
+    <EmbeddedResource Include="Assets\spyglass" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ILRepack.targets" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Libraries\ServerSync.dll" />
+    <EmbeddedResource Include="Assets\spyglassicon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets'))" />
-  </Target>
 </Project>

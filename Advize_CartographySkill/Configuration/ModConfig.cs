@@ -1,6 +1,5 @@
 ﻿using BepInEx.Configuration;
 using ServerSync;
-using UnityEngine;
 
 namespace Advize_CartographySkill.Configuration
 {
@@ -14,19 +13,10 @@ namespace Advize_CartographySkill.Configuration
         private readonly ConfigEntry<float> exploreRadiusIncrease;
         private readonly ConfigEntry<float> baseExploreRadius;
         private readonly ConfigEntry<bool> enableLocalization;
-        internal readonly ConfigEntry<int> nexusID;
         //Progression
         private readonly ConfigEntry<bool> enableSkill;
         private readonly ConfigEntry<float> skillIncrease;
         private readonly ConfigEntry<int> tilesDiscoveredForXPGain;
-        //Spyglass
-        private readonly ConfigEntry<bool> enableSpyglass;
-        private readonly ConfigEntry<float> fovReductionFactor;
-        private readonly ConfigEntry<float> zoomMultiplier;
-        //Controls
-        private readonly ConfigEntry<KeyboardShortcut> increaseZoomKey;
-        private readonly ConfigEntry<KeyboardShortcut> decreaseZoomModifierKey;
-        private readonly ConfigEntry<KeyboardShortcut> removeZoomKey;
         //Troubleshooting
         private readonly ConfigEntry<bool> enableDebugMessages;
 
@@ -51,12 +41,6 @@ namespace Advize_CartographySkill.Configuration
                 "Lock Configuration",
                 false,
                 "If on, the configuration is locked and can be changed by server admins only.");
-            nexusID = Config(
-                "General",
-                "NexusID",
-                394,
-                new ConfigDescription("Nexus mod ID for updates.", null, new ConfigurationManagerAttributes{ Category = "Internal", ReadOnly = true }),
-                false);
             exploreRadiusIncrease = Config(
                 "General",
                 "RadiusIncreasePerLevel",
@@ -89,49 +73,6 @@ namespace Advize_CartographySkill.Configuration
                 "TileDiscoveryRequirement",
                 100,
                 "Amount of map tiles that need to be discovered before XP is awarded (influences BetterUI xp gain spam)");
-            enableSpyglass = Config(
-                "Spyglass",
-                "EnableSpyglass",
-                true,
-                "Enables the spyglass item",
-                false);
-            fovReductionFactor = Config(
-                "Spyglass",
-                "FovReductionFactor",
-                5f,
-                "Influences field of view when zoomed, recommended range is 0 (disabled) to 5");
-            zoomMultiplier = Config(
-                "Spyglass",
-                "ZoomMultiplier",
-                5f,
-                "Increase/Decrease camera zoom distance");
-            increaseZoomKey = Config(
-                "Controls",
-                "IncreaseZoomKey",
-                new KeyboardShortcut(KeyCode.Mouse1),
-                new ConfigDescription(
-                    "Keyboard shortcut to increase zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                    null,
-                    new ConfigurationManagerAttributes { Description = "Keyboard shortcut to increase zoom level." }),
-                false);
-            decreaseZoomModifierKey = Config(
-                "Controls",
-                "DecreaseZoomModifierKey",
-                new KeyboardShortcut(KeyCode.Mouse1, KeyCode.LeftShift),
-                new ConfigDescription(
-                    "Keyboard shortcut to decrease zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                    null,
-                    new ConfigurationManagerAttributes { Description = "Keyboard shortcut to decrease zoom level." }),
-                false);
-            removeZoomKey = Config(
-                "Controls",
-                "RemoveZoomKey",
-                new KeyboardShortcut(),
-                new ConfigDescription(
-                    "Optional keyboard shortcut to fully zoom out. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                    null,
-                    new ConfigurationManagerAttributes { Description = "Optional keyboard shortcut to fully zoom out." }),
-                false);
             enableDebugMessages = Config(
                 "Troubleshooting",
                 "EnableDebugMessages",
@@ -169,37 +110,5 @@ namespace Advize_CartographySkill.Configuration
         {
             get { return enableDebugMessages.Value; }
         }
-        internal bool EnableSpyglass
-        {
-            get { return enableSpyglass.Value; }
-        }
-        internal float FovReductionFactor
-        {
-            get { return fovReductionFactor.Value; }
-        }
-        internal float ZoomMultiplier
-        {
-            get { return zoomMultiplier.Value; }
-        }
-        internal KeyboardShortcut IncreaseZoomKey
-        {
-            get { return increaseZoomKey.Value; }
-        }
-        internal KeyboardShortcut DecreaseZoomModifierKey
-        {
-            get { return decreaseZoomModifierKey.Value; }
-        }
-        internal KeyboardShortcut RemoveZoomKey
-        {
-            get { return removeZoomKey.Value; }
-        }
-#nullable enable
-        internal class ConfigurationManagerAttributes
-        {
-            public string? Category;
-            public string? Description;
-            public bool? ReadOnly;
-        }
-#nullable disable
     }
 }
