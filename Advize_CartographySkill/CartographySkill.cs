@@ -24,7 +24,7 @@ namespace Advize_CartographySkill
         private static readonly Dictionary<string, GameObject> prefabRefs = new();
         private static GameObject prefab;
         private static Recipe recipe;
-        private static CustomSkill customSkill;
+        private static CartographySkillDef cartographySkill;
 
         private static int zoomLevel = 1;
         private static float startingFov;
@@ -54,7 +54,7 @@ namespace Advize_CartographySkill
             config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.0.0" });
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
-            customSkill = new CustomSkill();
+            cartographySkill = new();
             harmony.PatchAll();
         }
 
@@ -107,6 +107,7 @@ namespace Advize_CartographySkill
             {
                 Localization.instance.AddWord($"cs{kvp.Key}", kvp.Value);
             }
+            Localization.instance.AddWord($"skill_{SKILL_TYPE}", stringDictionary["SkillName"]);
             stringDictionary.Clear();
         }
 
@@ -168,30 +169,20 @@ namespace Advize_CartographySkill
             recipe.m_minStationLevel = 1;
             recipe.m_item = prefab.GetComponent<ItemDrop>();
             recipe.m_enabled = true;
-
-            //Surely there is a more efficient way of doing this
-
-            foreach (Recipe rec in instance.m_recipes)
-            {
-                if (rec.m_craftingStation?.m_name == "$piece_workbench")
-                {
-                    recipe.m_craftingStation = rec.m_craftingStation;
-                    break;
-                }
-            }
+            recipe.m_craftingStation = instance.m_recipes.Where(x => x.m_craftingStation?.m_name == "$piece_workbench").First().m_craftingStation;
 
             List<Piece.Requirement> requirements = new()
             {
                 new Piece.Requirement
                 {
-                    m_amount = 1,
+                    m_amount = 2,
                     m_resItem = instance.GetItemPrefab("Crystal").GetComponent<ItemDrop>(),
                     m_recover = true
                 },
                 new Piece.Requirement
                 {
-                    m_amount = 2,
-                    m_resItem = instance.GetItemPrefab("Obsidian").GetComponent<ItemDrop>(),
+                    m_amount = 4,
+                    m_resItem = instance.GetItemPrefab("LeatherScraps").GetComponent<ItemDrop>(),
                     m_recover = true
                 },
                 new Piece.Requirement
@@ -236,7 +227,6 @@ namespace Advize_CartographySkill
 
             prefab.transform.Find("attach").Find("model").GetComponent<MeshRenderer>().sharedMaterials = prefabRefs["BronzeNails"].transform.Find("model").GetComponent<MeshRenderer>().sharedMaterials;
             prefab.transform.Find("attach").transform.Find("equiped").Find("trail").GetComponent<MeleeWeaponTrail>()._material = prefabRefs["Club"].transform.Find("attach").transform.Find("equiped").Find("trail").GetComponent<MeleeWeaponTrail>()._material;
-
             prefab.GetComponent<ParticleSystemRenderer>().sharedMaterials = prefabRefs["Club"].GetComponent<ParticleSystemRenderer>().sharedMaterials;
 
             item.m_itemData.m_shared.m_icons[0] = CreateSprite("spyglassicon.png", new Rect(0, 0, 64, 64));
@@ -303,7 +293,7 @@ namespace Advize_CartographySkill
             }
         }
 
-        private class CustomSkill
+        private class CartographySkillDef
         {
             public string name = "$csSkillName";
             public Skills.SkillDef skillDef = new()

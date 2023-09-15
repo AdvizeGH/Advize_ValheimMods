@@ -110,27 +110,27 @@ namespace Advize_CartographySkill.Configuration
                 "IncreaseZoomKey",
                 new KeyboardShortcut(KeyCode.Mouse1),
                 new ConfigDescription(
-                    "Key to increase zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+                    "Keyboard shortcut to increase zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new ConfigurationManagerAttributes { Description = "Key to increase zoom level." }),
+                    new ConfigurationManagerAttributes { Description = "Keyboard shortcut to increase zoom level." }),
                 false);
             decreaseZoomModifierKey = Config(
                 "Controls",
                 "DecreaseZoomModifierKey",
-                new KeyboardShortcut(KeyCode.LeftShift),
+                new KeyboardShortcut(KeyCode.Mouse1, KeyCode.LeftShift),
                 new ConfigDescription(
-                    "Hold this key while pressing IncreaseZoomKey to decrease zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+                    "Keyboard shortcut to decrease zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new ConfigurationManagerAttributes { Description = "Hold this key while pressing IncreaseZoomKey to decrease zoom level." }),
+                    new ConfigurationManagerAttributes { Description = "Keyboard shortcut to decrease zoom level." }),
                 false);
             removeZoomKey = Config(
                 "Controls",
                 "RemoveZoomKey",
                 new KeyboardShortcut(),
                 new ConfigDescription(
-                    "Optional key to fully zoom out. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+                    "Optional keyboard shortcut to fully zoom out. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                     null,
-                    new ConfigurationManagerAttributes { Description = "Optional key to fully zoom out." }),
+                    new ConfigurationManagerAttributes { Description = "Optional keyboard shortcut to fully zoom out." }),
                 false);
             enableDebugMessages = Config(
                 "Troubleshooting",
@@ -181,17 +181,17 @@ namespace Advize_CartographySkill.Configuration
         {
             get { return zoomMultiplier.Value; }
         }
-        internal KeyCode IncreaseZoomKey
+        internal KeyboardShortcut IncreaseZoomKey
         {
-            get { return increaseZoomKey.Value.MainKey; }
+            get { return increaseZoomKey.Value; }
         }
-        internal KeyCode DecreaseZoomModifierKey
+        internal KeyboardShortcut DecreaseZoomModifierKey
         {
-            get { return decreaseZoomModifierKey.Value.MainKey; }
+            get { return decreaseZoomModifierKey.Value; }
         }
-        internal KeyCode RemoveZoomKey
+        internal KeyboardShortcut RemoveZoomKey
         {
-            get { return removeZoomKey.Value.MainKey; }
+            get { return removeZoomKey.Value; }
         }
 #nullable enable
         internal class ConfigurationManagerAttributes

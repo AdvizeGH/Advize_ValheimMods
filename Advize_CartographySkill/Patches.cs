@@ -104,8 +104,7 @@ namespace Advize_CartographySkill
         {
             public static void Postfix(ZNetScene __instance)
             {
-                Dbgl("ZNetScene.Awake() Postfix");
-                //PrefabInit();
+                //Dbgl("ZNetScene.Awake() Postfix");
                 if (stringDictionary.Count > 0)
                     InitLocalization();
                 if (!config.EnableSpyglass) return;
@@ -125,22 +124,22 @@ namespace Advize_CartographySkill
             {
                 if (!config.EnableSpyglass || !GameCamera.m_instance) return;
 
-                if (isZooming && (!IsSpyglassEquipped() || ZInput.GetButtonDown("Attack") || (config.RemoveZoomKey != KeyCode.None && Input.GetKeyDown(config.RemoveZoomKey))))
+                if (isZooming && (!IsSpyglassEquipped() || ZInput.GetButtonDown("Attack") || config.RemoveZoomKey.IsDown()))
                 {
                     StopZoom();
                 }
 
                 if (InventoryGui.IsVisible()) return;
 
-                if (Input.GetKeyDown(config.IncreaseZoomKey) && IsSpyglassEquipped())
+                if(IsSpyglassEquipped())
                 {
-                    if (Input.GetKey(config.DecreaseZoomModifierKey))
-                    {
-                        ChangeZoom(-1);
-                    }
-                    else
+                    if (config.IncreaseZoomKey.IsDown())
                     {
                         ChangeZoom(1);
+                    }
+                    if (config.DecreaseZoomModifierKey.IsDown())
+                    {
+                        ChangeZoom(-1);
                     }
                 }
             }
@@ -199,10 +198,8 @@ namespace Advize_CartographySkill
                 {
                     if ((int)type == SKILL_TYPE)
                     {
-                        //Traverse.Create(Localization.instance).Method("AddWord", "skill_" + SKILL_TYPE, Localization.instance.Localize(customSkill.name)).GetValue("skill_" + SKILL_TYPE, Localization.instance.Localize(customSkill.name));
-                        Localization.instance.AddWord("skill_" + SKILL_TYPE, Localization.instance.Localize(customSkill.name));
-                        ___m_skills.Add(customSkill.skillDef);
-                        __result = customSkill.skillDef;
+                        ___m_skills.Add(cartographySkill.skillDef);
+                        __result = cartographySkill.skillDef;
                     }
                 }
             }
@@ -226,13 +223,14 @@ namespace Advize_CartographySkill
         {
             public static bool Prefix(string name, float value, Skills __instance, Player ___m_player)
             {
-                if (customSkill.name.ToLower() == name.ToLower())
+                string localizedSkillName = Localization.instance.Localize(cartographySkill.name);
+                if (localizedSkillName.ToLower() == name.ToLower())
                 {
-                    Skills.Skill skill = Traverse.Create(__instance).Method("GetSkill", (Skills.SkillType)SKILL_TYPE).GetValue<Skills.Skill>((Skills.SkillType)SKILL_TYPE);
+                    Skills.Skill skill = __instance.GetSkill((Skills.SkillType)SKILL_TYPE);
                     skill.m_level += value;
                     skill.m_level = Mathf.Clamp(skill.m_level, 0f, 100f);
-                    ___m_player.Message(MessageHud.MessageType.TopLeft, "Skill increased " + customSkill.name + ": " + (int)skill.m_level, 0, skill.m_info.m_icon);
-                    Console.instance.Print("Skill " + customSkill.name + " = " + skill.m_level);
+                    ___m_player.Message(MessageHud.MessageType.TopLeft, "Skill increased " + localizedSkillName + ": " + (int)skill.m_level, 0, skill.m_info.m_icon);
+                    Console.instance.Print("Skill " + localizedSkillName + " = " + skill.m_level);
                     return false;
                 }
                 return true;
@@ -242,11 +240,13 @@ namespace Advize_CartographySkill
         [HarmonyPatch(typeof(Skills), "CheatResetSkill")]
         public static class SkillsCheatResetSkill
         {
-            public static bool Prefix(string name, Player ___m_player)
+            public static bool Prefix(Skills __instance, string name)
             {
-                if (customSkill.name.ToLower() == name.ToLower())
+                string localizedSkillName = Localization.instance.Localize(cartographySkill.name);
+                if (localizedSkillName.ToLower() == name.ToLower())
                 {
-                    ___m_player.GetSkills().ResetSkill((Skills.SkillType)SKILL_TYPE);
+                    __instance.ResetSkill((Skills.SkillType)SKILL_TYPE);
+                    Console.instance.Print("Skill " + localizedSkillName + " reset");
                     return false;
                 }
                 return true;
