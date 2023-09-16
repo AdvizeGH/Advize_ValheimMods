@@ -13,7 +13,6 @@ namespace Advize_Spyglass.Configuration
         //private readonly ConfigEntry<bool> serverConfigLocked;
         private readonly ConfigEntry<bool> enableLocalization;
         //Spyglass
-        private readonly ConfigEntry<bool> enableSpyglass;
         private readonly ConfigEntry<float> fovReductionFactor;
         private readonly ConfigEntry<float> zoomMultiplier;
         //Controls
@@ -48,24 +47,18 @@ namespace Advize_Spyglass.Configuration
                 "General",
                 "EnableLocalization",
                 false,
-                "Enable this to attempt to load localized text",
-                false);
-            enableSpyglass = Config(
-                "Spyglass",
-                "EnableSpyglass",
-                true,
-                "Enables the spyglass item",
+                "Enable this to attempt to load localized text.",
                 false);
             fovReductionFactor = Config(
                 "Spyglass",
                 "FovReductionFactor",
                 5f,
-                "Influences field of view when zoomed, recommended range is 0 (disabled) to 5");
+                "Influences field of view when zoomed, recommended range is 0 (disabled) to 5.");
             zoomMultiplier = Config(
                 "Spyglass",
                 "ZoomMultiplier",
                 5f,
-                "Increase/Decrease camera zoom distance");
+                "Increase/Decrease camera zoom distance.");
             increaseZoomKey = Config(
                 "Controls",
                 "IncreaseZoomKey",
@@ -97,7 +90,7 @@ namespace Advize_Spyglass.Configuration
                 "Troubleshooting",
                 "EnableDebugMessages",
                 false,
-                "Enable mod debug messages in console", false);
+                "Enable mod debug messages in console.", false);
 
             //configSync.AddLockingConfigEntry(serverConfigLocked);
         }
@@ -109,10 +102,6 @@ namespace Advize_Spyglass.Configuration
         internal bool EnableDebugMessages
         {
             get { return enableDebugMessages.Value; }
-        }
-        internal bool EnableSpyglass
-        {
-            get { return enableSpyglass.Value; }
         }
         internal float FovReductionFactor
         {

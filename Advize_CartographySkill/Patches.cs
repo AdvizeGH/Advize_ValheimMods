@@ -7,15 +7,13 @@ namespace Advize_CartographySkill
 {
     public partial class CartographySkill
     {
-        #region Exploration Related Patches
         [HarmonyPatch(typeof(Minimap), "Awake")]
         public static class MinimapAwake
         {
             public static void Postfix(Minimap __instance)
             {
-                if (!config.EnableSkill) return;
                 __instance.m_exploreRadius = config.BaseExploreRadius;
-                Dbgl($"Explore Radius is now: {config.BaseExploreRadius}");
+                Dbgl($"Explore Radius is now: {__instance.m_exploreRadius}");
             }
         }
 
@@ -59,12 +57,11 @@ namespace Advize_CartographySkill
                 }
             }
         }
-        #endregion
 
         [HarmonyPatch(typeof(ZNetScene), "Awake")]
         public static class ZNetSceneAwake
         {
-            public static void Postfix(ZNetScene __instance)
+            public static void Postfix()
             {
                 //Dbgl("ZNetScene.Awake() Postfix");
                 if (stringDictionary.Count > 0)
@@ -72,7 +69,6 @@ namespace Advize_CartographySkill
             }
         }
 
-        #region Skill Related Patches
         [HarmonyPatch(typeof(Skills), "GetSkillDef")]
         public static class SkillsGetSkillDef
         {
@@ -108,6 +104,7 @@ namespace Advize_CartographySkill
         {
             public static bool Prefix(Skills __instance, string name, float value, Player ___m_player)
             {
+                if (!config.EnableSkill) return true;
                 string localizedSkillName = Localization.instance.Localize(cartographySkill.name);
                 if (localizedSkillName.ToLower() == name.ToLower())
                 {
@@ -127,6 +124,7 @@ namespace Advize_CartographySkill
         {
             public static bool Prefix(Skills __instance, string name)
             {
+                if (!config.EnableSkill) return true;
                 string localizedSkillName = Localization.instance.Localize(cartographySkill.name);
                 if (localizedSkillName.ToLower() == name.ToLower())
                 {
@@ -137,6 +135,5 @@ namespace Advize_CartographySkill
                 return true;
             }
         }
-        #endregion
     }
 }

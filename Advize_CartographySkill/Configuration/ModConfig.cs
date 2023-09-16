@@ -39,45 +39,53 @@ namespace Advize_CartographySkill.Configuration
             serverConfigLocked = Config(
                 "General",
                 "Lock Configuration",
-                false,
+                true,
                 "If on, the configuration is locked and can be changed by server admins only.");
             exploreRadiusIncrease = Config(
                 "General",
                 "RadiusIncreasePerLevel",
                 1f,
-                "Amount to increase base explore radius by per skill level");
+                "Amount to increase base explore radius by per skill level.");
             baseExploreRadius = Config(
                 "General",
                 "BaseExploreRadius",
                 100f,
-                "BaseExploreRadius (Vanilla value is 100)");
+                "BaseExploreRadius (Vanilla value is 100).");
             enableLocalization = Config(
                 "General",
                 "EnableLocalization",
                 false,
-                "Enable this to attempt to load localized text",
+                "Enable this to attempt to load localized text.",
                 false);
             enableSkill = Config(
                 "Progression",
                 "EnableSkill",
                 true,
-                "Enables the cartography skill",
-                false);
+                "Enables the cartography skill. Disable if you only want to increase base explore radius. !!Warning!! This will reset skill level to 0.");
             skillIncrease = Config(
                 "Progression",
                 "LevelingIncrement",
                 0.5f,
-                "Experience gain when cartography skill XP is awarded");
+                "Experience gain when cartography skill XP is awarded.");
             tilesDiscoveredForXPGain = Config(
                 "Progression",
                 "TileDiscoveryRequirement",
                 100,
-                "Amount of map tiles that need to be discovered before XP is awarded (influences BetterUI xp gain spam)");
+                "Amount of map tiles that need to be discovered before XP is awarded (influences BetterUI xp gain spam).");
             enableDebugMessages = Config(
                 "Troubleshooting",
                 "EnableDebugMessages",
                 false,
-                "Enable mod debug messages in console", false);
+                "Enable mod debug messages in console.", false);
+
+            enableSkill.SettingChanged += (_, _) =>
+            {
+                if (!EnableSkill)
+                {
+                    Minimap.instance.m_exploreRadius = BaseExploreRadius;
+                    CartographySkill.Dbgl($"enableSkill set to false. Explore Radius is now: {BaseExploreRadius}");
+                }
+            };
 
             configSync.AddLockingConfigEntry(serverConfigLocked);
         }

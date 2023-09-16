@@ -12,14 +12,14 @@ namespace Advize_Spyglass
             {
                 //Dbgl("ObjectDB.Awake() Prefix");
                 PrefabInit();
-                if (!config.EnableSpyglass || !ZNetScene.instance) return;
+                if (!ZNetScene.instance) return;
                 
                 if (!__instance.m_items.Contains(prefab)) __instance.m_items.Add(prefab);
             }
             public static void Postfix(ObjectDB __instance)
             {
                 //Dbgl("ObjectDB.Awake() Postfix");
-                if (!config.EnableSpyglass || !ZNetScene.instance) return;
+                if (!ZNetScene.instance) return;
 
                 if (!__instance.m_recipes.Contains(recipe)) AddRecipe(__instance);
             }
@@ -32,8 +32,6 @@ namespace Advize_Spyglass
             public static void Postfix(ObjectDB __instance)
             {
                 //Dbgl("ObjectDB.CopyOtherDB() Postfix");
-                if (!config.EnableSpyglass) return;
-
                 if (!__instance.m_items.Contains(prefab))
                 {
                     __instance.m_items.Add(prefab);
@@ -51,7 +49,6 @@ namespace Advize_Spyglass
                 //Dbgl("ZNetScene.Awake() Postfix");
                 if (stringDictionary.Count > 0)
                     InitLocalization();
-                if (!config.EnableSpyglass) return;
 
                 if (!__instance.m_prefabs.Contains(prefab))
                 {
@@ -66,7 +63,7 @@ namespace Advize_Spyglass
         {
             public static void Postfix()
             {
-                if (!config.EnableSpyglass || !GameCamera.m_instance) return;
+                if (!GameCamera.m_instance) return;
 
                 if (isZooming && (!IsSpyglassEquipped() || ZInput.GetButtonDown("Attack") || config.RemoveZoomKey.IsDown()))
                 {
