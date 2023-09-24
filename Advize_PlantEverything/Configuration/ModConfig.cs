@@ -100,7 +100,7 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<int> thistleReturn;
         private readonly ConfigEntry<int> dandelionReturn;
 
-        //Saplings 28
+        //Saplings 32
         private readonly ConfigEntry<float> birchMinScale;
         private readonly ConfigEntry<float> birchMaxScale;
         private readonly ConfigEntry<float> oakMinScale;
@@ -129,6 +129,10 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<float> yggaMaxScale;
         private readonly ConfigEntry<float> yggaGrowthTime;
         private readonly ConfigEntry<float> yggaGrowRadius;
+        private readonly ConfigEntry<float> autumnBirchMinScale;
+        private readonly ConfigEntry<float> autumnBirchMaxScale;
+        private readonly ConfigEntry<float> autumnBirchGrowthTime;
+        private readonly ConfigEntry<float> autumnBirchGrowRadius;
 
         //Seeds 7
         private readonly ConfigEntry<bool> enableSeedOverrides;
@@ -695,6 +699,26 @@ namespace Advize_PlantEverything.Configuration
                 "YggaGrowRadius",
                 2f,
                 "Radius of free space required for a ygga sapling to grow");
+            autumnBirchMinScale = Config(
+                "Saplings",
+                "AutumnBirchMinScale",
+                0.5f,
+                "The minimum scaling factor used to scale an autumn birch tree upon growth");
+            autumnBirchMaxScale = Config(
+                "Saplings",
+                "AutumnBirchMaxScale",
+                1f,
+                "The minimum scaling factor used to scale an autumn birch tree upon growth");
+            autumnBirchGrowthTime = Config(
+                "Saplings",
+                "AutumnBirchGrowthTime",
+                3000f,
+                "Number of seconds it takes for an autumn birch tree to grow from an autumn birch sapling (will take at least 10 seconds after planting to grow)");
+            autumnBirchGrowRadius = Config(
+                "Saplings",
+                "AutumnBirchGrowRadius",
+                2f,
+                "Radius of free space required for an autumn birch sapling to grow");
 
             //Seeds
             enableSeedOverrides = Config(
@@ -1285,6 +1309,22 @@ namespace Advize_PlantEverything.Configuration
         internal float YggaGrowRadius
         {
             get { return yggaGrowRadius.Value; }
+        }
+        internal float AutumnBirchMinScale
+        {
+            get { return autumnBirchMinScale.Value; }
+        }
+        internal float AutumnBirchMaxScale
+        {
+            get { return autumnBirchMaxScale.Value; }
+        }
+        internal float AutumnBirchGrowthTime
+        {
+            get { return autumnBirchGrowthTime.Value; }
+        }
+        internal float AutumnBirchGrowRadius
+        {
+            get { return autumnBirchGrowRadius.Value; }
         }
         internal bool EnableSeedOverrides
         {
