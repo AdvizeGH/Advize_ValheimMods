@@ -15,7 +15,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.13.7";
+        public const string Version = "1.14.0";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -34,8 +34,12 @@ namespace Advize_PlantEverything
 
         private static readonly Dictionary<string, string> stringDictionary = new()
         {
-            { "AncientSapling", "Ancient Sapling" },
-            { "YggaSapling", "Ygga Sapling" },
+            { "AncientSaplingName", "Ancient Sapling" },
+            { "AncientSaplingDescription", "" },
+            { "YggaSaplingName", "Ygga Sapling" },
+            { "YggaSaplingDescription", "" },
+            { "AutumnBirchSaplingName", "Autumn Birch Sapling" },
+            { "AutumnBirchSaplingDescription", "Plains Variant" },
             { "RaspberryBushName", "Raspberry Bush" },
             { "RaspberryBushDescription", "Plant raspberries to grow raspberry bushes." },
             { "BlueberryBushName", "Blueberry Bush" },
@@ -86,7 +90,7 @@ namespace Advize_PlantEverything
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
             assetBundle = LoadAssetBundle("planteverything");
-            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.13.7" });
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.14.0" });
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
             harmony.PatchAll();
@@ -295,6 +299,7 @@ namespace Advize_PlantEverything
 
             prefabRefs.Add("Ancient_Sapling", CreatePrefab("Ancient_Sapling"));
             prefabRefs.Add("Ygga_Sapling", CreatePrefab("Ygga_Sapling"));
+            prefabRefs.Add("Autumn_Birch_Sapling", CreatePrefab("Autumn_Birch_Sapling"));
             prefabRefs.Add("Pickable_Dandelion_Picked", CreatePrefab("Pickable_Dandelion_Picked"));
             prefabRefs.Add("Pickable_Thistle_Picked", CreatePrefab("Pickable_Thistle_Picked"));
             prefabRefs.Add("Pickable_Mushroom_Picked", CreatePrefab("Pickable_Mushroom_Picked"));
@@ -668,6 +673,20 @@ namespace Advize_PlantEverything
             {
                 new SaplingDB
                 {
+                    key = "Ygga_Sapling",
+                    source = "YggaShoot_small1",
+                    resource = "Sap",
+                    resourceCost = 1,
+                    biome = config.EnforceBiomes ? (int)Heightmap.Biome.Mistlands : 895,
+                    icon = true,
+                    growTime = config.YggaGrowthTime,
+                    growRadius = config.YggaGrowRadius,
+                    minScale = config.YggaMinScale,
+                    maxScale = config.YggaMaxScale,
+                    grownPrefabs = new GameObject[] { prefabRefs["YggaShoot1"], prefabRefs["YggaShoot2"], prefabRefs["YggaShoot3"] }
+                },
+                new SaplingDB
+                {
                     key = "Ancient_Sapling",
                     source = "SwampTree1",
                     resource = "AncientSeed",
@@ -682,19 +701,18 @@ namespace Advize_PlantEverything
                 },
                 new SaplingDB
                 {
-                    key = "Ygga_Sapling",
-                    source = "YggaShoot_small1",
-                    resource = "Sap",
+                    key = "Autumn_Birch_Sapling",
+                    source = "Birch1_aut",
+                    resource = "BirchSeeds",
                     resourceCost = 1,
-                    biome = config.EnforceBiomes ? (int)Heightmap.Biome.Mistlands : 895,
+                    biome = config.EnforceBiomes ? (int)Heightmap.Biome.Plains : 895,
                     icon = true,
-                    growTime = config.YggaGrowthTime,
-                    growRadius = config.YggaGrowRadius,
-                    minScale = config.YggaMinScale,
-                    maxScale = config.YggaMaxScale,
-                    grownPrefabs = new GameObject[] { prefabRefs["YggaShoot1"], prefabRefs["YggaShoot2"], prefabRefs["YggaShoot3"] }
+                    growTime = config.AutumnBirchGrowthTime,
+                    growRadius = config.AutumnBirchGrowRadius,
+                    minScale = config.AutumnBirchMinScale,
+                    maxScale = config.AutumnBirchMaxScale,
+                    grownPrefabs = new GameObject[] { prefabRefs["Birch1_aut"], prefabRefs["Birch2_aut"] }
                 }
-                // Maybe add plains birch variant
             };
 
             return newList;
@@ -793,7 +811,7 @@ namespace Advize_PlantEverything
                     foreach (string parent in p)
                         sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m;
                 }
-                else if(sdb.source.StartsWith("Ygga"))
+                else if (sdb.source.StartsWith("Ygga"))
                 {
                     string[] foliage = { "birchleafs002", "birchleafs003", "birchleafs008", "birchleafs009", "birchleafs010", "birchleafs011" };
                     Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("beech").GetComponent<MeshRenderer>().sharedMaterials[0] };
@@ -810,6 +828,26 @@ namespace Advize_PlantEverything
                             sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshRenderer>().sharedMaterials = m;
                         }
                     }
+                }
+                else if (sdb.source.StartsWith("Birch"))
+                {
+                    string[] foliage = { "birchleafs002", "birchleafs003", "birchleafs008", "birchleafs009", "birchleafs010", "birchleafs011" };
+                    Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("Lod0").GetComponent<MeshRenderer>().sharedMaterials[0] };
+                    Material[] m2 = new Material[] { t.Find("Birch_Sapling").GetComponent<MeshRenderer>().sharedMaterials[0] };
+                    
+
+                    foreach (string parent in p)
+                        sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m2;
+
+                    foreach (string child in foliage)
+                    {
+                        foreach (string parent in p)
+                        {
+                            sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshFilter>().mesh = t.Find(child).GetComponent<MeshFilter>().mesh;
+                            sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshRenderer>().sharedMaterials = m;
+                        }
+                    }
+
                 }
                 
                 piece.m_icon = sdb.icon ? CreateSprite($"{sdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : piece.m_resources[0].m_resItem.m_itemData.GetIcon();
@@ -935,7 +973,7 @@ namespace Advize_PlantEverything
             for (int i = 0; i < saplingRefs.Count; i++)
             {
                 if (!cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Contains(saplingRefs[i].Prefab))
-                    cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Add(saplingRefs[i].Prefab);
+                    cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Insert(16, saplingRefs[i].Prefab);
             }
             for (int i = 0; i < pieceRefs.Count; i++)
             {
@@ -960,7 +998,7 @@ namespace Advize_PlantEverything
             if (stringDictionary.Count > 0)
                 InitLocalization();
 
-            List<GameObject> customPrefabs = new() { prefabRefs["Ancient_Sapling"], prefabRefs["Ygga_Sapling"] };
+            List<GameObject> customPrefabs = new() { prefabRefs["Ancient_Sapling"], prefabRefs["Ygga_Sapling"], prefabRefs["Autumn_Birch_Sapling"] };
             foreach (GameObject go in customPrefabs)
             {
                 if (!instance.m_prefabs.Contains(go))
