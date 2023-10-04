@@ -19,6 +19,7 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<bool> enableDebugMessages; //local
         private readonly ConfigEntry<bool> showPickableSpawners; //local
         private readonly ConfigEntry<bool> enableMiscFlora;
+        private readonly ConfigEntry<bool> enableExtraResources;
         private readonly ConfigEntry<bool> snappableVines; //local
         private readonly ConfigEntry<bool> enableLocalization; //local
         private readonly ConfigEntry<string> language; //local
@@ -148,6 +149,9 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<bool> enablePlantTimers; //local
         private readonly ConfigEntry<bool> growthAsPercentage; //local
 
+        //CustomSyncedValue
+        private readonly CustomSyncedValue<List<string>> extraResources;
+
         private ConfigEntry<T> Config<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true)
         {
             ConfigEntry<T> configEntry = ConfigFile.Bind(group, name, value, description);
@@ -177,7 +181,7 @@ namespace Advize_PlantEverything.Configuration
             serverConfigLocked = Config(
                 "General",
                 "LockConfiguration",
-                false,
+                true,
                 "If on, the configuration is locked and can be changed by server admins only.");
             nexusID = Config(
                 "General",
@@ -202,6 +206,11 @@ namespace Advize_PlantEverything.Configuration
                 "EnableMiscFlora",
                 true,
                 "Enables small trees, bushes, shrubs, vines, and large mushrooms.");
+            enableExtraResources = Config(
+                "General",
+                "EnableExtraResources",
+                false,
+                "When set to true, the mod will attempt to make user-defined prefabs buildable with the cultivator. Prefabs are defined in PlantEverything_ExtraResources.cfg. If file is not present, an example one will be generated for you.");
             snappableVines = Config(
                 "General",
                 "SnappableVines",
@@ -893,6 +902,10 @@ namespace Advize_PlantEverything.Configuration
             dropChance.SettingChanged += PlantEverything.SeedSettingChanged;
             oneOfEach.SettingChanged += PlantEverything.SeedSettingChanged;
 
+            //CustomSyncedValue
+            extraResources = new(configSync, "PE_ExtraResources", new());
+            extraResources.ValueChanged += PlantEverything.ExtraResourcesChanged;
+
             configSync.AddLockingConfigEntry(serverConfigLocked);
 
             foreach (ConfigurationManagerAttributes attributes in cropSettingAttributes)
@@ -910,8 +923,6 @@ namespace Advize_PlantEverything.Configuration
                 seedSettingAtrributes.Browsable = enableSeedOverrides.Value;
                 ConfigManagerHelper.ReloadConfigDisplay();
             };
-
-            //Config.SettingChanged += PlantEverything.ConfigSettingChanged;
         }
 
         internal bool EnableDebugMessages
@@ -925,6 +936,10 @@ namespace Advize_PlantEverything.Configuration
         internal bool EnableMiscFlora
         {
             get { return enableMiscFlora.Value; }
+        }
+        internal bool EnableExtraResources
+        {
+            get { return enableExtraResources.Value; } // Fully integrate this more. It's only checked when adding pieces atm.
         }
         internal bool SnappableVines
         {
@@ -1366,6 +1381,12 @@ namespace Advize_PlantEverything.Configuration
         {
             get { return growthAsPercentage.Value; }
         }
+        internal CustomSyncedValue<List<string>> SyncedExtraResources
+        {
+            get { return extraResources; }
+        }
+
+        internal bool IsSourceOfTruth => ConfigSync.IsSourceOfTruth;
 #nullable enable
         internal class ConfigurationManagerAttributes
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -23,6 +24,7 @@ namespace Advize_PlantEverything
         private static readonly Dictionary<string, GameObject> prefabRefs = new();
         private static List<PieceDB> pieceRefs = new();
         private static List<SaplingDB> saplingRefs = new();
+        private static List<ExtraResource> deserializedExtraResources = new();
 
         private static bool isInitialized = false;
 
@@ -91,11 +93,156 @@ namespace Advize_PlantEverything
             BepInEx.Logging.Logger.Sources.Add(PELogger);
             assetBundle = LoadAssetBundle("planteverything");
             config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.14.0" });
+            SetupWatcher();
+            ExtraResourcesFileChanged(null, null);
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
             harmony.PatchAll();
+            Game.isModded = true;
+            Dbgl("PlantEverything has loaded and [General]EnableDebugMessages is set to true in mod configuration file. Set to false to disable these messages.", level: LogLevel.Message);
         }
 
+        private void SetupWatcher()
+        {
+            FileSystemWatcher watcher = new(modDirectory, $"{PluginName}_ExtraResources.cfg");
+            watcher.Changed += ExtraResourcesFileChanged;
+            watcher.Created += ExtraResourcesFileChanged;
+            watcher.Renamed += ExtraResourcesFileChanged;
+            watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
+            watcher.EnableRaisingEvents = true;
+        }
+
+        private void ExtraResourcesFileChanged(object sender, FileSystemEventArgs e)
+        {
+            Dbgl($"File watcher triggered, eventargs.ChangeType: {e?.ChangeType}");
+            if (config.IsSourceOfTruth)
+            {
+                Dbgl("IsSourceOfTruth: true, loading extra resources from disk");
+                LoadExtraResources();
+            }
+            else
+            {
+                Dbgl("IsSourceOfTruth: false, extra resources will not be loaded from disk");
+                // Currently if a client changes their local ExtraResources.cfg while on a server, their new data won't be loaded.
+                // If they then leave server and join a single player game their originally loaded ExtraResources.cfg data is used, not the updated file.
+            }
+        }
+
+        private List<ExtraResource> GenerateExampleResources()
+        {
+            List<ExtraResource> exampleResources = new();
+
+            exampleResources.Add(new("PE_FakePrefab1", "PretendSeeds1", 1));
+            exampleResources.Add(new("PE_FakePrefab2", "PretendSeeds2", 2, false));
+
+            return exampleResources;
+        }
+
+        private string SerializeExtraResource(ExtraResource extraResource, bool prettyPrint = true) => JsonUtility.ToJson(extraResource, prettyPrint);
+
+        private static ExtraResource DeserializeExtraResource(string extraResource) => JsonUtility.FromJson<ExtraResource>(extraResource);
+
+        private void SaveExtraResources()
+        {
+            string filePath = Path.Combine(modDirectory, $"{PluginName}_ExtraResources.cfg");
+            Dbgl($"deserializedExtraResources.Count is {deserializedExtraResources.Count}");
+
+            string fullContent = "";
+            //foreach (ExtraResource test in deserializedExtraResources)
+            //{
+            //    fullContent += SerializeExtraResource(test) + ";\n";
+            //}
+            fullContent += SerializeExtraResource(deserializedExtraResources[0]) + ";\n\n";
+            fullContent += SerializeExtraResource(deserializedExtraResources[1], false) + ";\n";
+
+            File.WriteAllText(filePath, fullContent);
+            Dbgl($"Serialized extraResources to {filePath}");
+        }
+
+        private void LoadExtraResources()
+        {
+            Dbgl("LoadExtraResources");
+            deserializedExtraResources.Clear();
+            string fileName = $"{PluginName}_ExtraResources.cfg";
+            string filePath = Path.Combine(modDirectory, fileName);
+
+            try
+            {
+                string jsonText = File.ReadAllText(filePath);
+                string[] split = jsonText.Split(';');
+
+                foreach (string value in split)
+                {
+                    if (value.IsNullOrWhiteSpace()) continue;
+                    ExtraResource er = DeserializeExtraResource(value);
+                    if (er.IsValid())
+                    {
+                        deserializedExtraResources.Add(er);
+                        //Dbgl($"er1 {er.prefabName}, {er.resourceName}, {er.resourceCost}, {er.groundOnly}");
+                    }
+                    else
+                    {
+                        Dbgl($"Invalid resource configured in {fileName}, skipping entry", true, LogLevel.Warning);
+                        continue;
+                    }
+                }
+
+                Dbgl($"Loaded extra resources from {filePath}");
+                //Dbgl($"deserializedExtraResources.Count is {deserializedExtraResources.Count}");
+                Dbgl($"Assigning local value from deserializedExtraResources");
+
+                List<string> resourcesToSync = new();
+
+                foreach (ExtraResource er in deserializedExtraResources)
+                    resourcesToSync.Add(SerializeExtraResource(er));
+
+                config.SyncedExtraResources.AssignLocalValue(resourcesToSync);
+                return;
+            }
+            catch (Exception e)
+            {
+                //Dbgl(e.GetType().FullName, true, LogLevel.Error);
+                if (e is FileNotFoundException)
+                {
+                    Dbgl($"Error loading data from {fileName}. Generating new file with example values", true, LogLevel.Warning);
+                    deserializedExtraResources = GenerateExampleResources();
+                    SaveExtraResources();
+                }
+                else
+                {
+                    Dbgl($"Error loading data from {fileName}. Additional resources have not been added", level: LogLevel.Warning);
+                    deserializedExtraResources.Clear();
+                }
+            }
+        }
+
+        internal static void ExtraResourcesChanged()
+        {
+            Dbgl("ExtraResourcesChanged");
+            //Dbgl($"deserializedExtraResources.Count is currently {deserializedExtraResources.Count}");
+            //Dbgl($"config.SyncedExtraResources.Count is currently {config.SyncedExtraResources.Value.Count}");
+
+            deserializedExtraResources.Clear();
+            foreach (string er in config.SyncedExtraResources.Value)
+            {
+                ExtraResource temp = DeserializeExtraResource(er);
+                deserializedExtraResources.Add(temp);
+                //Dbgl($"er2 {temp.prefabName}, {temp.resourceName}, {temp.resourceCost}, {temp.groundOnly}");
+            }
+
+            //Dbgl($"deserializedExtraResources.Count is now {deserializedExtraResources.Count}");
+
+            //Dbgl("Attempting to call InitExtraResources");
+            if (ZNetScene.s_instance)
+            {
+                //Dbgl("Calling InitExtraResources");
+                InitExtraResources(ZNetScene.s_instance);
+                InitPieceRefs();
+                InitPieces();
+                InitCultivator();
+            }
+        }
+        
         private void LoadLocalizedStrings()
         {
             string fileName = $"{config.Language}_{PluginName}.json";
@@ -138,14 +285,31 @@ namespace Advize_PlantEverything
             Dbgl($"Saved english localized strings to {filePath}");
         }
 
-        internal static void Dbgl(string message, bool forceLog = false, bool logError = false)
+        internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)
         {
             if (forceLog || config.EnableDebugMessages)
             {
-                if (!logError)
-                    PELogger.LogInfo(message);
-                else
-                    PELogger.LogError(message);
+                switch (level)
+                {
+                    case LogLevel.Error:
+                        PELogger.LogError(message);
+                        break;
+                    case LogLevel.Warning:
+                        PELogger.LogWarning(message);
+                        break;
+                    case LogLevel.Info:
+                        PELogger.LogInfo(message);
+                        break;
+                    case LogLevel.Message:
+                        PELogger.LogMessage(message);
+                        break;
+                    case LogLevel.Debug:
+                        PELogger.LogDebug(message);
+                        break;
+                    case LogLevel.Fatal:
+                        PELogger.LogFatal(message);
+                        break;
+                }
             }
         }
 
@@ -172,7 +336,7 @@ namespace Advize_PlantEverything
             }
             catch
             {
-                Dbgl("Unable to load texture", true, true);
+                Dbgl("Unable to load texture", true, LogLevel.Error);
             }
 
             return null;
@@ -198,10 +362,10 @@ namespace Advize_PlantEverything
             return result;
         }
 
-        private static Piece CreatePiece(string key, Piece component, bool? isGrounded = null, bool canBeRemoved = true)
+        private static Piece CreatePiece(string key, Piece component, bool? isGrounded = null, bool canBeRemoved = true, bool extraResource = false)
         {
-            component.m_name = $"$pe{key}Name";
-            component.m_description = $"$pe{key}Description";
+            component.m_name = extraResource ? key : $"$pe{key}Name";
+            component.m_description = extraResource ? "" : $"$pe{key}Description";
             component.m_category = Piece.PieceCategory.Misc;
             component.m_cultivatedGroundOnly = (key.Contains("berryBush") || key.Contains("Pickable")) && config.RequireCultivation;
             component.m_groundOnly = component.m_groundPiece = isGrounded ?? !config.PlaceAnywhere;
@@ -214,6 +378,8 @@ namespace Advize_PlantEverything
         {
             Dbgl("InitPrefabRefs");
             if (prefabRefs.Count > 0) return;
+
+            bool foundAllRefs = false;
 
             prefabRefs.Add("Bush02_en", null);
             prefabRefs.Add("Bush01_heath", null);
@@ -275,25 +441,37 @@ namespace Advize_PlantEverything
             prefabRefs.Add("YggaShoot3", null);
             prefabRefs.Add("YggaShoot2", null);
 
-            Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
+            foreach (ExtraResource er in deserializedExtraResources)
+            {
+                prefabRefs.Add(er.prefabName, null);
+            }
+
+            UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
             for (int i = 0; i < array.Length; i++)
             {
-                GameObject gameObject = (GameObject)array[i];
+                GameObject gameObject = ((GameObject)array[i]).transform.root.gameObject;
 
-                if (!prefabRefs.ContainsKey(gameObject.name)) continue;
-
-                if (gameObject.name == "FirTree_small")
-                {
-                    Component[] components = gameObject.GetComponents(typeof(Component));
-                    if (components.Length < 2) continue;
-                }
-                //Debug.Log($"{gameObject.name}");
+                if (!prefabRefs.ContainsKey(gameObject.name) || prefabRefs[gameObject.name]) continue;
+                
                 prefabRefs[gameObject.name] = gameObject;
 
                 if (!prefabRefs.Any(key => !key.Value))
                 {
                     Dbgl("Found all prefab references");
+                    foundAllRefs = true;
                     break;
+                }
+            }
+
+            if (!foundAllRefs)
+            {
+                Dbgl("Could not find all prefab references");
+                List<string> nullKeys = prefabRefs.Where(key => !key.Value).Select(kvp => kvp.Key).ToList();
+
+                foreach (string s in nullKeys)
+                {
+                    Dbgl($"prefabRefs[{s}] value is null, removing key and value pair");
+                    prefabRefs.Remove(s);
                 }
             }
 
@@ -305,6 +483,29 @@ namespace Advize_PlantEverything
             prefabRefs.Add("Pickable_Mushroom_Picked", CreatePrefab("Pickable_Mushroom_Picked"));
             prefabRefs.Add("Pickable_Mushroom_yellow_Picked", CreatePrefab("Pickable_Mushroom_yellow_Picked"));
             prefabRefs.Add("Pickable_Mushroom_blue_Picked", CreatePrefab("Pickable_Mushroom_blue_Picked"));
+        }
+
+        private static void InitExtraResources(ZNetScene instance)
+        {
+            Dbgl("InitExtraResources");
+
+            foreach (ExtraResource er in deserializedExtraResources)
+            {
+                //Dbgl($"er3 {er.prefabName}, {er.resourceName}, {er.resourceCost}, {er.groundOnly}");
+                if (!prefabRefs.ContainsKey(er.prefabName) || !prefabRefs[er.prefabName])
+                {
+                    GameObject targetPrefab = instance.GetPrefab(er.prefabName);
+                    if (targetPrefab)
+                    {
+                        prefabRefs.Add(er.prefabName, targetPrefab);
+                        Dbgl($"Added {er.prefabName} to prefabRefs");
+                    }
+                    else
+                    {
+                        Dbgl($"Could not find prefab: {er.prefabName}");
+                    }
+                }
+            }
         }
 
         private static void InitPieceRefs()
@@ -419,124 +620,143 @@ namespace Advize_PlantEverything
                 }
             };
 
-            if (!config.EnableMiscFlora) return newList;
-
-            newList.AddRange(new List<PieceDB>()
+            if (config.EnableMiscFlora)
             {
-                new PieceDB
+                newList.AddRange(new List<PieceDB>()
                 {
-                    key = "Beech_small1",
-                    Resource = new KeyValuePair<string, int>("BeechSeeds", 1),
-                    icon = true,
-                    piece = CreatePiece("BeechSmall", GetOrAddPieceComponent(prefabRefs["Beech_small1"]), canBeRemoved: false)
-                },
-                new PieceDB
-                {
-                    key = "FirTree_small",
-                    Resource = new KeyValuePair<string, int>("FirCone", 1),
-                    icon = true,
-                    piece = CreatePiece("FirSmall", GetOrAddPieceComponent(prefabRefs["FirTree_small"]), canBeRemoved: false)
-                },
-                new PieceDB
-                {
-                    key = "FirTree_small_dead",
-                    Resource = new KeyValuePair<string, int>("FirCone", 1),
-                    icon = true,
-                    piece = CreatePiece("FirSmallDead", GetOrAddPieceComponent(prefabRefs["FirTree_small_dead"]), canBeRemoved: false)
-                },
-                new PieceDB
-                {
-                    key = "Bush01",
-                    Resource = new KeyValuePair<string, int>("Wood", 2),
-                    icon = true,
-                    piece = CreatePiece("Bush01", GetOrAddPieceComponent(prefabRefs["Bush01"]), canBeRemoved: false)
-                },
-                new PieceDB
-                {
-                    key = "Bush01_heath",
-                    Resource = new KeyValuePair<string, int>("Wood", 2),
-                    icon = true,
-                    piece = CreatePiece("Bush02", GetOrAddPieceComponent(prefabRefs["Bush01_heath"]), canBeRemoved: false)
-                },
-                new PieceDB
-                {
-                    key = "Bush02_en",
-                    Resource = new KeyValuePair<string, int>("Wood", 3),
-                    icon = true,
-                    piece = CreatePiece("PlainsBush", GetOrAddPieceComponent(prefabRefs["Bush02_en"]), canBeRemoved: false)
-                },
-                new PieceDB
-                {
-                    key = "shrub_2",
-                    Resource = new KeyValuePair<string, int>("Wood", 2),
-                    icon = true,
-                    piece = CreatePiece("Shrub01", GetOrAddPieceComponent(prefabRefs["shrub_2"]), canBeRemoved: false)
-                },
-                new PieceDB
-                {
-                    key = "shrub_2_heath",
-                    Resource = new KeyValuePair<string, int>("Wood", 2),
-                    icon = true,
-                    piece = CreatePiece("Shrub02", GetOrAddPieceComponent(prefabRefs["shrub_2_heath"]), canBeRemoved: false)
-                },
-                new PieceDB
-                {
-                    key = "YggaShoot_small1",
-                    Resources = new Dictionary<string, int>() { { "YggdrasilWood", 1 }, { "Wood", 2 } },
-                    icon = true,
-                    piece = CreatePiece("YggaShoot", GetOrAddPieceComponent(prefabRefs["YggaShoot_small1"]), canBeRemoved: false)
-                },
-                new PieceDB
-                {
-                    key = "vines",
-                    Resource = new KeyValuePair<string, int>("Wood", 2),
-                    icon = true,
-                    recover = true,
-                    piece = CreatePiece("Vines", GetOrAddPieceComponent(prefabRefs["vines"]), isGrounded: false),
-                    points = new()
+                    new PieceDB
                     {
-                        { new Vector3(1f, 0.5f, 0) },
-                        { new Vector3(-1f, 0.5f, 0) },
-                        { new Vector3(1f, -1f, 0) },
-                        { new Vector3(-1f, -1f, 0) }
+                        key = "Beech_small1",
+                        Resource = new KeyValuePair<string, int>("BeechSeeds", 1),
+                        icon = true,
+                        piece = CreatePiece("BeechSmall", GetOrAddPieceComponent(prefabRefs["Beech_small1"]), canBeRemoved: false)
+                    },
+                    new PieceDB
+                    {
+                        key = "FirTree_small",
+                        Resource = new KeyValuePair<string, int>("FirCone", 1),
+                        icon = true,
+                        piece = CreatePiece("FirSmall", GetOrAddPieceComponent(prefabRefs["FirTree_small"]), canBeRemoved: false)
+                    },
+                    new PieceDB
+                    {
+                        key = "FirTree_small_dead",
+                        Resource = new KeyValuePair<string, int>("FirCone", 1),
+                        icon = true,
+                        piece = CreatePiece("FirSmallDead", GetOrAddPieceComponent(prefabRefs["FirTree_small_dead"]), canBeRemoved: false)
+                    },
+                    new PieceDB
+                    {
+                        key = "Bush01",
+                        Resource = new KeyValuePair<string, int>("Wood", 2),
+                        icon = true,
+                        piece = CreatePiece("Bush01", GetOrAddPieceComponent(prefabRefs["Bush01"]), canBeRemoved: false)
+                    },
+                    new PieceDB
+                    {
+                        key = "Bush01_heath",
+                        Resource = new KeyValuePair<string, int>("Wood", 2),
+                        icon = true,
+                        piece = CreatePiece("Bush02", GetOrAddPieceComponent(prefabRefs["Bush01_heath"]), canBeRemoved: false)
+                    },
+                    new PieceDB
+                    {
+                        key = "Bush02_en",
+                        Resource = new KeyValuePair<string, int>("Wood", 3),
+                        icon = true,
+                        piece = CreatePiece("PlainsBush", GetOrAddPieceComponent(prefabRefs["Bush02_en"]), canBeRemoved: false)
+                    },
+                    new PieceDB
+                    {
+                        key = "shrub_2",
+                        Resource = new KeyValuePair<string, int>("Wood", 2),
+                        icon = true,
+                        piece = CreatePiece("Shrub01", GetOrAddPieceComponent(prefabRefs["shrub_2"]), canBeRemoved: false)
+                    },
+                    new PieceDB
+                    {
+                        key = "shrub_2_heath",
+                        Resource = new KeyValuePair<string, int>("Wood", 2),
+                        icon = true,
+                        piece = CreatePiece("Shrub02", GetOrAddPieceComponent(prefabRefs["shrub_2_heath"]), canBeRemoved: false)
+                    },
+                    new PieceDB
+                    {
+                        key = "YggaShoot_small1",
+                        Resources = new Dictionary<string, int>() { { "YggdrasilWood", 1 }, { "Wood", 2 } },
+                        icon = true,
+                        piece = CreatePiece("YggaShoot", GetOrAddPieceComponent(prefabRefs["YggaShoot_small1"]), canBeRemoved: false)
+                    },
+                    new PieceDB
+                    {
+                        key = "vines",
+                        Resource = new KeyValuePair<string, int>("Wood", 2),
+                        icon = true,
+                        recover = true,
+                        piece = CreatePiece("Vines", GetOrAddPieceComponent(prefabRefs["vines"]), isGrounded: false),
+                        points = new()
+                        {
+                            { new Vector3(1f, 0.5f, 0) },
+                            { new Vector3(-1f, 0.5f, 0) },
+                            { new Vector3(1f, -1f, 0) },
+                            { new Vector3(-1f, -1f, 0) }
+                        }
+                    },
+                    new PieceDB
+                    {
+                        key = "GlowingMushroom",
+                        Resources = new Dictionary<string, int>() { { "MushroomYellow", 3 }, { "BoneFragments", 1 }, { "Ooze", 1 } },
+                        icon = true,
+                        recover = true,
+                        piece = CreatePiece("GlowingMushroom", GetOrAddPieceComponent(prefabRefs["GlowingMushroom"]), isGrounded: true, canBeRemoved: true)
+                    },
+                    new PieceDB
+                    {
+                        key = "Pickable_Branch",
+                        ResourceCost = config.PickableBranchCost,
+                        resourceReturn = config.PickableBranchReturn,
+                        respawnTime = 240,
+                        recover = config.RecoverResources,
+                        piece = CreatePiece("PickableBranch", GetOrAddPieceComponent(prefabRefs["Pickable_Branch"]), isGrounded: true)
+                    },
+                    new PieceDB
+                    {
+                        key = "Pickable_Stone",
+                        ResourceCost = config.PickableStoneCost,
+                        resourceReturn = config.PickableStoneReturn,
+                        respawnTime = 0,
+                        recover = config.RecoverResources,
+                        piece = CreatePiece("PickableStone", GetOrAddPieceComponent(prefabRefs["Pickable_Stone"]), isGrounded: true)
+                    },
+                    new PieceDB
+                    {
+                        key = "Pickable_Flint",
+                        ResourceCost = config.PickableFlintCost,
+                        resourceReturn = config.PickableFlintReturn,
+                        respawnTime = 240,
+                        recover = config.RecoverResources,
+                        piece = CreatePiece("PickableFlint", GetOrAddPieceComponent(prefabRefs["Pickable_Flint"]), isGrounded: true)
                     }
-                },
-                new PieceDB
+                });
+            }
+
+            if (config.EnableExtraResources)
+            {
+                foreach (ExtraResource er in deserializedExtraResources)
                 {
-                    key = "GlowingMushroom",
-                    Resources = new Dictionary<string, int>() { { "MushroomYellow", 3 }, { "BoneFragments", 1 }, { "Ooze", 1 } },
-                    icon = true,
-                    recover = true,
-                    piece = CreatePiece("GlowingMushroom", GetOrAddPieceComponent(prefabRefs["GlowingMushroom"]), isGrounded: true, canBeRemoved: true)
-                },
-                new PieceDB
-                {
-                    key = "Pickable_Branch",
-                    ResourceCost = config.PickableBranchCost,
-                    resourceReturn = config.PickableBranchReturn,
-                    respawnTime = 240,
-                    recover = config.RecoverResources,
-                    piece = CreatePiece("PickableBranch", GetOrAddPieceComponent(prefabRefs["Pickable_Branch"]), isGrounded: true)
-                },
-                new PieceDB
-                {
-                    key = "Pickable_Stone",
-                    ResourceCost = config.PickableStoneCost,
-                    resourceReturn = config.PickableStoneReturn,
-                    respawnTime = 0,
-                    recover = config.RecoverResources,
-                    piece = CreatePiece("PickableStone", GetOrAddPieceComponent(prefabRefs["Pickable_Stone"]), isGrounded: true)
-                },
-                new PieceDB
-                {
-                    key = "Pickable_Flint",
-                    ResourceCost = config.PickableFlintCost,
-                    resourceReturn = config.PickableFlintReturn,
-                    respawnTime = 240,
-                    recover = config.RecoverResources,
-                    piece = CreatePiece("PickableFlint", GetOrAddPieceComponent(prefabRefs["Pickable_Flint"]), isGrounded: true)
+                    if (!prefabRefs.ContainsKey(er.prefabName) || !prefabRefs[er.prefabName])
+                    {
+                        Dbgl($"{er.prefabName} is not in dict or has null value");
+                        continue;
+                    }
+                    newList.Add(new PieceDB()
+                    {
+                        key = er.prefabName,
+                        Resource = new KeyValuePair<string, int>(er.resourceName, er.resourceCost),
+                        piece = CreatePiece(er.prefabName, GetOrAddPieceComponent(prefabRefs[er.prefabName]), canBeRemoved: true, isGrounded: er.groundOnly, extraResource: true)
+                    });
                 }
-            });
+            }
 
             return newList;
         }
@@ -723,7 +943,7 @@ namespace Advize_PlantEverything
             Dbgl("InitSaplings");
 
             ModifyTreeDrops();
-
+            
             List<SaplingDB> vanillaSaplings = new()
             {
                 new SaplingDB
@@ -767,17 +987,18 @@ namespace Advize_PlantEverything
                     maxScale = config.OakMaxScale
                 }
             };
-
+            
             foreach (SaplingDB sdb in vanillaSaplings)
             {
                 Plant plant = sdb.Prefab.GetComponent<Plant>();
+                
                 plant.m_growTime = plant.m_growTimeMax = sdb.growTime;
                 plant.m_growRadius = sdb.growRadius;
                 plant.m_minScale = sdb.minScale;
                 plant.m_maxScale = sdb.maxScale;
                 plant.m_destroyIfCantGrow = sdb.Prefab.GetComponent<Piece>().m_groundOnly = !config.PlaceAnywhere;
             }
-
+            
             foreach (SaplingDB sdb in saplingRefs)
             {
                 Plant plant = sdb.Prefab.GetComponent<Plant>();
@@ -988,6 +1209,7 @@ namespace Advize_PlantEverything
 
         private static void FinalInit(ZNetScene instance)
         {
+            InitExtraResources(instance);
             InitPieceRefs();
             InitPieces();
             InitSaplingRefs();
@@ -1056,7 +1278,7 @@ namespace Advize_PlantEverything
             }
         }
 
-        internal static void CoreSettingChanged(object o, System.EventArgs e)
+        internal static void CoreSettingChanged(object o, EventArgs e)
         {
             Dbgl("Config setting changed, re-initializing mod");
             InitPieceRefs();
@@ -1067,7 +1289,7 @@ namespace Advize_PlantEverything
             InitCultivator();
         }
 
-        internal static void PickableSettingChanged(object o, System.EventArgs e)
+        internal static void PickableSettingChanged(object o, EventArgs e)
         {
             Dbgl("Config setting changed, re-initializing pieces");
             InitPieceRefs();
@@ -1075,20 +1297,20 @@ namespace Advize_PlantEverything
             InitCultivator();
         }
 
-        internal static void SaplingSettingChanged(object o, System.EventArgs e)
+        internal static void SaplingSettingChanged(object o, EventArgs e)
         {
             Dbgl("Config setting changed, re-initializing saplings");
             InitSaplingRefs();
             InitSaplings();
         }
 
-        internal static void SeedSettingChanged(object o, System.EventArgs e)
+        internal static void SeedSettingChanged(object o, EventArgs e)
         {
             Dbgl("Config setting changed, modifying TreeBase drop tables");
             ModifyTreeDrops();
         }
 
-        internal static void CropSettingChanged(object o, System.EventArgs e)
+        internal static void CropSettingChanged(object o, EventArgs e)
         {
             Dbgl("Config setting changed, re-initializing crops");
             InitCrops();
@@ -1107,6 +1329,24 @@ namespace Advize_PlantEverything
         internal class LocalizedStrings
         {
             public List<string> localizedStrings = new();
+        }
+
+        public struct ExtraResource
+        {
+            public string prefabName;
+            public string resourceName;
+            public int resourceCost;
+            public bool groundOnly;
+
+            public ExtraResource(string prefabName, string resourceName, int resourceCost = 1, bool groundOnly = true)
+            {
+                this.prefabName = prefabName;
+                this.resourceName = resourceName;
+                this.resourceCost = resourceCost;
+                this.groundOnly = groundOnly;
+            }
+
+            internal bool IsValid() => !(prefabName == default || prefabName.StartsWith("PE_Fake") || resourceName == default || resourceCost == default);
         }
 
         internal class PrefabDB

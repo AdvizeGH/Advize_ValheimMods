@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
@@ -37,10 +38,11 @@ namespace Advize_PlantEverything
             {
                 if (__instance.GetRightItem().m_shared.m_name == "$item_cultivator")
                 {
-                    if (Physics.Raycast(GameCamera.instance.transform.position, GameCamera.instance.transform.forward, out var hitInfo, 50f, LayerMask.GetMask("item", "piece_nonsolid", "Default_small", "Default")) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
+                    //Get layers from extra resources that need to be made removable and then add them to this layer mask
+                    if (Physics.Raycast(GameCamera.instance.transform.position, GameCamera.instance.transform.forward, out var hitInfo, 50f, LayerMask.GetMask("item", "piece_nonsolid", "Default_small", "Default"/*, "static_solid"*/)) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
                     {
                         Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
-                        if (piece && piece.m_name.StartsWith("$pe"))
+                        if (piece && pieceRefs.Any(x => x.piece.m_name == piece.m_name))
                         {
                             if (!CanRemove(piece.gameObject, __instance, true)) return false;
 
@@ -230,14 +232,9 @@ namespace Advize_PlantEverything
 
             private static void ModifyGrow(Plant plant, TreeBase treeBase)
             {
-                if (!plant || !treeBase)
+                if (!plant?.GetComponent<ZNetView>() || !treeBase)
                 {
-                    Dbgl("ModifyGrow not executed, reference is null", logError : true);
-                    return;
-                }
-                if (!plant.GetComponent<ZNetView>())
-                {
-                    Dbgl("ModifyGrow not executed, ZNetView component reference is null", logError: true);
+                    Dbgl("ModifyGrow not executed, a reference is null", true, level: BepInEx.Logging.LogLevel.Error);
                     return;
                 }
                 if (plant.GetComponent<ZNetView>().GetZDO().GetBool("pe_placeAnywhere") && treeBase.GetComponent<StaticPhysics>())
