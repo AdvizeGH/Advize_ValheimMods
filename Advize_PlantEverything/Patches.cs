@@ -38,8 +38,7 @@ namespace Advize_PlantEverything
             {
                 if (__instance.GetRightItem().m_shared.m_name == "$item_cultivator")
                 {
-                    //Get layers from extra resources that need to be made removable and then add them to this layer mask
-                    if (Physics.Raycast(GameCamera.instance.transform.position, GameCamera.instance.transform.forward, out var hitInfo, 50f, LayerMask.GetMask("item", "piece_nonsolid", "Default_small", "Default"/*, "static_solid"*/)) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
+                    if (Physics.Raycast(GameCamera.instance.transform.position, GameCamera.instance.transform.forward, out var hitInfo, 50f, LayerMask.GetMask(layersForPieceRemoval)) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
                     {
                         Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
                         if (piece && pieceRefs.Any(x => x.piece.m_name == piece.m_name))

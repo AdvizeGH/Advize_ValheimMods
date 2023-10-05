@@ -25,6 +25,7 @@ namespace Advize_PlantEverything
         private static List<PieceDB> pieceRefs = new();
         private static List<SaplingDB> saplingRefs = new();
         private static List<ExtraResource> deserializedExtraResources = new();
+        private static string[] layersForPieceRemoval = { "item", "piece_nonsolid", "Default_small", "Default" };
 
         private static bool isInitialized = false;
 
@@ -156,7 +157,7 @@ namespace Advize_PlantEverything
             fullContent += SerializeExtraResource(deserializedExtraResources[1], false) + ";\n";
 
             File.WriteAllText(filePath, fullContent);
-            Dbgl($"Serialized extraResources to {filePath}");
+            Dbgl($"Serialized extraResources to {filePath}", true);
         }
 
         private void LoadExtraResources()
@@ -187,7 +188,7 @@ namespace Advize_PlantEverything
                     }
                 }
 
-                Dbgl($"Loaded extra resources from {filePath}");
+                Dbgl($"Loaded extra resources from {filePath}", true);
                 //Dbgl($"deserializedExtraResources.Count is {deserializedExtraResources.Count}");
                 Dbgl($"Assigning local value from deserializedExtraResources");
 
@@ -443,7 +444,7 @@ namespace Advize_PlantEverything
 
             foreach (ExtraResource er in deserializedExtraResources)
             {
-                prefabRefs.Add(er.prefabName, null);
+                prefabRefs[er.prefabName] = null;
             }
 
             UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
@@ -497,7 +498,7 @@ namespace Advize_PlantEverything
                     GameObject targetPrefab = instance.GetPrefab(er.prefabName);
                     if (targetPrefab)
                     {
-                        prefabRefs.Add(er.prefabName, targetPrefab);
+                        prefabRefs[er.prefabName] = targetPrefab;
                         Dbgl($"Added {er.prefabName} to prefabRefs");
                     }
                     else
@@ -742,20 +743,36 @@ namespace Advize_PlantEverything
 
             if (config.EnableExtraResources)
             {
+                List<string> potentialNewLayers = layersForPieceRemoval.ToList();
                 foreach (ExtraResource er in deserializedExtraResources)
                 {
                     if (!prefabRefs.ContainsKey(er.prefabName) || !prefabRefs[er.prefabName])
                     {
-                        Dbgl($"{er.prefabName} is not in dict or has null value");
+                        Dbgl($"{er.prefabName} is not in dictionary of prefab references or has a null value", true, LogLevel.Warning);
                         continue;
                     }
+
+                    if (ObjectDB.instance?.GetItemPrefab(er.resourceName)?.GetComponent<ItemDrop>() == null)
+                    {
+                        Dbgl($"{er.prefabName}'s required resource {er.resourceName} not found", true, LogLevel.Warning);
+                        continue;
+                    }
+
                     newList.Add(new PieceDB()
                     {
                         key = er.prefabName,
                         Resource = new KeyValuePair<string, int>(er.resourceName, er.resourceCost),
                         piece = CreatePiece(er.prefabName, GetOrAddPieceComponent(prefabRefs[er.prefabName]), canBeRemoved: true, isGrounded: er.groundOnly, extraResource: true)
                     });
+
+                    foreach (Collider c in prefabRefs[er.prefabName].GetComponentsInChildren<Collider>())
+                    {
+                        string layer = LayerMask.LayerToName(c.gameObject.layer);
+                        //Dbgl($"Layer to potentially add is {layer}");
+                        potentialNewLayers.Add(layer);
+                    }
                 }
+                layersForPieceRemoval = potentialNewLayers.Distinct().ToArray();
             }
 
             return newList;
@@ -991,7 +1008,6 @@ namespace Advize_PlantEverything
             foreach (SaplingDB sdb in vanillaSaplings)
             {
                 Plant plant = sdb.Prefab.GetComponent<Plant>();
-                
                 plant.m_growTime = plant.m_growTimeMax = sdb.growTime;
                 plant.m_growRadius = sdb.growRadius;
                 plant.m_minScale = sdb.minScale;

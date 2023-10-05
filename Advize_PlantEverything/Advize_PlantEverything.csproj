@@ -119,7 +119,7 @@
     <EmbeddedResource Include="Assets\YggaShoot_small1PieceIcon.png" />
     <EmbeddedResource Include="Assets\Ancient_SaplingPieceIcon.png" />
     <EmbeddedResource Include="Assets\Ygga_SaplingPieceIcon.png" />
-	<EmbeddedResource Include="Assets\Autumn_Birch_SaplingPieceIcon.png" />
+    <EmbeddedResource Include="Assets\Autumn_Birch_SaplingPieceIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ILRepack.targets" />

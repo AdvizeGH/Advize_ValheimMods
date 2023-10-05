@@ -13,7 +13,7 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigFile ConfigFile;
         private readonly ConfigSync ConfigSync;
 
-        //General 3
+        //General 4
         private readonly ConfigEntry<bool> serverConfigLocked;
         internal readonly ConfigEntry<int> nexusID; //local
         private readonly ConfigEntry<bool> enableDebugMessages; //local
@@ -23,6 +23,7 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<bool> snappableVines; //local
         private readonly ConfigEntry<bool> enableLocalization; //local
         private readonly ConfigEntry<string> language; //local
+        private readonly ConfigEntry<string> disabledResourcenames;
 
         //Difficulty 6
         private readonly ConfigEntry<bool> requireCultivation;
@@ -193,13 +194,13 @@ namespace Advize_PlantEverything.Configuration
                 "General",
                 "EnableDebugMessages",
                 false,
-                "Enable mod debug messages in console",
+                "Enable mod debug messages in console.",
                 false);
             showPickableSpawners = Config(
                 "General",
                 "ShowPickableSpawners",
                 true,
-                "Continue to show mushroom, thistle, and dandelion spawners after being picked. (Requires world reload on client to take effect)",
+                "Continue to show mushroom, thistle, and dandelion spawners after being picked. (Requires world reload on client to take effect.)",
                 false);
             enableMiscFlora = Config(
                 "General",
@@ -215,556 +216,561 @@ namespace Advize_PlantEverything.Configuration
                 "General",
                 "SnappableVines",
                 true,
-                "Enables snap points when placing vines adjacently",
+                "Enables snap points when placing vines adjacently.",
                 false);
             enableLocalization = Config(
                 "General",
                 "EnableLocalization",
                 false,
-                "Enable this to attempt to load localized text data for the language set in the following setting",
+                "Enable this to attempt to load localized text data for the language set in the following setting.",
                 false);
             language = Config(
                 "General",
                 "Language",
                 "english",
-                "Language to be used. If EnableLocalization is enabled, game will attempt to load localized text from a file named {language}_PlantEverything.json",
+                "Language to be used. If EnableLocalization is enabled, game will attempt to load localized text from a file named {language}_PlantEverything.json.",
                 false);
+            disabledResourcenames = Config(
+                "General",
+                "DisabledResourcenames",
+                "",
+                "To disable specific resources added by this mod (remove them from the cultivator), list their prefab names here separated by a comma. Names are case-sensitive.");
 
             //Difficulty
             requireCultivation = Config(
                 "Difficulty",
                 "RequireCultivation",
                 false,
-                "Pickable resources can only be planted on cultivated ground");
+                "Pickable resources can only be planted on cultivated ground.");
             placeAnywhere = Config(
                 "Difficulty",
                 "PlaceAnywhere",
                 false,
-                "Allow resources to be placed anywhere (not just on the ground). Does not apply to mushrooms or flowers");
+                "Allow resources to be placed anywhere (not just on the ground). Does not apply to mushrooms or flowers.");
             enforceBiomes = Config(
                 "Difficulty",
                 "EnforceBiomes",
                 false,
-                "Restrict modded plantables to being placed in their respective biome");
+                "Restrict modded plantables to being placed in their respective biome.");
             enforceBiomesVanilla = Config(
                 "Difficulty",
                 "EnforceBiomesVanilla",
                 true,
-                "Restrict vanilla plantables to being placed in their respective biome");
+                "Restrict vanilla plantables to being placed in their respective biome.");
             recoverResources = Config(
                 "Difficulty",
                 "RecoverResources",
                 false,
-                "Recover resources when pickables are removed with the cultivator. Applies to berries, mushrooms, and flowers");
+                "Recover resources when pickables are removed with the cultivator. Applies to berries, mushrooms, and flowers.");
             resourcesSpawnEmpty = Config(
                 "Difficulty",
                 "ResourcesSpawnEmpty",
                 false,
-                "Specifies whether resources should spawn empty or full. Applies to berry bushes, mushrooms, flowers, and debris");
+                "Specifies whether resources should spawn empty or full. Applies to berry bushes, mushrooms, flowers, and debris.");
 
             //Berries
             raspberryCost = Config(
                 "Berries",
                 "RaspberryCost",
                 5,
-                "Number of raspberries required to place a raspberry bush. Set to 0 to disable the ability to plant this resource");
+                "Number of raspberries required to place a raspberry bush. Set to 0 to disable the ability to plant this resource.");
             blueberryCost = Config(
                 "Berries",
                 "BlueberryCost",
                 5,
-                "Number of blueberries required to place a blueberry bush. Set to 0 to disable the ability to plant this resource");
+                "Number of blueberries required to place a blueberry bush. Set to 0 to disable the ability to plant this resource.");
             cloudberryCost = Config(
                 "Berries",
                 "CloudberryCost",
                 5,
-                "Number of cloudberries required to place a cloudberry bush. Set to 0 to disable the ability to plant this resource");
+                "Number of cloudberries required to place a cloudberry bush. Set to 0 to disable the ability to plant this resource.");
             raspberryRespawnTime = Config(
                 "Berries",
                 "RaspberryRespawnTime",
                 300,
-                "Number of minutes it takes for a raspberry bush to respawn berries");
+                "Number of minutes it takes for a raspberry bush to respawn berries.");
             blueberryRespawnTime = Config(
                 "Berries",
                 "BlueberryRespawnTime",
                 300,
-                "Number of minutes it takes for a blueberry bush to respawn berries");
+                "Number of minutes it takes for a blueberry bush to respawn berries.");
             cloudberryRespawnTime = Config(
                 "Berries",
                 "CloudberryRespawnTime",
                 300,
-                "Number of minutes it takes for a cloudberry bush to respawn berries");
+                "Number of minutes it takes for a cloudberry bush to respawn berries.");
             raspberryReturn = Config(
                 "Berries",
                 "RaspberryReturn",
                 1,
-                "Number of berries a raspberry bush will spawn");
+                "Number of berries a raspberry bush will spawn.");
             blueberryReturn = Config(
                 "Berries",
                 "BlueberryReturn",
                 1,
-                "Number of berries a blueberry bush will spawn");
+                "Number of berries a blueberry bush will spawn.");
             cloudberryReturn = Config(
                 "Berries",
                 "CloudberryReturn",
                 1,
-                "Number of berries a cloudberry bush will spawn");
+                "Number of berries a cloudberry bush will spawn.");
 
             //Crops
             enableCropOverrides = Config(
                 "Crops",
                 "EnableCropOverrides",
                 false,
-                new ConfigDescription("Enables the [Crops] section of this config", null, new ConfigurationManagerAttributes { Order = 27 }));
+                new ConfigDescription("Enables the [Crops] section of this config.", null, new ConfigurationManagerAttributes { Order = 27 }));
             cropMinScale = Config(
                 "Crops",
                 "CropMinScale",
                 0.9f,
-                new ConfigDescription("The minimum scaling factor used to scale crops upon growth", null, cropSettingAttributes[0]));
+                new ConfigDescription("The minimum scaling factor used to scale crops upon growth.", null, cropSettingAttributes[0]));
             cropMaxScale = Config(
                 "Crops",
                 "CropMaxScale",
                 1.1f,
-                new ConfigDescription("The maximum scaling factor used to scale crops upon growth", null, cropSettingAttributes[0]));
+                new ConfigDescription("The maximum scaling factor used to scale crops upon growth.", null, cropSettingAttributes[0]));
             cropGrowTimeMin = Config(
                 "Crops",
                 "CropGrowTimeMin",
                 4000f,
-                new ConfigDescription("Minimum number of seconds it takes for crops to grow (will take at least 10 seconds after planting to grow)", null, cropSettingAttributes[0]));
+                new ConfigDescription("Minimum number of seconds it takes for crops to grow (will take at least 10 seconds after planting to grow).", null, cropSettingAttributes[0]));
             cropGrowTimeMax = Config(
                 "Crops",
                 "CropGrowTimeMax",
                 5000f,
-                new ConfigDescription("Maximum number of seconds it takes for crops to grow (will take at least 10 seconds after planting to grow)", null, cropSettingAttributes[0]));
+                new ConfigDescription("Maximum number of seconds it takes for crops to grow (will take at least 10 seconds after planting to grow).", null, cropSettingAttributes[0]));
             cropGrowRadius = Config(
                 "Crops",
                 "CropGrowRadius",
                 0.5f,
-                new ConfigDescription("Radius of free space required for crops to grow", null, cropSettingAttributes[0]));
+                new ConfigDescription("Radius of free space required for crops to grow.", null, cropSettingAttributes[0]));
             cropRequireCultivation = Config(
                 "Crops",
                 "CropsRequireCultivation",
                 true,
-                new ConfigDescription("Crops can only be planted on cultivated ground", null, cropSettingAttributes[1]));
+                new ConfigDescription("Crops can only be planted on cultivated ground.", null, cropSettingAttributes[1]));
             cropRequireSunlight = Config(
                 "Crops",
                 "CropsRequireSunlight",
                 true,
-                new ConfigDescription("Crops can only grow under an open sky", null, cropSettingAttributes[2]));
+                new ConfigDescription("Crops can only grow under an open sky.", null, cropSettingAttributes[2]));
             cropRequireGrowthSpace = Config(
                 "Crops",
                 "CropsRequireGrowthSpace",
                 true,
-                new ConfigDescription("Crops require space to grow. This setting overrides the CropGrowRadius setting but without altering it, allowing grid spacing mods to continue functioning", null, cropSettingAttributes[3]));
+                new ConfigDescription("Crops require space to grow. This setting overrides the CropGrowRadius setting but without altering it, allowing grid spacing mods to continue functioning.", null, cropSettingAttributes[3]));
             barleyCost = Config(
                 "Crops",
                 "BarleyCost",
                 1,
-                new ConfigDescription("Resource cost of planting barley", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resource cost of planting barley.", null, cropSettingAttributes[0]));
             barleyReturn = Config(
                 "Crops",
                 "BarleyReturn",
                 2,
-                new ConfigDescription("Resources gained upon harvesting barley (does not apply to wild barley)", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resources gained upon harvesting barley (does not apply to wild barley).", null, cropSettingAttributes[0]));
             carrotCost = Config(
                 "Crops",
                 "CarrotCost",
                 1,
-                new ConfigDescription("Resource cost of planting carrots", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resource cost of planting carrots.", null, cropSettingAttributes[0]));
             carrotReturn = Config(
                 "Crops",
                 "CarrotReturn",
                 1,
-                new ConfigDescription("Resources gained upon harvesting carrots", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resources gained upon harvesting carrots.", null, cropSettingAttributes[0]));
             flaxCost = Config(
                 "Crops",
                 "FlaxCost",
                 1,
-                new ConfigDescription("Resource cost of planting flax", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resource cost of planting flax.", null, cropSettingAttributes[0]));
             flaxReturn = Config(
                 "Crops",
                 "FlaxReturn",
                 2,
-                new ConfigDescription("Resources gained upon harvesting flax (does not apply to wild flax)", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resources gained upon harvesting flax (does not apply to wild flax).", null, cropSettingAttributes[0]));
             onionCost = Config(
                 "Crops",
                 "OnionCost",
                 1,
-                new ConfigDescription("Resource cost of planting onions", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resource cost of planting onions.", null, cropSettingAttributes[0]));
             onionReturn = Config(
                 "Crops",
                 "OnionReturn",
                 1,
-                new ConfigDescription("Resources gained upon harvesting onions", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resources gained upon harvesting onions.", null, cropSettingAttributes[0]));
             seedCarrotCost = Config(
                 "Crops",
                 "SeedCarrotCost",
                 1,
-                new ConfigDescription("Resource cost of planting seed carrots", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resource cost of planting seed carrots.", null, cropSettingAttributes[0]));
             seedCarrotReturn = Config(
                 "Crops",
                 "SeedCarrotReturn",
                 3,
-                new ConfigDescription("Resources gained upon harvesting seed carrots", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resources gained upon harvesting seed carrots.", null, cropSettingAttributes[0]));
             seedOnionCost = Config(
                 "Crops",
                 "SeedOnionCost",
                 1,
-                new ConfigDescription("Resource cost of planting seed onions", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resource cost of planting seed onions.", null, cropSettingAttributes[0]));
             seedOnionReturn = Config(
                 "Crops",
                 "SeedOnionReturn",
                 3,
-                new ConfigDescription("Resources gained upon harvesting seed onions", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resources gained upon harvesting seed onions.", null, cropSettingAttributes[0]));
             seedTurnipCost = Config(
                 "Crops",
                 "SeedTurnipCost",
                 1,
-                new ConfigDescription("Resource cost of planting seed turnips", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resource cost of planting seed turnips.", null, cropSettingAttributes[0]));
             seedTurnipReturn = Config(
                 "Crops",
                 "SeedTurnipReturn",
                 3,
-                new ConfigDescription("Resources gained upon harvesting seed turnips", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resources gained upon harvesting seed turnips.", null, cropSettingAttributes[0]));
             turnipCost = Config(
                 "Crops",
                 "TurnipCost",
                 1,
-                new ConfigDescription("Resource cost of planting turnips", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resource cost of planting turnips.", null, cropSettingAttributes[0]));
             turnipReturn = Config(
                 "Crops",
                 "TurnipReturn",
                 1,
-                new ConfigDescription("Resources gained upon harvesting turnips", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resources gained upon harvesting turnips.", null, cropSettingAttributes[0]));
             magecapCost = Config(
                 "Crops",
                 "MagecapCost",
                 1,
-                new ConfigDescription("Resource cost of planting magecap", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resource cost of planting magecap.", null, cropSettingAttributes[0]));
             magecapReturn = Config(
                 "Crops",
                 "MagecapReturn",
                 3,
-                new ConfigDescription("Resources gained upon harvesting magecap", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resources gained upon harvesting magecap.", null, cropSettingAttributes[0]));
             jotunPuffsCost = Config(
                 "Crops",
                 "JotunPuffsCost",
                 1,
-                new ConfigDescription("Resource cost of planting Jotun puffs", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resource cost of planting Jotun puffs.", null, cropSettingAttributes[0]));
             jotunPuffsReturn = Config(
                 "Crops",
                 "JotunPuffsReturn",
                 3,
-                new ConfigDescription("Resources gained upon harvesting Jotun puffs", null, cropSettingAttributes[0]));
+                new ConfigDescription("Resources gained upon harvesting Jotun puffs.", null, cropSettingAttributes[0]));
 
             //Debris
             pickableBranchCost = Config(
                 "Debris",
                 "PickableBranchCost",
                 5,
-                "Amount of wood required to place branch debris. Set to 0 to disable the ability to plant this resource");
+                "Amount of wood required to place branch debris. Set to 0 to disable the ability to plant this resource.");
             pickableBranchReturn = Config(
                 "Debris",
                 "PickableBranchReturn",
                 1,
-                "Amount of wood that branch debris drops when picked");
+                "Amount of wood that branch debris drops when picked.");
             pickableStoneCost = Config(
                 "Debris",
                 "PickableStoneCost",
                 1,
-                "Amount of stone required to place stone debris. Set to 0 to disable the ability to plant this resource");
+                "Amount of stone required to place stone debris. Set to 0 to disable the ability to plant this resource.");
             pickableStoneReturn = Config(
                 "Debris",
                 "PickableStoneReturn",
                 1,
-                "Amount of stones that stone debris drops when picked");
+                "Amount of stones that stone debris drops when picked.");
             pickableFlintCost = Config(
                 "Debris",
                 "PickableFlintCost",
                 5,
-                "Amount of flint required to place flint debris. Set to 0 to disable the ability to plant this resource");
+                "Amount of flint required to place flint debris. Set to 0 to disable the ability to plant this resource.");
             pickableFlintReturn = Config(
                 "Debris",
                 "PickableFlintReturn",
                 1,
-                "Amount of flint that flint debris drops when picked");
+                "Amount of flint that flint debris drops when picked.");
 
             //Mushrooms
             mushroomCost = Config(
                 "Mushrooms",
                 "MushroomCost",
                 5,
-                "Number of mushrooms required to place a pickable mushroom spawner. Set to 0 to disable the ability to plant this resource");
+                "Number of mushrooms required to place a pickable mushroom spawner. Set to 0 to disable the ability to plant this resource.");
             yellowMushroomCost = Config(
                 "Mushrooms",
                 "YellowMushroomCost",
                 5,
-                "Number of yellow mushrooms required to place a pickable yellow mushroom spawner. Set to 0 to disable the ability to plant this resource");
+                "Number of yellow mushrooms required to place a pickable yellow mushroom spawner. Set to 0 to disable the ability to plant this resource.");
             blueMushroomCost = Config(
                 "Mushrooms",
                 "BlueMushroomCost",
                 5,
-                "Number of blue mushrooms required to place a pickable blue mushroom spawner. Set to 0 to disable the ability to plant this resource");
+                "Number of blue mushrooms required to place a pickable blue mushroom spawner. Set to 0 to disable the ability to plant this resource.");
             mushroomRespawnTime = Config(
                 "Mushrooms",
                 "MushroomRespawnTime",
                 240,
-                "Number of minutes it takes for mushrooms to respawn");
+                "Number of minutes it takes for mushrooms to respawn.");
             yellowMushroomRespawnTime = Config(
                 "Mushrooms",
                 "YellowMushroomRespawnTime",
                 240,
-                "Number of minutes it takes for yellow mushrooms to respawn");
+                "Number of minutes it takes for yellow mushrooms to respawn.");
             blueMushroomRespawnTime = Config(
                 "Mushrooms",
                 "BlueMushroomRespawnTime",
                 240,
-                "Number of minutes it takes for blue mushrooms to respawn");
+                "Number of minutes it takes for blue mushrooms to respawn.");
             mushroomReturn = Config(
                 "Mushrooms",
                 "MushroomReturn",
                 1,
-                "Number of mushrooms a pickable mushroom spawner will spawn");
+                "Number of mushrooms a pickable mushroom spawner will spawn.");
             yellowMushroomReturn = Config(
                 "Mushrooms",
                 "YellowMushroomReturn",
                 1,
-                "Number of yellow mushrooms a pickable yellow mushroom spawner will spawn");
+                "Number of yellow mushrooms a pickable yellow mushroom spawner will spawn.");
             blueMushroomReturn = Config(
                 "Mushrooms",
                 "BlueMushroomReturn",
                 1,
-                "Number of blue mushrooms a pickable blue mushroom spawner will spawn");
+                "Number of blue mushrooms a pickable blue mushroom spawner will spawn.");
 
             //Flowers
             thistleCost = Config(
                 "Flowers",
                 "ThistleCost",
                 5,
-                "Number of thistle required to place a pickable thistle spawner. Set to 0 to disable the ability to plant this resource");
+                "Number of thistle required to place a pickable thistle spawner. Set to 0 to disable the ability to plant this resource.");
             dandelionCost = Config(
                 "Flowers",
                 "DandelionCost",
                 5,
-                "Number of dandelion required to place a pickable dandelion spawner. Set to 0 to disable the ability to plant this resource");
+                "Number of dandelion required to place a pickable dandelion spawner. Set to 0 to disable the ability to plant this resource.");
             thistleRespawnTime = Config(
                 "Flowers",
                 "ThistleRespawnTime",
                 240,
-                "Number of minutes it takes for thistle to respawn");
+                "Number of minutes it takes for thistle to respawn.");
             dandelionRespawnTime = Config(
                 "Flowers",
                 "DandelionRespawnTime",
                 240,
-                "Number of minutes it takes for dandelion to respawn");
+                "Number of minutes it takes for dandelion to respawn.");
             thistleReturn = Config(
                 "Flowers",
                 "ThistleReturn",
                 1,
-                "Number of thistle a pickable thistle spawner will spawn");
+                "Number of thistle a pickable thistle spawner will spawn.");
             dandelionReturn = Config(
                 "Flowers",
                 "DandelionReturn",
                 1,
-                "Number of dandelion a pickable dandelion spawner will spawn");
+                "Number of dandelion a pickable dandelion spawner will spawn.");
 
             //Saplings
             birchMinScale = Config(
                 "Saplings",
                 "BirchMinScale",
                 0.5f,
-                "The minimum scaling factor used to scale a birch tree upon growth");
+                "The minimum scaling factor used to scale a birch tree upon growth.");
             birchMaxScale = Config(
                 "Saplings",
                 "BirchMaxScale",
                 1f,
-                "The maximum scaling factor used to scale a birch tree upon growth");
+                "The maximum scaling factor used to scale a birch tree upon growth.");
             oakMinScale = Config(
                 "Saplings",
                 "OakMinScale",
                 0.7f,
-                "The minimum scaling factor used to scale an oak tree upon growth");
+                "The minimum scaling factor used to scale an oak tree upon growth.");
             oakMaxScale = Config(
                 "Saplings",
                 "OakMaxScale",
                 0.9f,
-                "The maximum scaling factor used to scale an oak tree upon growth");
+                "The maximum scaling factor used to scale an oak tree upon growth.");
             ancientMinScale = Config(
                 "Saplings",
                 "AncientMinScale",
                 0.5f,
-                "The minimum scaling factor used to scale an ancient tree upon growth");
+                "The minimum scaling factor used to scale an ancient tree upon growth.");
             ancientMaxScale = Config(
                 "Saplings",
                 "AncientMaxScale",
                 2f,
-                "The maximum scaling factor used to scale an ancient tree upon growth");
+                "The maximum scaling factor used to scale an ancient tree upon growth.");
             birchGrowthTime = Config(
                 "Saplings",
                 "BirchGrowthTime",
                 3000f,
-                "Number of seconds it takes for a birch tree to grow from a birch sapling (will take at least 10 seconds after planting to grow)");
+                "Number of seconds it takes for a birch tree to grow from a birch sapling (will take at least 10 seconds after planting to grow).");
             oakGrowthTime = Config(
                 "Saplings",
                 "OakGrowthTime",
                 3000f,
-                "Number of seconds it takes for an oak tree to grow from an oak sapling (will take at least 10 seconds after planting to grow)");
+                "Number of seconds it takes for an oak tree to grow from an oak sapling (will take at least 10 seconds after planting to grow).");
             ancientGrowthTime = Config(
                 "Saplings",
                 "AncientGrowthTime",
                 3000f,
-                "Number of seconds it takes for an ancient tree to grow from an ancient sapling (will take at least 10 seconds after planting to grow)");
+                "Number of seconds it takes for an ancient tree to grow from an ancient sapling (will take at least 10 seconds after planting to grow).");
             birchGrowRadius = Config(
                 "Saplings",
                 "BirchGrowRadius",
                 2f,
-                "Radius of free space required for a birch sapling to grow");
+                "Radius of free space required for a birch sapling to grow.");
             oakGrowRadius = Config(
                 "Saplings",
                 "OakGrowRadius",
                 3f,
-                "Radius of free space required for an oak sapling to grow");
+                "Radius of free space required for an oak sapling to grow.");
             ancientGrowRadius = Config(
                 "Saplings",
                 "AncientGrowRadius",
                 2f,
-                "Radius of free space required for an ancient sapling to grow");
+                "Radius of free space required for an ancient sapling to grow.");
             beechGrowthTime = Config(
                 "Saplings",
                 "BeechGrowthTime",
                 3000f,
-                "Number of seconds it takes for a beech tree to grow from a beech sapling (will take at least 10 seconds after planting to grow)");
+                "Number of seconds it takes for a beech tree to grow from a beech sapling (will take at least 10 seconds after planting to grow).");
             pineGrowthTime = Config(
                 "Saplings",
                 "PineGrowthTime",
                 3000f,
-                "Number of seconds it takes for a pine tree to grow from a pine sapling (will take at least 10 seconds after planting to grow)");
+                "Number of seconds it takes for a pine tree to grow from a pine sapling (will take at least 10 seconds after planting to grow).");
             firGrowthTime = Config(
                 "Saplings",
                 "FirGrowthTime",
                 3000f,
-                "Number of seconds it takes for a fir tree to grow from a fir sapling (will take at least 10 seconds after planting to grow)");
+                "Number of seconds it takes for a fir tree to grow from a fir sapling (will take at least 10 seconds after planting to grow).");
             beechMinScale = Config(
                 "Saplings",
                 "BeechMinScale",
                 0.8f,
-                "The minimum scaling factor used to scale a beech tree upon growth");
+                "The minimum scaling factor used to scale a beech tree upon growth.");
             beechMaxScale = Config(
                 "Saplings",
                 "BeechMaxScale",
                 1.5f,
-                "The maximum scaling factor used to scale a beech tree upon growth");
+                "The maximum scaling factor used to scale a beech tree upon growth.");
             pineMinScale = Config(
                 "Saplings",
                 "PineMinScale",
                 1.5f,
-                "The minimum scaling factor used to scale a pine tree upon growth");
+                "The minimum scaling factor used to scale a pine tree upon growth.");
             pineMaxScale = Config(
                 "Saplings",
                 "PineMaxScale",
                 2.5f,
-                "The maximum scaling factor used to scale a pine tree upon growth");
+                "The maximum scaling factor used to scale a pine tree upon growth.");
             firMinScale = Config(
                 "Saplings",
                 "FirMinScale",
                 1f,
-                "The minimum scaling factor used to scale a fir tree upon growth");
+                "The minimum scaling factor used to scale a fir tree upon growth.");
             firMaxScale = Config(
                 "Saplings",
                 "FirMaxScale",
                 2.5f,
-                "The maximum scaling factor used to scale a fir tree upon growth");
+                "The maximum scaling factor used to scale a fir tree upon growth.");
             beechGrowRadius = Config(
                 "Saplings",
                 "BeechGrowRadius",
                 2f,
-                "Radius of free space required for a beech sapling to grow");
+                "Radius of free space required for a beech sapling to grow.");
             pineGrowRadius = Config(
                 "Saplings",
                 "PineGrowRadius",
                 2f,
-                "Radius of free space required for a pine sapling to grow");
+                "Radius of free space required for a pine sapling to grow.");
             firGrowRadius = Config(
                 "Saplings",
                 "FirGrowRadius",
                 2f,
-                "Radius of free space required for a fir sapling to grow");
+                "Radius of free space required for a fir sapling to grow.");
             yggaMinScale = Config(
                 "Saplings",
                 "YggaMinScale",
                 0.5f,
-                "The minimum scaling factor used to scale a ygga tree upon growth");
+                "The minimum scaling factor used to scale a ygga tree upon growth.");
             yggaMaxScale = Config(
                 "Saplings",
                 "YggaMaxScale",
                 2f,
-                "The minimum scaling factor used to scale a ygga tree upon growth");
+                "The minimum scaling factor used to scale a ygga tree upon growth.");
             yggaGrowthTime = Config(
                 "Saplings",
                 "YggaGrowthTime",
                 3000f,
-                "Number of seconds it takes for a ygga tree to grow from a ygga sapling (will take at least 10 seconds after planting to grow)");
+                "Number of seconds it takes for a ygga tree to grow from a ygga sapling (will take at least 10 seconds after planting to grow).");
             yggaGrowRadius = Config(
                 "Saplings",
                 "YggaGrowRadius",
                 2f,
-                "Radius of free space required for a ygga sapling to grow");
+                "Radius of free space required for a ygga sapling to grow.");
             autumnBirchMinScale = Config(
                 "Saplings",
                 "AutumnBirchMinScale",
                 0.5f,
-                "The minimum scaling factor used to scale an autumn birch tree upon growth");
+                "The minimum scaling factor used to scale an autumn birch tree upon growth.");
             autumnBirchMaxScale = Config(
                 "Saplings",
                 "AutumnBirchMaxScale",
                 1f,
-                "The minimum scaling factor used to scale an autumn birch tree upon growth");
+                "The minimum scaling factor used to scale an autumn birch tree upon growth.");
             autumnBirchGrowthTime = Config(
                 "Saplings",
                 "AutumnBirchGrowthTime",
                 3000f,
-                "Number of seconds it takes for an autumn birch tree to grow from an autumn birch sapling (will take at least 10 seconds after planting to grow)");
+                "Number of seconds it takes for an autumn birch tree to grow from an autumn birch sapling (will take at least 10 seconds after planting to grow).");
             autumnBirchGrowRadius = Config(
                 "Saplings",
                 "AutumnBirchGrowRadius",
                 2f,
-                "Radius of free space required for an autumn birch sapling to grow");
+                "Radius of free space required for an autumn birch sapling to grow.");
 
             //Seeds
             enableSeedOverrides = Config(
                 "Seeds",
                 "EnableSeedOverrides",
                 false,
-                new ConfigDescription("Enables the [Seeds] section of this config", null, new ConfigurationManagerAttributes { Order = 10 }));
+                new ConfigDescription("Enables the [Seeds] section of this config.", null, new ConfigurationManagerAttributes { Order = 10 }));
             seedDropMin = Config(
                 "Seeds",
                 "seedDropMin",
                 1,
-                new ConfigDescription("Determines minimum amount of seeds that can drop when trees drop seeds", null, seedSettingAtrributes));
+                new ConfigDescription("Determines minimum amount of seeds that can drop when trees drop seeds.", null, seedSettingAtrributes));
             seedDropMax = Config(
                 "Seeds",
                 "seedDropMax",
                 2,
-                new ConfigDescription("Determines maximum amount of seeds that can drop when trees drop seeds", null, seedSettingAtrributes));
+                new ConfigDescription("Determines maximum amount of seeds that can drop when trees drop seeds.", null, seedSettingAtrributes));
             treeDropMin = Config(
                 "Seeds",
                 "treeDropMin",
                 1,
-                new ConfigDescription("Determines minimum amount of times a destroyed tree will attempt to select a drop from its drop table", null, seedSettingAtrributes));
+                new ConfigDescription("Determines minimum amount of times a destroyed tree will attempt to select a drop from its drop table.", null, seedSettingAtrributes));
             treeDropMax = Config(
                 "Seeds",
                 "treeDropMax",
                 3,
-                new ConfigDescription("Determines (maximum amount of times - 1) a destroyed tree will attempt to select a drop from its drop table", null, seedSettingAtrributes));
+                new ConfigDescription("Determines (maximum amount of times - 1) a destroyed tree will attempt to select a drop from its drop table.", null, seedSettingAtrributes));
             dropChance = Config(
                 "Seeds",
                 "dropChance",
                 0.5f,
-                new ConfigDescription("Chance that items will drop from trees when destroyed. Default value 0.5f (50%). Set between 0 and 1f", null, seedSettingAtrributes));
+                new ConfigDescription("Chance that items will drop from trees when destroyed. Default value 0.5f (50%). Set between 0 and 1f.", null, seedSettingAtrributes));
             oneOfEach = Config(
                 "Seeds",
                 "oneOfEach",
                 false,
-                new ConfigDescription("When enabled, destroyed trees will not drop the same item from its drop table more than once", null, seedSettingAtrributes));
+                new ConfigDescription("When enabled, destroyed trees will not drop the same item from its drop table more than once.", null, seedSettingAtrributes));
 
             //UI
             enablePickableTimers = Config(
