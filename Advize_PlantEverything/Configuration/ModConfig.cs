@@ -234,7 +234,8 @@ namespace Advize_PlantEverything.Configuration
                 "General",
                 "DisabledResourceNames",
                 "",
-                "To disable specific resources added by this mod (and not add them to the cultivator), list their prefab names here separated by a comma. Names are case-sensitive.");
+                new ConfigDescription("To disable specific resources added by this mod (and not add them to the cultivator), list their prefab names here separated by a comma. Names are case-sensitive.",
+                null, new ConfigurationManagerAttributes { Order = -1 }));
 
             //Difficulty
             requireCultivation = Config(
@@ -797,6 +798,7 @@ namespace Advize_PlantEverything.Configuration
             showPickableSpawners.SettingChanged += PlantEverything.CoreSettingChanged;
             enableMiscFlora.SettingChanged += PlantEverything.CoreSettingChanged;
             snappableVines.SettingChanged += PlantEverything.CoreSettingChanged;
+            enableExtraResources.SettingChanged += PlantEverything.ExtraResourcesFileOrSettingChanged;
             disabledResourceNames.SettingChanged += PlantEverything.PieceSettingChanged;
 
             //Difficulty

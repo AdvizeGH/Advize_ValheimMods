@@ -95,7 +95,8 @@ namespace Advize_PlantEverything
             assetBundle = LoadAssetBundle("planteverything");
             config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.14.0" });
             SetupWatcher();
-            ExtraResourcesFileChanged(null, null);
+            if (config.EnableExtraResources)
+                ExtraResourcesFileOrSettingChanged(null, null);
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
             harmony.PatchAll();
@@ -106,20 +107,28 @@ namespace Advize_PlantEverything
         private void SetupWatcher()
         {
             FileSystemWatcher watcher = new(modDirectory, $"{PluginName}_ExtraResources.cfg");
-            watcher.Changed += ExtraResourcesFileChanged;
-            watcher.Created += ExtraResourcesFileChanged;
-            watcher.Renamed += ExtraResourcesFileChanged;
+            watcher.Changed += ExtraResourcesFileOrSettingChanged;
+            watcher.Created += ExtraResourcesFileOrSettingChanged;
+            watcher.Renamed += ExtraResourcesFileOrSettingChanged;
             watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
+            watcher.IncludeSubdirectories = true;
             watcher.EnableRaisingEvents = true;
         }
-
-        private void ExtraResourcesFileChanged(object sender, FileSystemEventArgs e)
+        //Tidy up these events related to extra resources in followup updates, code flow is getting ridiculous. Clean up all the log messages too while you're at it.
+        internal static void ExtraResourcesFileOrSettingChanged(object sender, EventArgs e)
         {
-            Dbgl($"File watcher triggered, eventargs.ChangeType: {e?.ChangeType}");
+            Dbgl($"ExtraResources file or setting has changed");
             if (config.IsSourceOfTruth)
             {
-                Dbgl("IsSourceOfTruth: true, loading extra resources from disk");
-                LoadExtraResources();
+                if (config.EnableExtraResources)
+                {
+                    Dbgl("IsSourceOfTruth: true, loading extra resources from disk");
+                    LoadExtraResources();
+                }
+                else
+                {
+                    config.SyncedExtraResources.AssignLocalValue(new());
+                }
             }
             else
             {
@@ -129,21 +138,20 @@ namespace Advize_PlantEverything
             }
         }
 
-        private List<ExtraResource> GenerateExampleResources()
+        private static List<ExtraResource> GenerateExampleResources()
         {
-            List<ExtraResource> exampleResources = new();
-
-            exampleResources.Add(new("PE_FakePrefab1", "PretendSeeds1", 1));
-            exampleResources.Add(new("PE_FakePrefab2", "PretendSeeds2", 2, false));
-
-            return exampleResources;
+            return new()
+            {
+                new("PE_FakePrefab1", "PretendSeeds1", 1),
+                new("PE_FakePrefab2", "PretendSeeds2", 2, false)
+            };
         }
 
-        private string SerializeExtraResource(ExtraResource extraResource, bool prettyPrint = true) => JsonUtility.ToJson(extraResource, prettyPrint);
+        private static string SerializeExtraResource(ExtraResource extraResource, bool prettyPrint = true) => JsonUtility.ToJson(extraResource, prettyPrint);
 
         private static ExtraResource DeserializeExtraResource(string extraResource) => JsonUtility.FromJson<ExtraResource>(extraResource);
 
-        private void SaveExtraResources()
+        private static void SaveExtraResources()
         {
             string filePath = Path.Combine(modDirectory, $"{PluginName}_ExtraResources.cfg");
             Dbgl($"deserializedExtraResources.Count is {deserializedExtraResources.Count}");
@@ -160,7 +168,7 @@ namespace Advize_PlantEverything
             Dbgl($"Serialized extraResources to {filePath}", true);
         }
 
-        private void LoadExtraResources()
+        private static void LoadExtraResources()
         {
             Dbgl("LoadExtraResources");
             deserializedExtraResources.Clear();
@@ -224,11 +232,11 @@ namespace Advize_PlantEverything
             //Dbgl($"config.SyncedExtraResources.Count is currently {config.SyncedExtraResources.Value.Count}");
 
             deserializedExtraResources.Clear();
-            foreach (string er in config.SyncedExtraResources.Value)
+            foreach (string s in config.SyncedExtraResources.Value)
             {
-                ExtraResource temp = DeserializeExtraResource(er);
-                deserializedExtraResources.Add(temp);
-                //Dbgl($"er2 {temp.prefabName}, {temp.resourceName}, {temp.resourceCost}, {temp.groundOnly}");
+                ExtraResource er = DeserializeExtraResource(s);
+                deserializedExtraResources.Add(er);
+                //Dbgl($"er2 {er.prefabName}, {er.resourceName}, {er.resourceCost}, {er.groundOnly}");
             }
 
             //Dbgl($"deserializedExtraResources.Count is now {deserializedExtraResources.Count}");
