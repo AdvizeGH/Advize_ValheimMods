@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -392,7 +393,7 @@ namespace Advize_PlantEasily
             {
                 if (extraGhosts.Count < 1 || !config.ShowCost) return;
 
-                Text component = elementRoot.transform.Find("res_amount").GetComponent<Text>();
+                TMP_Text component = elementRoot.transform.Find("res_amount").GetComponent<TMP_Text>();
                 int totalGhosts = ghostPlacementStatus.Count;
 
                 string formattedCost = config.CostDisplayStyle == 0 ? config.CostDisplayLocation == 0 ? 
