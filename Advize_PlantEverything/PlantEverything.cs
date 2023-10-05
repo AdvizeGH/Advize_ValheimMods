@@ -238,9 +238,7 @@ namespace Advize_PlantEverything
             {
                 //Dbgl("Calling InitExtraResources");
                 InitExtraResources(ZNetScene.s_instance);
-                InitPieceRefs();
-                InitPieces();
-                InitCultivator();
+                PieceSettingChanged(null, null);
             }
         }
         
@@ -781,9 +779,15 @@ namespace Advize_PlantEverything
         private static void InitPieces()
         {
             Dbgl("InitPieces");
-
+            List<PieceDB> disabledResources = new();
             foreach (PieceDB pdb in pieceRefs)
             {
+                if (config.DisabledResourceNames.Contains(pdb.key))
+                {
+                    Dbgl("Resource disabled, skipping");
+                    disabledResources.Add(pdb);
+                    continue;
+                }
                 ItemDrop resource = ObjectDB.instance.GetItemPrefab(pdb.Resource.Key).GetComponent<ItemDrop>();
 
                 if (pdb.Resources.Count > 0)
@@ -891,6 +895,10 @@ namespace Advize_PlantEverything
                 }
 
                 pdb.piece.m_icon = pdb.icon ? CreateSprite($"{pdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : resource.m_itemData.GetIcon();
+            }
+            foreach (PieceDB piece in disabledResources)
+            {
+                pieceRefs.Remove(piece);
             }
         }
 
@@ -1305,7 +1313,7 @@ namespace Advize_PlantEverything
             InitCultivator();
         }
 
-        internal static void PickableSettingChanged(object o, EventArgs e)
+        internal static void PieceSettingChanged(object o, EventArgs e)
         {
             Dbgl("Config setting changed, re-initializing pieces");
             InitPieceRefs();

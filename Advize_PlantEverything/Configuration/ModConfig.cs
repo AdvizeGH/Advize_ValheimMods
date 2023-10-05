@@ -23,7 +23,7 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<bool> snappableVines; //local
         private readonly ConfigEntry<bool> enableLocalization; //local
         private readonly ConfigEntry<string> language; //local
-        private readonly ConfigEntry<string> disabledResourcenames;
+        private readonly ConfigEntry<string> disabledResourceNames;
 
         //Difficulty 6
         private readonly ConfigEntry<bool> requireCultivation;
@@ -230,11 +230,11 @@ namespace Advize_PlantEverything.Configuration
                 "english",
                 "Language to be used. If EnableLocalization is enabled, game will attempt to load localized text from a file named {language}_PlantEverything.json.",
                 false);
-            disabledResourcenames = Config(
+            disabledResourceNames = Config(
                 "General",
-                "DisabledResourcenames",
+                "DisabledResourceNames",
                 "",
-                "To disable specific resources added by this mod (remove them from the cultivator), list their prefab names here separated by a comma. Names are case-sensitive.");
+                "To disable specific resources added by this mod (and not add them to the cultivator), list their prefab names here separated by a comma. Names are case-sensitive.");
 
             //Difficulty
             requireCultivation = Config(
@@ -797,6 +797,7 @@ namespace Advize_PlantEverything.Configuration
             showPickableSpawners.SettingChanged += PlantEverything.CoreSettingChanged;
             enableMiscFlora.SettingChanged += PlantEverything.CoreSettingChanged;
             snappableVines.SettingChanged += PlantEverything.CoreSettingChanged;
+            disabledResourceNames.SettingChanged += PlantEverything.PieceSettingChanged;
 
             //Difficulty
             requireCultivation.SettingChanged += PlantEverything.CoreSettingChanged;
@@ -807,15 +808,15 @@ namespace Advize_PlantEverything.Configuration
             //resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
 
             //Berries
-            raspberryCost.SettingChanged += PlantEverything.PickableSettingChanged;
-            blueberryCost.SettingChanged += PlantEverything.PickableSettingChanged;
-            cloudberryCost.SettingChanged += PlantEverything.PickableSettingChanged;
-            raspberryRespawnTime.SettingChanged += PlantEverything.PickableSettingChanged;
-            blueberryRespawnTime.SettingChanged += PlantEverything.PickableSettingChanged;
-            cloudberryRespawnTime.SettingChanged += PlantEverything.PickableSettingChanged;
-            raspberryReturn.SettingChanged += PlantEverything.PickableSettingChanged;
-            blueberryReturn.SettingChanged += PlantEverything.PickableSettingChanged;
-            cloudberryReturn.SettingChanged += PlantEverything.PickableSettingChanged;
+            raspberryCost.SettingChanged += PlantEverything.PieceSettingChanged;
+            blueberryCost.SettingChanged += PlantEverything.PieceSettingChanged;
+            cloudberryCost.SettingChanged += PlantEverything.PieceSettingChanged;
+            raspberryRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
+            blueberryRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
+            cloudberryRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
+            raspberryReturn.SettingChanged += PlantEverything.PieceSettingChanged;
+            blueberryReturn.SettingChanged += PlantEverything.PieceSettingChanged;
+            cloudberryReturn.SettingChanged += PlantEverything.PieceSettingChanged;
 
             //Crops
             enableCropOverrides.SettingChanged += PlantEverything.CropSettingChanged;
@@ -843,31 +844,31 @@ namespace Advize_PlantEverything.Configuration
             turnipReturn.SettingChanged += PlantEverything.CropSettingChanged;
 
             //Debris
-            pickableBranchCost.SettingChanged += PlantEverything.PickableSettingChanged;
-            pickableBranchReturn.SettingChanged += PlantEverything.PickableSettingChanged;
-            pickableStoneCost.SettingChanged += PlantEverything.PickableSettingChanged;
-            pickableStoneReturn.SettingChanged += PlantEverything.PickableSettingChanged;
-            pickableFlintCost.SettingChanged += PlantEverything.PickableSettingChanged;
-            pickableFlintReturn.SettingChanged += PlantEverything.PickableSettingChanged;
+            pickableBranchCost.SettingChanged += PlantEverything.PieceSettingChanged;
+            pickableBranchReturn.SettingChanged += PlantEverything.PieceSettingChanged;
+            pickableStoneCost.SettingChanged += PlantEverything.PieceSettingChanged;
+            pickableStoneReturn.SettingChanged += PlantEverything.PieceSettingChanged;
+            pickableFlintCost.SettingChanged += PlantEverything.PieceSettingChanged;
+            pickableFlintReturn.SettingChanged += PlantEverything.PieceSettingChanged;
 
             //Mushrooms
-            mushroomCost.SettingChanged += PlantEverything.PickableSettingChanged;
-            yellowMushroomCost.SettingChanged += PlantEverything.PickableSettingChanged;
-            blueMushroomCost.SettingChanged += PlantEverything.PickableSettingChanged;
-            mushroomRespawnTime.SettingChanged += PlantEverything.PickableSettingChanged;
-            yellowMushroomRespawnTime.SettingChanged += PlantEverything.PickableSettingChanged;
-            blueMushroomRespawnTime.SettingChanged += PlantEverything.PickableSettingChanged;
-            mushroomReturn.SettingChanged += PlantEverything.PickableSettingChanged;
-            yellowMushroomReturn.SettingChanged += PlantEverything.PickableSettingChanged;
-            blueMushroomReturn.SettingChanged += PlantEverything.PickableSettingChanged;
+            mushroomCost.SettingChanged += PlantEverything.PieceSettingChanged;
+            yellowMushroomCost.SettingChanged += PlantEverything.PieceSettingChanged;
+            blueMushroomCost.SettingChanged += PlantEverything.PieceSettingChanged;
+            mushroomRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
+            yellowMushroomRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
+            blueMushroomRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
+            mushroomReturn.SettingChanged += PlantEverything.PieceSettingChanged;
+            yellowMushroomReturn.SettingChanged += PlantEverything.PieceSettingChanged;
+            blueMushroomReturn.SettingChanged += PlantEverything.PieceSettingChanged;
 
             //Flowers
-            thistleCost.SettingChanged += PlantEverything.PickableSettingChanged;
-            dandelionCost.SettingChanged += PlantEverything.PickableSettingChanged;
-            thistleRespawnTime.SettingChanged += PlantEverything.PickableSettingChanged;
-            dandelionRespawnTime.SettingChanged += PlantEverything.PickableSettingChanged;
-            thistleReturn.SettingChanged += PlantEverything.PickableSettingChanged;
-            dandelionReturn.SettingChanged += PlantEverything.PickableSettingChanged;
+            thistleCost.SettingChanged += PlantEverything.PieceSettingChanged;
+            dandelionCost.SettingChanged += PlantEverything.PieceSettingChanged;
+            thistleRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
+            dandelionRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
+            thistleReturn.SettingChanged += PlantEverything.PieceSettingChanged;
+            dandelionReturn.SettingChanged += PlantEverything.PieceSettingChanged;
 
             //Saplings
             ancientGrowRadius.SettingChanged += PlantEverything.SaplingSettingChanged;
@@ -958,6 +959,10 @@ namespace Advize_PlantEverything.Configuration
         internal string Language
         {
             get { return language.Value; }
+        }
+        internal string[] DisabledResourceNames
+        {
+            get { return disabledResourceNames.Value.Split(','); }
         }
         internal bool RequireCultivation
         {
