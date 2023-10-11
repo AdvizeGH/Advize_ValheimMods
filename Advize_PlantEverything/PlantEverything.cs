@@ -16,7 +16,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.14.0";
+        public const string Version = "1.14.1";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -840,7 +840,7 @@ namespace Advize_PlantEverything
                 };
 
                 Pickable pickable = pdb.Prefab.GetComponent<Pickable>();
-                if (pickable)
+                if (pickable && !deserializedExtraResources.Any(x => x.prefabName == pdb.key))
                 {
                     pickable.m_respawnTimeMinutes = pdb.respawnTime;
                     pickable.m_amount = pdb.resourceReturn;
