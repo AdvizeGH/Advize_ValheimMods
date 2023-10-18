@@ -378,6 +378,7 @@ namespace Advize_PlantEverything
             component.m_groundOnly = component.m_groundPiece = isGrounded ?? !config.PlaceAnywhere;
             component.m_canBeRemoved = canBeRemoved;
             component.m_targetNonPlayerBuilt = false;
+            component.m_randomTarget = config.EnemiesTargetPieces;
             return component;
         }
 
@@ -1193,6 +1194,7 @@ namespace Advize_PlantEverything
                 Pickable pickable = plant.m_grownPrefabs[0].GetComponent<Pickable>();
 
                 piece.m_resources[0].m_amount = pdb.resourceCost;
+                piece.m_randomTarget = config.EnemiesTargetCrops;
 
                 plant.m_destroyIfCantGrow = pdb.Prefab.GetComponent<Piece>().m_groundOnly = !config.PlaceAnywhere;
 

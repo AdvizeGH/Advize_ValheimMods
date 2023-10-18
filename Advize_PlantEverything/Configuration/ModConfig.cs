@@ -25,13 +25,14 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<string> language; //local
         private readonly ConfigEntry<string> disabledResourceNames;
 
-        //Difficulty 6
+        //Difficulty 7
         private readonly ConfigEntry<bool> requireCultivation;
         private readonly ConfigEntry<bool> placeAnywhere;
         private readonly ConfigEntry<bool> enforceBiomes;
         private readonly ConfigEntry<bool> enforceBiomesVanilla;
         private readonly ConfigEntry<bool> recoverResources;
         private readonly ConfigEntry<bool> resourcesSpawnEmpty;
+        private readonly ConfigEntry<bool> enemiesTargetPieces;
 
         //Berries 9
         private readonly ConfigEntry<int> raspberryCost;
@@ -44,11 +45,12 @@ namespace Advize_PlantEverything.Configuration
         private readonly ConfigEntry<int> blueberryReturn;
         private readonly ConfigEntry<int> cloudberryReturn;
 
-        //Crops 29
+        //Crops 30
         private readonly ConfigEntry<bool> enableCropOverrides;
         private readonly ConfigEntry<bool> cropRequireCultivation;
         private readonly ConfigEntry<bool> cropRequireSunlight;
         private readonly ConfigEntry<bool> cropRequireGrowthSpace;
+        private readonly ConfigEntry<bool> enemiesTargetCrops;
         private readonly ConfigEntry<float> cropMinScale;
         private readonly ConfigEntry<float> cropMaxScale;
         private readonly ConfigEntry<float> cropGrowTimeMin;
@@ -268,6 +270,11 @@ namespace Advize_PlantEverything.Configuration
                 "ResourcesSpawnEmpty",
                 false,
                 "Specifies whether resources should spawn empty or full. Applies to berry bushes, mushrooms, flowers, and debris.");
+            enemiesTargetPieces = Config(
+                "Difficulty",
+                "EnemiesTargetPieces",
+                true,
+                "When enabled, enemies may target and attack player placed resources added by the mod. If this setting is changed, pre-existing placed pieces will not be affected until the world/server is reloaded.");
 
             //Berries
             raspberryCost = Config(
@@ -362,6 +369,11 @@ namespace Advize_PlantEverything.Configuration
                 "CropsRequireGrowthSpace",
                 true,
                 new ConfigDescription("Crops require space to grow. This setting overrides the CropGrowRadius setting but without altering it, allowing grid spacing mods to continue functioning.", null, cropSettingAttributes[3]));
+            enemiesTargetCrops = Config(
+                "Crops",
+                "EnemiesTargetCrops",
+                true,
+                new ConfigDescription("Determines whether enemies will target and attack crops. If this setting is changed, pre-existing placed crops will not be affected until the world/server is reloaded.", null, cropSettingAttributes[0]));
             barleyCost = Config(
                 "Crops",
                 "BarleyCost",
@@ -808,6 +820,7 @@ namespace Advize_PlantEverything.Configuration
             //enforceBiomesVanilla.SettingChanged += PlantEverything.ConfigurationSettingChanged;
             recoverResources.SettingChanged += PlantEverything.CoreSettingChanged;
             //resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+            enemiesTargetPieces.SettingChanged += PlantEverything.PieceSettingChanged;
 
             //Berries
             raspberryCost.SettingChanged += PlantEverything.PieceSettingChanged;
@@ -828,6 +841,7 @@ namespace Advize_PlantEverything.Configuration
             cropGrowTimeMax.SettingChanged += PlantEverything.CropSettingChanged;
             cropGrowRadius.SettingChanged += PlantEverything.CropSettingChanged;
             cropRequireCultivation.SettingChanged += PlantEverything.CropSettingChanged;
+            enemiesTargetCrops.SettingChanged += PlantEverything.CropSettingChanged;
             barleyCost.SettingChanged += PlantEverything.CropSettingChanged;
             barleyReturn.SettingChanged += PlantEverything.CropSettingChanged;
             carrotCost.SettingChanged += PlantEverything.CropSettingChanged;
@@ -990,6 +1004,10 @@ namespace Advize_PlantEverything.Configuration
         {
             get { return resourcesSpawnEmpty.Value; }
         }
+        internal bool EnemiesTargetPieces
+        {
+            get { return enemiesTargetPieces.Value; }
+        }
         internal int RaspberryCost
         {
             get { return raspberryCost.Value; }
@@ -1061,6 +1079,10 @@ namespace Advize_PlantEverything.Configuration
         internal bool CropRequireGrowthSpace
         {
             get { return cropRequireGrowthSpace.Value; }
+        }
+        internal bool EnemiesTargetCrops
+        {
+            get { return enemiesTargetCrops.Value; }
         }
         internal int BarleyCost
         {
