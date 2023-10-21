@@ -31,6 +31,26 @@ namespace Advize_PlantEverything
             }
         }
 
+        [HarmonyPatch(typeof(Player), nameof(Player.CheckCanRemovePiece))]
+        public static class PlayerCheckCanRemovePiece
+        {
+            private static bool Prefix(Player __instance, Piece piece, ref bool __result)
+            {
+                // check if the piece exists and if the mod has modified it
+                if (piece && pieceRefs.Any(x => x.piece.m_name == piece.m_name))
+                {
+                    // is piece from mod, so prevent deconstruction
+                    // unless it is with the cultivator.
+                    if (__instance.GetRightItem().m_shared.m_name != "$item_cultivator")
+                    {
+                        __result = false;
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
         [HarmonyPatch(typeof(Piece), nameof(Piece.DropResources))]
         public static class PieceDropResources
         {
@@ -133,7 +153,7 @@ namespace Advize_PlantEverything
                 }
                 return true;
             }
-            
+
             private static bool CanRemove(GameObject component, Player instance, bool isPiece)
             {
                 bool canRemove = true;
