@@ -15,7 +15,7 @@ namespace Advize_PlantEasily
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "1.6.3";
+        public const string Version = "1.6.4";
         
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -104,7 +104,7 @@ namespace Advize_PlantEasily
                 colliderRoots.AddRange(plant.m_grownPrefabs);
                 isSapling = colliderRoots.Any(x => x.GetComponent<TreeBase>());
 
-                if (!config.StandardizeGridSpacing && !isSapling)
+                if (config.MinimizeGridSpacing && !isSapling)
                 {
                     for (int i = 0; i < colliderRoots.Count; i++)
                     {
@@ -117,7 +117,7 @@ namespace Advize_PlantEasily
                 colliderRadius += isSapling ? config.ExtraSaplingSpacing : config.ExtraCropSpacing;
             }
             
-            float growRadius = isSapling ? plant.m_growRadius * 2.2f : plant?.m_growRadius * (config.StandardizeGridSpacing ? 2f : 1.1f) ?? PickableSnapRadius(go.name);
+            float growRadius = isSapling ? plant.m_growRadius * 2.2f : plant?.m_growRadius * (config.MinimizeGridSpacing ? 1.1f : 2f) ?? PickableSnapRadius(go.name);
 
             return growRadius + colliderRadius;
         }

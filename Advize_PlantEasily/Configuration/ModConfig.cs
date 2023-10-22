@@ -25,7 +25,7 @@ namespace Advize_PlantEasily.Configuration
         private readonly ConfigEntry<float> extraSaplingSpacing;
         private readonly ConfigEntry<GridSnappingStyle> gridSnappingStyle;
         private readonly ConfigEntry<bool> standardizeGridRotations;
-        private readonly ConfigEntry<bool> standardizeGridSpacing;
+        private readonly ConfigEntry<bool> minimizeGridSpacing;
         private readonly ConfigEntry<bool> globallyAlignGridDirections;
 
         //Pickables
@@ -80,7 +80,7 @@ namespace Advize_PlantEasily.Configuration
             extraSaplingSpacing = Config.Bind("General", "ExtraSaplingSpacing", 0f, "Adds extra spacing between saplings. Accepts negative values to decrease spacing (not recommended).");
             gridSnappingStyle = Config.Bind("General", "GridSnappingStyle", GridSnappingStyle.Intelligent, "Determines grid snapping style. Intelligent will attempt to prevent a new grid from overlapping with an old one. Legacy will allow any orientation of new rows and columns.");
             standardizeGridRotations = Config.Bind("General", "StandardizeGridRotations", true, "When set to true, this setting will prevent the diagonal snapping of new grids to existing grids.");
-            standardizeGridSpacing = Config.Bind("General", "StandardizeGridSpacing", false, "When set to true, spacing between each type of plant will be normalized to an equal distance. Setting this to false will allow for tighter grids, but with varying spacing used between diverse plants. ");
+            minimizeGridSpacing = Config.Bind("General", "MinimizeGridSpacing", false, "Allows for tighter grids, but with varying spacing used between diverse/distinct plants. ");
             globallyAlignGridDirections = Config.Bind("General", "GloballyAlignGridDirections", true, "When set to true, new grid placements will have their column and row directions align with the global grid.");
 
             //Pickables
@@ -237,9 +237,9 @@ namespace Advize_PlantEasily.Configuration
         {
             get { return standardizeGridRotations.Value; }
         }
-        internal bool StandardizeGridSpacing
+        internal bool MinimizeGridSpacing
         {
-            get { return standardizeGridSpacing.Value; }
+            get { return minimizeGridSpacing.Value; }
         }
         internal bool GloballyAlignGridDirections
         {
