@@ -16,7 +16,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.14.1";
+        public const string Version = "1.14.2";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -29,7 +29,6 @@ namespace Advize_PlantEverything
 
         private static bool isInitialized = false;
 
-        private static readonly string modDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static AssetBundle assetBundle;
         private static readonly Dictionary<string, Texture2D> cachedTextures = new();
 
@@ -93,7 +92,7 @@ namespace Advize_PlantEverything
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
             assetBundle = LoadAssetBundle("planteverything");
-            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.14.0" });
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.14.2" });
             SetupWatcher();
             if (config.EnableExtraResources)
                 ExtraResourcesFileOrSettingChanged(null, null);
@@ -104,9 +103,19 @@ namespace Advize_PlantEverything
             Dbgl("PlantEverything has loaded and [General]EnableDebugMessages is set to true in mod configuration file. Set to false to disable these messages.", level: LogLevel.Message);
         }
 
+        private static string ModConfigDirectory()
+        {
+            string path = Path.Combine(Paths.ConfigPath, "PlantEverything");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            return path;
+        }
+
         private void SetupWatcher()
         {
-            FileSystemWatcher watcher = new(modDirectory, $"{PluginName}_ExtraResources.cfg");
+            FileSystemWatcher watcher = new(ModConfigDirectory(), $"{PluginName}_ExtraResources.cfg");
             watcher.Changed += ExtraResourcesFileOrSettingChanged;
             watcher.Created += ExtraResourcesFileOrSettingChanged;
             watcher.Renamed += ExtraResourcesFileOrSettingChanged;
@@ -153,7 +162,7 @@ namespace Advize_PlantEverything
 
         private static void SaveExtraResources()
         {
-            string filePath = Path.Combine(modDirectory, $"{PluginName}_ExtraResources.cfg");
+            string filePath = Path.Combine(ModConfigDirectory(), $"{PluginName}_ExtraResources.cfg");
             Dbgl($"deserializedExtraResources.Count is {deserializedExtraResources.Count}");
 
             string fullContent = "";
@@ -173,7 +182,7 @@ namespace Advize_PlantEverything
             Dbgl("LoadExtraResources");
             deserializedExtraResources.Clear();
             string fileName = $"{PluginName}_ExtraResources.cfg";
-            string filePath = Path.Combine(modDirectory, fileName);
+            string filePath = Path.Combine(ModConfigDirectory(), fileName);
 
             try
             {
@@ -253,7 +262,7 @@ namespace Advize_PlantEverything
         private void LoadLocalizedStrings()
         {
             string fileName = $"{config.Language}_{PluginName}.json";
-            string filePath = Path.Combine(modDirectory, fileName);
+            string filePath = Path.Combine(ModConfigDirectory(), fileName);
 
             try
             {
@@ -279,7 +288,7 @@ namespace Advize_PlantEverything
 
         private void SerializeDict()
         {
-            string filePath = Path.Combine(modDirectory, $"english_{PluginName}.json");
+            string filePath = Path.Combine(ModConfigDirectory(), $"english_{PluginName}.json");
 
             LocalizedStrings localizedStrings = new();
             foreach (KeyValuePair<string, string> kvp in stringDictionary)
