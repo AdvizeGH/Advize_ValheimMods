@@ -31,6 +31,106 @@ namespace Advize_PlantEverything
             }
         }
 
+        [HarmonyPatch(typeof(Player), nameof(Player.CheckCanRemovePiece))]
+        public static class PlayerCheckCanRemovePiece
+        {
+            private static bool Prefix(Player __instance, Piece piece, ref bool __result)
+            {
+                // check if the piece exists and if the mod has modified it
+                if (piece && pieceRefs.Any(x => x.piece.m_name == piece.m_name))
+                {
+                    // is piece from mod, so prevent deconstruction
+                    // unless it is with the cultivator.
+                    if (__instance.GetRightItem().m_shared.m_name != "$item_cultivator")
+                    {
+                        __result = false;
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(Piece), nameof(Piece.DropResources))]
+        public static class PieceDropResources
+        {
+            internal static void Prefix(
+                Piece __instance,
+                out Piece.Requirement[] __state
+            )
+            {
+                __state = null;
+
+                // Only interact if it is a piece that is modified by the mod
+                if (__instance && pieceRefs.Any(x => x.piece.m_name == __instance.m_name))
+                {
+                    // If piece has a pickable component then adjust resource drops
+                    // to prevent infinite item exploits by placing a pickable,
+                    // picking it, and then deconstructing it to get extra items.
+                    __state = __instance.m_resources;
+                    __instance.m_resources = RemovePickableDropFromRequirements(
+                        __instance.m_resources,
+                        __instance.GetComponent<Pickable>()
+                    );
+                }
+            }
+
+            internal static void Postfix(Piece __instance, Piece.Requirement[] __state)
+            {
+                if (__state != null)
+                {
+                    // Restore resources if they were changed
+                    __instance.m_resources = __state;
+                }
+            }
+
+            private static Piece.Requirement[] RemovePickableDropFromRequirements(
+                Piece.Requirement[] requirements,
+                Pickable pickable
+            )
+            {
+                // Pickables from this mod drop the pickable when deconstructed so
+                // it doesn't matter if it's been picked or not.
+                var pickableDrop = pickable?.m_itemPrefab?.GetComponent<ItemDrop>()?.m_itemData;
+                if (requirements == null || pickable == null || pickableDrop == null)
+                {
+                    return requirements;
+                }
+
+                // Check if pickable is included in piece build requirements
+                for (int i = 0; i < requirements.Length; i++)
+                {
+                    var req = requirements[i];
+                    if (req.m_resItem.m_itemData.m_shared.m_name == pickableDrop.m_shared.m_name)
+                    {
+                        // Make a copy before altering drops
+                        var pickedRequirements = new Piece.Requirement[requirements.Length];
+                        requirements.CopyTo(pickedRequirements, 0);
+
+                        // Get amount returned on picking based on world modifiers
+                        var pickedAmount = GetScaledPickableDropAmount(pickable);
+
+                        // Reduce drops by the amount that picking the item gave.
+                        // This is to prevent infinite resource exploits.
+                        pickedRequirements[i].m_amount = Mathf.Clamp(req.m_amount - pickedAmount, 0, req.m_amount);
+                        return pickedRequirements;
+                    }
+                }
+
+                // If no pickable item, return the requirements array unchanged.
+                return requirements;
+            }
+
+            private static int GetScaledPickableDropAmount(Pickable pickable)
+            {
+                if (Game.instance == null)
+                {
+                    return pickable.m_amount;
+                }
+                return pickable.m_dontScale ? pickable.m_amount : Mathf.Max(pickable.m_minAmountScaled, Game.instance.ScaleDrops(pickable.m_itemPrefab, pickable.m_amount));
+            }
+        }
+
         [HarmonyPatch(typeof(Player), "RemovePiece")]
         public static class PlayerRemovePiece
         {
@@ -53,7 +153,7 @@ namespace Advize_PlantEverything
                 }
                 return true;
             }
-            
+
             private static bool CanRemove(GameObject component, Player instance, bool isPiece)
             {
                 bool canRemove = true;
