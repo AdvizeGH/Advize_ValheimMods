@@ -37,10 +37,9 @@ namespace Advize_PlantEverything
             private static bool Prefix(Player __instance, Piece piece, ref bool __result)
             {
                 // check if the piece exists and if the mod has modified it
-                if (piece && pieceRefs.Any(x => x.piece.m_name == piece.m_name))
+                if (piece && prefabRefs.ContainsKey(ReplaceGameObjectName(piece.transform.root.name)))
                 {
-                    // is piece from mod, so prevent deconstruction
-                    // unless it is with the cultivator.
+                    // is piece from mod, so prevent deconstruction unless it is with the cultivator.
                     if (__instance.GetRightItem().m_shared.m_name != "$item_cultivator")
                     {
                         __result = false;
@@ -54,24 +53,23 @@ namespace Advize_PlantEverything
         [HarmonyPatch(typeof(Piece), nameof(Piece.DropResources))]
         public static class PieceDropResources
         {
-            internal static void Prefix(
-                Piece __instance,
-                out Piece.Requirement[] __state
-            )
+            internal static void Prefix(Piece __instance, out Piece.Requirement[] __state)
             {
                 __state = null;
+                if (!config.RecoverResources) return;
 
                 // Only interact if it is a piece that is modified by the mod
-                if (__instance && pieceRefs.Any(x => x.piece.m_name == __instance.m_name))
+                if (__instance && prefabRefs.ContainsKey(ReplaceGameObjectName(__instance.transform.root.name)))
                 {
                     // If piece has a pickable component then adjust resource drops
                     // to prevent infinite item exploits by placing a pickable,
                     // picking it, and then deconstructing it to get extra items.
-                    __state = __instance.m_resources;
-                    __instance.m_resources = RemovePickableDropFromRequirements(
-                        __instance.m_resources,
-                        __instance.GetComponent<Pickable>()
-                    );
+                    Pickable pickable = __instance.GetComponent<Pickable>();
+                    if (pickable)
+                    {
+                        __state = __instance.m_resources;
+                        __instance.m_resources = RemovePickableDropFromRequirements(__instance.m_resources, pickable);
+                    }
                 }
             }
 
@@ -84,18 +82,9 @@ namespace Advize_PlantEverything
                 }
             }
 
-            private static Piece.Requirement[] RemovePickableDropFromRequirements(
-                Piece.Requirement[] requirements,
-                Pickable pickable
-            )
+            private static Piece.Requirement[] RemovePickableDropFromRequirements(Piece.Requirement[] requirements, Pickable pickable)
             {
-                // Pickables from this mod drop the pickable when deconstructed so
-                // it doesn't matter if it's been picked or not.
-                var pickableDrop = pickable?.m_itemPrefab?.GetComponent<ItemDrop>()?.m_itemData;
-                if (requirements == null || pickable == null || pickableDrop == null)
-                {
-                    return requirements;
-                }
+                ItemDrop.ItemData pickableDrop = pickable.m_itemPrefab.GetComponent<ItemDrop>().m_itemData;
 
                 // Check if pickable is included in piece build requirements
                 for (int i = 0; i < requirements.Length; i++)
@@ -108,7 +97,7 @@ namespace Advize_PlantEverything
                         requirements.CopyTo(pickedRequirements, 0);
 
                         // Get amount returned on picking based on world modifiers
-                        var pickedAmount = GetScaledPickableDropAmount(pickable);
+                        int pickedAmount = GetScaledPickableDropAmount(pickable);
 
                         // Reduce drops by the amount that picking the item gave.
                         // This is to prevent infinite resource exploits.
@@ -123,10 +112,6 @@ namespace Advize_PlantEverything
 
             private static int GetScaledPickableDropAmount(Pickable pickable)
             {
-                if (Game.instance == null)
-                {
-                    return pickable.m_amount;
-                }
                 return pickable.m_dontScale ? pickable.m_amount : Mathf.Max(pickable.m_minAmountScaled, Game.instance.ScaleDrops(pickable.m_itemPrefab, pickable.m_amount));
             }
         }
@@ -141,7 +126,7 @@ namespace Advize_PlantEverything
                     if (Physics.Raycast(GameCamera.instance.transform.position, GameCamera.instance.transform.forward, out var hitInfo, 50f, LayerMask.GetMask(layersForPieceRemoval)) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
                     {
                         Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
-                        if (piece && pieceRefs.Any(x => x.piece.m_name == piece.m_name))
+                        if (piece && prefabRefs.ContainsKey(ReplaceGameObjectName(piece.transform.root.name)))
                         {
                             if (!CanRemove(piece.gameObject, __instance, true)) return false;
 

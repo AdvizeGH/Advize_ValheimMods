@@ -113,6 +113,8 @@ namespace Advize_PlantEverything
             return path;
         }
 
+        private static string ReplaceGameObjectName(string name) => name.Replace("(Clone)", "");
+
         private void SetupWatcher()
         {
             FileSystemWatcher watcher = new(ModConfigDirectory(), $"{PluginName}_ExtraResources.cfg");
