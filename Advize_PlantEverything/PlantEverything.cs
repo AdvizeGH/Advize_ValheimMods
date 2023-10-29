@@ -16,7 +16,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.14.2";
+        public const string Version = "1.15.0";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -92,7 +92,7 @@ namespace Advize_PlantEverything
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
             assetBundle = LoadAssetBundle("planteverything");
-            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.14.2" });
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.15.0" });
             SetupWatcher();
             if (config.EnableExtraResources)
                 ExtraResourcesFileOrSettingChanged(null, null);
