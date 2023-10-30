@@ -16,7 +16,7 @@ namespace Advize_PlantEverything
     {
         public const string PluginID = "advize.PlantEverything";
         public const string PluginName = "PlantEverything";
-        public const string Version = "1.15.0";
+        public const string Version = "1.15.1";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -1205,7 +1205,7 @@ namespace Advize_PlantEverything
                 Pickable pickable = plant.m_grownPrefabs[0].GetComponent<Pickable>();
 
                 piece.m_resources[0].m_amount = pdb.resourceCost;
-                piece.m_randomTarget = config.EnemiesTargetCrops;
+                piece.m_primaryTarget = piece.m_randomTarget = config.EnemiesTargetCrops;
 
                 plant.m_destroyIfCantGrow = pdb.Prefab.GetComponent<Piece>().m_groundOnly = !config.PlaceAnywhere;
 
