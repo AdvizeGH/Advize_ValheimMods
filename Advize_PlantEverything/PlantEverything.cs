@@ -533,18 +533,7 @@ namespace Advize_PlantEverything
 
             if (pieceRefs.Count > 0)
             {
-                foreach (PieceDB pdb in pieceRefs)
-                {
-                    if (prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pdb.Prefab))
-                        prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Remove(pdb.Prefab);
-
-                    if (Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator")
-                    {
-                        PELogger.LogWarning("Cultivator updated through config change, unequipping cultivator");
-                        Player.m_localPlayer.HideHandItems();
-                    }
-                    DestroyImmediate(pdb.Prefab.GetComponent<Piece>());
-                }
+                RemoveFromCultivator(pieceRefs.ConvertAll(x => (PrefabDB)x), destroy: true);
                 pieceRefs.Clear();
             }
             pieceRefs = GeneratePieceRefs();
@@ -799,13 +788,12 @@ namespace Advize_PlantEverything
         private static void InitPieces()
         {
             Dbgl("InitPieces");
-            List<PieceDB> disabledResources = new();
             foreach (PieceDB pdb in pieceRefs)
             {
                 if (config.DisabledResourceNames.Contains(pdb.key))
                 {
-                    Dbgl("Resource disabled, skipping");
-                    disabledResources.Add(pdb);
+                    Dbgl($"Resource disabled: {pdb.key}, skipping");
+                    pdb.enabled = false;
                     continue;
                 }
                 ItemDrop resource = ObjectDB.instance.GetItemPrefab(pdb.Resource.Key).GetComponent<ItemDrop>();
@@ -916,10 +904,6 @@ namespace Advize_PlantEverything
 
                 pdb.piece.m_icon = pdb.icon ? CreateSprite($"{pdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : resource.m_itemData.GetIcon();
             }
-            foreach (PieceDB piece in disabledResources)
-            {
-                pieceRefs.Remove(piece);
-            }
         }
 
         private static void InitSaplingRefs()
@@ -927,8 +911,10 @@ namespace Advize_PlantEverything
             Dbgl("InitSaplingRefs");
 
             if (saplingRefs.Count > 0)
+            {
+                RemoveFromCultivator(saplingRefs.ConvertAll(x => (PrefabDB)x), destroy: false);
                 saplingRefs.Clear();
-
+            }
             saplingRefs = GenerateSaplingRefs();
         }
 
@@ -1042,9 +1028,15 @@ namespace Advize_PlantEverything
                 plant.m_maxScale = sdb.maxScale;
                 plant.m_destroyIfCantGrow = sdb.Prefab.GetComponent<Piece>().m_groundOnly = !config.PlaceAnywhere;
             }
-            
+
             foreach (SaplingDB sdb in saplingRefs)
             {
+                if (config.DisabledResourceNames.Contains(sdb.key))
+                {
+                    Dbgl($"Resource disabled: {sdb.key}");
+                    sdb.enabled = false;
+                }
+
                 Plant plant = sdb.Prefab.GetComponent<Plant>();
                 Piece piece = sdb.Prefab.GetComponent<Piece>();
 
@@ -1238,6 +1230,8 @@ namespace Advize_PlantEverything
 
             for (int i = 0; i < saplingRefs.Count; i++)
             {
+                if (!saplingRefs[i].enabled)
+                    continue;
                 if (!cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Contains(saplingRefs[i].Prefab))
                     cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Insert(16, saplingRefs[i].Prefab);
             }
@@ -1250,6 +1244,23 @@ namespace Advize_PlantEverything
             }
 
             cultivator.m_itemData.m_shared.m_buildPieces.m_canRemovePieces = true;
+        }
+
+        private static void RemoveFromCultivator(List<PrefabDB> prefabs, bool destroy)
+        {
+            if (Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator")
+            {
+                PELogger.LogWarning("Cultivator updated through config change, unequipping cultivator");
+                Player.m_localPlayer.HideHandItems();
+            }
+
+            foreach (PrefabDB pdb in prefabs)
+            {
+                if (prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pdb.Prefab))
+                    prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Remove(pdb.Prefab);
+                if (destroy)
+                    DestroyImmediate(pdb.Prefab.GetComponent<Piece>());
+            }
         }
 
         private static void FinalInit(ZNetScene instance)
@@ -1402,6 +1413,7 @@ namespace Advize_PlantEverything
             internal int resourceReturn;
             internal bool extraDrops;
             internal bool icon;
+            internal bool enabled = true;
 
             internal GameObject Prefab
             {
@@ -1414,20 +1426,19 @@ namespace Advize_PlantEverything
             private Dictionary<string, int> resources;
             internal int respawnTime;
             internal bool recover;
-            internal bool enabled;
             internal Piece piece;
             internal List<Vector3> points;
 
             internal KeyValuePair<string, int> Resource
             {
                 get { return Resources.Count > 0 ? Resources.First() : new KeyValuePair<string, int>(Prefab.GetComponent<Pickable>().m_itemPrefab.name, resourceCost); }
-                set { if (resources == null) { resources = new Dictionary<string, int>(); } if (!resources.ContainsKey(value.Key)) resources.Add(value.Key, value.Value); enabled = true; }
+                set { if (resources == null) { resources = new Dictionary<string, int>(); } if (!resources.ContainsKey(value.Key)) resources.Add(value.Key, value.Value); }
             }
 
             internal Dictionary<string, int> Resources
             {
                 get { return resources ?? new Dictionary<string, int>(); }
-                set { resources = value; enabled = true; }
+                set { resources = value; }
             }
 
             internal int ResourceCost
