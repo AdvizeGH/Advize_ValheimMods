@@ -1091,7 +1091,6 @@ namespace Advize_PlantEverything
                     string[] foliage = { "birchleafs002", "birchleafs003", "birchleafs008", "birchleafs009", "birchleafs010", "birchleafs011" };
                     Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("Lod0").GetComponent<MeshRenderer>().sharedMaterials[0] };
                     Material[] m2 = new Material[] { t.Find("Birch_Sapling").GetComponent<MeshRenderer>().sharedMaterials[0] };
-                    
 
                     foreach (string parent in p)
                         sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m2;
@@ -1104,7 +1103,6 @@ namespace Advize_PlantEverything
                             sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshRenderer>().sharedMaterials = m;
                         }
                     }
-
                 }
                 
                 piece.m_icon = sdb.icon ? CreateSprite($"{sdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : piece.m_resources[0].m_resItem.m_itemData.GetIcon();

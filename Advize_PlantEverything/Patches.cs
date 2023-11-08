@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
@@ -128,9 +127,9 @@ namespace Advize_PlantEverything
                         Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
                         if (piece && prefabRefs.ContainsKey(ReplaceGameObjectName(piece.transform.root.name)))
                         {
-                            if (!CanRemove(piece.gameObject, __instance, true)) return false;
+                            if (!CanRemove(piece, __instance)) return false;
 
-                            RemoveObject(piece.gameObject, __instance);
+                            RemoveObject(piece, __instance);
                             __result = true;
                         }
                     }
@@ -139,42 +138,37 @@ namespace Advize_PlantEverything
                 return true;
             }
 
-            private static bool CanRemove(GameObject component, Player instance, bool isPiece)
+            private static bool CanRemove(Piece piece, Player instance)
             {
-                bool canRemove = true;
-                if (isPiece)
-                {
-                    if (!component.GetComponent<Piece>().m_canBeRemoved) canRemove = false;
-                }
-                if (!PrivateArea.CheckAccess(component.transform.position))
+                bool canRemove = piece.m_canBeRemoved;
+
+                if (canRemove && !PrivateArea.CheckAccess(piece.transform.position))
                 {
                     instance.Message(MessageHud.MessageType.Center, "$msg_privatezone");
                     canRemove = false;
                 }
-                if (!component.GetComponent<ZNetView>()) canRemove = false;
                 return canRemove;
             }
 
-            private static void RemoveObject(GameObject component, Player player)
+            private static void RemoveObject(Piece piece, Player player)
             {
-                ZNetView component2 = component.GetComponent<ZNetView>();
-                WearNTear component3 = component.GetComponent<WearNTear>();
-                if (component3)
+                ZNetView znv = piece.GetComponent<ZNetView>();
+                WearNTear wnt = piece.GetComponent<WearNTear>();
+                if (wnt)
                 {
-                    player.m_removeEffects.Create(component.transform.position, Quaternion.identity);
-                    component3.Remove();
+                    player.m_removeEffects.Create(piece.transform.position, Quaternion.identity);
+                    wnt.Remove();
                 }
                 else
                 {
-                    component2.ClaimOwnership();
-                    Piece piece = component.GetComponent<Piece>();
+                    znv.ClaimOwnership();
                     piece.DropResources();
                     piece.m_placeEffect.Create(piece.transform.position, piece.transform.rotation);
-                    if (component.GetComponentInParent<Pickable>())
+                    if (piece.GetComponent<Pickable>())
                     {
-                        component2.InvokeRPC("Pick");
+                        znv.InvokeRPC("Pick");
                     }
-                    ZNetScene.instance.Destroy(component.gameObject);
+                    ZNetScene.instance.Destroy(piece.gameObject);
                 }
                 player.FaceLookDirection();
                 player.m_zanim.SetTrigger(player.GetRightItem().m_shared.m_attack.m_attackAnimation);
@@ -188,7 +182,7 @@ namespace Advize_PlantEverything
             {
                 if (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling"))
                 {
-                    if (config.ResourcesSpawnEmpty && (__instance.m_name.Contains("berryBush") || (__instance.m_name.Contains("Pickable") && !__instance.m_name.Contains("Stone"))))
+                    if (config.ResourcesSpawnEmpty && __instance.GetComponent<Pickable>() && !__instance.m_name.Contains("Stone"))
                     {
                         __instance.GetComponent<ZNetView>().InvokeRPC(ZNetView.Everybody, "SetPicked", true);
                     }
@@ -209,19 +203,13 @@ namespace Advize_PlantEverything
         [HarmonyPatch(typeof(Piece), "Awake")]
         public static class PieceAwake
         {
-            public static void Postfix(Piece __instance)
-            {
-                CheckZDO(__instance);
-            }
+            public static void Postfix(Piece __instance) => CheckZDO(__instance);
         }
 
         [HarmonyPatch(typeof(TreeBase), "Awake")]
         public static class TreeBaseAwake
         {
-            public static void Postfix(TreeBase __instance)
-            {
-                CheckZDO(__instance);
-            }
+            public static void Postfix(TreeBase __instance) => CheckZDO(__instance);
         }
 
         public static void CheckZDO(Component instance)
@@ -252,7 +240,7 @@ namespace Advize_PlantEverything
                     __instance.m_growTimeMax = config.CropGrowTimeMax;
                     __instance.m_growRadius = config.CropGrowRadius;
                     __instance.m_needCultivatedGround = config.CropRequireCultivation;
-                    __instance.GetComponentInParent<Piece>().m_cultivatedGroundOnly = config.CropRequireCultivation;
+                    __instance.GetComponent<Piece>().m_cultivatedGroundOnly = config.CropRequireCultivation;
                 }
             }
         }
