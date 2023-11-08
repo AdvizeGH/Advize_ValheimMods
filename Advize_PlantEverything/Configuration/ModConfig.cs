@@ -811,7 +811,7 @@ namespace Advize_PlantEverything.Configuration
             enableMiscFlora.SettingChanged += PlantEverything.CoreSettingChanged;
             snappableVines.SettingChanged += PlantEverything.CoreSettingChanged;
             enableExtraResources.SettingChanged += PlantEverything.ExtraResourcesFileOrSettingChanged;
-            disabledResourceNames.SettingChanged += PlantEverything.PieceSettingChanged;
+            disabledResourceNames.SettingChanged += PlantEverything.CoreSettingChanged;
 
             //Difficulty
             requireCultivation.SettingChanged += PlantEverything.CoreSettingChanged;
