@@ -962,7 +962,7 @@ namespace Advize_PlantEverything.Configuration
         }
         internal bool EnableExtraResources
         {
-            get { return enableExtraResources.Value; } // Fully integrate this more. It's only checked when adding pieces atm.
+            get { return enableExtraResources.Value; }
         }
         internal bool SnappableVines
         {
