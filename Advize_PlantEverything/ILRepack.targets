@@ -4,7 +4,13 @@
 	
 	<ItemGroup>
 		<InputAssemblies Include="$(TargetPath)" />
-		<InputAssemblies Include="$(OutputPath)\ServerSync.dll" />
+		<InputAssemblies Include="$(OutputPath)..\..\Libraries\ServerSync.dll" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<LibraryPath Include="$(OutputPath)" />
+		<LibraryPath Include="$(GamePath)\valheim_Data\Managed" />
+		<LibraryPath Include="$(GamePath)\BepInEx\core" />
 	</ItemGroup>
 		
     <ILRepack
@@ -14,7 +20,7 @@
         InputAssemblies="@(InputAssemblies)"
         TargetKind="SameAsPrimaryAssembly"
         OutputFile="$(TargetPath)"
-		LibraryPath="$(OutputPath)"
+		LibraryPath="@(LibraryPath)"
     />
 	
     </Target>
