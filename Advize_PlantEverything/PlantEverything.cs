@@ -114,7 +114,7 @@ namespace Advize_PlantEverything
             return path;
         }
 
-        private static string ReplaceGameObjectName(string name) => name.Replace("(Clone)", "");
+        private static string GetPrefabName(Component c) => c.transform.root.name.Replace("(Clone)", "");
 
         private void SetupWatcher()
         {

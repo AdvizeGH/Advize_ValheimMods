@@ -36,7 +36,7 @@ namespace Advize_PlantEverything
             private static bool Prefix(Player __instance, Piece piece, ref bool __result)
             {
                 // check if the piece exists and if the mod has modified it
-                if (piece && prefabRefs.ContainsKey(ReplaceGameObjectName(piece.transform.root.name)))
+                if (piece && prefabRefs.ContainsKey(GetPrefabName(piece)))
                 {
                     // is piece from mod, so prevent deconstruction unless it is with the cultivator.
                     if (__instance.GetRightItem().m_shared.m_name != "$item_cultivator")
@@ -58,7 +58,7 @@ namespace Advize_PlantEverything
                 if (!config.RecoverResources) return;
 
                 // Only interact if it is a piece that is modified by the mod
-                if (__instance && prefabRefs.ContainsKey(ReplaceGameObjectName(__instance.transform.root.name)))
+                if (__instance && prefabRefs.ContainsKey(GetPrefabName(__instance)))
                 {
                     // If piece has a pickable component then adjust resource drops
                     // to prevent infinite item exploits by placing a pickable,
@@ -125,7 +125,7 @@ namespace Advize_PlantEverything
                     if (Physics.Raycast(GameCamera.instance.transform.position, GameCamera.instance.transform.forward, out var hitInfo, 50f, LayerMask.GetMask(layersForPieceRemoval)) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
                     {
                         Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
-                        if (piece && prefabRefs.ContainsKey(ReplaceGameObjectName(piece.transform.root.name)))
+                        if (piece && prefabRefs.ContainsKey(GetPrefabName(piece)))
                         {
                             if (!CanRemove(piece, __instance)) return false;
 
