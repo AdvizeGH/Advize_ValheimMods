@@ -28,7 +28,8 @@ namespace Advize_PlantEverything
         private static List<ExtraResource> deserializedExtraResources = new();
         private static string[] layersForPieceRemoval = { "item", "piece_nonsolid", "Default_small", "Default" };
 
-        private static bool isInitialized = false;
+        private static bool piecesInitialized = false;
+        private static bool saplingsInitialized = false;
 
         private static AssetBundle assetBundle;
         private static readonly Dictionary<string, Texture2D> cachedTextures = new();
@@ -789,11 +790,10 @@ namespace Advize_PlantEverything
 
                     foreach (Collider c in prefabRefs[er.prefabName].GetComponentsInChildren<Collider>())
                     {
-                        string layer = LayerMask.LayerToName(c.gameObject.layer);
-                        //Dbgl($"Layer to potentially add is {layer}");
-                        potentialNewLayers.Add(layer);
+                        potentialNewLayers.Add(LayerMask.LayerToName(c.gameObject.layer));
                     }
                 }
+
                 layersForPieceRemoval = potentialNewLayers.Distinct().ToArray();
             }
 
@@ -809,7 +809,6 @@ namespace Advize_PlantEverything
                 {
                     Dbgl($"Resource disabled: {pdb.key}, skipping");
                     pdb.enabled = false;
-                    continue;
                 }
                 ItemDrop resource = ObjectDB.instance.GetItemPrefab(pdb.Resource.Key).GetComponent<ItemDrop>();
 
@@ -840,6 +839,8 @@ namespace Advize_PlantEverything
                     };
                 }
 
+                pdb.piece.m_icon = pdb.icon ? CreateSprite($"{pdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : resource.m_itemData.GetIcon();
+
                 pdb.piece.m_placeEffect.m_effectPrefabs = new EffectList.EffectData[]
                 {
                     new EffectList.EffectData
@@ -853,42 +854,6 @@ namespace Advize_PlantEverything
                         m_enabled = true
                     }
                 };
-
-                Pickable pickable = pdb.Prefab.GetComponent<Pickable>();
-                if (pickable && !deserializedExtraResources.Any(x => x.prefabName == pdb.key))
-                {
-                    pickable.m_respawnTimeMinutes = pdb.respawnTime;
-                    pickable.m_amount = pdb.resourceReturn;
-                    pdb.piece.m_onlyInBiome = (Heightmap.Biome)pdb.biome;
-
-                    if (pdb.Prefab.transform.Find("visual"))
-                    {
-                        if (config.ShowPickableSpawners)
-                        {
-                            Transform t = prefabRefs[pdb.key + "_Picked"].transform.Find("PE_Picked");
-                            if (t)
-                            {
-                                t.SetParent(pdb.Prefab.transform);
-                                t.GetComponent<MeshRenderer>().sharedMaterials = pdb.key == "Pickable_Thistle" ?
-                                    pdb.Prefab.transform.Find("visual").Find("default").GetComponent<MeshRenderer>().sharedMaterials :
-                                    pdb.Prefab.transform.Find("visual").GetComponent<MeshRenderer>().sharedMaterials;
-                                if (pdb.key.Contains("Dandelion"))
-                                {
-                                    Material m = pdb.Prefab.transform.Find("visual").GetComponent<MeshRenderer>().sharedMaterials[0];
-                                    t.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { m, m };
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Transform t = prefabRefs[pdb.key].transform.Find("PE_Picked");
-                            if (t)
-                            {
-                                t.SetParent(prefabRefs[pdb.key + "_Picked"].transform);
-                            }
-                        }
-                    }
-                }
 
                 if (pdb.points != null)
                 {
@@ -917,8 +882,55 @@ namespace Advize_PlantEverything
                     }
                 }
 
-                pdb.piece.m_icon = pdb.icon ? CreateSprite($"{pdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : resource.m_itemData.GetIcon();
+                Pickable pickable = pdb.Prefab.GetComponent<Pickable>();
+                if (pickable && !deserializedExtraResources.Any(x => x.prefabName == pdb.key))
+                {
+                    pickable.m_respawnTimeMinutes = pdb.respawnTime;
+                    pickable.m_amount = pdb.resourceReturn;
+                    pdb.piece.m_onlyInBiome = (Heightmap.Biome)pdb.biome;
+
+                    Transform vanillaVisualChild = pdb.Prefab.transform.Find("visual");
+
+                    if (vanillaVisualChild)
+                    {
+                        Transform moddedPickedChild = prefabRefs[pdb.key + "_Picked"].transform.Find("PE_Picked");
+
+                        if (moddedPickedChild)
+                        {
+                            if (config.ShowPickableSpawners)
+                            {
+                                moddedPickedChild.SetParent(pdb.Prefab.transform);
+                            }
+
+                            if (!piecesInitialized)
+                            {
+                                MeshRenderer target = moddedPickedChild.GetComponent<MeshRenderer>();
+                                MeshRenderer source = vanillaVisualChild.GetComponent<MeshRenderer>();
+
+                                target.sharedMaterials = pdb.key == "Pickable_Thistle" ?
+                                vanillaVisualChild.Find("default").GetComponent<MeshRenderer>().sharedMaterials :
+                                source.sharedMaterials;
+
+                                if (pdb.key.Contains("Dandelion"))
+                                {
+                                    Material m = source.sharedMaterials[0];
+                                    target.sharedMaterials = new Material[] { m, m };
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Transform vanillaPickedChild = prefabRefs[pdb.key].transform.Find("PE_Picked");
+                            if (!config.ShowPickableSpawners && vanillaPickedChild)
+                            {
+                                vanillaPickedChild.SetParent(prefabRefs[pdb.key + "_Picked"].transform);
+                            }
+                        }
+                    }
+                }
             }
+
+            piecesInitialized = true;
         }
 
         private static void InitSaplingRefs()
@@ -1067,7 +1079,7 @@ namespace Advize_PlantEverything
                 piece.m_onlyInBiome = plant.m_biome = (Heightmap.Biome)sdb.biome;
                 plant.m_destroyIfCantGrow = piece.m_groundOnly = !config.PlaceAnywhere;
 
-                if (isInitialized) continue;
+                if (saplingsInitialized) continue;
 
                 string[] p = { "healthy", "unhealthy" };
                 Transform t = prefabRefs["Birch_Sapling"].transform.Find(p[0]);
@@ -1128,7 +1140,7 @@ namespace Advize_PlantEverything
                 sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab = prefabRefs["Birch_Sapling"].GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab;
             }
 
-            isInitialized = true;
+            saplingsInitialized = true;
         }
 
         private static void InitCrops()
@@ -1212,7 +1224,7 @@ namespace Advize_PlantEverything
                 piece.m_resources[0].m_amount = pdb.resourceCost;
                 piece.m_primaryTarget = piece.m_randomTarget = config.EnemiesTargetCrops;
 
-                plant.m_destroyIfCantGrow = pdb.Prefab.GetComponent<Piece>().m_groundOnly = !config.PlaceAnywhere;
+                plant.m_destroyIfCantGrow = piece.m_groundOnly = !config.PlaceAnywhere;
 
                 if (!config.EnforceBiomesVanilla)
                     plant.m_biome = (Heightmap.Biome)895;
