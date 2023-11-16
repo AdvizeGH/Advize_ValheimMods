@@ -25,7 +25,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-    <Choose>
+  <Choose>
     <When Condition="($(OS) == 'Unix' OR $(OS) == 'OSX') AND $(GamePath) == ''">
       <PropertyGroup>
         <GamePath Condition="!Exists('$(GamePath)')">$(HOME)/.steam/steam/steamapps/common/Valheim</GamePath>
