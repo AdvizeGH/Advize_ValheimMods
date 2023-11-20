@@ -1,55 +1,76 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Advize_PlantEverything
 {
-    internal static class Extensions
+    internal static class CloneManager
     {
-        private const BindingFlags AllBindings =
-            BindingFlags.Public
-            | BindingFlags.NonPublic
-            | BindingFlags.Instance
-            | BindingFlags.Static
-            | BindingFlags.GetField
-            | BindingFlags.SetField
-            | BindingFlags.GetProperty
-            | BindingFlags.SetProperty;
-
         /// <summary>
-        ///     Extension for 'Object' that copies all fields from the source to the object.
+        ///     Extension for 'Object' that copies all fields from the source to the calling object.
         ///     Including private and static fields.
         /// </summary>
-        /// <param name="target">The target.</param>
         /// <param name="source">The source.</param>
-        internal static void CopyFields(this object target, object source)
+        /// <param name="target">The target.</param>
+        public static void CopyFields<T>(this T target, T source)
         {
             // If any this null throw an exception
             if (target == null || source == null)
-                throw new Exception("Target or/and Source Objects are null");
-            // Getting the Types of the objects
-            Type typeTarget = source.GetType();
-            Type typeSrc = target.GetType();
-
-            // Iterate over the fields of the source instance and copy
-            // them them to their counterparts in the target instance
-            FieldInfo[] srcFields = typeSrc.GetFields(AllBindings);
-            foreach (FieldInfo srcField in srcFields)
             {
-                FieldInfo targetField = typeTarget.GetField(srcField.Name, AllBindings);
-                if (targetField == null)
+                throw new Exception("Target or/and Source Objects are null");
+            }
+
+            // Iterate over the fields of type T and copy them from the source instance to the target instance
+            FieldInfo[] fieldInfos = FieldInfoCache.GetFieldInfo(source.GetType());
+            foreach (FieldInfo fieldInfo in fieldInfos)
+            {
+                if (fieldInfo == null || !fieldInfo.IsInitOnly)
                 {
                     continue;
                 }
-                if (!targetField.IsInitOnly)
-                {
-                    continue;
-                }
-                if (!targetField.FieldType.IsAssignableFrom(srcField.FieldType))
-                {
-                    continue;
-                }
+
                 // Passed all tests, lets set the value
-                targetField.SetValue(source, srcField.GetValue(target));
+                fieldInfo.SetValue(target, fieldInfo.GetValue(source));
+            }
+        }
+
+        private static class FieldInfoCache
+        {
+            private const BindingFlags AllBindings = BindingFlags.Public | BindingFlags.NonPublic |
+                                                    BindingFlags.Instance | BindingFlags.Static |
+                                                    BindingFlags.GetField | BindingFlags.SetField |
+                                                    BindingFlags.GetProperty | BindingFlags.SetProperty;
+
+            private static readonly Dictionary<Type, FieldInfo[]> dictionaryCache = new();
+
+            /// <summary>
+            ///     Get FieldInfo array from Cache if it exists or cache the FieldInfo array and return it.
+            /// </summary>
+            /// <param name="type"></param>
+            /// <returns></returns>
+            internal static FieldInfo[] GetFieldInfo(Type type)
+            {
+                if (dictionaryCache.TryGetValue(type, out var fieldInfos))
+                {
+                    return fieldInfos;
+                }
+                else
+                {
+                    CacheTypeFieldInfo(type);
+                }
+                return dictionaryCache[type];
+            }
+
+            /// <summary>
+            ///     Create the FieldInfo array and cache it if it is not already cached.
+            /// </summary>
+            /// <param name="type"></param>
+            internal static void CacheTypeFieldInfo(Type type)
+            {
+                if (!dictionaryCache.ContainsKey(type))
+                {
+                    dictionaryCache.Add(type, type.GetFields(AllBindings));
+                }
             }
         }
     }
