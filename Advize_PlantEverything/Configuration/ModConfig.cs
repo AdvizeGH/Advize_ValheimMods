@@ -171,6 +171,7 @@ namespace Advize_PlantEverything.Configuration
         private readonly List<ConfigurationManagerAttributes> cropSettingAttributes = new()
         {
             { new() },
+            { new ConfigurationManagerAttributes { Order = 27 } },
             { new ConfigurationManagerAttributes { Order = 26 } },
             { new ConfigurationManagerAttributes { Order = 25 } },
             { new ConfigurationManagerAttributes { Order = 24 } }
@@ -328,7 +329,7 @@ namespace Advize_PlantEverything.Configuration
                 "Crops",
                 "EnableCropOverrides",
                 false,
-                new ConfigDescription("Enables the [Crops] section of this config.", null, new ConfigurationManagerAttributes { Order = 27 }));
+                new ConfigDescription("Enables the [Crops] section of this config.", null, new ConfigurationManagerAttributes { Order = 28 }));
             cropMinScale = Config(
                 "Crops",
                 "CropMinScale",
@@ -373,7 +374,7 @@ namespace Advize_PlantEverything.Configuration
                 "Crops",
                 "EnemiesTargetCrops",
                 true,
-                new ConfigDescription("Determines whether enemies will target and attack crops. If this setting is changed, pre-existing placed crops will not be affected until the world/server is reloaded.", null, cropSettingAttributes[0]));
+                new ConfigDescription("Determines whether enemies will target and attack crops. If this setting is changed, pre-existing placed crops will not be affected until the world/server is reloaded.", null, cropSettingAttributes[4]));
             barleyCost = Config(
                 "Crops",
                 "BarleyCost",
