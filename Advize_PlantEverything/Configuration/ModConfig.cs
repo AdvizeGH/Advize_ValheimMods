@@ -180,6 +180,7 @@ namespace Advize_PlantEverything.Configuration
         internal ModConfig(ConfigFile configFile, ConfigSync configSync)
         {
             ConfigFile = configFile; ConfigSync = configSync;
+            configFile.SaveOnConfigSet = false;
 
             //General
             serverConfigLocked = Config(
@@ -805,6 +806,9 @@ namespace Advize_PlantEverything.Configuration
                 false,
                 "Enables display of growth time as a percentage instead of time remaining.",
                 false);
+
+            configFile.Save();
+            configFile.SaveOnConfigSet = true;
 
             //General
             //resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
