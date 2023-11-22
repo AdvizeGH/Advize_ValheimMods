@@ -953,478 +953,124 @@ namespace Advize_PlantEverything.Configuration
             };
         }
 
-        internal bool EnableDebugMessages
-        {
-            get { return enableDebugMessages.Value; }
-        }
-        internal bool ShowPickableSpawners
-        {
-            get { return showPickableSpawners.Value; }
-        }
-        internal bool EnableMiscFlora
-        {
-            get { return enableMiscFlora.Value; }
-        }
-        internal bool EnableExtraResources
-        {
-            get { return enableExtraResources.Value; }
-        }
-        internal bool SnappableVines
-        {
-            get { return snappableVines.Value; }
-        }
-        internal bool EnableLocalization
-        {
-            get { return enableLocalization.Value; }
-        }
-        internal string Language
-        {
-            get { return language.Value; }
-        }
-        internal string[] DisabledResourceNames
-        {
-            get { return disabledResourceNames.Value.Split(','); }
-        }
-        internal bool RequireCultivation
-        {
-            get { return requireCultivation.Value; }
-        }
-        internal bool PlaceAnywhere
-        {
-            get { return placeAnywhere.Value; }
-        }
-        internal bool EnforceBiomes
-        {
-            get { return enforceBiomes.Value; }
-        }
-        internal bool EnforceBiomesVanilla
-        {
-            get { return enforceBiomesVanilla.Value; }
-        }
-        internal bool RecoverResources
-        {
-            get { return recoverResources.Value; }
-        }
-        internal bool ResourcesSpawnEmpty
-        {
-            get { return resourcesSpawnEmpty.Value; }
-        }
-        internal bool EnemiesTargetPieces
-        {
-            get { return enemiesTargetPieces.Value; }
-        }
-        internal int RaspberryCost
-        {
-            get { return raspberryCost.Value; }
-        }
-        internal int BlueberryCost
-        {
-            get { return blueberryCost.Value; }
-        }
-        internal int CloudberryCost
-        {
-            get { return cloudberryCost.Value; }
-        }
-        internal int RaspberryRespawnTime
-        {
-            get { return raspberryRespawnTime.Value; }
-        }
-        internal int BlueberryRespawnTime
-        {
-            get { return blueberryRespawnTime.Value; }
-        }
-        internal int CloudberryRespawnTime
-        {
-            get { return cloudberryRespawnTime.Value; }
-        }
-        internal int RaspberryReturn
-        {
-            get { return raspberryReturn.Value; }
-        }
-        internal int BlueberryReturn
-        {
-            get { return blueberryReturn.Value; }
-        }
-        internal int CloudberryReturn
-        {
-            get { return cloudberryReturn.Value; }
-        }
-        internal bool EnableCropOverrides
-        {
-            get { return enableCropOverrides.Value; }
-        }
-        internal float CropMinScale
-        {
-            get { return cropMinScale.Value; }
-        }
-        internal float CropMaxScale
-        {
-            get { return cropMaxScale.Value; }
-        }
-        internal float CropGrowTimeMin
-        {
-            get { return Mathf.Max(cropGrowTimeMin.Value, 10); }
-        }
-        internal float CropGrowTimeMax
-        {
-            get { return Mathf.Max(cropGrowTimeMax.Value, 10); }
-        }
-        internal float CropGrowRadius
-        {
-            get { return cropGrowRadius.Value; }
-        }
-        internal bool CropRequireCultivation
-        {
-            get { return cropRequireCultivation.Value; }
-        }
-        internal bool CropRequireSunlight
-        {
-            get { return cropRequireSunlight.Value; }
-        }
-        internal bool CropRequireGrowthSpace
-        {
-            get { return cropRequireGrowthSpace.Value; }
-        }
-        internal bool EnemiesTargetCrops
-        {
-            get { return enemiesTargetCrops.Value; }
-        }
-        internal int BarleyCost
-        {
-            get { return barleyCost.Value; }
-        }
-        internal int BarleyReturn
-        {
-            get { return barleyReturn.Value; }
-        }
-        internal int CarrotCost
-        {
-            get { return carrotCost.Value; }
-        }
-        internal int CarrotReturn
-        {
-            get { return carrotReturn.Value; }
-        }
-        internal int FlaxCost
-        {
-            get { return flaxCost.Value; }
-        }
-        internal int FlaxReturn
-        {
-            get { return flaxReturn.Value; }
-        }
-        internal int OnionCost
-        {
-            get { return onionCost.Value; }
-        }
-        internal int OnionReturn
-        {
-            get { return onionReturn.Value; }
-        }
-        internal int SeedCarrotCost
-        {
-            get { return seedCarrotCost.Value; }
-        }
-        internal int SeedCarrotReturn
-        {
-            get { return seedCarrotReturn.Value; }
-        }
-        internal int SeedOnionCost
-        {
-            get { return seedOnionCost.Value; }
-        }
-        internal int SeedOnionReturn
-        {
-            get { return seedOnionReturn.Value; }
-        }
-        internal int SeedTurnipCost
-        {
-            get { return seedTurnipCost.Value; }
-        }
-        internal int SeedTurnipReturn
-        {
-            get { return seedTurnipReturn.Value; }
-        }
-        internal int TurnipCost
-        {
-            get { return turnipCost.Value; }
-        }
-        internal int TurnipReturn
-        {
-            get { return turnipReturn.Value; }
-        }
-        internal int MagecapCost
-        {
-            get { return magecapCost.Value; }
-        }
-        internal int MagecapReturn
-        {
-            get { return magecapReturn.Value; }
-        }
-        internal int JotunPuffsCost
-        {
-            get { return jotunPuffsCost.Value; }
-        }
-        internal int JotunPuffsReturn
-        {
-            get { return jotunPuffsReturn.Value; }
-        }
-        internal int PickableBranchCost
-        {
-            get { return pickableBranchCost.Value; }
-        }
-        internal int PickableBranchReturn
-        {
-            get { return pickableBranchReturn.Value; }
-        }
-        internal int PickableStoneCost
-        {
-            get { return pickableStoneCost.Value; }
-        }
-        internal int PickableStoneReturn
-        {
-            get { return pickableStoneReturn.Value; }
-        }
-        internal int PickableFlintCost
-        {
-            get { return pickableFlintCost.Value; }
-        }
-        internal int PickableFlintReturn
-        {
-            get { return pickableFlintReturn.Value; }
-        }
-        internal int MushroomCost
-        {
-            get { return mushroomCost.Value; }
-        }
-        internal int YellowMushroomCost
-        {
-            get { return yellowMushroomCost.Value; }
-        }
-        internal int BlueMushroomCost
-        {
-            get { return blueMushroomCost.Value; }
-        }
-        internal int MushroomRespawnTime
-        {
-            get { return mushroomRespawnTime.Value; }
-        }
-        internal int YellowMushroomRespawnTime
-        {
-            get { return yellowMushroomRespawnTime.Value; }
-        }
-        internal int BlueMushroomRespawnTime
-        {
-            get { return blueMushroomRespawnTime.Value; }
-        }
-        internal int MushroomReturn
-        {
-            get { return mushroomReturn.Value; }
-        }
-        internal int YellowMushroomReturn
-        {
-            get { return yellowMushroomReturn.Value; }
-        }
-        internal int BlueMushroomReturn
-        {
-            get { return blueMushroomReturn.Value; }
-        }
-        internal int ThistleCost
-        {
-            get { return thistleCost.Value; }
-        }
-        internal int DandelionCost
-        {
-            get { return dandelionCost.Value; }
-        }
-        internal int ThistleRespawnTime
-        {
-            get { return thistleRespawnTime.Value; }
-        }
-        internal int DandelionRespawnTime
-        {
-            get { return dandelionRespawnTime.Value; }
-        }
-        internal int ThistleReturn
-        {
-            get { return thistleReturn.Value; }
-        }
-        internal int DandelionReturn
-        {
-            get { return dandelionReturn.Value; }
-        }
-        internal float BirchMinScale
-        {
-            get { return birchMinScale.Value; }
-        }
-        internal float BirchMaxScale
-        {
-            get { return birchMaxScale.Value; }
-        }
-        internal float OakMinScale
-        {
-            get { return oakMinScale.Value; }
-        }
-        internal float OakMaxScale
-        {
-            get { return oakMaxScale.Value; }
-        }
-        internal float AncientMinScale
-        {
-            get { return ancientMinScale.Value; }
-        }
-        internal float AncientMaxScale
-        {
-            get { return ancientMaxScale.Value; }
-        }
-        internal float BirchGrowthTime
-        {
-            get { return Mathf.Max(birchGrowthTime.Value, 10); }
-        }
-        internal float OakGrowthTime
-        {
-            get { return Mathf.Max(oakGrowthTime.Value, 10); }
-        }
-        internal float AncientGrowthTime
-        {
-            get { return Mathf.Max(ancientGrowthTime.Value, 10); }
-        }
-        internal float BirchGrowRadius
-        {
-            get { return birchGrowRadius.Value; }
-        }
-        internal float OakGrowRadius
-        {
-            get { return oakGrowRadius.Value; }
-        }
-        internal float AncientGrowRadius
-        {
-            get { return ancientGrowRadius.Value; }
-        }
-        internal float BeechGrowthTime
-        {
-            get { return Mathf.Max(beechGrowthTime.Value, 10); }
-        }
-        internal float PineGrowthTime
-        {
-            get { return Mathf.Max(pineGrowthTime.Value, 10); }
-        }
-        internal float FirGrowthTime
-        {
-            get { return Mathf.Max(firGrowthTime.Value, 10); }
-        }
-        internal float BeechMinScale
-        {
-            get { return beechMinScale.Value; }
-        }
-        internal float BeechMaxScale
-        {
-            get { return beechMaxScale.Value; }
-        }
-        internal float PineMinScale
-        {
-            get { return pineMinScale.Value; }
-        }
-        internal float PineMaxScale
-        {
-            get { return pineMaxScale.Value; }
-        }
-        internal float FirMinScale
-        {
-            get { return firMinScale.Value; }
-        }
-        internal float FirMaxScale
-        {
-            get { return firMaxScale.Value; }
-        }
-        internal float BeechGrowRadius
-        {
-            get { return beechGrowRadius.Value; }
-        }
-        internal float PineGrowRadius
-        {
-            get { return pineGrowRadius.Value; }
-        }
-        internal float FirGrowRadius
-        {
-            get { return firGrowRadius.Value; }
-        }
-        internal float YggaMinScale
-        {
-            get { return yggaMinScale.Value; }
-        }
-        internal float YggaMaxScale
-        {
-            get { return yggaMaxScale.Value; }
-        }
-        internal float YggaGrowthTime
-        {
-            get { return yggaGrowthTime.Value; }
-        }
-        internal float YggaGrowRadius
-        {
-            get { return yggaGrowRadius.Value; }
-        }
-        internal float AutumnBirchMinScale
-        {
-            get { return autumnBirchMinScale.Value; }
-        }
-        internal float AutumnBirchMaxScale
-        {
-            get { return autumnBirchMaxScale.Value; }
-        }
-        internal float AutumnBirchGrowthTime
-        {
-            get { return autumnBirchGrowthTime.Value; }
-        }
-        internal float AutumnBirchGrowRadius
-        {
-            get { return autumnBirchGrowRadius.Value; }
-        }
-        internal bool EnableSeedOverrides
-        {
-            get { return enableSeedOverrides.Value; }
-        }
-        internal int SeedDropMin
-        {
-            get { return seedDropMin.Value; }
-        }
-        internal int SeedDropMax
-        {
-            get { return seedDropMax.Value; }
-        }
-        internal int TreeDropMin
-        {
-            get { return treeDropMin.Value; }
-        }
-        internal int TreeDropMax
-        {
-            get { return treeDropMax.Value; }
-        }
-        internal float DropChance
-        {
-            get { return dropChance.Value; }
-        }
-        internal bool OneOfEach
-        {
-            get { return oneOfEach.Value; }
-        }
-        internal bool EnablePickableTimers
-        {
-            get { return enablePickableTimers.Value; }
-        }
-        internal bool EnablePlantTimers
-        {
-            get { return enablePlantTimers.Value; }
-        }
-        internal bool GrowthAsPercentage
-        {
-            get { return growthAsPercentage.Value; }
-        }
-        internal CustomSyncedValue<List<string>> SyncedExtraResources
-        {
-            get { return extraResources; }
-        }
+        internal bool EnableDebugMessages => enableDebugMessages.Value;
+        internal bool ShowPickableSpawners => showPickableSpawners.Value;
+        internal bool EnableMiscFlora => enableMiscFlora.Value;
+        internal bool EnableExtraResources => enableExtraResources.Value;
+        internal bool SnappableVines => snappableVines.Value;
+        internal bool EnableLocalization => enableLocalization.Value;
+        internal string Language => language.Value;
+        internal string[] DisabledResourceNames => disabledResourceNames.Value.Split(',');
+        internal bool RequireCultivation => requireCultivation.Value;
+        internal bool PlaceAnywhere => placeAnywhere.Value;
+        internal bool EnforceBiomes => enforceBiomes.Value;
+        internal bool EnforceBiomesVanilla => enforceBiomesVanilla.Value;
+        internal bool RecoverResources => recoverResources.Value;
+        internal bool ResourcesSpawnEmpty => resourcesSpawnEmpty.Value;
+        internal bool EnemiesTargetPieces => enemiesTargetPieces.Value;
+        internal int RaspberryCost => raspberryCost.Value;
+        internal int BlueberryCost => blueberryCost.Value;
+        internal int CloudberryCost => cloudberryCost.Value;
+        internal int RaspberryRespawnTime => raspberryRespawnTime.Value;
+        internal int BlueberryRespawnTime => blueberryRespawnTime.Value;
+        internal int CloudberryRespawnTime => cloudberryRespawnTime.Value;
+        internal int RaspberryReturn => raspberryReturn.Value;
+        internal int BlueberryReturn => blueberryReturn.Value;
+        internal int CloudberryReturn => cloudberryReturn.Value;
+        internal bool EnableCropOverrides => enableCropOverrides.Value;
+        internal float CropMinScale => cropMinScale.Value;
+        internal float CropMaxScale => cropMaxScale.Value;
+        internal float CropGrowTimeMin => Mathf.Max(cropGrowTimeMin.Value, 10);
+        internal float CropGrowTimeMax => Mathf.Max(cropGrowTimeMax.Value, 10);
+        internal float CropGrowRadius => cropGrowRadius.Value;
+        internal bool CropRequireCultivation => cropRequireCultivation.Value;
+        internal bool CropRequireSunlight => cropRequireSunlight.Value;
+        internal bool CropRequireGrowthSpace => cropRequireGrowthSpace.Value;
+        internal bool EnemiesTargetCrops => enemiesTargetCrops.Value;
+        internal int BarleyCost => barleyCost.Value;
+        internal int BarleyReturn => barleyReturn.Value;
+        internal int CarrotCost => carrotCost.Value;
+        internal int CarrotReturn => carrotReturn.Value;
+        internal int FlaxCost => flaxCost.Value;
+        internal int FlaxReturn => flaxReturn.Value;
+        internal int OnionCost => onionCost.Value;
+        internal int OnionReturn => onionReturn.Value;
+        internal int SeedCarrotCost => seedCarrotCost.Value;
+        internal int SeedCarrotReturn => seedCarrotReturn.Value;
+        internal int SeedOnionCost => seedOnionCost.Value;
+        internal int SeedOnionReturn => seedOnionReturn.Value;
+        internal int SeedTurnipCost => seedTurnipCost.Value;
+        internal int SeedTurnipReturn => seedTurnipReturn.Value;
+        internal int TurnipCost => turnipCost.Value;
+        internal int TurnipReturn => turnipReturn.Value;
+        internal int MagecapCost => magecapCost.Value;
+        internal int MagecapReturn => magecapReturn.Value;
+        internal int JotunPuffsCost => jotunPuffsCost.Value;
+        internal int JotunPuffsReturn => jotunPuffsReturn.Value;
+        internal int PickableBranchCost => pickableBranchCost.Value;
+        internal int PickableBranchReturn => pickableBranchReturn.Value;
+        internal int PickableStoneCost => pickableStoneCost.Value;
+        internal int PickableStoneReturn => pickableStoneReturn.Value;
+        internal int PickableFlintCost => pickableFlintCost.Value;
+        internal int PickableFlintReturn => pickableFlintReturn.Value;
+        internal int MushroomCost => mushroomCost.Value;
+        internal int YellowMushroomCost => yellowMushroomCost.Value;
+        internal int BlueMushroomCost => blueMushroomCost.Value;
+        internal int MushroomRespawnTime => mushroomRespawnTime.Value;
+        internal int YellowMushroomRespawnTime => yellowMushroomRespawnTime.Value;
+        internal int BlueMushroomRespawnTime => blueMushroomRespawnTime.Value;
+        internal int MushroomReturn => mushroomReturn.Value;
+        internal int YellowMushroomReturn => yellowMushroomReturn.Value;
+        internal int BlueMushroomReturn => blueMushroomReturn.Value;
+        internal int ThistleCost => thistleCost.Value;
+        internal int DandelionCost => dandelionCost.Value;
+        internal int ThistleRespawnTime => thistleRespawnTime.Value;
+        internal int DandelionRespawnTime => dandelionRespawnTime.Value;
+        internal int ThistleReturn => thistleReturn.Value;
+        internal int DandelionReturn => dandelionReturn.Value;
+        internal float BirchMinScale => birchMinScale.Value;
+        internal float BirchMaxScale => birchMaxScale.Value;
+        internal float OakMinScale => oakMinScale.Value;
+        internal float OakMaxScale => oakMaxScale.Value;
+        internal float AncientMinScale => ancientMinScale.Value;
+        internal float AncientMaxScale => ancientMaxScale.Value;
+        internal float BirchGrowthTime => Mathf.Max(birchGrowthTime.Value, 10);
+        internal float OakGrowthTime => Mathf.Max(oakGrowthTime.Value, 10);
+        internal float AncientGrowthTime => Mathf.Max(ancientGrowthTime.Value, 10);
+        internal float BirchGrowRadius => birchGrowRadius.Value;
+        internal float OakGrowRadius => oakGrowRadius.Value;
+        internal float AncientGrowRadius => ancientGrowRadius.Value;
+        internal float BeechGrowthTime => Mathf.Max(beechGrowthTime.Value, 10);
+        internal float PineGrowthTime => Mathf.Max(pineGrowthTime.Value, 10);
+        internal float FirGrowthTime => Mathf.Max(firGrowthTime.Value, 10);
+        internal float BeechMinScale => beechMinScale.Value;
+        internal float BeechMaxScale => beechMaxScale.Value;
+        internal float PineMinScale => pineMinScale.Value;
+        internal float PineMaxScale => pineMaxScale.Value;
+        internal float FirMinScale => firMinScale.Value;
+        internal float FirMaxScale => firMaxScale.Value;
+        internal float BeechGrowRadius => beechGrowRadius.Value;
+        internal float PineGrowRadius => pineGrowRadius.Value;
+        internal float FirGrowRadius => firGrowRadius.Value;
+        internal float YggaMinScale => yggaMinScale.Value;
+        internal float YggaMaxScale => yggaMaxScale.Value;
+        internal float YggaGrowthTime => yggaGrowthTime.Value;
+        internal float YggaGrowRadius => yggaGrowRadius.Value;
+        internal float AutumnBirchMinScale => autumnBirchMinScale.Value;
+        internal float AutumnBirchMaxScale => autumnBirchMaxScale.Value;
+        internal float AutumnBirchGrowthTime => autumnBirchGrowthTime.Value;
+        internal float AutumnBirchGrowRadius => autumnBirchGrowRadius.Value;
+        internal bool EnableSeedOverrides => enableSeedOverrides.Value;
+        internal int SeedDropMin => seedDropMin.Value;
+        internal int SeedDropMax => seedDropMax.Value;
+        internal int TreeDropMin => treeDropMin.Value;
+        internal int TreeDropMax => treeDropMax.Value;
+        internal float DropChance => dropChance.Value;
+        internal bool OneOfEach => oneOfEach.Value;
+        internal bool EnablePickableTimers => enablePickableTimers.Value;
+        internal bool EnablePlantTimers => enablePlantTimers.Value;
+        internal bool GrowthAsPercentage => growthAsPercentage.Value;
+        internal CustomSyncedValue<List<string>> SyncedExtraResources => extraResources;
 
         internal bool IsSourceOfTruth => ConfigSync.IsSourceOfTruth;
 #nullable enable

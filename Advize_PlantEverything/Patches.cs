@@ -1,31 +1,28 @@
-﻿using System;
+﻿using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
-using HarmonyLib;
 using UnityEngine;
 
 namespace Advize_PlantEverything
 {
     public partial class PlantEverything
     {
-        [HarmonyPatch(typeof(ObjectDB), "Awake")]
-        public static class ObjectDBAwake
+        [HarmonyPatch]
+        public static class ModInitPatches
         {
+            [HarmonyPatch(typeof(ObjectDB), nameof(ObjectDB.Awake))]
             public static void Postfix()
             {
                 Dbgl("ObjectDBAwake");
                 InitPrefabRefs();
             }
-        }
 
-        [HarmonyPatch(typeof(ZNetScene), "Awake")]
-        public static class ZNetSceneAwake
-        {
+            [HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]
             public static void Postfix(ZNetScene __instance)
             {
-                Dbgl("ZNetSceneAwake");
-                Dbgl("Performing final mod initialization");
+                Dbgl("ZNetSceneAwake\nPerforming final mod initialization");
                 FinalInit(__instance);
             }
         }
@@ -36,15 +33,15 @@ namespace Advize_PlantEverything
             private static bool Prefix(Player __instance, Piece piece, ref bool __result)
             {
                 // check if the piece exists and if the mod has modified it
-                if (piece && prefabRefs.ContainsKey(GetPrefabName(piece)))
+                if (Helper.IsModdedPrefab(piece))
                 {
                     // is piece from mod, so prevent deconstruction unless it is with the cultivator.
                     if (__instance.GetRightItem().m_shared.m_name != "$item_cultivator")
                     {
-                        __result = false;
-                        return false;
+                        return __result = false;
                     }
                 }
+
                 return true;
             }
         }
@@ -58,7 +55,7 @@ namespace Advize_PlantEverything
                 if (!config.RecoverResources) return;
 
                 // Only interact if it is a piece that is modified by the mod
-                if (__instance && prefabRefs.ContainsKey(GetPrefabName(__instance)))
+                if (Helper.IsModdedPrefab(__instance))
                 {
                     // If piece has a pickable component then adjust resource drops
                     // to prevent infinite item exploits by placing a pickable,
@@ -115,17 +112,19 @@ namespace Advize_PlantEverything
             }
         }
 
-        [HarmonyPatch(typeof(Player), "RemovePiece")]
+        [HarmonyPatch(typeof(Player), nameof(Player.RemovePiece))]
         public static class PlayerRemovePiece
         {
             public static bool Prefix(Player __instance, ref bool __result)
             {
                 if (__instance.GetRightItem().m_shared.m_name == "$item_cultivator")
                 {
-                    if (Physics.Raycast(GameCamera.instance.transform.position, GameCamera.instance.transform.forward, out var hitInfo, 50f, LayerMask.GetMask(layersForPieceRemoval)) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
+                    Transform t = GameCamera.instance.transform;
+                    if (Physics.Raycast(t.position, t.forward, out var hitInfo, 50f, Helper.GetRemovalMask()) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
                     {
                         Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
-                        if (piece && prefabRefs.ContainsKey(GetPrefabName(piece)))
+
+                        if (Helper.IsModdedPrefab(piece))
                         {
                             if (!CanRemove(piece, __instance)) return false;
 
@@ -133,8 +132,10 @@ namespace Advize_PlantEverything
                             __result = true;
                         }
                     }
+
                     return false;
                 }
+
                 return true;
             }
 
@@ -147,6 +148,7 @@ namespace Advize_PlantEverything
                     instance.Message(MessageHud.MessageType.Center, "$msg_privatezone");
                     canRemove = false;
                 }
+
                 return canRemove;
             }
 
@@ -154,6 +156,7 @@ namespace Advize_PlantEverything
             {
                 ZNetView znv = piece.GetComponent<ZNetView>();
                 WearNTear wnt = piece.GetComponent<WearNTear>();
+
                 if (wnt)
                 {
                     player.m_removeEffects.Create(piece.transform.position, Quaternion.identity);
@@ -164,66 +167,70 @@ namespace Advize_PlantEverything
                     znv.ClaimOwnership();
                     piece.DropResources();
                     piece.m_placeEffect.Create(piece.transform.position, piece.transform.rotation);
+
                     if (piece.GetComponent<Pickable>())
                     {
                         znv.InvokeRPC("Pick");
                     }
+
                     ZNetScene.instance.Destroy(piece.gameObject);
                 }
+
                 player.FaceLookDirection();
                 player.m_zanim.SetTrigger(player.GetRightItem().m_shared.m_attack.m_attackAnimation);
             }
         }
 
-        [HarmonyPatch(typeof(Piece), "SetCreator")]
+        [HarmonyPatch(typeof(Piece), nameof(Piece.SetCreator))]
         public static class PieceSetCreator
         {
             public static void Postfix(Piece __instance)
             {
                 if (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling"))
                 {
+                    ZNetView znv = __instance.GetComponent<ZNetView>();
+
                     if (config.ResourcesSpawnEmpty && __instance.GetComponent<Pickable>() && !__instance.m_name.Contains("Stone"))
                     {
-                        __instance.GetComponent<ZNetView>().InvokeRPC(ZNetView.Everybody, "SetPicked", true);
+                        znv.InvokeRPC(ZNetView.Everybody, "SetPicked", true);
                     }
 
                     if (config.PlaceAnywhere)
                     {
                         StaticPhysics sp = __instance.GetComponent<StaticPhysics>();
+
                         if (sp)
                         {
                             sp.m_fall = false;
-                            __instance.GetComponent<ZNetView>().GetZDO().Set("pe_placeAnywhere", true);
+                            znv.GetZDO().Set("pe_placeAnywhere", true);
                         }
                     }
                 }
             }
         }
 
-        [HarmonyPatch(typeof(Piece), "Awake")]
-        public static class PieceAwake
+        [HarmonyPatch]
+        public static class CheckZDOPatches
         {
+            [HarmonyPatch(typeof(Piece), nameof(Piece.Awake))]
             public static void Postfix(Piece __instance) => CheckZDO(__instance);
-        }
 
-        [HarmonyPatch(typeof(TreeBase), "Awake")]
-        public static class TreeBaseAwake
-        {
+            [HarmonyPatch(typeof(TreeBase), nameof(TreeBase.Awake))]
             public static void Postfix(TreeBase __instance) => CheckZDO(__instance);
-        }
 
-        public static void CheckZDO(Component instance)
-        {
-            ZNetView nview = instance.GetComponent<ZNetView>();
-            if (!nview || nview.GetZDO() == null) return;
-
-            if (nview.GetZDO().GetBool("pe_placeAnywhere"))
+            public static void CheckZDO(Component instance)
             {
-                instance.GetComponent<StaticPhysics>().m_fall = false;
+                ZNetView znv = instance.GetComponent<ZNetView>();
+                if (!znv || znv.GetZDO() == null) return;
+
+                if (znv.GetZDO().GetBool("pe_placeAnywhere"))
+                {
+                    instance.GetComponent<StaticPhysics>().m_fall = false;
+                }
             }
         }
 
-        [HarmonyPatch(typeof(Plant), "Awake")]
+        [HarmonyPatch(typeof(Plant), nameof(Plant.Awake))]
         public static class PlantAwake
         {
             public static void Postfix(Plant __instance)
@@ -232,6 +239,7 @@ namespace Advize_PlantEverything
                 {
                     __instance.m_biome = (Heightmap.Biome)895;
                 }
+
                 if (config.EnableCropOverrides && __instance.name.StartsWith("sapling_"))
                 {
                     __instance.m_minScale = config.CropMinScale;
@@ -245,47 +253,34 @@ namespace Advize_PlantEverything
             }
         }
 
-        [HarmonyPatch(typeof(Plant), "HaveRoof")]
+        [HarmonyPatch(typeof(Plant), nameof(Plant.HaveRoof))]
         public static class PlantHaveRoof
         {
             public static bool Prefix(Plant __instance, ref bool __result)
             {
-                if (!config.CropRequireSunlight && __instance.m_name.StartsWith("$piece_sapling"))
-                {
-                    __result = false;
-                    return false;
-                }
+                if ((!config.CropRequireSunlight && __instance.m_name.StartsWith("$piece_sapling")) || (config.PlaceAnywhere && (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling"))))
+                    return __result = false;
 
-                if (config.PlaceAnywhere && (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling")))
-                {
-                    __result = false;
-                    return false;
-                }
                 return true;
             }
         }
 
-        [HarmonyPatch(typeof(Plant), "HaveGrowSpace")]
+        [HarmonyPatch(typeof(Plant), nameof(Plant.HaveGrowSpace))]
         public static class PlantHaveGrowSpace
         {
             public static bool Prefix(Plant __instance, ref bool __result)
             {
-                if (!config.CropRequireGrowthSpace && __instance.m_name.StartsWith("$piece_sapling"))
+                if ((!config.CropRequireGrowthSpace && __instance.m_name.StartsWith("$piece_sapling")) || (config.PlaceAnywhere && (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling"))))
                 {
                     __result = true;
                     return false;
                 }
 
-                if (config.PlaceAnywhere && (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling")))
-                {
-                    __result = true;
-                    return false;
-                }
                 return true;
             }
         }
 
-        [HarmonyPatch(typeof(Plant), "Grow")]
+        [HarmonyPatch(typeof(Plant), nameof(Plant.Grow))]
         public static class PlantGrow
         {
             private static readonly MethodInfo ModifyGrowMethod = AccessTools.Method(typeof(PlantGrow), nameof(ModifyGrow));
@@ -296,37 +291,41 @@ namespace Advize_PlantEverything
                 .MatchForward(true, new CodeMatch(OpCodes.Stloc_3))
                 .MatchForward(false, new CodeMatch(OpCodes.Callvirt))
                 .Advance(-1)
-                .InsertAndAdvance(new CodeInstruction(OpCodes.Ldarg_0))
-                .InsertAndAdvance(new CodeInstruction(OpCodes.Ldloc_3))
-                .InsertAndAdvance(new CodeInstruction(OpCodes.Call, ModifyGrowMethod))
+                .InsertAndAdvance(new CodeInstruction[] { new(OpCodes.Ldarg_0), new(OpCodes.Ldloc_3), new(OpCodes.Call, ModifyGrowMethod) })
                 .InstructionEnumeration();
             }
 
             private static void ModifyGrow(Plant plant, TreeBase treeBase)
             {
-                if (!plant?.GetComponent<ZNetView>() || !treeBase)
+                ZNetView znv = plant?.GetComponent<ZNetView>();
+
+                if (!znv || !treeBase)
                 {
                     Dbgl("ModifyGrow not executed, a reference is null", true, level: BepInEx.Logging.LogLevel.Error);
                     return;
                 }
-                if (plant.GetComponent<ZNetView>().GetZDO().GetBool("pe_placeAnywhere") && treeBase.GetComponent<StaticPhysics>())
+
+                if (!znv.GetZDO().GetBool("pe_placeAnywhere")) return;
+
+                StaticPhysics sp = treeBase.GetComponent<StaticPhysics>();
+
+                if (sp)
                 {
-                    treeBase.GetComponent<StaticPhysics>().m_fall = false;
+                    sp.m_fall = false;
                     treeBase.GetComponent<ZNetView>().GetZDO().Set("pe_placeAnywhere", true);
                 }
             }
         }
 
-        [HarmonyPatch(typeof(Pickable), "GetHoverText")]
-        public static class PickableGetHoverText
+        [HarmonyPatch]
+        public static class HoverTextPatches
         {
-            [HarmonyPostfix]
+            [HarmonyPatch(typeof(Pickable), nameof(Pickable.GetHoverText))]
             public static void Postfix(Pickable __instance, ref string __result)
             {
                 if (__instance.m_picked && config.EnablePickableTimers && __instance.m_nview.GetZDO() != null)
                 {
-                    if (__instance.name.ToLower().Contains("core"))
-                        return;
+                    if (__instance.m_respawnTimeMinutes == 0) return;
 
                     float growthTime = __instance.m_respawnTimeMinutes * 60;
                     DateTime pickedTime = new(__instance.m_nview.GetZDO().GetLong(ZDOVars.s_pickedTime, 0L));
@@ -335,12 +334,8 @@ namespace Advize_PlantEverything
                     __result = Localization.instance.Localize(__instance.GetHoverName()) + $"\n{timeString}";
                 }
             }
-        }
 
-        [HarmonyPatch(typeof(Plant), "GetHoverText")]
-        public static class PlantGetHoverText
-        {
-            [HarmonyPostfix]
+            [HarmonyPatch(typeof(Plant), nameof(Plant.GetHoverText))]
             public static void Postfix(Plant __instance, ref string __result)
             {
                 if (config.EnablePlantTimers && __instance.m_status == 0 && __instance.m_nview.GetZDO() != null)
@@ -352,35 +347,47 @@ namespace Advize_PlantEverything
                     __result += $"\n{timeString}";
                 }
             }
+
+            public static string FormatTimeString(float growthTime, DateTime placedTime)
+            {
+                TimeSpan timeSincePlaced = ZNet.instance.GetTime() - placedTime;
+                TimeSpan t = TimeSpan.FromSeconds(growthTime - timeSincePlaced.TotalSeconds);
+
+                double remainingMinutes = (growthTime / 60) - timeSincePlaced.TotalMinutes;
+                double remainingRatio = remainingMinutes / (growthTime / 60);
+                int growthPercentage = Math.Min((int)((timeSincePlaced.TotalSeconds * 100) / growthTime), 100);
+
+                string color = "red";
+                if (remainingRatio < 0)
+                    color = "#00FFFF"; // cyan
+                else if (remainingRatio < 0.25)
+                    color = "#32CD32"; // lime
+                else if (remainingRatio < 0.5)
+                    color = "yellow";
+                else if (remainingRatio < 0.75)
+                    color = "orange";
+
+                string timeRemaining = t.Hours <= 0 ? t.Minutes <= 0 ?
+                    $"{t.Seconds:D2}s" : $"{t.Minutes:D2}m {t.Seconds:D2}s" : $"{t.Hours:D2}h {t.Minutes:D2}m {t.Seconds:D2}s";
+
+                string formattedString = config.GrowthAsPercentage ?
+                    $"(<color={color}>{growthPercentage}%</color>)" : remainingMinutes < 0.0 ?
+                    $"(<color={color}>Ready any second now</color>)" : $"(Ready in <color={color}>{timeRemaining}</color>)";
+
+                return formattedString;
+            }
         }
 
-        public static string FormatTimeString(float growthTime, DateTime placedTime)
+        [HarmonyPatch]
+        public static class ShowPickableSpawnerPatches
         {
-            TimeSpan timeSincePlaced = ZNet.instance.GetTime() - placedTime;
-            TimeSpan t = TimeSpan.FromSeconds(growthTime - timeSincePlaced.TotalSeconds);
+            [HarmonyPatch(typeof(Pickable), nameof(Pickable.Awake))]
+            public static void Postfix(Pickable __instance) => TogglePickedMesh(__instance, __instance.m_picked);
 
-            double remainingMinutes = (growthTime / 60) - timeSincePlaced.TotalMinutes;
-            double remainingRatio = remainingMinutes / (growthTime / 60);
-            int growthPercentage = Math.Min((int)((timeSincePlaced.TotalSeconds * 100) / growthTime), 100);
+            [HarmonyPatch(typeof(Pickable), nameof(Pickable.SetPicked))]
+            public static void Postfix(Pickable __instance, bool picked) => TogglePickedMesh(__instance, picked);
 
-            string color = "red";
-            if (remainingRatio < 0)
-                color = "#00FFFF"; // cyan
-            else if (remainingRatio < 0.25)
-                color = "#32CD32"; // lime
-            else if (remainingRatio < 0.5)
-                color = "yellow";
-            else if (remainingRatio < 0.75)
-                color = "orange";
-
-            string timeRemaining = t.Hours <= 0 ? t.Minutes <= 0 ?
-                $"{t.Seconds:D2}s" : $"{t.Minutes:D2}m {t.Seconds:D2}s" : $"{t.Hours:D2}h {t.Minutes:D2}m {t.Seconds:D2}s";
-
-            string formattedString = config.GrowthAsPercentage ?
-                $"(<color={color}>{growthPercentage}%</color>)" : remainingMinutes < 0.0 ?
-                $"(<color={color}>Ready any second now</color>)" : $"(Ready in <color={color}>{timeRemaining}</color>)";
-
-            return formattedString;
+            public static void TogglePickedMesh(Pickable instance, bool picked) => instance.transform.root.Find("PE_Picked")?.gameObject.SetActive(picked);
         }
 
         //Replace this... possibly with separate config option and hopefully with different entry point and implementation

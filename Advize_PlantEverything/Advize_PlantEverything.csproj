@@ -115,8 +115,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Framework\ExtraResource.cs" />
+    <Compile Include="Framework\ModLocalization.cs" />
+    <Compile Include="Framework\StaticContent.cs" />
     <Compile Include="Configuration\ModConfig.cs" />
     <Compile Include="Framework\PrefabDB.cs" />
+    <Compile Include="Framework\PluginHelper.cs" />
     <Compile Include="Patches.cs" />
     <Compile Include="PlantEverything.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
