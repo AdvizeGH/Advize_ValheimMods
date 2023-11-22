@@ -114,6 +114,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions.cs" />
     <Compile Include="Framework\ExtraResource.cs" />
     <Compile Include="Framework\ModLocalization.cs" />
     <Compile Include="Framework\StaticContent.cs" />
