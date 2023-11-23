@@ -5,7 +5,6 @@ using BepInEx.Logging;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -38,11 +37,8 @@ namespace Advize_PlantEverything
 
 		internal static PluginHelper Helper => helper ??= new(config);
 
-		private static readonly Stopwatch timer = new();
-
 		public void Awake()
 		{
-			timer.Start();
 			BepInEx.Logging.Logger.Sources.Add(PELogger);
 			assetBundle = LoadAssetBundle("planteverything");
 			config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.16.0" });
@@ -53,9 +49,6 @@ namespace Advize_PlantEverything
 				LoadLocalizedStrings();
 			harmony.PatchAll();
 			Game.isModded = true;
-			timer.Stop();
-			Dbgl("Time taken: " + timer.Elapsed.ToString(@"m\:ss\.fff"));
-			timer.Reset();
 			Dbgl("PlantEverything has loaded. Set [General]EnableDebugMessages to false to disable these messages.", level: LogLevel.Message);
 		}
 
@@ -748,7 +741,6 @@ namespace Advize_PlantEverything
 
 		private static void FinalInit(ZNetScene instance)
 		{
-			timer.Start();
 			InitExtraResources(instance);
 			InitPieceRefs();
 			InitPieces();
@@ -770,25 +762,17 @@ namespace Advize_PlantEverything
 					instance.m_namedPrefabs.Add(instance.GetPrefabHash(go), go);
 				}
 			}
-
-			timer.Stop();
-			Dbgl("Time taken: " + timer.Elapsed.ToString(@"m\:ss\.fff"));
-			timer.Reset();
 		}
 
 		internal static void CoreSettingChanged(object o, EventArgs e)
 		{
 			Dbgl("Config setting changed, re-initializing mod");
-			timer.Start();
 			InitPieceRefs();
 			InitPieces();
 			InitSaplingRefs();
 			InitSaplings();
 			InitCrops();
 			InitCultivator();
-			timer.Stop();
-			Dbgl("Time taken: " + timer.Elapsed.ToString(@"m\:ss\.fff"));
-			timer.Reset();
 		}
 
 		internal static void PieceSettingChanged(object o, EventArgs e)
