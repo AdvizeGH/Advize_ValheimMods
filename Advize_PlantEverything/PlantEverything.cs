@@ -45,7 +45,7 @@ namespace Advize_PlantEverything
 			timer.Start();
 			BepInEx.Logging.Logger.Sources.Add(PELogger);
 			assetBundle = LoadAssetBundle("planteverything");
-			config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.15.0" });
+			config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.16.0" });
 			SetupWatcher();
 			if (config.EnableExtraResources)
 				ExtraResourcesFileOrSettingChanged(null, null);
@@ -71,8 +71,7 @@ namespace Advize_PlantEverything
 
 		private void SetupWatcher()
 		{
-			/* Change watcher to handle localization file as well
-            Going to need localization support for ExtraResources */
+			/* Change watcher to handle localization file as well. Going to need localization support for ExtraResources */
 
 			FileSystemWatcher watcher = new(ModConfigDirectory(), $"{PluginName}_ExtraResources.cfg");
 			watcher.Changed += ExtraResourcesFileOrSettingChanged;
@@ -376,7 +375,7 @@ namespace Advize_PlantEverything
 
 			if (pieceRefs.Count > 0)
 			{
-				RemoveFromCultivator(pieceRefs.ConvertAll(x => (PrefabDB)x), destroy: true);
+				RemoveFromCultivator(pieceRefs.ConvertAll(x => (PrefabDB)x));
 				pieceRefs.Clear();
 			}
 
@@ -525,7 +524,7 @@ namespace Advize_PlantEverything
 
 			if (saplingRefs.Count > 0)
 			{
-				RemoveFromCultivator(saplingRefs.ConvertAll(x => (PrefabDB)x), destroy: false);
+				RemoveFromCultivator(saplingRefs.ConvertAll(x => (PrefabDB)x));
 				saplingRefs.Clear();
 			}
 
@@ -641,7 +640,6 @@ namespace Advize_PlantEverything
 
 			foreach (KeyValuePair<GameObject, GameObject> kvp in StaticContent.GetSeedDropsByTarget)
 			{
-				Dbgl($"get SeedDropsByTarget called, SeedDropsByTarget.Count : {StaticContent.GetSeedDropsByTarget.Count}");
 				TreeBase target = kvp.Key.GetComponent<TreeBase>();
 				DropTable.DropData itemDrop = default;
 				bool dropExists = false;
@@ -712,27 +710,27 @@ namespace Advize_PlantEverything
 		{
 			Dbgl("InitCultivator");
 
-			ItemDrop cultivator = prefabRefs["Cultivator"].GetComponent<ItemDrop>();
+			PieceTable pieceTable = prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
 
 			for (int i = 0; i < saplingRefs.Count; i++)
 			{
 				if (!saplingRefs[i].enabled)
 					continue;
-				if (!cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Contains(saplingRefs[i].Prefab))
-					cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Insert(16, saplingRefs[i].Prefab);
+				if (!pieceTable.m_pieces.Contains(saplingRefs[i].Prefab))
+					pieceTable.m_pieces.Insert(16, saplingRefs[i].Prefab);
 			}
 			for (int i = 0; i < pieceRefs.Count; i++)
 			{
 				if (!pieceRefs[i].enabled)
 					continue;
-				if (!cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pieceRefs[i].Prefab))
-					cultivator.m_itemData.m_shared.m_buildPieces.m_pieces.Add(pieceRefs[i].Prefab);
+				if (!pieceTable.m_pieces.Contains(pieceRefs[i].Prefab))
+					pieceTable.m_pieces.Add(pieceRefs[i].Prefab);
 			}
 
-			cultivator.m_itemData.m_shared.m_buildPieces.m_canRemovePieces = true;
+			pieceTable.m_canRemovePieces = true;
 		}
 
-		private static void RemoveFromCultivator(List<PrefabDB> prefabs, bool destroy)
+		private static void RemoveFromCultivator(List<PrefabDB> prefabs)
 		{
 			if (Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator")
 			{
@@ -740,12 +738,11 @@ namespace Advize_PlantEverything
 				Player.m_localPlayer.HideHandItems();
 			}
 
+			PieceTable pieceTable = prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
+			
 			foreach (PrefabDB pdb in prefabs)
 			{
-				if (prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Contains(pdb.Prefab))
-					prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces.m_pieces.Remove(pdb.Prefab);
-				if (destroy)
-					DestroyImmediate(pdb.Prefab.GetComponent<Piece>());
+				pieceTable.m_pieces.Remove(pdb.Prefab);
 			}
 		}
 
