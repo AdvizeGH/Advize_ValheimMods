@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Advize_PlantEverything.Configuration
 {
-	class ModConfig
+	sealed class ModConfig
 	{
 		private readonly ConfigFile ConfigFile;
 		private readonly ConfigSync ConfigSync;

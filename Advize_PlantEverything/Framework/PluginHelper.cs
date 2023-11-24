@@ -8,7 +8,7 @@ using PE = Advize_PlantEverything.PlantEverything;
 
 namespace Advize_PlantEverything.Framework
 {
-	class PluginHelper
+	sealed class PluginHelper
 	{
 		internal ModConfig config;
 

@@ -2,7 +2,7 @@
 
 namespace Advize_PlantEverything.Framework
 {
-	internal class ModLocalization
+	sealed class ModLocalization
 	{
 		public List<string> LocalizedStrings = new();
 	}

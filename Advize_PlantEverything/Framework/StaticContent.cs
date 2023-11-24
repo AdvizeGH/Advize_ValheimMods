@@ -7,7 +7,7 @@ using PE = Advize_PlantEverything.PlantEverything;
 
 namespace Advize_PlantEverything.Framework
 {
-	internal class StaticContent
+	static class StaticContent
 	{
 		private static ModConfig config => PE.Helper.config;
 
