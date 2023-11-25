@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using Advize_PlantEverything.Framework;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -33,7 +34,7 @@ namespace Advize_PlantEverything
 			private static bool Prefix(Player __instance, Piece piece, ref bool __result)
 			{
 				// check if the piece exists and if the mod has modified it
-				if (Helper.IsModdedPrefab(piece))
+				if (IsModdedPrefab(piece))
 				{
 					// is piece from mod, so prevent deconstruction unless it is with the cultivator.
 					if (__instance.GetRightItem().m_shared.m_name != "$item_cultivator")
@@ -55,7 +56,7 @@ namespace Advize_PlantEverything
 				if (!config.RecoverResources) return;
 
 				// Only interact if it is a piece that is modified by the mod
-				if (Helper.IsModdedPrefab(__instance))
+				if (IsModdedPrefab(__instance))
 				{
 					// If piece has a pickable component then adjust resource drops
 					// to prevent infinite item exploits by placing a pickable,
@@ -120,11 +121,11 @@ namespace Advize_PlantEverything
 				if (__instance.GetRightItem().m_shared.m_name == "$item_cultivator")
 				{
 					Transform t = GameCamera.instance.transform;
-					if (Physics.Raycast(t.position, t.forward, out var hitInfo, 50f, Helper.GetRemovalMask()) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
+					if (Physics.Raycast(t.position, t.forward, out var hitInfo, 50f, GetRemovalMask()) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
 					{
 						Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
 
-						if (Helper.IsModdedPrefab(piece))
+						if (IsModdedPrefab(piece))
 						{
 							if (!CanRemove(piece, __instance)) return false;
 
@@ -138,6 +139,8 @@ namespace Advize_PlantEverything
 
 				return true;
 			}
+
+			private static LayerMask GetRemovalMask() => LayerMask.GetMask(StaticContent.layersForPieceRemoval);
 
 			private static bool CanRemove(Piece piece, Player instance)
 			{
@@ -237,7 +240,7 @@ namespace Advize_PlantEverything
 			{
 				if (!config.EnforceBiomesVanilla)
 				{
-					__instance.m_biome = (Heightmap.Biome)895;
+					__instance.m_biome = (Heightmap.Biome)895/*StaticContent.AllBiomes*/;
 				}
 
 				if (config.EnableCropOverrides && __instance.name.StartsWith("sapling_"))

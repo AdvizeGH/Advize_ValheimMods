@@ -7,7 +7,7 @@ namespace Advize_PlantEverything.Framework
 	internal class PrefabDB
 	{
 		internal string key;
-		internal int biome;
+		internal Heightmap.Biome biome;
 		internal int resourceCost;
 		internal int resourceReturn;
 		internal bool extraDrops;
@@ -34,7 +34,7 @@ namespace Advize_PlantEverything.Framework
 		internal bool? canBeRemoved;
 		internal bool extraResource;
 
-		internal Piece Piece => piece ??= PlantEverything.Helper.CreatePiece(this);
+		internal Piece Piece => piece ??= PlantEverything.CreatePiece(this);
 
 		internal string Name
 		{

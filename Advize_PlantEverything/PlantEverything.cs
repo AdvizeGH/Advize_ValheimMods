@@ -31,12 +31,11 @@ namespace Advize_PlantEverything
 		private static bool saplingsInitialized = false;
 
 		private static AssetBundle assetBundle;
+		private static readonly Dictionary<string, Texture2D> cachedTextures = new();
+		private static readonly Dictionary<Texture2D, Sprite> cachedSprites = new();
 
-		private static ModConfig config;
-		private static PluginHelper helper;
-
-		internal static PluginHelper Helper => helper ??= new(config);
-
+		internal static ModConfig config;
+		
 		public void Awake()
 		{
 			BepInEx.Logging.Logger.Sources.Add(PELogger);
@@ -64,8 +63,6 @@ namespace Advize_PlantEverything
 
 		private void SetupWatcher()
 		{
-			/* Change watcher to handle localization file as well. Going to need localization support for ExtraResources */
-
 			FileSystemWatcher watcher = new(ModConfigDirectory(), $"{PluginName}_ExtraResources.cfg");
 			watcher.Changed += ExtraResourcesFileOrSettingChanged;
 			watcher.Created += ExtraResourcesFileOrSettingChanged;
@@ -285,6 +282,76 @@ namespace Advize_PlantEverything
 			return loadedPrefab;
 		}
 
+		private static Piece GetOrAddPieceComponent(GameObject go) => go.GetComponent<Piece>() ?? go.AddComponent<Piece>();
+
+		private static string GetPrefabName(Component c) => c.transform.root.name.Replace("(Clone)", "");
+
+		private static bool IsModdedPrefab(Component c) => c && prefabRefs.ContainsKey(GetPrefabName(c));
+
+		internal static Piece CreatePiece(PieceDB pdb)
+		{
+			Piece piece = GetOrAddPieceComponent(prefabRefs[pdb.key]);
+
+			piece.m_name = pdb.extraResource ? pdb.pieceName : $"$pe{pdb.Name}Name";
+			piece.m_description = pdb.extraResource ? pdb.pieceDescription : $"$pe{pdb.Name}Description";
+			piece.m_category = Piece.PieceCategory.Misc;
+			piece.m_cultivatedGroundOnly = (pdb.key.Contains("berryBush") || pdb.key.Contains("Pickable")) && config.RequireCultivation;
+			piece.m_groundOnly = piece.m_groundPiece = pdb.isGrounded ?? !config.PlaceAnywhere;
+			piece.m_canBeRemoved = pdb.canBeRemoved ?? true;
+			piece.m_targetNonPlayerBuilt = false;
+			piece.m_randomTarget = config.EnemiesTargetPieces;
+
+			return piece;
+		}
+
+		private static Sprite CreateSprite(string fileName, Rect spriteSection)
+		{
+			try
+			{
+				Sprite result;
+				Texture2D texture = LoadTexture(fileName);
+
+				if (cachedSprites.ContainsKey(texture))
+				{
+					result = cachedSprites[texture];
+				}
+				else
+				{
+					result = Sprite.Create(texture, spriteSection, Vector2.zero);
+					cachedSprites.Add(texture, result);
+				}
+				return result;
+			}
+			catch
+			{
+				Dbgl("Unable to load texture", true, LogLevel.Error);
+			}
+
+			return null;
+		}
+
+		private static Texture2D LoadTexture(string fileName)
+		{
+			Texture2D result;
+
+			if (cachedTextures.ContainsKey(fileName))
+			{
+				result = cachedTextures[fileName];
+			}
+			else
+			{
+				Stream manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"Advize_{PluginName}.Assets.{fileName}");
+				byte[] array = new byte[manifestResourceStream.Length];
+				manifestResourceStream.Read(array, 0, array.Length);
+				Texture2D texture = new(0, 0);
+				ImageConversion.LoadImage(texture, array);
+				result = texture;
+				cachedTextures.Add(fileName, result);
+			}
+
+			return result;
+		}
+
 		private static void InitPrefabRefs()
 		{
 			Dbgl("InitPrefabRefs");
@@ -377,7 +444,7 @@ namespace Advize_PlantEverything
 
 		private static void InitPieces()
 		{
-			Dbgl("InitPieces"); // CreatePiece in this method somewhere?
+			Dbgl("InitPieces");
 
 			foreach (PieceDB pdb in pieceRefs)
 			{
@@ -417,7 +484,7 @@ namespace Advize_PlantEverything
 					};
 				}
 
-				pdb.Piece.m_icon = pdb.icon ? Helper.CreateSprite($"{pdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : resource.m_itemData.GetIcon();
+				pdb.Piece.m_icon = pdb.icon ? CreateSprite($"{pdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : resource.m_itemData.GetIcon();
 
 				pdb.Piece.m_placeEffect.m_effectPrefabs = new EffectList.EffectData[]
 				{
@@ -465,7 +532,7 @@ namespace Advize_PlantEverything
 				{
 					pickable.m_respawnTimeMinutes = pdb.respawnTime;
 					pickable.m_amount = pdb.resourceReturn;
-					pdb.Piece.m_onlyInBiome = (Heightmap.Biome)pdb.biome;
+					pdb.Piece.m_onlyInBiome = pdb.biome;
 
 					Transform vanillaVisualChild = pdb.Prefab.transform.Find("visual");
 
@@ -560,7 +627,7 @@ namespace Advize_PlantEverything
 				piece.m_resources[0].m_resItem = prefabRefs[sdb.resource].GetComponent<ItemDrop>();
 				piece.m_resources[0].m_amount = sdb.resourceCost;
 
-				piece.m_onlyInBiome = plant.m_biome = (Heightmap.Biome)sdb.biome;
+				piece.m_onlyInBiome = plant.m_biome = sdb.biome;
 				plant.m_destroyIfCantGrow = piece.m_groundOnly = !config.PlaceAnywhere;
 
 				if (saplingsInitialized) continue;
@@ -616,7 +683,7 @@ namespace Advize_PlantEverything
 					}
 				}
 
-				piece.m_icon = sdb.icon ? Helper.CreateSprite($"{sdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : piece.m_resources[0].m_resItem.m_itemData.GetIcon();
+				piece.m_icon = sdb.icon ? CreateSprite($"{sdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : piece.m_resources[0].m_resItem.m_itemData.GetIcon();
 
 				piece.m_placeEffect.m_effectPrefabs[0].m_prefab = prefabRefs["vfx_Place_wood_pole"];
 				piece.m_placeEffect.m_effectPrefabs[1].m_prefab = prefabRefs["sfx_build_cultivator"];
@@ -631,13 +698,13 @@ namespace Advize_PlantEverything
 		{
 			if (!config.EnableSeedOverrides) return;
 
-			foreach (KeyValuePair<GameObject, GameObject> kvp in StaticContent.GetSeedDropsByTarget)
+			foreach (KeyValuePair<GameObject, GameObject> kvp in StaticContent.TreesToSeeds)
 			{
-				TreeBase target = kvp.Key.GetComponent<TreeBase>();
+				TreeBase tree = kvp.Key.GetComponent<TreeBase>();
 				DropTable.DropData itemDrop = default;
 				bool dropExists = false;
 
-				foreach (DropTable.DropData drop in target.m_dropWhenDestroyed.m_drops)
+				foreach (DropTable.DropData drop in tree.m_dropWhenDestroyed.m_drops)
 				{
 					if (drop.m_item.Equals(kvp.Value))
 					{
@@ -647,17 +714,17 @@ namespace Advize_PlantEverything
 					}
 				}
 
-				if (dropExists) target.m_dropWhenDestroyed.m_drops.Remove(itemDrop);
+				if (dropExists) tree.m_dropWhenDestroyed.m_drops.Remove(itemDrop);
 
 				itemDrop.m_item = kvp.Value;
 				itemDrop.m_stackMin = config.SeedDropMin;
 				itemDrop.m_stackMax = config.SeedDropMax;
 				itemDrop.m_weight = 1;
-				target.m_dropWhenDestroyed.m_dropMin = config.TreeDropMin;
-				target.m_dropWhenDestroyed.m_dropMax = config.TreeDropMax;
-				target.m_dropWhenDestroyed.m_drops.Add(itemDrop);
-				target.m_dropWhenDestroyed.m_dropChance = Mathf.Clamp(config.DropChance, 0f, 1f);
-				target.m_dropWhenDestroyed.m_oneOfEach = config.OneOfEach;
+				tree.m_dropWhenDestroyed.m_dropMin = config.TreeDropMin;
+				tree.m_dropWhenDestroyed.m_dropMax = config.TreeDropMax;
+				tree.m_dropWhenDestroyed.m_drops.Add(itemDrop);
+				tree.m_dropWhenDestroyed.m_dropChance = Mathf.Clamp(config.DropChance, 0f, 1f);
+				tree.m_dropWhenDestroyed.m_oneOfEach = config.OneOfEach;
 			}
 		}
 
@@ -679,7 +746,7 @@ namespace Advize_PlantEverything
 				plant.m_destroyIfCantGrow = piece.m_groundOnly = !config.PlaceAnywhere;
 
 				if (!config.EnforceBiomesVanilla)
-					plant.m_biome = (Heightmap.Biome)895;
+					plant.m_biome = StaticContent.AllBiomes;
 
 				plant.m_minScale = overridesEnabled ? config.CropMinScale : 0.9f;
 				plant.m_maxScale = overridesEnabled ? config.CropMaxScale : 1.1f;

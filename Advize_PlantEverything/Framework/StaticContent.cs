@@ -9,7 +9,22 @@ namespace Advize_PlantEverything.Framework
 {
 	static class StaticContent
 	{
-		private static ModConfig config => PE.Helper.config;
+		private static ModConfig Config => PE.config;
+
+		private const Heightmap.Biome TemperateBiomes = Heightmap.Biome.Meadows | Heightmap.Biome.BlackForest | Heightmap.Biome.Plains;
+		internal const Heightmap.Biome AllBiomes = (Heightmap.Biome)895/*GetBiomeMask((Heightmap.Biome[])System.Enum.GetValues(typeof(Heightmap.Biome)))*/;
+
+		//private static Heightmap.Biome GetBiomeMask(Heightmap.Biome[] biomes)
+		//{
+		//	Heightmap.Biome biomeMask = 0;
+
+		//	foreach (Heightmap.Biome biome in biomes)
+		//	{
+		//		biomeMask |= biome;
+		//	}
+
+		//	return biomeMask;
+		//}
 
 		internal static string[] layersForPieceRemoval = { "item", "piece_nonsolid", "Default_small", "Default" };
 
@@ -142,9 +157,9 @@ namespace Advize_PlantEverything.Framework
 			{ "Pickable_Mushroom_blue_Picked" }
 		};
 
-		private static Dictionary<GameObject, GameObject> seedDropsByTarget;
+		private static Dictionary<GameObject, GameObject> treesToSeeds;
 
-		internal static Dictionary<GameObject, GameObject> GetSeedDropsByTarget => seedDropsByTarget ??= new()
+		internal static Dictionary<GameObject, GameObject> TreesToSeeds => treesToSeeds ??= new()
 		{
 			{ PE.prefabRefs["Birch1"], PE.prefabRefs["BirchSeeds"] },
 			{ PE.prefabRefs["Birch2"], PE.prefabRefs["BirchSeeds"] },
@@ -182,95 +197,95 @@ namespace Advize_PlantEverything.Framework
 
 		internal static List<PieceDB> GeneratePieceRefs()
 		{
-			bool enforceBiomes = config.EnforceBiomes;
+			bool enforceBiomes = Config.EnforceBiomes;
 
 			List<PieceDB> newList = new()
 			{
 				new PieceDB
 				{
 					key = "RaspberryBush",
-					ResourceCost = config.RaspberryCost,
-					resourceReturn = config.RaspberryReturn,
-					respawnTime = config.RaspberryRespawnTime,
-					biome = enforceBiomes ? (int)Heightmap.Biome.Meadows : 0,
+					ResourceCost = Config.RaspberryCost,
+					resourceReturn = Config.RaspberryReturn,
+					respawnTime = Config.RaspberryRespawnTime,
+					biome = enforceBiomes ? Heightmap.Biome.Meadows : 0,
 					icon = true,
-					recover = config.RecoverResources
+					recover = Config.RecoverResources
 				},
 				new PieceDB
 				{
 					key = "BlueberryBush",
-					ResourceCost = config.BlueberryCost,
-					resourceReturn = config.BlueberryReturn,
-					respawnTime = config.BlueberryRespawnTime,
-					biome = enforceBiomes ? (int)Heightmap.Biome.BlackForest : 0,
+					ResourceCost = Config.BlueberryCost,
+					resourceReturn = Config.BlueberryReturn,
+					respawnTime = Config.BlueberryRespawnTime,
+					biome = enforceBiomes ? Heightmap.Biome.BlackForest : 0,
 					icon = true,
-					recover = config.RecoverResources
+					recover = Config.RecoverResources
 				},
 				new PieceDB
 				{
 					key = "CloudberryBush",
-					ResourceCost = config.CloudberryCost,
-					resourceReturn = config.CloudberryReturn,
-					respawnTime = config.CloudberryRespawnTime,
-					biome = enforceBiomes ? (int)Heightmap.Biome.Plains : 0,
+					ResourceCost = Config.CloudberryCost,
+					resourceReturn = Config.CloudberryReturn,
+					respawnTime = Config.CloudberryRespawnTime,
+					biome = enforceBiomes ? Heightmap.Biome.Plains : 0,
 					icon = true,
-					recover = config.RecoverResources
+					recover = Config.RecoverResources
 				},
 				new PieceDB
 				{
 					key = "Pickable_Mushroom",
-					ResourceCost = config.MushroomCost,
-					resourceReturn = config.MushroomReturn,
-					respawnTime = config.MushroomRespawnTime,
-					recover = config.RecoverResources,
+					ResourceCost = Config.MushroomCost,
+					resourceReturn = Config.MushroomReturn,
+					respawnTime = Config.MushroomRespawnTime,
+					recover = Config.RecoverResources,
 					Name = "PickableMushroom",
 					isGrounded = true
 				},
 				new PieceDB
 				{
 					key = "Pickable_Mushroom_yellow",
-					ResourceCost = config.YellowMushroomCost,
-					resourceReturn = config.YellowMushroomReturn,
-					respawnTime = config.YellowMushroomRespawnTime,
-					recover = config.RecoverResources,
+					ResourceCost = Config.YellowMushroomCost,
+					resourceReturn = Config.YellowMushroomReturn,
+					respawnTime = Config.YellowMushroomRespawnTime,
+					recover = Config.RecoverResources,
 					Name = "PickableYellowMushroom",
 					isGrounded = true
 				},
 				new PieceDB
 				{
 					key = "Pickable_Mushroom_blue",
-					ResourceCost = config.BlueMushroomCost,
-					resourceReturn = config.BlueMushroomReturn,
-					respawnTime = config.BlueMushroomRespawnTime,
-					recover = config.RecoverResources,
+					ResourceCost = Config.BlueMushroomCost,
+					resourceReturn = Config.BlueMushroomReturn,
+					respawnTime = Config.BlueMushroomRespawnTime,
+					recover = Config.RecoverResources,
 					Name = "PickableBlueMushroom",
 					isGrounded = true
 				},
 				new PieceDB
 				{
 					key = "Pickable_Thistle",
-					ResourceCost = config.ThistleCost,
-					resourceReturn = config.ThistleReturn,
-					respawnTime = config.ThistleRespawnTime,
-					biome = enforceBiomes ? (int)Heightmap.Biome.BlackForest : 0,
-					recover = config.RecoverResources,
+					ResourceCost = Config.ThistleCost,
+					resourceReturn = Config.ThistleReturn,
+					respawnTime = Config.ThistleRespawnTime,
+					biome = enforceBiomes ? Heightmap.Biome.BlackForest : 0,
+					recover = Config.RecoverResources,
 					Name = "PickableThistle",
 					isGrounded = true
 				},
 				new PieceDB
 				{
 					key = "Pickable_Dandelion",
-					ResourceCost = config.DandelionCost,
-					resourceReturn = config.DandelionReturn,
-					respawnTime = config.DandelionRespawnTime,
-					biome = enforceBiomes ? (int)Heightmap.Biome.Meadows : 0,
-					recover = config.RecoverResources,
+					ResourceCost = Config.DandelionCost,
+					resourceReturn = Config.DandelionReturn,
+					respawnTime = Config.DandelionRespawnTime,
+					biome = enforceBiomes ? Heightmap.Biome.Meadows : 0,
+					recover = Config.RecoverResources,
 					Name = "PickableDandelion",
 					isGrounded = true
 				}
 			};
 
-			if (config.EnableMiscFlora)
+			if (Config.EnableMiscFlora)
 			{
 				newList.AddRange(new List<PieceDB>()
 				{
@@ -372,37 +387,37 @@ namespace Advize_PlantEverything.Framework
 					new PieceDB
 					{
 						key = "Pickable_Branch",
-						ResourceCost = config.PickableBranchCost,
-						resourceReturn = config.PickableBranchReturn,
+						ResourceCost = Config.PickableBranchCost,
+						resourceReturn = Config.PickableBranchReturn,
 						respawnTime = 240,
-						recover = config.RecoverResources,
+						recover = Config.RecoverResources,
 						Name = "PickableBranch",
 						isGrounded = true
 					},
 					new PieceDB
 					{
 						key = "Pickable_Stone",
-						ResourceCost = config.PickableStoneCost,
-						resourceReturn = config.PickableStoneReturn,
+						ResourceCost = Config.PickableStoneCost,
+						resourceReturn = Config.PickableStoneReturn,
 						respawnTime = 0,
-						recover = config.RecoverResources,
+						recover = Config.RecoverResources,
 						Name = "PickableStone",
 						isGrounded = true
 					},
 					new PieceDB
 					{
 						key = "Pickable_Flint",
-						ResourceCost = config.PickableFlintCost,
-						resourceReturn = config.PickableFlintReturn,
+						ResourceCost = Config.PickableFlintCost,
+						resourceReturn = Config.PickableFlintReturn,
 						respawnTime = 240,
-						recover = config.RecoverResources,
+						recover = Config.RecoverResources,
 						Name = "PickableFlint",
 						isGrounded = true
 					}
 				});
 			}
-			// vvvvvvvv Move lots of this to an AddExtraResource() PluginHelper method
-			if (config.EnableExtraResources)
+			
+			if (Config.EnableExtraResources)
 			{
 				List<string> potentialNewLayers = layersForPieceRemoval.ToList();
 
@@ -414,7 +429,7 @@ namespace Advize_PlantEverything.Framework
 						continue;
 					}
 
-					if (!ObjectDB.instance?.GetItemPrefab(er.resourceName)?.GetComponent<ItemDrop>()/* == null*/)
+					if (!ObjectDB.instance?.GetItemPrefab(er.resourceName)?.GetComponent<ItemDrop>())
 					{
 						PE.Dbgl($"{er.prefabName}'s required resource {er.resourceName} not found", true, LogLevel.Warning);
 						continue;
@@ -454,12 +469,12 @@ namespace Advize_PlantEverything.Framework
 					source = "YggaShoot_small1",
 					resource = "Sap",
 					resourceCost = 1,
-					biome = config.EnforceBiomes ? (int)Heightmap.Biome.Mistlands : 895,
+					biome = Config.EnforceBiomes ? TemperateBiomes | Heightmap.Biome.Mistlands : AllBiomes,
 					icon = true,
-					growTime = config.YggaGrowthTime,
-					growRadius = config.YggaGrowRadius,
-					minScale = config.YggaMinScale,
-					maxScale = config.YggaMaxScale,
+					growTime = Config.YggaGrowthTime,
+					growRadius = Config.YggaGrowRadius,
+					minScale = Config.YggaMinScale,
+					maxScale = Config.YggaMaxScale,
 					grownPrefabs = new GameObject[] { PE.prefabRefs["YggaShoot1"], PE.prefabRefs["YggaShoot2"], PE.prefabRefs["YggaShoot3"] }
 				},
 				new SaplingDB
@@ -468,12 +483,12 @@ namespace Advize_PlantEverything.Framework
 					source = "SwampTree1",
 					resource = "AncientSeed",
 					resourceCost = 1,
-					biome = config.EnforceBiomes ? (int)Heightmap.Biome.Swamp : 895,
+					biome = Config.EnforceBiomes ? TemperateBiomes | Heightmap.Biome.Swamp : AllBiomes,
 					icon = true,
-					growTime = config.AncientGrowthTime,
-					growRadius = config.AncientGrowRadius,
-					minScale = config.AncientMinScale,
-					maxScale = config.AncientMaxScale,
+					growTime = Config.AncientGrowthTime,
+					growRadius = Config.AncientGrowRadius,
+					minScale = Config.AncientMinScale,
+					maxScale = Config.AncientMaxScale,
 					grownPrefabs = new GameObject[] { PE.prefabRefs["SwampTree1"] }
 				},
 				new SaplingDB
@@ -482,12 +497,12 @@ namespace Advize_PlantEverything.Framework
 					source = "Birch1_aut",
 					resource = "BirchSeeds",
 					resourceCost = 1,
-					biome = config.EnforceBiomes ? (int)Heightmap.Biome.Plains : 895,
+					biome = Config.EnforceBiomes ? TemperateBiomes : AllBiomes,
 					icon = true,
-					growTime = config.AutumnBirchGrowthTime,
-					growRadius = config.AutumnBirchGrowRadius,
-					minScale = config.AutumnBirchMinScale,
-					maxScale = config.AutumnBirchMaxScale,
+					growTime = Config.AutumnBirchGrowthTime,
+					growRadius = Config.AutumnBirchGrowRadius,
+					minScale = Config.AutumnBirchMinScale,
+					maxScale = Config.AutumnBirchMaxScale,
 					grownPrefabs = new GameObject[] { PE.prefabRefs["Birch1_aut"], PE.prefabRefs["Birch2_aut"] }
 				}
 			};
@@ -500,111 +515,112 @@ namespace Advize_PlantEverything.Framework
 				new SaplingDB
 				{
 					key = "Beech_Sapling",
-					growTime = config.BeechGrowthTime,
-					growRadius = config.BeechGrowRadius,
-					minScale = config.BeechMinScale,
-					maxScale = config.BeechMaxScale
+					growTime = Config.BeechGrowthTime,
+					growRadius = Config.BeechGrowRadius,
+					minScale = Config.BeechMinScale,
+					maxScale = Config.BeechMaxScale
 				},
 				new SaplingDB
 				{
 					key = "PineTree_Sapling",
-					growTime = config.PineGrowthTime,
-					growRadius = config.PineGrowRadius,
-					minScale = config.PineMinScale,
-					maxScale = config.PineMaxScale
+					growTime = Config.PineGrowthTime,
+					growRadius = Config.PineGrowRadius,
+					minScale = Config.PineMinScale,
+					maxScale = Config.PineMaxScale
 				},
 				new SaplingDB
 				{
 					key = "FirTree_Sapling",
-					growTime = config.FirGrowthTime,
-					growRadius = config.FirGrowRadius,
-					minScale = config.FirMinScale,
-					maxScale = config.FirMaxScale
+					growTime = Config.FirGrowthTime,
+					growRadius = Config.FirGrowRadius,
+					minScale = Config.FirMinScale,
+					maxScale = Config.FirMaxScale
 				},
 				new SaplingDB
 				{
 					key = "Birch_Sapling",
-					growTime = config.BirchGrowthTime,
-					growRadius = config.BirchGrowRadius,
-					minScale = config.BirchMinScale,
-					maxScale = config.BirchMaxScale
+					growTime = Config.BirchGrowthTime,
+					growRadius = Config.BirchGrowRadius,
+					minScale = Config.BirchMinScale,
+					maxScale = Config.BirchMaxScale
 				},
 				new SaplingDB
 				{
 					key = "Oak_Sapling",
-					growTime = config.OakGrowthTime,
-					growRadius = config.OakGrowRadius,
-					minScale = config.OakMinScale,
-					maxScale = config.OakMaxScale
+					growTime = Config.OakGrowthTime,
+					growRadius = Config.OakGrowRadius,
+					minScale = Config.OakMinScale,
+					maxScale = Config.OakMaxScale
 				}
 			};
 		}
 
 		internal static List<PrefabDB> GenerateCropRefs()
 		{
-			bool overridesEnabled = config.EnableCropOverrides;
+			bool overridesEnabled = Config.EnableCropOverrides;
+
 			return new()
 			{
 				new PrefabDB
 				{
 					key = "sapling_barley",
-					resourceCost = overridesEnabled ? config.BarleyCost : 1,
-					resourceReturn = overridesEnabled ? config.BarleyReturn : 2
+					resourceCost = overridesEnabled ? Config.BarleyCost : 1,
+					resourceReturn = overridesEnabled ? Config.BarleyReturn : 2
 				},
 				new PrefabDB
 				{
 					key = "sapling_carrot",
-					resourceCost = overridesEnabled ? config.CarrotCost : 1,
-					resourceReturn = overridesEnabled ? config.CarrotReturn : 1
+					resourceCost = overridesEnabled ? Config.CarrotCost : 1,
+					resourceReturn = overridesEnabled ? Config.CarrotReturn : 1
 				},
 				new PrefabDB
 				{
 					key = "sapling_flax",
-					resourceCost = overridesEnabled ? config.FlaxCost : 1,
-					resourceReturn = overridesEnabled ? config.FlaxReturn : 2
+					resourceCost = overridesEnabled ? Config.FlaxCost : 1,
+					resourceReturn = overridesEnabled ? Config.FlaxReturn : 2
 				},
 				new PrefabDB
 				{
 					key = "sapling_onion",
-					resourceCost = overridesEnabled ? config.OnionCost : 1,
-					resourceReturn = overridesEnabled ? config.OnionReturn : 1
+					resourceCost = overridesEnabled ? Config.OnionCost : 1,
+					resourceReturn = overridesEnabled ? Config.OnionReturn : 1
 				},
 				new PrefabDB
 				{
 					key = "sapling_seedcarrot",
-					resourceCost = overridesEnabled ? config.SeedCarrotCost : 1,
-					resourceReturn = overridesEnabled ? config.SeedCarrotReturn : 3
+					resourceCost = overridesEnabled ? Config.SeedCarrotCost : 1,
+					resourceReturn = overridesEnabled ? Config.SeedCarrotReturn : 3
 				},
 				new PrefabDB
 				{
 					key = "sapling_seedonion",
-					resourceCost = overridesEnabled ? config.SeedOnionCost : 1,
-					resourceReturn = overridesEnabled ? config.SeedOnionReturn : 3
+					resourceCost = overridesEnabled ? Config.SeedOnionCost : 1,
+					resourceReturn = overridesEnabled ? Config.SeedOnionReturn : 3
 				},
 				new PrefabDB
 				{
 					key = "sapling_seedturnip",
-					resourceCost = overridesEnabled ? config.SeedTurnipCost : 1,
-					resourceReturn = overridesEnabled ? config.SeedTurnipReturn : 3
+					resourceCost = overridesEnabled ? Config.SeedTurnipCost : 1,
+					resourceReturn = overridesEnabled ? Config.SeedTurnipReturn : 3
 				},
 				new PrefabDB
 				{
 					key = "sapling_turnip",
-					resourceCost = overridesEnabled ? config.TurnipCost : 1,
-					resourceReturn = overridesEnabled ? config.TurnipReturn : 1
+					resourceCost = overridesEnabled ? Config.TurnipCost : 1,
+					resourceReturn = overridesEnabled ? Config.TurnipReturn : 1
 				},
 				new PrefabDB
 				{
 					key = "sapling_magecap",
-					resourceCost = overridesEnabled ? config.MagecapCost : 1,
-					resourceReturn = overridesEnabled ? config.MagecapReturn : 1,
+					resourceCost = overridesEnabled ? Config.MagecapCost : 1,
+					resourceReturn = overridesEnabled ? Config.MagecapReturn : 1,
 					extraDrops = true
 				},
 				new PrefabDB
 				{
 					key = "sapling_jotunpuffs",
-					resourceCost = overridesEnabled ? config.JotunPuffsCost : 1,
-					resourceReturn = overridesEnabled ? config.JotunPuffsReturn : 1,
+					resourceCost = overridesEnabled ? Config.JotunPuffsCost : 1,
+					resourceReturn = overridesEnabled ? Config.JotunPuffsReturn : 1,
 					extraDrops = true
 				}
 			};
