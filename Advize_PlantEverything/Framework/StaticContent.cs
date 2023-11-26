@@ -459,7 +459,7 @@ namespace Advize_PlantEverything.Framework
 			return newList;
 		}
 
-		internal static List<SaplingDB> GenerateSaplingRefs()
+		internal static List<SaplingDB> GenerateCustomSaplingRefs()
 		{
 			return new()
 			{

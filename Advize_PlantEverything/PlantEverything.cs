@@ -592,7 +592,7 @@ namespace Advize_PlantEverything
 				saplingRefs.Clear();
 			}
 
-			saplingRefs = StaticContent.GenerateSaplingRefs();
+			saplingRefs = StaticContent.GenerateCustomSaplingRefs();
 		}
 
 		private static void InitSaplings()
@@ -601,38 +601,31 @@ namespace Advize_PlantEverything
 
 			ModifyTreeDrops();
 
-			foreach (SaplingDB sdb in StaticContent.GenerateVanillaSaplingRefs())
+			foreach (SaplingDB sdb in Enumerable.Concat(StaticContent.GenerateVanillaSaplingRefs(), saplingRefs))
 			{
 				Plant plant = sdb.Prefab.GetComponent<Plant>();
+				Piece piece = sdb.Prefab.GetComponent<Piece>();
+
 				plant.m_growTime = plant.m_growTimeMax = sdb.growTime;
 				plant.m_growRadius = sdb.growRadius;
 				plant.m_minScale = sdb.minScale;
 				plant.m_maxScale = sdb.maxScale;
-				plant.m_destroyIfCantGrow = sdb.Prefab.GetComponent<Piece>().m_groundOnly = !config.PlaceAnywhere;
-			}
 
-			foreach (SaplingDB sdb in saplingRefs)
-			{
+				piece.m_onlyInBiome = plant.m_biome = sdb.biome;
+				plant.m_destroyIfCantGrow = piece.m_groundOnly = !config.PlaceAnywhere;
+
+				if (!saplingRefs.Contains(sdb)) continue;
+
+				plant.m_grownPrefabs = sdb.grownPrefabs;
+
+				piece.m_resources[0].m_resItem = prefabRefs[sdb.resource].GetComponent<ItemDrop>();
+				piece.m_resources[0].m_amount = sdb.resourceCost;
+
 				if (config.DisabledResourceNames.Contains(sdb.key))
 				{
 					Dbgl($"Resource disabled: {sdb.key}");
 					sdb.enabled = false;
 				}
-
-				Plant plant = sdb.Prefab.GetComponent<Plant>();
-				Piece piece = sdb.Prefab.GetComponent<Piece>();
-
-				plant.m_growTime = plant.m_growTimeMax = sdb.growTime;
-				plant.m_grownPrefabs = sdb.grownPrefabs;
-				plant.m_minScale = sdb.minScale;
-				plant.m_maxScale = sdb.maxScale;
-				plant.m_growRadius = sdb.growRadius;
-
-				piece.m_resources[0].m_resItem = prefabRefs[sdb.resource].GetComponent<ItemDrop>();
-				piece.m_resources[0].m_amount = sdb.resourceCost;
-
-				piece.m_onlyInBiome = plant.m_biome = sdb.biome;
-				plant.m_destroyIfCantGrow = piece.m_groundOnly = !config.PlaceAnywhere;
 
 				if (saplingsInitialized) continue;
 
@@ -642,57 +635,67 @@ namespace Advize_PlantEverything
 				foreach (string parent in p)
 					sdb.Prefab.transform.Find(parent).GetComponent<MeshFilter>().mesh = t.Find("Birch_Sapling").GetComponent<MeshFilter>().mesh;
 
-				if (sdb.source.StartsWith("Swamp"))
+				switch (sdb.source)
 				{
-					Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("swamptree1").GetComponent<MeshRenderer>().sharedMaterials[0] };
-					m[0].shader = Shader.Find("Custom/Piece");
-
-					foreach (string parent in p)
-						sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m;
-				}
-				else if (sdb.source.StartsWith("Ygga"))
-				{
-					string[] foliage = { "birchleafs002", "birchleafs003", "birchleafs008", "birchleafs009", "birchleafs010", "birchleafs011" };
-					Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("beech").GetComponent<MeshRenderer>().sharedMaterials[0] };
-					Material[] m2 = new Material[] { prefabRefs[sdb.source].transform.Find("beech").GetComponent<MeshRenderer>().sharedMaterials[1] };
-
-					foreach (string parent in p)
-						sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m2;
-
-					foreach (string child in foliage)
+					case "YggaShoot_small1":
 					{
+						string[] foliage = { "birchleafs002", "birchleafs003", "birchleafs008", "birchleafs009", "birchleafs010", "birchleafs011" };
+						Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("beech").GetComponent<MeshRenderer>().sharedMaterials[0] };
+						Material[] m2 = new Material[] { prefabRefs[sdb.source].transform.Find("beech").GetComponent<MeshRenderer>().sharedMaterials[1] };
+
 						foreach (string parent in p)
+							sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m2;
+
+						foreach (string child in foliage)
 						{
-							sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshFilter>().mesh = t.Find(child).GetComponent<MeshFilter>().mesh;
-							sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshRenderer>().sharedMaterials = m;
+							foreach (string parent in p)
+							{
+								sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshFilter>().mesh = t.Find(child).GetComponent<MeshFilter>().mesh;
+								sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshRenderer>().sharedMaterials = m;
+							}
 						}
 					}
-				}
-				else if (sdb.source.StartsWith("Birch"))
-				{
-					string[] foliage = { "birchleafs002", "birchleafs003", "birchleafs008", "birchleafs009", "birchleafs010", "birchleafs011" };
-					Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("Lod0").GetComponent<MeshRenderer>().sharedMaterials[0] };
-					Material[] m2 = new Material[] { t.Find("Birch_Sapling").GetComponent<MeshRenderer>().sharedMaterials[0] };
+					break;
 
-					foreach (string parent in p)
-						sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m2;
-
-					foreach (string child in foliage)
-					{
-						foreach (string parent in p)
+					case "SwampTree1":
 						{
-							sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshFilter>().mesh = t.Find(child).GetComponent<MeshFilter>().mesh;
-							sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshRenderer>().sharedMaterials = m;
+							Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("swamptree1").GetComponent<MeshRenderer>().sharedMaterials[0] };
+							m[0].shader = Shader.Find("Custom/Piece");
+
+							foreach (string parent in p)
+								sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m;
 						}
-					}
+						
+						break;
+
+					case "Birch1_aut":
+						{
+							string[] foliage = { "birchleafs002", "birchleafs003", "birchleafs008", "birchleafs009", "birchleafs010", "birchleafs011" };
+							Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("Lod0").GetComponent<MeshRenderer>().sharedMaterials[0] };
+							Material[] m2 = new Material[] { t.Find("Birch_Sapling").GetComponent<MeshRenderer>().sharedMaterials[0] };
+
+							foreach (string parent in p)
+								sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m2;
+
+							foreach (string child in foliage)
+							{
+								foreach (string parent in p)
+								{
+									sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshFilter>().mesh = t.Find(child).GetComponent<MeshFilter>().mesh;
+									sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshRenderer>().sharedMaterials = m;
+								}
+							}
+						}
+						
+						break;
 				}
 
 				piece.m_icon = sdb.icon ? CreateSprite($"{sdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : piece.m_resources[0].m_resItem.m_itemData.GetIcon();
 
 				piece.m_placeEffect.m_effectPrefabs[0].m_prefab = prefabRefs["vfx_Place_wood_pole"];
 				piece.m_placeEffect.m_effectPrefabs[1].m_prefab = prefabRefs["sfx_build_cultivator"];
-				sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[0].m_prefab = prefabRefs["Birch_Sapling"].GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[0].m_prefab;
-				sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab = prefabRefs["Birch_Sapling"].GetComponent<Destructible>().m_hitEffect.m_effectPrefabs[1].m_prefab;
+
+				sdb.Prefab.GetComponent<Destructible>().m_hitEffect.m_effectPrefabs = prefabRefs["Birch_Sapling"].GetComponent<Destructible>().m_hitEffect.m_effectPrefabs;
 			}
 
 			saplingsInitialized = true;
