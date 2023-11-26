@@ -233,29 +233,6 @@ namespace Advize_PlantEverything
 			}
 		}
 
-		[HarmonyPatch(typeof(Plant), nameof(Plant.Awake))]
-		public static class PlantAwake
-		{
-			public static void Postfix(Plant __instance)
-			{
-				if (!config.EnforceBiomesVanilla)
-				{
-					__instance.m_biome = (Heightmap.Biome)895/*StaticContent.AllBiomes*/;
-				}
-
-				if (config.EnableCropOverrides && __instance.name.StartsWith("sapling_"))
-				{
-					__instance.m_minScale = config.CropMinScale;
-					__instance.m_maxScale = config.CropMaxScale;
-					__instance.m_growTime = config.CropGrowTimeMin;
-					__instance.m_growTimeMax = config.CropGrowTimeMax;
-					__instance.m_growRadius = config.CropGrowRadius;
-					__instance.m_needCultivatedGround = config.CropRequireCultivation;
-					__instance.GetComponent<Piece>().m_cultivatedGroundOnly = config.CropRequireCultivation;
-				}
-			}
-		}
-
 		[HarmonyPatch(typeof(Plant), nameof(Plant.HaveRoof))]
 		public static class PlantHaveRoof
 		{
