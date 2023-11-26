@@ -862,6 +862,7 @@ namespace Advize_PlantEverything
 			Dbgl("Config setting changed, re-initializing saplings");
 			InitSaplingRefs();
 			InitSaplings();
+			InitCultivator();
 		}
 
 		internal static void SeedSettingChanged(object o, EventArgs e)
