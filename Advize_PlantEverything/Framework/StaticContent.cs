@@ -466,10 +466,10 @@ namespace Advize_PlantEverything.Framework
 				new SaplingDB
 				{
 					key = "Ygga_Sapling",
+					biome = Config.EnforceBiomes ? TemperateBiomes | Heightmap.Biome.Mistlands : AllBiomes,
 					source = "YggaShoot_small1",
 					resource = "Sap",
 					resourceCost = 1,
-					biome = Config.EnforceBiomes ? TemperateBiomes | Heightmap.Biome.Mistlands : AllBiomes,
 					icon = true,
 					growTime = Config.YggaGrowthTime,
 					growRadius = Config.YggaGrowRadius,
@@ -480,10 +480,10 @@ namespace Advize_PlantEverything.Framework
 				new SaplingDB
 				{
 					key = "Ancient_Sapling",
+					biome = Config.EnforceBiomes ? TemperateBiomes | Heightmap.Biome.Swamp : AllBiomes,
 					source = "SwampTree1",
 					resource = "AncientSeed",
 					resourceCost = 1,
-					biome = Config.EnforceBiomes ? TemperateBiomes | Heightmap.Biome.Swamp : AllBiomes,
 					icon = true,
 					growTime = Config.AncientGrowthTime,
 					growRadius = Config.AncientGrowRadius,
@@ -494,10 +494,10 @@ namespace Advize_PlantEverything.Framework
 				new SaplingDB
 				{
 					key = "Autumn_Birch_Sapling",
+					biome = Config.EnforceBiomes ? TemperateBiomes : AllBiomes,
 					source = "Birch1_aut",
 					resource = "BirchSeeds",
 					resourceCost = 1,
-					biome = Config.EnforceBiomes ? TemperateBiomes : AllBiomes,
 					icon = true,
 					growTime = Config.AutumnBirchGrowthTime,
 					growRadius = Config.AutumnBirchGrowRadius,
@@ -515,6 +515,7 @@ namespace Advize_PlantEverything.Framework
 				new SaplingDB
 				{
 					key = "Beech_Sapling",
+					biome = Config.EnforceBiomesVanilla ? TemperateBiomes : AllBiomes,
 					growTime = Config.BeechGrowthTime,
 					growRadius = Config.BeechGrowRadius,
 					minScale = Config.BeechMinScale,
@@ -523,6 +524,7 @@ namespace Advize_PlantEverything.Framework
 				new SaplingDB
 				{
 					key = "PineTree_Sapling",
+					biome = Config.EnforceBiomesVanilla ? TemperateBiomes : AllBiomes,
 					growTime = Config.PineGrowthTime,
 					growRadius = Config.PineGrowRadius,
 					minScale = Config.PineMinScale,
@@ -531,6 +533,7 @@ namespace Advize_PlantEverything.Framework
 				new SaplingDB
 				{
 					key = "FirTree_Sapling",
+					biome = Config.EnforceBiomesVanilla ? TemperateBiomes | Heightmap.Biome.Mountain : AllBiomes,
 					growTime = Config.FirGrowthTime,
 					growRadius = Config.FirGrowRadius,
 					minScale = Config.FirMinScale,
@@ -539,6 +542,7 @@ namespace Advize_PlantEverything.Framework
 				new SaplingDB
 				{
 					key = "Birch_Sapling",
+					biome = Config.EnforceBiomesVanilla ? TemperateBiomes : AllBiomes,
 					growTime = Config.BirchGrowthTime,
 					growRadius = Config.BirchGrowRadius,
 					minScale = Config.BirchMinScale,
@@ -547,6 +551,7 @@ namespace Advize_PlantEverything.Framework
 				new SaplingDB
 				{
 					key = "Oak_Sapling",
+					biome = Config.EnforceBiomesVanilla ? TemperateBiomes : AllBiomes,
 					growTime = Config.OakGrowthTime,
 					growRadius = Config.OakGrowRadius,
 					minScale = Config.OakMinScale,
@@ -558,60 +563,70 @@ namespace Advize_PlantEverything.Framework
 		internal static List<PrefabDB> GenerateCropRefs()
 		{
 			bool overridesEnabled = Config.EnableCropOverrides;
+			bool enforceBiomesVanilla = Config.EnforceBiomesVanilla;
 
 			return new()
 			{
 				new PrefabDB
 				{
 					key = "sapling_barley",
+					biome = enforceBiomesVanilla ? Heightmap.Biome.Plains : AllBiomes,
 					resourceCost = overridesEnabled ? Config.BarleyCost : 1,
 					resourceReturn = overridesEnabled ? Config.BarleyReturn : 2
 				},
 				new PrefabDB
 				{
 					key = "sapling_carrot",
+					biome = enforceBiomesVanilla ? TemperateBiomes : AllBiomes,
 					resourceCost = overridesEnabled ? Config.CarrotCost : 1,
 					resourceReturn = overridesEnabled ? Config.CarrotReturn : 1
 				},
 				new PrefabDB
 				{
 					key = "sapling_flax",
+					biome = enforceBiomesVanilla ? Heightmap.Biome.Plains : AllBiomes,
 					resourceCost = overridesEnabled ? Config.FlaxCost : 1,
 					resourceReturn = overridesEnabled ? Config.FlaxReturn : 2
 				},
 				new PrefabDB
 				{
 					key = "sapling_onion",
+					biome = enforceBiomesVanilla ? TemperateBiomes : AllBiomes,
 					resourceCost = overridesEnabled ? Config.OnionCost : 1,
 					resourceReturn = overridesEnabled ? Config.OnionReturn : 1
 				},
 				new PrefabDB
 				{
 					key = "sapling_seedcarrot",
+					biome = enforceBiomesVanilla ? TemperateBiomes : AllBiomes,
 					resourceCost = overridesEnabled ? Config.SeedCarrotCost : 1,
 					resourceReturn = overridesEnabled ? Config.SeedCarrotReturn : 3
 				},
 				new PrefabDB
 				{
 					key = "sapling_seedonion",
+					biome = enforceBiomesVanilla ? TemperateBiomes : AllBiomes,
 					resourceCost = overridesEnabled ? Config.SeedOnionCost : 1,
 					resourceReturn = overridesEnabled ? Config.SeedOnionReturn : 3
 				},
 				new PrefabDB
 				{
 					key = "sapling_seedturnip",
+					biome = enforceBiomesVanilla ? TemperateBiomes | Heightmap.Biome.Swamp | Heightmap.Biome.Mistlands : AllBiomes,
 					resourceCost = overridesEnabled ? Config.SeedTurnipCost : 1,
 					resourceReturn = overridesEnabled ? Config.SeedTurnipReturn : 3
 				},
 				new PrefabDB
 				{
 					key = "sapling_turnip",
+					biome = enforceBiomesVanilla ? TemperateBiomes | Heightmap.Biome.Swamp | Heightmap.Biome.Mistlands : AllBiomes,
 					resourceCost = overridesEnabled ? Config.TurnipCost : 1,
 					resourceReturn = overridesEnabled ? Config.TurnipReturn : 1
 				},
 				new PrefabDB
 				{
 					key = "sapling_magecap",
+					biome = enforceBiomesVanilla ? Heightmap.Biome.Mistlands : AllBiomes,
 					resourceCost = overridesEnabled ? Config.MagecapCost : 1,
 					resourceReturn = overridesEnabled ? Config.MagecapReturn : 1,
 					extraDrops = true
@@ -619,6 +634,7 @@ namespace Advize_PlantEverything.Framework
 				new PrefabDB
 				{
 					key = "sapling_jotunpuffs",
+					biome = enforceBiomesVanilla ? Heightmap.Biome.Mistlands : AllBiomes,
 					resourceCost = overridesEnabled ? Config.JotunPuffsCost : 1,
 					resourceReturn = overridesEnabled ? Config.JotunPuffsReturn : 1,
 					extraDrops = true
