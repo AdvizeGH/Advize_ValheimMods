@@ -17,7 +17,7 @@ namespace Advize_PlantEverything
 	{
 		public const string PluginID = "advize.PlantEverything";
 		public const string PluginName = "PlantEverything";
-		public const string Version = "1.16.0";
+		public const string Version = "1.16.1";
 
 		private readonly Harmony harmony = new(PluginID);
 		public static ManualLogSource PELogger = new($" {PluginName}");
@@ -750,10 +750,7 @@ namespace Advize_PlantEverything
 				piece.m_resources[0].m_amount = pdb.resourceCost;
 				piece.m_primaryTarget = piece.m_randomTarget = config.EnemiesTargetCrops;
 
-				plant.m_destroyIfCantGrow = piece.m_groundOnly = !config.PlaceAnywhere;
-
-				if (!config.EnforceBiomesVanilla)
-					plant.m_biome = StaticContent.AllBiomes;
+				plant.m_biome = pdb.biome;
 
 				plant.m_minScale = overridesEnabled ? config.CropMinScale : 0.9f;
 				plant.m_maxScale = overridesEnabled ? config.CropMaxScale : 1.1f;
