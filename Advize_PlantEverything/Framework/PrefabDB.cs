@@ -14,10 +14,7 @@ namespace Advize_PlantEverything.Framework
 		internal bool icon;
 		internal bool enabled = true;
 
-		internal GameObject Prefab
-		{
-			get { return PlantEverything.prefabRefs[key]; }
-		}
+		internal GameObject Prefab => PlantEverything.prefabRefs[key];
 	}
 
 	internal sealed class PieceDB : PrefabDB

@@ -288,6 +288,10 @@ namespace Advize_PlantEverything
 
 		private static bool IsModdedPrefab(Component c) => c && prefabRefs.ContainsKey(GetPrefabName(c));
 
+		private static bool IsModdedPrefabOrSapling(Piece p) => p.m_name.StartsWith("$pe") || p.m_name.EndsWith("_sapling");
+
+		private static bool IsModdedPrefabOrSapling(Plant p) => p.m_name.StartsWith("$pe") || p.m_name.EndsWith("_sapling");
+
 		internal static Piece CreatePiece(PieceDB pdb)
 		{
 			Piece piece = GetOrAddPieceComponent(prefabRefs[pdb.key]);

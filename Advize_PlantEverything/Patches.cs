@@ -31,20 +31,7 @@ namespace Advize_PlantEverything
 		[HarmonyPatch(typeof(Player), nameof(Player.CheckCanRemovePiece))]
 		public static class PlayerCheckCanRemovePiece
 		{
-			private static bool Prefix(Player __instance, Piece piece, ref bool __result)
-			{
-				// check if the piece exists and if the mod has modified it
-				if (IsModdedPrefab(piece))
-				{
-					// is piece from mod, so prevent deconstruction unless it is with the cultivator.
-					if (__instance.GetRightItem().m_shared.m_name != "$item_cultivator")
-					{
-						return __result = false;
-					}
-				}
-
-				return true;
-			}
+			private static bool Prefix(Piece piece, ref bool __result) => !IsModdedPrefab(piece) || (__result = false);
 		}
 
 		[HarmonyPatch(typeof(Piece), nameof(Piece.DropResources))]
@@ -53,21 +40,10 @@ namespace Advize_PlantEverything
 			internal static void Prefix(Piece __instance, out Piece.Requirement[] __state)
 			{
 				__state = null;
-				if (!config.RecoverResources) return;
+				if (!config.RecoverResources || !IsModdedPrefab(__instance) || !__instance.TryGetComponent(out Pickable pickable)) return;
 
-				// Only interact if it is a piece that is modified by the mod
-				if (IsModdedPrefab(__instance))
-				{
-					// If piece has a pickable component then adjust resource drops
-					// to prevent infinite item exploits by placing a pickable,
-					// picking it, and then deconstructing it to get extra items.
-					Pickable pickable = __instance.GetComponent<Pickable>();
-					if (pickable)
-					{
-						__state = __instance.m_resources;
-						__instance.m_resources = RemovePickableDropFromRequirements(__instance.m_resources, pickable);
-					}
-				}
+				__state = __instance.m_resources;
+				__instance.m_resources = RemovePickableDropFromRequirements(__instance.m_resources, pickable);
 			}
 
 			internal static void Postfix(Piece __instance, Piece.Requirement[] __state)
@@ -86,11 +62,11 @@ namespace Advize_PlantEverything
 				// Check if pickable is included in piece build requirements
 				for (int i = 0; i < requirements.Length; i++)
 				{
-					var req = requirements[i];
+					Piece.Requirement req = requirements[i];
 					if (req.m_resItem.m_itemData.m_shared.m_name == pickableDrop.m_shared.m_name)
 					{
 						// Make a copy before altering drops
-						var pickedRequirements = new Piece.Requirement[requirements.Length];
+						Piece.Requirement[] pickedRequirements = new Piece.Requirement[requirements.Length];
 						requirements.CopyTo(pickedRequirements, 0);
 
 						// Get amount returned on picking based on world modifiers
@@ -189,7 +165,7 @@ namespace Advize_PlantEverything
 		{
 			public static void Postfix(Piece __instance)
 			{
-				if (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling"))
+				if (IsModdedPrefabOrSapling(__instance))
 				{
 					ZNetView znv = __instance.GetComponent<ZNetView>();
 
@@ -238,7 +214,7 @@ namespace Advize_PlantEverything
 		{
 			public static bool Prefix(Plant __instance, ref bool __result)
 			{
-				if ((!config.CropRequireSunlight && __instance.m_name.StartsWith("$piece_sapling")) || (config.PlaceAnywhere && (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling"))))
+				if ((!config.CropRequireSunlight && __instance.m_name.StartsWith("$piece_sapling")) || (config.PlaceAnywhere && IsModdedPrefabOrSapling(__instance)))
 					return __result = false;
 
 				return true;
@@ -250,7 +226,7 @@ namespace Advize_PlantEverything
 		{
 			public static bool Prefix(Plant __instance, ref bool __result)
 			{
-				if ((!config.CropRequireGrowthSpace && __instance.m_name.StartsWith("$piece_sapling")) || (config.PlaceAnywhere && (__instance.m_name.StartsWith("$pe") || __instance.m_name.EndsWith("_sapling"))))
+				if ((!config.CropRequireGrowthSpace && __instance.m_name.StartsWith("$piece_sapling")) || (config.PlaceAnywhere && IsModdedPrefabOrSapling(__instance)))
 				{
 					__result = true;
 					return false;
