@@ -171,10 +171,7 @@ namespace Advize_PlantEverything.Configuration
 		private readonly List<ConfigurationManagerAttributes> cropSettingAttributes = new()
 		{
 			{ new() },
-			{ new ConfigurationManagerAttributes { Order = 27 } },
-			{ new ConfigurationManagerAttributes { Order = 26 } },
-			{ new ConfigurationManagerAttributes { Order = 25 } },
-			{ new ConfigurationManagerAttributes { Order = 24 } }
+			{ new() { Order = 27 } }
 		};
 
 		internal ModConfig(ConfigFile configFile, ConfigSync configSync)
@@ -365,17 +362,17 @@ namespace Advize_PlantEverything.Configuration
 				"Crops",
 				"CropsRequireSunlight",
 				true,
-				new ConfigDescription("Crops can only grow under an open sky.", null, cropSettingAttributes[2]));
+				new ConfigDescription("Crops can only grow under an open sky.", null, cropSettingAttributes[1]));
 			cropRequireGrowthSpace = Config(
 				"Crops",
 				"CropsRequireGrowthSpace",
 				true,
-				new ConfigDescription("Crops require space to grow. This setting overrides the CropGrowRadius setting but without altering it, allowing grid spacing mods to continue functioning.", null, cropSettingAttributes[3]));
+				new ConfigDescription("Crops require space to grow. This setting overrides the CropGrowRadius setting but without altering it, allowing grid spacing mods to continue functioning.", null, cropSettingAttributes[1]));
 			enemiesTargetCrops = Config(
 				"Crops",
 				"EnemiesTargetCrops",
 				true,
-				new ConfigDescription("Determines whether enemies will target and attack crops. If this setting is changed, pre-existing placed crops will not be affected until the world/server is reloaded.", null, cropSettingAttributes[4]));
+				new ConfigDescription("Determines whether enemies will target and attack crops. If this setting is changed, pre-existing placed crops will not be affected until the world/server is reloaded.", null, cropSettingAttributes[1]));
 			barleyCost = Config(
 				"Crops",
 				"BarleyCost",
