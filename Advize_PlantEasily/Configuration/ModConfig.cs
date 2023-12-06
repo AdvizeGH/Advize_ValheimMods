@@ -64,6 +64,7 @@ namespace Advize_PlantEasily.Configuration
         internal ModConfig(ConfigFile configFile)
         {
             Config = configFile;
+            configFile.SaveOnConfigSet = false;
 
             //General
             enableDebugMessages = Config.Bind("General", "EnableDebugMessages", false, "Enable mod debug messages in console.");
@@ -153,6 +154,9 @@ namespace Advize_PlantEasily.Configuration
             costDisplayStyle = Config.Bind("UI", "CostDisplayStyle", CostDisplayStyle.TotalCount, "Determines display style of the ShowCost setting. TotalCount shows total number of pieces to be placed. FullCost shows combined resoure cost of all pieces.");
             costDisplayLocation = Config.Bind("UI", "CostDisplayLocation", CostDisplayLocation.RightSide, "Determines whether to prepend or append text to the resource cost in build UI. LeftSide or RightSide will prepend or append respectively.");
 
+            configFile.Save();
+            configFile.SaveOnConfigSet = true;
+            
             rows.SettingChanged += PlantEasily.GridSizeChanged;
             columns.SettingChanged += PlantEasily.GridSizeChanged;
         }
