@@ -80,7 +80,7 @@ namespace Advize_Spyglass
             }
         }
 
-		[HarmonyPatch(typeof(GameCamera), nameof(GameCamera.UpdateCamera))]
+        [HarmonyPatch(typeof(GameCamera), nameof(GameCamera.UpdateCamera))]
         public static class GameCameraUpdateCamera
         {
             [HarmonyPriority(Priority.Last)]
@@ -92,7 +92,7 @@ namespace Advize_Spyglass
             [HarmonyAfter(new string[] { "Azumatt.FirstPersonMode" })]
             public static void Postfix(ref GameCamera __instance)
             {
-				if (!isZooming) return;
+                if (!isZooming) return;
 
                 Vector3 scopeLevel = Vector3.forward * zoomLevel * config.ZoomMultiplier;
                 Vector3 difference = __instance.transform.TransformVector(scopeLevel);
