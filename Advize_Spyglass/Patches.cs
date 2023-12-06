@@ -35,7 +35,8 @@ namespace Advize_Spyglass
                 if (!__instance.m_items.Contains(prefab))
                 {
                     __instance.m_items.Add(prefab);
-                    __instance.UpdateItemHashes();
+                    __instance.m_itemByHash.Add(prefab.name.GetStableHashCode(), prefab);
+                    //__instance.UpdateItemHashes();
                 }
                 if (!__instance.m_recipes.Contains(recipe)) AddRecipe(__instance);
             }
@@ -61,32 +62,25 @@ namespace Advize_Spyglass
         [HarmonyPatch(typeof(Player), "Update")]
         public static class PlayerUpdate
         {
-            public static void Postfix()
+            public static void Postfix(Player __instance)
             {
-                if (!GameCamera.m_instance) return;
-
-                if (isZooming && (!IsSpyglassEquipped() || ZInput.GetButtonDown("Attack") || config.RemoveZoomKey.IsDown()))
+                if (isZooming && (!IsSpyglassEquipped(__instance) || ZInput.GetButtonDown("Attack") || config.RemoveZoomKey.IsDown()))
                 {
                     StopZoom();
+                    return;
                 }
 
-                if (InventoryGui.IsVisible()) return;
+                if (!IsSpyglassEquipped(__instance) || InventoryGui.IsVisible()) return;
 
-                if(IsSpyglassEquipped())
-                {
-                    if (config.IncreaseZoomKey.IsDown())
-                    {
-                        ChangeZoom(1);
-                    }
-                    if (config.DecreaseZoomModifierKey.IsDown())
-                    {
-                        ChangeZoom(-1);
-                    }
-                }
+                if (config.IncreaseZoomKey.IsDown())
+                    ChangeZoom(1);
+
+                if (config.DecreaseZoomModifierKey.IsDown())
+                    ChangeZoom(-1);
             }
         }
 
-        [HarmonyPatch(typeof(GameCamera), "UpdateCamera")]
+		[HarmonyPatch(typeof(GameCamera), nameof(GameCamera.UpdateCamera))]
         public static class GameCameraUpdateCamera
         {
             [HarmonyPriority(Priority.Last)]

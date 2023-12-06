@@ -273,7 +273,7 @@ namespace Advize_Spyglass
             Dbgl($"StopZoom() fov is now {GameCamera.m_instance.m_fov}");
         }
 
-        private static bool IsSpyglassEquipped() => Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$csSpyglassName";
+        private static bool IsSpyglassEquipped(Player player) => player.GetRightItem()?.m_shared.m_name == "$csSpyglassName";
 
         internal static void Dbgl(string message, bool forceLog = false, bool logError = false)
         {
