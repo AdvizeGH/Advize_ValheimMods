@@ -31,6 +31,7 @@ namespace Advize_Spyglass
 
         private static AssetBundle assetBundle;
         private static readonly Dictionary<string, Texture2D> cachedTextures = new();
+        private static readonly Dictionary<Texture2D, Sprite> cachedSprites = new();
 
         private static ModConfig config;
 
@@ -123,8 +124,19 @@ namespace Advize_Spyglass
         {
             try
             {
+                Sprite result;
                 Texture2D texture = LoadTexture(fileName);
-                return Sprite.Create(texture, spriteSection, Vector2.zero);
+
+                if (cachedSprites.ContainsKey(texture))
+                {
+                    result = cachedSprites[texture];
+                }
+                else
+                {
+                    result = Sprite.Create(texture, spriteSection, Vector2.zero);
+                    cachedSprites.Add(texture, result);
+                }
+                return result;
             }
             catch
             {
@@ -136,9 +148,9 @@ namespace Advize_Spyglass
 
         private static Texture2D LoadTexture(string fileName)
         {
-            bool textureLoaded = cachedTextures.ContainsKey(fileName);
             Texture2D result;
-            if (textureLoaded)
+
+            if (cachedTextures.ContainsKey(fileName))
             {
                 result = cachedTextures[fileName];
             }
@@ -150,6 +162,7 @@ namespace Advize_Spyglass
                 Texture2D texture = new(0, 0);
                 ImageConversion.LoadImage(texture, array);
                 result = texture;
+                cachedTextures.Add(fileName, result);
             }
 
             return result;
