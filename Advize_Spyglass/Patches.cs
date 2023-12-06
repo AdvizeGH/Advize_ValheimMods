@@ -95,16 +95,14 @@ namespace Advize_Spyglass
                 if (!isZooming) return;
 
                 Vector3 scopeLevel = Vector3.forward * zoomLevel * config.ZoomMultiplier;
-                Vector3 difference = __instance.transform.TransformVector(scopeLevel);
 
                 // Try to prevent zooming through things
-                if (Physics.Raycast(__instance.transform.position, __instance.transform.forward, out var hitInfo, difference.magnitude, __instance.m_blockCameraMask))
+                if (Physics.Raycast(__instance.transform.position, __instance.transform.forward, out var hitInfo, scopeLevel.magnitude, __instance.m_blockCameraMask))
                 {
-                    scopeLevel = Vector3.forward * Vector3.Distance(hitInfo.point, __instance.transform.position) * 0.9f;
-                    difference = __instance.transform.TransformVector(scopeLevel);
+                    scopeLevel = Vector3.forward * Vector3.Distance(hitInfo.point, __instance.transform.position) * 0.75f;
                 }
 
-                __instance.transform.position += difference;
+                __instance.transform.position += __instance.transform.TransformVector(scopeLevel);
 
                 // Keep camera above the ground hopefully
                 if (ZoneSystem.instance.GetGroundHeight(__instance.transform.position, out float num) && __instance.transform.position.y < num +1f)
