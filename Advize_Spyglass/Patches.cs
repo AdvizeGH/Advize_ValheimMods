@@ -75,7 +75,7 @@ namespace Advize_Spyglass
                 if (config.IncreaseZoomKey.IsDown())
                     ChangeZoom(1);
 
-                if (config.DecreaseZoomModifierKey.IsDown())
+                if (config.DecreaseZoomKey.IsDown())
                     ChangeZoom(-1);
             }
         }

@@ -1,5 +1,5 @@
 ﻿using BepInEx.Configuration;
-//using ServerSync;
+using ServerSync;
 using UnityEngine;
 
 namespace Advize_Spyglass.Configuration
@@ -7,17 +7,17 @@ namespace Advize_Spyglass.Configuration
     class ModConfig
     {
         private readonly ConfigFile ConfigFile;
-        //private readonly ConfigSync ConfigSync;
+        private readonly ConfigSync ConfigSync;
 
         //General
-        //private readonly ConfigEntry<bool> serverConfigLocked;
+        private readonly ConfigEntry<bool> serverConfigLocked;
         private readonly ConfigEntry<bool> enableLocalization;
         //Spyglass
         private readonly ConfigEntry<float> fovReductionFactor;
         private readonly ConfigEntry<float> zoomMultiplier;
         //Controls
         private readonly ConfigEntry<KeyboardShortcut> increaseZoomKey;
-        private readonly ConfigEntry<KeyboardShortcut> decreaseZoomModifierKey;
+        private readonly ConfigEntry<KeyboardShortcut> decreaseZoomKey;
         private readonly ConfigEntry<KeyboardShortcut> removeZoomKey;
         //Troubleshooting
         private readonly ConfigEntry<bool> enableDebugMessages;
@@ -26,23 +26,24 @@ namespace Advize_Spyglass.Configuration
         {
             ConfigEntry<T> configEntry = ConfigFile.Bind(group, name, value, description);
 
-            //SyncedConfigEntry<T> syncedConfigEntry = ConfigSync.AddConfigEntry(configEntry);
-            //syncedConfigEntry.SynchronizedConfig = synchronizedSetting;
+            SyncedConfigEntry<T> syncedConfigEntry = ConfigSync.AddConfigEntry(configEntry);
+            syncedConfigEntry.SynchronizedConfig = synchronizedSetting;
 
             return configEntry;
         }
 
         private ConfigEntry<T> Config<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => Config(group, name, value, new ConfigDescription(description), synchronizedSetting);
 
-        internal ModConfig(ConfigFile configFile/*, ConfigSync configSync*/)
+        internal ModConfig(ConfigFile configFile, ConfigSync configSync)
         {
-            ConfigFile = configFile;/* ConfigSync = configSync;*/
+            ConfigFile = configFile; ConfigSync = configSync;
+            configFile.SaveOnConfigSet = false;
 
-            //serverConfigLocked = Config(
-            //    "General",
-            //    "Lock Configuration",
-            //    false,
-            //    "If on, the configuration is locked and can be changed by server admins only.");
+            serverConfigLocked = Config(
+                "General",
+                "Lock Configuration",
+                true,
+                "If on, the configuration is locked and can be changed by server admins only.");
             enableLocalization = Config(
                 "General",
                 "EnableLocalization",
@@ -68,9 +69,9 @@ namespace Advize_Spyglass.Configuration
                     null,
                     new ConfigurationManagerAttributes { Description = "Keyboard shortcut to increase zoom level." }),
                 false);
-            decreaseZoomModifierKey = Config(
+            decreaseZoomKey = Config(
                 "Controls",
-                "DecreaseZoomModifierKey",
+                "DecreaseZoomKey",
                 new KeyboardShortcut(KeyCode.Mouse1, KeyCode.LeftShift),
                 new ConfigDescription(
                     "Keyboard shortcut to decrease zoom level. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
@@ -90,39 +91,22 @@ namespace Advize_Spyglass.Configuration
                 "Troubleshooting",
                 "EnableDebugMessages",
                 false,
-                "Enable mod debug messages in console.", false);
+                "Enable mod debug messages in console.",
+                false);
 
-            //configSync.AddLockingConfigEntry(serverConfigLocked);
+            configFile.Save();
+            configFile.SaveOnConfigSet = true;
+
+            configSync.AddLockingConfigEntry(serverConfigLocked);
         }
 
-        internal bool EnableLocalization
-        {
-            get { return enableLocalization.Value; }
-        }
-        internal bool EnableDebugMessages
-        {
-            get { return enableDebugMessages.Value; }
-        }
-        internal float FovReductionFactor
-        {
-            get { return fovReductionFactor.Value; }
-        }
-        internal float ZoomMultiplier
-        {
-            get { return zoomMultiplier.Value; }
-        }
-        internal KeyboardShortcut IncreaseZoomKey
-        {
-            get { return increaseZoomKey.Value; }
-        }
-        internal KeyboardShortcut DecreaseZoomModifierKey
-        {
-            get { return decreaseZoomModifierKey.Value; }
-        }
-        internal KeyboardShortcut RemoveZoomKey
-        {
-            get { return removeZoomKey.Value; }
-        }
+        internal bool EnableLocalization => enableLocalization.Value;
+        internal bool EnableDebugMessages => enableDebugMessages.Value;
+        internal float FovReductionFactor => fovReductionFactor.Value;
+        internal float ZoomMultiplier => zoomMultiplier.Value;
+        internal KeyboardShortcut IncreaseZoomKey => increaseZoomKey.Value;
+        internal KeyboardShortcut DecreaseZoomKey => decreaseZoomKey.Value;
+        internal KeyboardShortcut RemoveZoomKey => removeZoomKey.Value;
 #nullable enable
         internal class ConfigurationManagerAttributes
         {
