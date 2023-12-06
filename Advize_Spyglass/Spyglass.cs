@@ -29,7 +29,6 @@ namespace Advize_Spyglass
         private static float currentFov;
         private static bool isZooming;
 
-        private static readonly string modDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static AssetBundle assetBundle;
         private static readonly Dictionary<string, Texture2D> cachedTextures = new();
 
@@ -52,10 +51,20 @@ namespace Advize_Spyglass
             harmony.PatchAll();
         }
 
+        private static string ModConfigDirectory()
+        {
+            string path = Path.Combine(Paths.ConfigPath, "Spyglass");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            return path;
+        }
+
         private void LoadLocalizedStrings()
         {
             string fileName = $"Advize_{PluginName}.json";
-            string filePath = Path.Combine(modDirectory, fileName);
+            string filePath = Path.Combine(ModConfigDirectory(), fileName);
 
             try
             {
@@ -81,7 +90,7 @@ namespace Advize_Spyglass
 
         private void SerializeDict()
         {
-            string filePath = Path.Combine(modDirectory, $"Advize_{PluginName}.json");
+            string filePath = Path.Combine(ModConfigDirectory(), $"Advize_{PluginName}.json");
 
             LocalizedStrings localizedStrings = new();
             foreach (KeyValuePair<string, string> kvp in stringDictionary)
