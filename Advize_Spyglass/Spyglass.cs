@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using Advize_Spyglass.Configuration;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
-using Advize_Spyglass.Configuration;
 
 namespace Advize_Spyglass
 {
@@ -54,7 +54,7 @@ namespace Advize_Spyglass
 
         private static string ModConfigDirectory()
         {
-            string path = Path.Combine(Paths.ConfigPath, "Spyglass");
+            string path = Path.Combine(Paths.ConfigPath, PluginName);
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);

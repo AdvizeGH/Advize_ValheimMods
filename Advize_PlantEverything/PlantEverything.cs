@@ -53,7 +53,7 @@ namespace Advize_PlantEverything
 
 		private static string ModConfigDirectory()
 		{
-			string path = Path.Combine(Paths.ConfigPath, "PlantEverything");
+			string path = Path.Combine(Paths.ConfigPath, PluginName);
 			if (!Directory.Exists(path))
 			{
 				Directory.CreateDirectory(path);

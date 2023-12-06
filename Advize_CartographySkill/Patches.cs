@@ -20,6 +20,8 @@ namespace Advize_CartographySkill
         [HarmonyPatch(typeof(Minimap), "Explore", new Type[] { typeof(int), typeof(int) })]
         public static class MinimapExplore
         {
+            private static int tileCount = 0;
+
             public static void Prefix(Minimap __instance)
             {
                 if (!Player.m_localPlayer || !config.EnableSkill) return;
@@ -27,33 +29,27 @@ namespace Advize_CartographySkill
                 float skillLevel = Player.m_localPlayer.GetSkillFactor((Skills.SkillType)SKILL_TYPE) * 100;
                 float newExploreRadius = config.BaseExploreRadius + (config.ExploreRadiusIncrease * skillLevel);
 
-                if (__instance.m_exploreRadius != newExploreRadius)
-                {
-                    Dbgl($"Previous explore radius was: {__instance.m_exploreRadius} new radius is: {newExploreRadius}");
-                    __instance.m_exploreRadius = newExploreRadius;
-                }
+                Dbgl($"Previous explore radius was: {__instance.m_exploreRadius} new radius is: {newExploreRadius}");
+                __instance.m_exploreRadius = newExploreRadius;
             }
 
             public static void Postfix(ref bool __result)
             {
-                if (!Player.m_localPlayer || !config.EnableSkill) return;
+                if (!Player.m_localPlayer || !config.EnableSkill || !__result) return;
+                //if Explore(int,int) (__result) returns true, it means we have discovered more of the world map
+                tileCount++;
 
-                //if Explore(int,int) returns true, it means we have discovered more of the world map
-                if (__result)
+                if (tileCount >= config.TilesDiscoveredForXPGain)
                 {
-                    tileCount++;
-                    if (tileCount >= config.TilesDiscoveredForXPGain)
+                    int num1 = tileCount / config.TilesDiscoveredForXPGain; // gets whole numbers
+                    int num2 = tileCount % config.TilesDiscoveredForXPGain; // gets remainder
+
+                    for (int i = 0; i < num1; i++)
                     {
-                        int num1 = tileCount / config.TilesDiscoveredForXPGain; // gets whole numbers
-                        int num2 = tileCount % config.TilesDiscoveredForXPGain; // gets remainder
-
-                        for (int i = 0; i < num1; i++)
-                        {
-                            Player.m_localPlayer.RaiseSkill((Skills.SkillType)SKILL_TYPE, config.SkillIncrease);
-                        }
-
-                        tileCount = num2;
+                        Player.m_localPlayer.RaiseSkill((Skills.SkillType)SKILL_TYPE, config.SkillIncrease);
                     }
+
+                    tileCount = num2;
                 }
             }
         }
@@ -74,15 +70,10 @@ namespace Advize_CartographySkill
         {
             public static void Postfix(Skills.SkillType type, ref Skills.SkillDef __result, List<Skills.SkillDef> ___m_skills)
             {
-                if (!config.EnableSkill) return;
-                if (__result == null)
-                {
-                    if ((int)type == SKILL_TYPE)
-                    {
-                        ___m_skills.Add(cartographySkill.skillDef);
-                        __result = cartographySkill.skillDef;
-                    }
-                }
+                if (!config.EnableSkill || __result != null || (int)type != SKILL_TYPE) return;
+                
+                ___m_skills.Add(cartographySkill.skillDef);
+                __result = cartographySkill.skillDef;
             }
         }
 
@@ -91,11 +82,9 @@ namespace Advize_CartographySkill
         {
             public static void Postfix(Skills.SkillType type, ref bool __result)
             {
-                if (!config.EnableSkill) return;
-                if (!__result)
-                {
-                    __result = (int)type == SKILL_TYPE;
-                }
+                if (!config.EnableSkill || __result) return;
+                
+                __result = (int)type == SKILL_TYPE;
             }
         }
 

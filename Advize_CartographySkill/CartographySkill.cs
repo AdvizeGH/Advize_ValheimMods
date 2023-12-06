@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
+﻿using Advize_CartographySkill.Configuration;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using UnityEngine;
-using Advize_CartographySkill.Configuration;
 
 namespace Advize_CartographySkill
 {
@@ -22,10 +22,8 @@ namespace Advize_CartographySkill
 
         private static CartographySkillDef cartographySkill;
 
-        private static int tileCount = 0;
-
-        private static readonly string modDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static readonly Dictionary<string, Texture2D> cachedTextures = new();
+        private static readonly Dictionary<Texture2D, Sprite> cachedSprites = new();
 
         private static ModConfig config;
 
@@ -45,10 +43,20 @@ namespace Advize_CartographySkill
             harmony.PatchAll();
         }
 
+        private static string ModConfigDirectory()
+        {
+            string path = Path.Combine(Paths.ConfigPath, PluginName);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            return path;
+        }
+
         private void LoadLocalizedStrings()
         {
             string fileName = $"Advize_{PluginName}.json";
-            string filePath = Path.Combine(modDirectory, fileName);
+            string filePath = Path.Combine(ModConfigDirectory(), fileName);
 
             try
             {
@@ -74,7 +82,7 @@ namespace Advize_CartographySkill
 
         private void SerializeDict()
         {
-            string filePath = Path.Combine(modDirectory, $"Advize_{PluginName}.json");
+            string filePath = Path.Combine(ModConfigDirectory(), $"Advize_{PluginName}.json");
 
             LocalizedStrings localizedStrings = new();
             foreach (KeyValuePair<string, string> kvp in stringDictionary)
@@ -102,8 +110,19 @@ namespace Advize_CartographySkill
         {
             try
             {
+                Sprite result;
                 Texture2D texture = LoadTexture(fileName);
-                return Sprite.Create(texture, spriteSection, Vector2.zero);
+
+                if (cachedSprites.ContainsKey(texture))
+                {
+                    result = cachedSprites[texture];
+                }
+                else
+                {
+                    result = Sprite.Create(texture, spriteSection, Vector2.zero);
+                    cachedSprites.Add(texture, result);
+                }
+                return result;
             }
             catch
             {
@@ -115,9 +134,9 @@ namespace Advize_CartographySkill
 
         private static Texture2D LoadTexture(string fileName)
         {
-            bool textureLoaded = cachedTextures.ContainsKey(fileName);
             Texture2D result;
-            if (textureLoaded)
+
+            if (cachedTextures.ContainsKey(fileName))
             {
                 result = cachedTextures[fileName];
             }
@@ -129,6 +148,7 @@ namespace Advize_CartographySkill
                 Texture2D texture = new(0, 0);
                 ImageConversion.LoadImage(texture, array);
                 result = texture;
+                cachedTextures.Add(fileName, result);
             }
 
             return result;

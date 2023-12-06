@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using HarmonyLib;
+using System.Collections.Generic;
 using System.Linq;
-using HarmonyLib;
 using TMPro;
 using UnityEngine;
 
@@ -314,48 +314,47 @@ namespace Advize_PlantEasily
             public static void Postfix(Player __instance, Piece piece, bool __state)
             {
                 //Dbgl("Player.PlacePiece Postfix" + $"\n __state is {__state}");
-                if (!config.ModActive || !piece || !IsPlantOrPickable(piece.gameObject) || !HoldingCultivator)
+                if (!config.ModActive || !__state || !piece || !IsPlantOrPickable(piece.gameObject) || !HoldingCultivator)
                     return;
                 //This doesn't apply to the root placement ghost.
-                if (__state)
+                __instance.m_placeRotation = placementRotation;
+                ItemDrop.ItemData rightItem = __instance.GetRightItem();
+                int count = extraGhosts.Count;
+
+                for (int i = 0; i < extraGhosts.Count; i++)
                 {
-                    __instance.m_placeRotation = placementRotation;
-                    ItemDrop.ItemData rightItem = __instance.GetRightItem();
-                    int count = extraGhosts.Count;
-
-                    for (int i = 0; i < extraGhosts.Count; i++)
+                    if (ghostPlacementStatus[i + 1] != Status.Healthy)
                     {
-                        if (ghostPlacementStatus[i + 1] != Status.Healthy)
+                        bool canPlant = (ghostPlacementStatus[i + 1] == Status.LackResources && __instance.m_noPlacementCost) || (!config.PreventInvalidPlanting && (int)ghostPlacementStatus[i + 1] > 1);
+                        if (!canPlant)
                         {
-                            bool canPlant = (ghostPlacementStatus[i + 1] == Status.LackResources && __instance.m_noPlacementCost) || (!config.PreventInvalidPlanting && (int)ghostPlacementStatus[i + 1] > 1);
-                            if (!canPlant)
-                            {
-                                count--;
-                                continue;
-                            }
+                            count--;
+                            continue;
                         }
-
-                        PlacePiece(__instance, extraGhosts[i], piece);
                     }
 
-                    count = __instance.m_noPlacementCost ? 0 : count;
-
-                    for (int i = 0; i < count; i++)
-                        __instance.ConsumeResources(piece.m_resources, 0);
-
-                    if (config.UseStamina)
-                        __instance.UseStamina(rightItem.m_shared.m_attack.m_attackStamina * count, true);
-
-                    if (rightItem.m_shared.m_useDurability && config.UseDurability)
-                        rightItem.m_durability -= rightItem.m_shared.m_useDurabilityDrain * count;
+                    PlacePiece(__instance, extraGhosts[i], piece);
                 }
+
+                count = __instance.m_noPlacementCost ? 0 : count;
+
+                for (int i = 0; i < count; i++)
+                    __instance.ConsumeResources(piece.m_resources, 0);
+
+                if (config.UseStamina)
+                    __instance.UseStamina(rightItem.m_shared.m_attack.m_attackStamina * count, true);
+
+                if (rightItem.m_shared.m_useDurability && config.UseDurability)
+                    rightItem.m_durability -= rightItem.m_shared.m_useDurabilityDrain * count;
             }
         }
 
         [HarmonyPatch(typeof(Player), "Interact")]
         public class PlayerInteract
         {
-            public static void Prefix(Player __instance, GameObject go, bool hold, bool alt)
+			private static string GetPrefabName(Interactable i) => i.ToString().Replace("(Clone) (Pickable)", "");
+
+			public static void Prefix(Player __instance, GameObject go, bool hold, bool alt)
             {
                 if (!config.ModActive || (!config.EnableBulkHarvest && !config.ReplantOnHarvest) || __instance.InAttack() || __instance.InDodge() || (hold && Time.time - __instance.m_lastHoverInteractTime < 0.2f))
                     return;
@@ -363,7 +362,7 @@ namespace Advize_PlantEasily
                 Interactable interactable = go.GetComponentInParent<Interactable>();
                 if (interactable == null) return;
 
-                if (interactable as Pickable && config.ReplantOnHarvest && pickablesToPlants.ContainsKey(interactable.ToString().Replace("(Clone) (Pickable)", "")))
+                if (interactable as Pickable && config.ReplantOnHarvest && pickablesToPlants.ContainsKey(GetPrefabName(interactable)))
                     instanceIDS.Add(((Pickable)interactable).GetInstanceID());
 
                 if (!config.EnableBulkHarvest || (!Input.GetKey(config.KeyboardHarvestModifierKey) && !Input.GetKey(config.GamepadModifierKey)))
@@ -375,7 +374,7 @@ namespace Advize_PlantEasily
                     {
                         if (config.ReplantOnHarvest)
                         {
-                            if (pickablesToPlants.ContainsKey(extraInteractable.ToString().Replace("(Clone) (Pickable)", "")))
+                            if (pickablesToPlants.ContainsKey(GetPrefabName(extraInteractable)))
                                 instanceIDS.Add(((Pickable)extraInteractable).GetInstanceID());
                         }
                         extraInteractable.Interact(__instance, hold, alt);
