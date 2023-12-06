@@ -92,33 +92,26 @@ namespace Advize_Spyglass
             [HarmonyAfter(new string[] { "Azumatt.FirstPersonMode" })]
             public static void Postfix(ref GameCamera __instance)
             {
-                if (isZooming)
+				if (!isZooming) return;
+
+                Vector3 scopeLevel = Vector3.forward * zoomLevel * config.ZoomMultiplier;
+                Vector3 difference = __instance.transform.TransformVector(scopeLevel);
+
+                // Try to prevent zooming through things
+                if (Physics.Raycast(__instance.transform.position, __instance.transform.forward, out var hitInfo, difference.magnitude, __instance.m_blockCameraMask))
                 {
-                    Vector3 scopeLevel = Vector3.zero;
-                    scopeLevel += Vector3.forward * zoomLevel * config.ZoomMultiplier;
-                    Vector3 difference = __instance.transform.TransformVector(scopeLevel);
+                    scopeLevel = Vector3.forward * Vector3.Distance(hitInfo.point, __instance.transform.position) * 0.9f;
+                    difference = __instance.transform.TransformVector(scopeLevel);
+                }
 
-                    //Try to prevent zooming through things? Needs lots of work still
-                    if (!Physics.Raycast(__instance.transform.position, __instance.transform.forward, out var hitInfo, difference.magnitude, __instance.m_blockCameraMask))
-                    {
-                        __instance.transform.position += difference;
-                    }
-                    else
-                    {
-                        scopeLevel = Vector3.zero;
-                        scopeLevel += Vector3.forward * Vector3.Distance(hitInfo.point, __instance.transform.position);
-                        difference = __instance.transform.TransformVector(scopeLevel);
+                __instance.transform.position += difference;
 
-                        __instance.transform.position += difference;
-                    }
-
-                    //Keep camera above the ground hopefully
-                    if (ZoneSystem.instance.GetGroundHeight(__instance.transform.position, out float num) && __instance.transform.position.y < num +1f)
-                    {
-                        Vector3 position = __instance.transform.position;
-                        position.y = num + 1f;
-                        __instance.transform.position = position;
-                    }
+                // Keep camera above the ground hopefully
+                if (ZoneSystem.instance.GetGroundHeight(__instance.transform.position, out float num) && __instance.transform.position.y < num +1f)
+                {
+                    Vector3 position = __instance.transform.position;
+                    position.y = num + 1f;
+                    __instance.transform.position = position;
                 }
             }
         }
