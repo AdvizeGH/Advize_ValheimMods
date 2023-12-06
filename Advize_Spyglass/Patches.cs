@@ -95,6 +95,7 @@ namespace Advize_Spyglass
                 if (isZooming) __instance.m_fov = currentFov;
             }
 
+            [HarmonyAfter(new string[] { "Azumatt.FirstPersonMode" })]
             public static void Postfix(ref GameCamera __instance)
             {
                 if (isZooming)
