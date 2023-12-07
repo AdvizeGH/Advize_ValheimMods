@@ -45,7 +45,7 @@ namespace Advize_Spyglass
         {
             BepInEx.Logging.Logger.Sources.Add(SGLogger);
             assetBundle = LoadAssetBundle("spyglass");
-            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.0.0" });
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.0.0", ModRequired = true });
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
             harmony.PatchAll();

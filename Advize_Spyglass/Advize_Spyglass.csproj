@@ -47,7 +47,7 @@
         <GamePath Condition="!Exists('$(GamePath)') AND '$(_SteamLibraryPath)' != ''">$(_SteamLibraryPath)\steamapps\common\Valheim</GamePath>
         <GamePath Condition="!Exists('$(GamePath)')">C:\Program Files\Steam\steamapps\common\Valheim</GamePath>
         <GamePath Condition="!Exists('$(GamePath)')">C:\Program Files (x86)\Steam\steamapps\common\Valheim</GamePath>
-		<AfterTargets Condition="'$(AfterTargets)' == ''">ILRepacker</AfterTargets>
+        <AfterTargets Condition="'$(AfterTargets)' == ''">ILRepacker</AfterTargets>
       </PropertyGroup>
     </When>
   </Choose>
