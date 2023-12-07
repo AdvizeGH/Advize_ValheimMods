@@ -72,6 +72,11 @@ namespace Advize_Spyglass
 
                 if (!IsSpyglassEquipped(__instance) || InventoryGui.IsVisible()) return;
 
+                if (ZInput.GamepadActive && ZInput.GetButtonDown("JoyLTrigger"))
+                {
+                    ChangeZoom(ZInput.GetButton("JoyLBumper") ? -1 : 1);
+                }
+
                 if (config.IncreaseZoomKey.IsDown())
                     ChangeZoom(1);
 
