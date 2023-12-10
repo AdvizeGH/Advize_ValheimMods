@@ -64,6 +64,8 @@ namespace Advize_Spyglass
         {
             public static void Postfix(Player __instance)
             {
+                if (__instance != Player.m_localPlayer) return;
+                
                 if (isZooming && (!IsSpyglassEquipped(__instance) || ZInput.GetButtonDown("Attack") || config.RemoveZoomKey.IsDown()))
                 {
                     StopZoom();

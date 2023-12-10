@@ -15,7 +15,7 @@ namespace Advize_Spyglass
     {
         public const string PluginID = "advize.Spyglass";
         public const string PluginName = "Spyglass";
-        public const string Version = "3.0.0";
+        public const string Version = "3.0.1";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource SGLogger = new($" {PluginName}");
@@ -45,7 +45,7 @@ namespace Advize_Spyglass
         {
             BepInEx.Logging.Logger.Sources.Add(SGLogger);
             assetBundle = LoadAssetBundle("spyglass");
-            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.0.0", ModRequired = true });
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.0.1", ModRequired = true });
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
             harmony.PatchAll();
