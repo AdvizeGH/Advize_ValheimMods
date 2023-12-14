@@ -325,12 +325,12 @@ namespace Advize_Spyglass
             customVignetteSettings = new()
             {
                 mode = VignetteModel.Mode.Classic,
+                rounded = config.VignetteRounded,
                 intensity = config.VignetteIntensity,
-                color = config.VignetteColor,
-                center = config.VignetteCenter,
                 smoothness = config.VignetteSmoothness,
                 roundness = config.VignetteRoundness,
-                rounded = config.VignetteRounded
+                color = config.VignetteColor,
+                center = config.VignetteCenter
             };
 
             vignetteSettingsChanged = true;
