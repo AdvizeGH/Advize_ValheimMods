@@ -2,11 +2,13 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.PostProcessing;
 
 namespace Advize_Spyglass
 {
@@ -15,7 +17,7 @@ namespace Advize_Spyglass
     {
         public const string PluginID = "advize.Spyglass";
         public const string PluginName = "Spyglass";
-        public const string Version = "3.0.1";
+        public const string Version = "3.1.0";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource SGLogger = new($" {PluginName}");
@@ -28,6 +30,9 @@ namespace Advize_Spyglass
         private static float startingFov;
         private static float currentFov;
         private static bool isZooming;
+
+        private static VignetteModel.Settings customVignetteSettings;
+        private static bool vignetteSettingsChanged;
 
         private static AssetBundle assetBundle;
         private static readonly Dictionary<string, Texture2D> cachedTextures = new();
@@ -45,9 +50,10 @@ namespace Advize_Spyglass
         {
             BepInEx.Logging.Logger.Sources.Add(SGLogger);
             assetBundle = LoadAssetBundle("spyglass");
-            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.0.1", ModRequired = true });
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.1.0", ModRequired = true });
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
+            VignetteSettingChanged(null, null);
             harmony.PatchAll();
         }
 
@@ -220,7 +226,7 @@ namespace Advize_Spyglass
             prefabRefs.Add("Club", null/*Resources.FindObjectsOfTypeAll<GameObject>().ToList().Find(x => x.name == "Club")*/);
             prefabRefs.Add("BronzeNails", null);
 
-            Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
+            UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
             for (int i = 0; i < array.Length; i++)
             {
                 GameObject gameObject = (GameObject)array[i];
@@ -310,6 +316,24 @@ namespace Advize_Spyglass
         internal class LocalizedStrings
         {
             public List<string> localizedStrings = new();
+        }
+
+        internal static void VignetteSettingChanged(object o, EventArgs e)
+        {
+            Dbgl("Vignette setting changed, modifying customVignetteSettings");
+
+            customVignetteSettings = new()
+            {
+                mode = VignetteModel.Mode.Classic,
+                intensity = config.VignetteIntensity,
+                color = config.VignetteColor,
+                center = config.VignetteCenter,
+                smoothness = config.VignetteSmoothness,
+                roundness = config.VignetteRoundness,
+                rounded = config.VignetteRounded
+            };
+
+            vignetteSettingsChanged = true;
         }
     }
 }

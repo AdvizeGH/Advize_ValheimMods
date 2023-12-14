@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using UnityEngine;
+using UnityEngine.PostProcessing;
 
 namespace Advize_Spyglass
 {
@@ -118,6 +119,21 @@ namespace Advize_Spyglass
                     position.y = num + 1f;
                     __instance.transform.position = position;
                 }
+            }
+        }
+
+        [HarmonyPatch(typeof(PostProcessingBehaviour), "OnPreCull")]
+        public static class PostProcessingBehaviourOnPreCull
+        {
+            public static void Postfix(ref VignetteComponent ___m_Vignette)
+            {
+                if (vignetteSettingsChanged)
+                {
+                    ___m_Vignette.model.settings = customVignetteSettings;
+                    vignetteSettingsChanged = false;
+                }
+
+                ___m_Vignette.model.enabled = isZooming && config.EnableZoomVignetteEffect;
             }
         }
     }

@@ -15,6 +15,15 @@ namespace Advize_Spyglass.Configuration
         //Spyglass
         private readonly ConfigEntry<float> fovReductionFactor;
         private readonly ConfigEntry<float> zoomMultiplier;
+
+        private readonly ConfigEntry<bool> enableZoomVignetteEffect;
+        private readonly ConfigEntry<bool> vignetteRounded;
+        private readonly ConfigEntry<float> vignetteIntensity;
+        private readonly ConfigEntry<float> vignetteSmoothness;
+        private readonly ConfigEntry<float> vignetteRoundness;
+        private readonly ConfigEntry<Color> vignetteColor;
+        private readonly ConfigEntry<Vector2> vignetteCenter;
+
         //Controls
         private readonly ConfigEntry<KeyboardShortcut> increaseZoomKey;
         private readonly ConfigEntry<KeyboardShortcut> decreaseZoomKey;
@@ -60,6 +69,41 @@ namespace Advize_Spyglass.Configuration
                 "ZoomMultiplier",
                 5f,
                 "Increase/Decrease camera zoom distance.");
+            enableZoomVignetteEffect = Config(
+                "Spyglass",
+                "EnableZoomVignetteEffect",
+                true,
+                "Enable vignette postprocessing effect when zooming with the spyglass.");
+            vignetteRounded = Config(
+                "Spyglass",
+                "VignetteRounded",
+                true,
+                "Enable this to make the vignette perfectly round. When disabled, the vignette effect is dependent on the current aspect ratio.");
+            vignetteIntensity = Config(
+                "Spyglass",
+                "VignetteIntensity",
+                0.65f,
+                "Set the amount of vignetting on screen.");
+            vignetteSmoothness = Config(
+                "Spyglass",
+                "VignetteSmoothness",
+                0.2f,
+                "Set the smoothness of the vignette borders.");
+            vignetteRoundness = Config(
+                "Spyglass",
+                "VignetteRoundness",
+                1f,
+                "Set the value to round the vignette. Lower values will make a more squared vignette.");
+            vignetteColor = Config(
+                "Spyglass",
+                "VignetteColor",
+                new Color(0, 0, 0, 1),
+                "Set the color of the vignette.");
+            vignetteCenter = Config(
+                "Spyglass",
+                "VignetteCenter",
+                new Vector2(0.5f, 0.5f),
+                "Set the vignette center point (screen center is [0.5, 0.5]).");
             increaseZoomKey = Config(
                 "Controls",
                 "IncreaseZoomKey",
@@ -98,12 +142,26 @@ namespace Advize_Spyglass.Configuration
             configFile.SaveOnConfigSet = true;
 
             configSync.AddLockingConfigEntry(serverConfigLocked);
+
+            vignetteRounded.SettingChanged += Spyglass.VignetteSettingChanged;
+            vignetteIntensity.SettingChanged += Spyglass.VignetteSettingChanged;
+            vignetteSmoothness.SettingChanged += Spyglass.VignetteSettingChanged;
+            vignetteRoundness.SettingChanged += Spyglass.VignetteSettingChanged;
+            vignetteColor.SettingChanged += Spyglass.VignetteSettingChanged;
+            vignetteCenter.SettingChanged += Spyglass.VignetteSettingChanged;
         }
 
         internal bool EnableLocalization => enableLocalization.Value;
         internal bool EnableDebugMessages => enableDebugMessages.Value;
         internal float FovReductionFactor => fovReductionFactor.Value;
         internal float ZoomMultiplier => zoomMultiplier.Value;
+        internal bool EnableZoomVignetteEffect => enableZoomVignetteEffect.Value;
+        internal bool VignetteRounded => vignetteRounded.Value;
+        internal float VignetteIntensity => vignetteIntensity.Value;
+        internal float VignetteSmoothness => vignetteSmoothness.Value;
+        internal float VignetteRoundness => vignetteRoundness.Value;
+        internal Color VignetteColor => vignetteColor.Value;
+        internal Vector2 VignetteCenter => vignetteCenter.Value;
         internal KeyboardShortcut IncreaseZoomKey => increaseZoomKey.Value;
         internal KeyboardShortcut DecreaseZoomKey => decreaseZoomKey.Value;
         internal KeyboardShortcut RemoveZoomKey => removeZoomKey.Value;

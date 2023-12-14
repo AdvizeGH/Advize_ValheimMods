@@ -63,6 +63,10 @@
       <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_guiutils_publicized.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="assembly_postprocessing">
+      <HintPath>$(GamePath)\valheim_Data\Managed\assembly_postprocessing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="assembly_utils">
       <HintPath>$(GamePath)\valheim_Data\Managed\assembly_utils.dll</HintPath>
       <Private>False</Private>
