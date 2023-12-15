@@ -139,13 +139,20 @@ namespace Advize_PlantEasily
                 return snapPoints.Count > 0;
             }
 
+            public static void Prefix(Player __instance)
+            {
+                if (!config.ModActive)
+                    return;
+
+                //If there are no extra ghosts but there is supposed to be
+                if (ghostPlacementStatus.Count == 0 || (extraGhosts.Count == 0 && !(config.Rows == 1 && config.Columns == 1)))
+                    __instance.SetupPlacementGhost();
+            }
+
             public static void Postfix(Player __instance, ref GameObject ___m_placementGhost, ref int ___m_placementStatus)
             {
                 if (!config.ModActive || !___m_placementGhost || !IsPlantOrPickable(___m_placementGhost) || !HoldingCultivator)
                     return;
-                
-                if (ghostPlacementStatus.Count == 0 || (extraGhosts.Count == 0 && !(config.Rows == 1 && config.Columns == 1))) //If there are no extra ghosts but there is supposed to be
-                    __instance.SetupPlacementGhost();
                 
                 for (int i = 0; i < extraGhosts.Count; i++)
                 {
