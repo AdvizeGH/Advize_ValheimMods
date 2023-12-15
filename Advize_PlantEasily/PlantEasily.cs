@@ -16,7 +16,7 @@ namespace Advize_PlantEasily
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "1.7.1";
+        public const string Version = "1.7.2";
         
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");

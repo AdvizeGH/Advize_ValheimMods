@@ -80,7 +80,7 @@ namespace Advize_PlantEasily
                 //Dbgl("SetupPlacementGhost");
                 DestroyGhosts();
                 
-                if (!config.ModActive || !___m_placementGhost || !IsPlantOrPickable(___m_placementGhost) || !HoldingCultivator)
+                if (!config.ModActive || !___m_placementGhost || !HoldingCultivator || !IsPlantOrPickable(___m_placementGhost))
                     return;
                 
                 ___m_placeRotation = placementRotation;
@@ -139,9 +139,9 @@ namespace Advize_PlantEasily
                 return snapPoints.Count > 0;
             }
 
-            public static void Prefix(Player __instance)
+            public static void Prefix(Player __instance, GameObject ___m_placementGhost)
             {
-                if (!config.ModActive)
+                if (!config.ModActive || !___m_placementGhost || !HoldingCultivator || !IsPlantOrPickable(___m_placementGhost))
                     return;
 
                 //If there are no extra ghosts but there is supposed to be
@@ -151,7 +151,7 @@ namespace Advize_PlantEasily
 
             public static void Postfix(Player __instance, ref GameObject ___m_placementGhost, ref int ___m_placementStatus)
             {
-                if (!config.ModActive || !___m_placementGhost || !IsPlantOrPickable(___m_placementGhost) || !HoldingCultivator)
+                if (!config.ModActive || !___m_placementGhost || !HoldingCultivator || !IsPlantOrPickable(___m_placementGhost))
                     return;
                 
                 for (int i = 0; i < extraGhosts.Count; i++)
@@ -288,7 +288,7 @@ namespace Advize_PlantEasily
             public static bool Prefix(Player __instance, Piece piece, ref bool __result, ref bool __state)
             {
                 //Dbgl("Player.PlacePiece Prefix");
-                if (!config.ModActive || !piece || !IsPlantOrPickable(piece.gameObject) || !HoldingCultivator)
+                if (!config.ModActive || !piece || !HoldingCultivator || !IsPlantOrPickable(piece.gameObject))
                     return true;
 
                 __state = true;
@@ -321,7 +321,7 @@ namespace Advize_PlantEasily
             public static void Postfix(Player __instance, Piece piece, bool __state)
             {
                 //Dbgl("Player.PlacePiece Postfix" + $"\n __state is {__state}");
-                if (!config.ModActive || !__state || !piece || !IsPlantOrPickable(piece.gameObject) || !HoldingCultivator)
+                if (!config.ModActive || !__state || !piece || !HoldingCultivator || !IsPlantOrPickable(piece.gameObject))
                     return;
                 //This doesn't apply to the root placement ghost.
                 __instance.m_placeRotation = placementRotation;
