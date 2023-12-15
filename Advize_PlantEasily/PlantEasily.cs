@@ -16,7 +16,7 @@ namespace Advize_PlantEasily
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "1.7.0";
+        public const string Version = "1.7.1";
         
         private readonly Harmony Harmony = new(PluginID);
         public static ManualLogSource PELogger = new($" {PluginName}");
@@ -35,7 +35,7 @@ namespace Advize_PlantEasily
 
         private static bool HoldingCultivator => Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator";
 
-        private static bool OverrideGamepadInput => placementGhost && Input.GetKey(config.GamepadModifierKey);
+        private static bool OverrideGamepadInput => placementGhost && ZInput.GetKey(config.GamepadModifierKey, false);
 
         public void Awake()
         {
@@ -219,7 +219,7 @@ namespace Advize_PlantEasily
             TerrainModifier.SetTriggerOnPlaced(trigger: false);
 
             gameObject2.GetComponent<Piece>().SetCreator(player.GetPlayerID());
-
+            //Disable this when placing tons of things at once??
             piece.m_placeEffect.Create(position, rotation, gameObject2.transform, 1f);
             player.AddNoise(50f);
 

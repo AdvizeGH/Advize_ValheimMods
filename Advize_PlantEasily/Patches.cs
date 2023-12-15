@@ -34,18 +34,18 @@ namespace Advize_PlantEasily
                     __instance.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.ReplantOnHarvest: {config.ReplantOnHarvest}");
                 }
 
-                if (Input.GetKey(config.KeyboardModifierKey) || Input.GetKey(config.GamepadModifierKey))
+                if (ZInput.GetKey(config.KeyboardModifierKey) || ZInput.GetKey(config.GamepadModifierKey))
                 {
-                    if (Input.GetKeyUp(config.IncreaseXKey) || ZInput.GetButtonDown("JoyDPadRight"))
+                    if (ZInput.GetKeyDown(config.IncreaseXKey, false) || ZInput.GetButtonDown("JoyDPadRight"))
                         config.Columns += 1;
                     
-                    if (Input.GetKeyUp(config.IncreaseYKey) || ZInput.GetButtonDown("JoyDPadUp"))
+                    if (ZInput.GetKeyDown(config.IncreaseYKey, false) || ZInput.GetButtonDown("JoyDPadUp"))
                         config.Rows += 1;
                     
-                    if (Input.GetKeyUp(config.DecreaseXKey) || ZInput.GetButtonDown("JoyDPadLeft"))
+                    if (ZInput.GetKeyDown(config.DecreaseXKey, false) || ZInput.GetButtonDown("JoyDPadLeft"))
                         config.Columns -= 1;
                     
-                    if (Input.GetKeyUp(config.DecreaseYKey) || ZInput.GetButtonDown("JoyDPadDown"))
+                    if (ZInput.GetKeyDown(config.DecreaseYKey, false) || ZInput.GetButtonDown("JoyDPadDown"))
                         config.Rows -= 1;
                 }
             }
@@ -365,7 +365,7 @@ namespace Advize_PlantEasily
                 if (interactable as Pickable && config.ReplantOnHarvest && pickablesToPlants.ContainsKey(GetPrefabName(interactable)))
                     instanceIDS.Add(((Pickable)interactable).GetInstanceID());
 
-                if (!config.EnableBulkHarvest || (!Input.GetKey(config.KeyboardHarvestModifierKey) && !Input.GetKey(config.GamepadModifierKey)))
+                if (!config.EnableBulkHarvest || (!ZInput.GetKey(config.KeyboardHarvestModifierKey, false) && !ZInput.GetKey(config.GamepadModifierKey, false)))
                     return;
 
                 if (interactable as Pickable || interactable as Beehive)
