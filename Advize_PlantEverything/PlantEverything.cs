@@ -40,7 +40,7 @@ namespace Advize_PlantEverything
 		{
 			BepInEx.Logging.Logger.Sources.Add(PELogger);
 			assetBundle = LoadAssetBundle("planteverything");
-			config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.16.0" });
+			config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.16.2" });
 			SetupWatcher();
 			if (config.EnableExtraResources)
 				ExtraResourcesFileOrSettingChanged(null, null);
