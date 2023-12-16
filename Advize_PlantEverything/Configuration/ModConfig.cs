@@ -253,12 +253,12 @@ namespace Advize_PlantEverything.Configuration
 				"Difficulty",
 				"EnforceBiomes",
 				false,
-				"Restrict modded plantables to being placed in their respective biome.");
+				"Restrict modded plantables (pickables and saplings) to being placed in their respective biome.");
 			enforceBiomesVanilla = Config(
 				"Difficulty",
 				"EnforceBiomesVanilla",
 				true,
-				"Restrict vanilla plantables to being placed in their respective biome.");
+				"Restrict vanilla plantables (crops and saplings) to being placed in their respective biome.");
 			recoverResources = Config(
 				"Difficulty",
 				"RecoverResources",
@@ -819,7 +819,7 @@ namespace Advize_PlantEverything.Configuration
 			requireCultivation.SettingChanged += PlantEverything.CoreSettingChanged;
 			placeAnywhere.SettingChanged += PlantEverything.CoreSettingChanged;
 			enforceBiomes.SettingChanged += PlantEverything.CoreSettingChanged;
-			//enforceBiomesVanilla.SettingChanged += PlantEverything.ConfigurationSettingChanged;
+			enforceBiomesVanilla.SettingChanged += PlantEverything.CoreSettingChanged;
 			recoverResources.SettingChanged += PlantEverything.CoreSettingChanged;
 			//resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
 			enemiesTargetPieces.SettingChanged += PlantEverything.PieceSettingChanged;

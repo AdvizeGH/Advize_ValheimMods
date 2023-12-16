@@ -17,7 +17,7 @@ namespace Advize_PlantEverything
 	{
 		public const string PluginID = "advize.PlantEverything";
 		public const string PluginName = "PlantEverything";
-		public const string Version = "1.16.1";
+		public const string Version = "1.16.2";
 
 		private readonly Harmony harmony = new(PluginID);
 		public static ManualLogSource PELogger = new($" {PluginName}");
@@ -540,40 +540,39 @@ namespace Advize_PlantEverything
 
 					Transform vanillaVisualChild = pdb.Prefab.transform.Find("visual");
 
-					if (vanillaVisualChild)
+					if (!vanillaVisualChild) continue;
+
+					Transform moddedPickedChild = prefabRefs[pdb.key + "_Picked"].transform.Find("PE_Picked");
+
+					if (moddedPickedChild)
 					{
-						Transform moddedPickedChild = prefabRefs[pdb.key + "_Picked"].transform.Find("PE_Picked");
-
-						if (moddedPickedChild)
+						if (config.ShowPickableSpawners)
 						{
-							if (config.ShowPickableSpawners)
+							moddedPickedChild.SetParent(pdb.Prefab.transform);
+						}
+
+						if (!piecesInitialized)
+						{
+							MeshRenderer target = moddedPickedChild.GetComponent<MeshRenderer>();
+							MeshRenderer source = vanillaVisualChild.GetComponent<MeshRenderer>();
+
+							target.sharedMaterials = pdb.key == "Pickable_Thistle" ?
+							vanillaVisualChild.Find("default").GetComponent<MeshRenderer>().sharedMaterials :
+							source.sharedMaterials;
+
+							if (pdb.key.Contains("Dandelion"))
 							{
-								moddedPickedChild.SetParent(pdb.Prefab.transform);
-							}
-
-							if (!piecesInitialized)
-							{
-								MeshRenderer target = moddedPickedChild.GetComponent<MeshRenderer>();
-								MeshRenderer source = vanillaVisualChild.GetComponent<MeshRenderer>();
-
-								target.sharedMaterials = pdb.key == "Pickable_Thistle" ?
-								vanillaVisualChild.Find("default").GetComponent<MeshRenderer>().sharedMaterials :
-								source.sharedMaterials;
-
-								if (pdb.key.Contains("Dandelion"))
-								{
-									Material m = source.sharedMaterials[0];
-									target.sharedMaterials = new Material[] { m, m };
-								}
+								Material m = source.sharedMaterials[0];
+								target.sharedMaterials = new Material[] { m, m };
 							}
 						}
-						else
+					}
+					else
+					{
+						Transform vanillaPickedChild = prefabRefs[pdb.key].transform.Find("PE_Picked");
+						if (!config.ShowPickableSpawners && vanillaPickedChild)
 						{
-							Transform vanillaPickedChild = prefabRefs[pdb.key].transform.Find("PE_Picked");
-							if (!config.ShowPickableSpawners && vanillaPickedChild)
-							{
-								vanillaPickedChild.SetParent(prefabRefs[pdb.key + "_Picked"].transform);
-							}
+							vanillaPickedChild.SetParent(prefabRefs[pdb.key + "_Picked"].transform);
 						}
 					}
 				}
