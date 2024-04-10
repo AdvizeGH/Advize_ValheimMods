@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using SoftReferenceableAssets;
 
 namespace Advize_PlantEverything
 {
@@ -17,7 +18,7 @@ namespace Advize_PlantEverything
 	{
 		public const string PluginID = "advize.PlantEverything";
 		public const string PluginName = "PlantEverything";
-		public const string Version = "1.16.2";
+		public const string Version = "1.16.3";
 
 		private readonly Harmony harmony = new(PluginID);
 		public static ManualLogSource PELogger = new($" {PluginName}");
@@ -35,9 +36,10 @@ namespace Advize_PlantEverything
 		private static readonly Dictionary<Texture2D, Sprite> cachedSprites = new();
 
 		internal static ModConfig config;
-		
+
 		public void Awake()
 		{
+			Runtime.MakeAllAssetsLoadable();
 			BepInEx.Logging.Logger.Sources.Add(PELogger);
 			assetBundle = LoadAssetBundle("planteverything");
 			config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.16.2" });
@@ -139,8 +141,8 @@ namespace Advize_PlantEverything
 					}
 					else
 					{
-						Dbgl($"Invalid resource configured in {fileName}, skipping entry", true, LogLevel.Warning);
-						continue;
+						Dbgl($"Invalid resource, {er.prefabName}, configured in {fileName}, skipping entry", true, LogLevel.Warning);
+						//continue; Why did I ever put this here?
 					}
 				}
 
@@ -375,14 +377,20 @@ namespace Advize_PlantEverything
 				prefabRefs[er.prefabName] = null;
 			}
 
-			UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
-			for (int i = 0; i < array.Length; i++)
+			Dictionary<string, AssetID> assetIds = Runtime.GetAllAssetPathsInBundleMappedToAssetID();
+
+			foreach (string key in assetIds.Keys)
 			{
-				GameObject gameObject = ((GameObject)array[i]).transform.root.gameObject;
+				if (!key.EndsWith(".prefab", StringComparison.Ordinal)) continue;
 
-				if (!prefabRefs.ContainsKey(gameObject.name) || prefabRefs[gameObject.name]) continue;
+				string prefabName = key.Split('/').Last().Replace(".prefab", "");
 
-				prefabRefs[gameObject.name] = gameObject;
+				if (!prefabRefs.ContainsKey(prefabName)) continue;
+
+				SoftReference<GameObject> prefab = new(assetIds[key]);
+				prefab.Load();
+				//prefab.HoldReference();
+				prefabRefs[prefabName] = prefab.Asset;
 
 				if (!prefabRefs.Any(key => !key.Value))
 				{
@@ -399,7 +407,7 @@ namespace Advize_PlantEverything
 
 				foreach (string s in nullKeys)
 				{
-					Dbgl($"prefabRefs[{s}] value is null, removing key and value pair");
+					Dbgl($"prefabRefs[{s}] value is null, removing key and value pair. Will attempt to resolve post ZNetScene Awake");
 					prefabRefs.Remove(s);
 				}
 			}
@@ -427,7 +435,7 @@ namespace Advize_PlantEverything
 					}
 					else
 					{
-						Dbgl($"Could not find prefab: {er.prefabName}");
+						Dbgl($"Could not find prefab reference for {er.prefabName}, skipping entry", true, LogLevel.Warning);
 					}
 				}
 			}
@@ -634,7 +642,7 @@ namespace Advize_PlantEverything
 				foreach (string parent in p)
 					sdb.Prefab.transform.Find(parent).GetComponent<MeshFilter>().mesh = t.Find("Birch_Sapling").GetComponent<MeshFilter>().mesh;
 
-				switch (sdb.source)
+				switch (sdb.source) // Cases are in {} code blocks to re-use variable names and contain them within a local scope. Why did I do this? -> Don't know, just stop trying to delete them
 				{
 					case "YggaShoot_small1":
 					{
@@ -657,36 +665,38 @@ namespace Advize_PlantEverything
 					break;
 
 					case "SwampTree1":
-						{
-							Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("swamptree1").GetComponent<MeshRenderer>().sharedMaterials[0] };
-							m[0].shader = Shader.Find("Custom/Piece");
+					{
+						Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("swamptree1").GetComponent<MeshRenderer>().sharedMaterials[0] };
+						AssetID.TryParse("f6de4704e075b4095ae641aed283b641", out AssetID id);
+						SoftReference<Shader> pieceShader = new(id);
+						pieceShader.Load();
+						//pieceShader.HoldReference();
+						m[0].shader = pieceShader.Asset;// Shader.Find("Custom/Piece");
 
-							foreach (string parent in p)
-								sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m;
-						}
-						
-						break;
+						foreach (string parent in p)
+							sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m;
+					}
+					break;
 
 					case "Birch1_aut":
+					{
+						string[] foliage = { "birchleafs002", "birchleafs003", "birchleafs008", "birchleafs009", "birchleafs010", "birchleafs011" };
+						Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("Lod0").GetComponent<MeshRenderer>().sharedMaterials[0] };
+						Material[] m2 = new Material[] { t.Find("Birch_Sapling").GetComponent<MeshRenderer>().sharedMaterials[0] };
+
+						foreach (string parent in p)
+							sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m2;
+
+						foreach (string child in foliage)
 						{
-							string[] foliage = { "birchleafs002", "birchleafs003", "birchleafs008", "birchleafs009", "birchleafs010", "birchleafs011" };
-							Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("Lod0").GetComponent<MeshRenderer>().sharedMaterials[0] };
-							Material[] m2 = new Material[] { t.Find("Birch_Sapling").GetComponent<MeshRenderer>().sharedMaterials[0] };
-
 							foreach (string parent in p)
-								sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m2;
-
-							foreach (string child in foliage)
 							{
-								foreach (string parent in p)
-								{
-									sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshFilter>().mesh = t.Find(child).GetComponent<MeshFilter>().mesh;
-									sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshRenderer>().sharedMaterials = m;
-								}
+								sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshFilter>().mesh = t.Find(child).GetComponent<MeshFilter>().mesh;
+								sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshRenderer>().sharedMaterials = m;
 							}
 						}
-						
-						break;
+					}
+					break;
 				}
 
 				piece.m_icon = sdb.icon ? CreateSprite($"{sdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : piece.m_resources[0].m_resItem.m_itemData.GetIcon();
