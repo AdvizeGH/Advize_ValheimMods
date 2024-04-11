@@ -23,8 +23,28 @@ namespace Advize_PlantEverything
 			[HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]
 			public static void Postfix(ZNetScene __instance)
 			{
-				Dbgl("ZNetSceneAwake\nPerforming final mod initialization");
+				Dbgl("ZNetSceneAwake");
 				FinalInit(__instance);
+			}
+
+			[HarmonyPostfix]
+			[HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]
+			[HarmonyPriority(Priority.Last)]
+			public static void LastPostfix(ZNetScene __instance)
+			{
+				if (!resolveMissingReferences) return;
+
+				Dbgl("ZNetSceneAwake2");
+				Dbgl("Performing final attempt to resolve missing references for configured ExtraResources", true);
+
+				resolveMissingReferences = false;
+
+				if (InitExtraResources(__instance))
+				{
+					Dbgl("One or more missing references for configured ExtraResources were successfully resolved", true);
+					PieceSettingChanged(null, null);
+				}
+					
 			}
 		}
 

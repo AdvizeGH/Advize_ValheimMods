@@ -420,18 +420,21 @@ namespace Advize_PlantEverything.Framework
 			if (Config.EnableExtraResources)
 			{
 				List<string> potentialNewLayers = layersForPieceRemoval.ToList();
+				bool queueReattempt = false;
 
 				foreach (ExtraResource er in PE.deserializedExtraResources)
 				{
 					if (!PE.prefabRefs.ContainsKey(er.prefabName) || !PE.prefabRefs[er.prefabName])
 					{
-						PE.Dbgl($"{er.prefabName} is not in dictionary of prefab references or has a null value", true, LogLevel.Warning);
+						PE.Dbgl($"{er.prefabName} is not in dictionary of prefab references or has a null value", level: LogLevel.Warning);
+						queueReattempt = true;
 						continue;
 					}
 
 					if (!ObjectDB.instance?.GetItemPrefab(er.resourceName)?.GetComponent<ItemDrop>())
 					{
-						PE.Dbgl($"{er.prefabName}'s required resource {er.resourceName} not found", true, LogLevel.Warning);
+						PE.Dbgl($"{er.prefabName}'s required resource {er.resourceName} not found", level: LogLevel.Warning);
+						queueReattempt = true;
 						continue;
 					}
 
@@ -454,6 +457,7 @@ namespace Advize_PlantEverything.Framework
 				}
 
 				layersForPieceRemoval = potentialNewLayers.Distinct().ToArray();
+				PE.resolveMissingReferences = queueReattempt;
 			}
 
 			return newList;

@@ -18,7 +18,7 @@ namespace Advize_PlantEverything
 	{
 		public const string PluginID = "advize.PlantEverything";
 		public const string PluginName = "PlantEverything";
-		public const string Version = "1.16.3";
+		public const string Version = "1.16.4";
 
 		private readonly Harmony harmony = new(PluginID);
 		public static ManualLogSource PELogger = new($" {PluginName}");
@@ -30,6 +30,7 @@ namespace Advize_PlantEverything
 
 		private static bool piecesInitialized = false;
 		private static bool saplingsInitialized = false;
+		internal static bool resolveMissingReferences = false;
 
 		private static AssetBundle assetBundle;
 		private static readonly Dictionary<string, Texture2D> cachedTextures = new();
@@ -42,7 +43,7 @@ namespace Advize_PlantEverything
 			Runtime.MakeAllAssetsLoadable();
 			BepInEx.Logging.Logger.Sources.Add(PELogger);
 			assetBundle = LoadAssetBundle("planteverything");
-			config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.16.2" });
+			config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.16.4" });
 			SetupWatcher();
 			if (config.EnableExtraResources)
 				ExtraResourcesFileOrSettingChanged(null, null);
@@ -407,7 +408,7 @@ namespace Advize_PlantEverything
 
 				foreach (string s in nullKeys)
 				{
-					Dbgl($"prefabRefs[{s}] value is null, removing key and value pair. Will attempt to resolve post ZNetScene Awake");
+					Dbgl($"prefabRefs[{s}] value is null, removing key and value pair.");
 					prefabRefs.Remove(s);
 				}
 			}
@@ -418,9 +419,10 @@ namespace Advize_PlantEverything
 			}
 		}
 
-		private static void InitExtraResources(ZNetScene instance)
+		private static bool InitExtraResources(ZNetScene instance)
 		{
 			Dbgl("InitExtraResources");
+			bool addedExtraResources = false;
 
 			foreach (ExtraResource er in deserializedExtraResources)
 			{
@@ -432,6 +434,7 @@ namespace Advize_PlantEverything
 					{
 						prefabRefs[er.prefabName] = targetPrefab;
 						Dbgl($"Added {er.prefabName} to prefabRefs");
+						addedExtraResources = true;
 					}
 					else
 					{
@@ -439,6 +442,8 @@ namespace Advize_PlantEverything
 					}
 				}
 			}
+
+			return addedExtraResources;
 		}
 
 		private static void InitPieceRefs()
@@ -821,6 +826,7 @@ namespace Advize_PlantEverything
 
 		private static void FinalInit(ZNetScene instance)
 		{
+			Dbgl("Performing final mod initialization");
 			InitExtraResources(instance);
 			InitPieceRefs();
 			InitPieces();
