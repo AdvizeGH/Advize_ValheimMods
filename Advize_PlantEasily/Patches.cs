@@ -50,7 +50,7 @@ namespace Advize_PlantEasily
                 }
             }
         }
-        
+
         [HarmonyPatch(typeof(HotkeyBar), "Update")]
         public class HotKeyBarUpdate
         {
@@ -186,7 +186,7 @@ namespace Advize_PlantEasily
                     List<SnapPosition> snapPoints = new();
                     Plant plant = ___m_placementGhost.GetComponent<Plant>();
 
-                    Collider[] obstructions = Physics.OverlapSphere(___m_placementGhost.transform.position, pieceSpacing, snapCollisionMask);
+                    Collider[] obstructions = Physics.OverlapSphere(___m_placementGhost.transform.position, pieceSpacing, CollisionMask);
                     int validFirstOrderCollisions = 0;
                     
                     foreach (Collider collider in obstructions)
@@ -195,7 +195,7 @@ namespace Advize_PlantEasily
                         validFirstOrderCollisions++;
                         if (validFirstOrderCollisions > 8) break;
                         
-                        Collider[] secondaryObstructions = Physics.OverlapSphere(collider.transform.position, pieceSpacing, snapCollisionMask);
+                        Collider[] secondaryObstructions = Physics.OverlapSphere(collider.transform.position, pieceSpacing, CollisionMask);
                         int validSecondOrderCollisions = 0;
                         
                         foreach (Collider secondaryCollider in secondaryObstructions)
@@ -359,9 +359,9 @@ namespace Advize_PlantEasily
         [HarmonyPatch(typeof(Player), "Interact")]
         public class PlayerInteract
         {
-			private static string GetPrefabName(Interactable i) => i.ToString().Replace("(Clone) (Pickable)", "");
+            private static string GetPrefabName(Interactable i) => i.ToString().Replace("(Clone) (Pickable)", "");
 
-			public static void Prefix(Player __instance, GameObject go, bool hold, bool alt)
+            public static void Prefix(Player __instance, GameObject go, bool hold, bool alt)
             {
                 if (!config.ModActive || (!config.EnableBulkHarvest && !config.ReplantOnHarvest) || __instance.InAttack() || __instance.InDodge() || (hold && Time.time - __instance.m_lastHoverInteractTime < 0.2f))
                     return;

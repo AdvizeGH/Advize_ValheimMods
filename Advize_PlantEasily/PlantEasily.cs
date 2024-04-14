@@ -10,28 +10,23 @@ using UnityEngine;
 namespace Advize_PlantEasily
 {
     [BepInPlugin(PluginID, PluginName, Version)]
-    [BepInProcess("valheim.exe")] // This mod shouldn't be run on the server... yet
-    [BepInProcess("valheim.x86_64")]
     public partial class PlantEasily : BaseUnityPlugin
     {
         public const string PluginID = "advize.PlantEasily";
         public const string PluginName = "PlantEasily";
-        public const string Version = "1.7.2";
+        public const string Version = "1.7.3";
         
-        private readonly Harmony Harmony = new(PluginID);
-        public static ManualLogSource PELogger = new($" {PluginName}");
+        private static readonly ManualLogSource PELogger = new($" {PluginName}");
+        private static ModConfig config;
 
         private static readonly Dictionary<string, GameObject> prefabRefs = new();
-
-        private static ModConfig config;
 
         private static GameObject placementGhost;
         private static readonly List<GameObject> extraGhosts = new();
         private static readonly List<Status> ghostPlacementStatus = new();
         private static readonly List<int> instanceIDS = new();
         
-        private static readonly int snapCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid", "item");
-        private static readonly int plantCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid");
+        private static readonly int CollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid", "item");
 
         private static bool HoldingCultivator => Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator";
 
@@ -40,8 +35,14 @@ namespace Advize_PlantEasily
         public void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(PELogger);
+            if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null)
+            {
+                Dbgl("This mod is client-side only and is not needed on a dedicated server. Plugin patches will not be applied.", true, LogLevel.Warning);
+                return;
+            }
             config = new ModConfig(Config);
-            Harmony.PatchAll();
+            Harmony harmony = new(PluginID);
+            harmony.PatchAll();
         }
 
         private static bool IsPlantOrPickable(GameObject go) => go.GetComponent<Plant>() || go.GetComponent<Pickable>();
@@ -76,9 +77,10 @@ namespace Advize_PlantEasily
                     GameObject newGhost = Instantiate(rootGhost);
                     ZNetView.m_forceDisableInit = false;
                     newGhost.name = rootGhost.name;
-                    
+
+                    int layer = LayerMask.NameToLayer("ghost");
                     foreach (Transform t in newGhost.GetComponentsInChildren<Transform>())
-                        t.gameObject.layer = LayerMask.NameToLayer("ghost");
+                        t.gameObject.layer = layer;
                     
                     newGhost.transform.position = rootGhost.transform.position;
                     newGhost.transform.localScale = rootGhost.transform.localScale;
@@ -88,9 +90,9 @@ namespace Advize_PlantEasily
             }
         }
 
-        private static bool HasGrowSpace(Plant plant, Vector3 position) => Physics.OverlapSphere(position, plant.m_growRadius, plantCollisionMask).Length == 0;
+        private static bool HasGrowSpace(Plant plant, Vector3 position) => Physics.OverlapSphere(position, plant.m_growRadius, Plant.m_spaceMask).Length == 0;
         
-        private static bool PositionHasCollisions(Vector3 position) => Physics.CheckCapsule(position, position + (Vector3.up / 2), 0.0001f, snapCollisionMask);
+        private static bool PositionHasCollisions(Vector3 position) => Physics.CheckCapsule(position, position + (Vector3.up / 2), 0.0001f, CollisionMask);
 
         private static float GetPieceSpacing(GameObject go)
         {
@@ -180,7 +182,7 @@ namespace Advize_PlantEasily
         private static List<Interactable> FindResourcesInRadius(GameObject rootInteractable)
         {
             List<Interactable> extraInteractables = new();
-            Collider[] obstructions = Physics.OverlapSphere(rootInteractable.transform.root.position, config.HarvestRadius, snapCollisionMask);
+            Collider[] obstructions = Physics.OverlapSphere(rootInteractable.transform.root.position, config.HarvestRadius, CollisionMask);
 
             foreach (Collider obstruction in obstructions)
             {
@@ -287,14 +289,31 @@ namespace Advize_PlantEasily
             }
         }
 
-        internal static void Dbgl(string message, bool forceLog = false, bool logError = false)
+        internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)
         {
             if (forceLog || config.EnableDebugMessages)
             {
-                if (!logError)
-                    PELogger.LogInfo(message);
-                else
-                    PELogger.LogError(message);
+                switch (level)
+                {
+                    case LogLevel.Error:
+                        PELogger.LogError(message);
+                        break;
+                    case LogLevel.Warning:
+                        PELogger.LogWarning(message);
+                        break;
+                    case LogLevel.Info:
+                        PELogger.LogInfo(message);
+                        break;
+                    case LogLevel.Message:
+                        PELogger.LogMessage(message);
+                        break;
+                    case LogLevel.Debug:
+                        PELogger.LogDebug(message);
+                        break;
+                    case LogLevel.Fatal:
+                        PELogger.LogFatal(message);
+                        break;
+                }
             }
         }
     }
