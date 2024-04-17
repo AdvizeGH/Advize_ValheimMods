@@ -152,10 +152,7 @@ namespace Advize_PlantEverything
 				Dbgl($"Assigning local value from deserializedExtraResources");
 
 				List<string> resourcesToSync = new();
-
-				foreach (ExtraResource er in deserializedExtraResources)
-					resourcesToSync.Add(SerializeExtraResource(er));
-
+				deserializedExtraResources.ForEach(er => resourcesToSync.Add(SerializeExtraResource(er)));
 				config.SyncedExtraResources.AssignLocalValue(resourcesToSync);
 				return;
 			}
@@ -196,7 +193,7 @@ namespace Advize_PlantEverything
 			if (ZNetScene.s_instance)
 			{
 				//Dbgl("Calling InitExtraResources");
-				InitExtraResources(ZNetScene.s_instance);
+				InitExtraResourceRefs(ZNetScene.s_instance);
 				PieceSettingChanged(null, null);
 			}
 		}
@@ -364,21 +361,13 @@ namespace Advize_PlantEverything
 			Dbgl("InitPrefabRefs");
 			if (prefabRefs.Count > 0) return;
 
+			Dictionary<string, AssetID> assetIds = Runtime.GetAllAssetPathsInBundleMappedToAssetID();
 			bool foundAllRefs = false;
 
-			foreach (string s in StaticContent.VanillaPrefabRefs)
-			{
-				prefabRefs.Add(s, null);
-			}
-
+			StaticContent.VanillaPrefabRefs.ForEach(s => prefabRefs.Add(s, null));
 			StaticContent.VanillaPrefabRefs.Clear();
 
-			foreach (ExtraResource er in deserializedExtraResources)
-			{
-				prefabRefs[er.prefabName] = null;
-			}
-
-			Dictionary<string, AssetID> assetIds = Runtime.GetAllAssetPathsInBundleMappedToAssetID();
+			deserializedExtraResources.ForEach(er => prefabRefs[er.prefabName] = null);
 
 			foreach (string key in assetIds.Keys)
 			{
@@ -390,7 +379,6 @@ namespace Advize_PlantEverything
 
 				SoftReference<GameObject> prefab = new(assetIds[key]);
 				prefab.Load();
-				//prefab.HoldReference();
 				prefabRefs[prefabName] = prefab.Asset;
 
 				if (!prefabRefs.Any(key => !key.Value))
@@ -413,15 +401,13 @@ namespace Advize_PlantEverything
 				}
 			}
 
-			foreach (string s in StaticContent.CustomPrefabRefs)
-			{
-				prefabRefs.Add(s, CreatePrefab(s));
-			}
+			StaticContent.CustomPrefabRefs.ForEach(s => prefabRefs.Add(s, CreatePrefab(s)));
+			StaticContent.CustomPrefabRefs.Clear();
 		}
 
-		private static bool InitExtraResources(ZNetScene instance)
+		private static bool InitExtraResourceRefs(ZNetScene instance, bool logErrors = false)
 		{
-			Dbgl("InitExtraResources");
+			Dbgl("InitExtraResourceRefs");
 			bool addedExtraResources = false;
 
 			foreach (ExtraResource er in deserializedExtraResources)
@@ -675,7 +661,6 @@ namespace Advize_PlantEverything
 						AssetID.TryParse("f6de4704e075b4095ae641aed283b641", out AssetID id);
 						SoftReference<Shader> pieceShader = new(id);
 						pieceShader.Load();
-						//pieceShader.HoldReference();
 						m[0].shader = pieceShader.Asset;// Shader.Find("Custom/Piece");
 
 						foreach (string parent in p)
@@ -817,17 +802,14 @@ namespace Advize_PlantEverything
 			}
 
 			PieceTable pieceTable = prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
-			
-			foreach (PrefabDB pdb in prefabs)
-			{
-				pieceTable.m_pieces.Remove(pdb.Prefab);
-			}
+
+			prefabs.ForEach(x => pieceTable.m_pieces.Remove(x.Prefab));
 		}
 
 		private static void FinalInit(ZNetScene instance)
 		{
 			Dbgl("Performing final mod initialization");
-			InitExtraResources(instance);
+			InitExtraResourceRefs(instance);
 			InitPieceRefs();
 			InitPieces();
 			InitSaplingRefs();

@@ -39,7 +39,7 @@ namespace Advize_PlantEverything
 
 				resolveMissingReferences = false;
 
-				if (InitExtraResources(__instance))
+				if (InitExtraResourceRefs(__instance, true))
 				{
 					Dbgl("One or more missing references for configured ExtraResources were successfully resolved", true);
 					PieceSettingChanged(null, null);

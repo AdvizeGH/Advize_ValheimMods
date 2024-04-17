@@ -933,14 +933,12 @@ namespace Advize_PlantEverything.Configuration
 
 			configSync.AddLockingConfigEntry(serverConfigLocked);
 
-			foreach (ConfigurationManagerAttributes attributes in cropSettingAttributes)
-				attributes.Browsable = enableCropOverrides.Value;
+			cropSettingAttributes.ForEach(attributes => attributes.Browsable = enableCropOverrides.Value);
 			seedSettingAtrributes.Browsable = enableSeedOverrides.Value;
 
 			enableCropOverrides.SettingChanged += (_, _) =>
 			{
-				foreach (ConfigurationManagerAttributes attributes in cropSettingAttributes)
-					attributes.Browsable = enableCropOverrides.Value;
+				cropSettingAttributes.ForEach(attributes => attributes.Browsable = enableCropOverrides.Value);
 				ConfigManagerHelper.ReloadConfigDisplay();
 			};
 			enableSeedOverrides.SettingChanged += (_, _) =>
