@@ -142,8 +142,8 @@ namespace Advize_PlantEverything
 					}
 					else
 					{
+						if (er.prefabName.StartsWith("PE_Fake")) continue;
 						Dbgl($"Invalid resource, {er.prefabName}, configured in {fileName}, skipping entry", true, LogLevel.Warning);
-						//continue; Why did I ever put this here?
 					}
 				}
 
@@ -438,7 +438,7 @@ namespace Advize_PlantEverything
 					}
 					else
 					{
-						Dbgl($"Could not find prefab reference for {er.prefabName}, skipping entry", true, LogLevel.Warning);
+						Dbgl($"Could not find prefab reference for {er.prefabName}, skipping entry", logErrors || config.EnableDebugMessages, LogLevel.Warning);
 					}
 				}
 			}
