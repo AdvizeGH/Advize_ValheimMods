@@ -394,6 +394,27 @@ namespace Advize_PlantEverything
 				Dbgl("Could not find all prefab references");
 				List<string> nullKeys = prefabRefs.Where(key => !key.Value).Select(kvp => kvp.Key).ToList();
 
+				if (!nullKeys.Any(key => !deserializedExtraResources.Select(x => x.prefabName).ToList().Contains(key)))
+				{
+					Dbgl("All missing prefab references are configured as ExtraResources. Attempting alternate prefab detection method.");
+					UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
+					for (int i = 0; i < array.Length; i++)
+					{
+						GameObject gameObject = (GameObject)array[i];
+
+						if (!nullKeys.Contains(gameObject.name)) continue;
+
+						prefabRefs[gameObject.name] = gameObject;
+						nullKeys.Remove(gameObject.name);
+
+						if (!nullKeys.Any())
+						{
+							Dbgl("Found all prefab references");
+							break;
+						}
+					}
+				}
+
 				foreach (string s in nullKeys)
 				{
 					Dbgl($"prefabRefs[{s}] value is null, removing key and value pair.");
