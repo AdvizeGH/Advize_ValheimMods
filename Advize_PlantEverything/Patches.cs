@@ -263,11 +263,24 @@ namespace Advize_PlantEverything
 
 			public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 			{
-				return new CodeMatcher(instructions)
-				.MatchForward(true, new CodeMatch(OpCodes.Stloc_3))
-				.MatchForward(false, new CodeMatch(OpCodes.Callvirt))
+				//match for ldloc and then a callvirt to TreeBase::Grow
+				var matcher = new CodeMatcher(instructions)
+				.MatchForward(false,
+					new CodeMatch(code => code.IsLdloc()),
+					new CodeMatch(code => code.Calls(TreeBaseGrowMethod)));
+				
+				//clone the ldloc instruction found
+				//ashlands seems to use Ldloc.5 whereas main branch uses Ldloc.3
+				//so this just makes sure that both work
+				var ldloc = matcher.Instruction.Clone();
+				
+				//this is largely unchanged, just go back one and insert the call to the modify method
+				return matcher
 				.Advance(-1)
-				.InsertAndAdvance(new CodeInstruction[] { new(OpCodes.Ldarg_0), new(OpCodes.Ldloc_3), new(OpCodes.Call, ModifyGrowMethod) })
+				.InsertAndAdvance(new CodeInstruction[] {
+					new(OpCodes.Ldarg_0), ldloc,
+					new(OpCodes.Call, ModifyGrowMethod)
+				})
 				.InstructionEnumeration();
 			}
 
