@@ -264,32 +264,19 @@ namespace Advize_PlantEverything
 			public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 			{
 				return new CodeMatcher(instructions)
-				.MatchForward(true, new CodeMatch(OpCodes.Stloc_3))
-				.MatchForward(false, new CodeMatch(OpCodes.Callvirt))
-				.Advance(-1)
-				.InsertAndAdvance(new CodeInstruction[] { new(OpCodes.Ldarg_0), new(OpCodes.Ldloc_3), new(OpCodes.Call, ModifyGrowMethod) })
+				.MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(TreeBase), nameof(TreeBase.Grow))))
+				.Advance(1)
+				.InsertAndAdvance(new CodeInstruction[] { new(OpCodes.Ldarg_0), new(OpCodes.Ldloc_1), new(OpCodes.Call, ModifyGrowMethod) })
 				.InstructionEnumeration();
 			}
 
-			private static void ModifyGrow(Plant plant, TreeBase treeBase)
+			private static void ModifyGrow(Plant plant, GameObject grownTree)
 			{
-				ZNetView znv = plant?.GetComponent<ZNetView>();
-
-				if (!znv || !treeBase)
-				{
-					Dbgl("ModifyGrow not executed, a reference is null", true, level: BepInEx.Logging.LogLevel.Error);
+				if (!plant.m_nview || !plant.m_nview.GetZDO().GetBool("pe_placeAnywhere") || !grownTree.TryGetComponent(out TreeBase tb) || !tb.TryGetComponent(out StaticPhysics sp))
 					return;
-				}
 
-				if (!znv.GetZDO().GetBool("pe_placeAnywhere")) return;
-
-				StaticPhysics sp = treeBase.GetComponent<StaticPhysics>();
-
-				if (sp)
-				{
-					sp.m_fall = false;
-					treeBase.GetComponent<ZNetView>().GetZDO().Set("pe_placeAnywhere", true);
-				}
+				sp.m_fall = false;
+				tb.m_nview.GetZDO().Set("pe_placeAnywhere", true);
 			}
 		}
 
