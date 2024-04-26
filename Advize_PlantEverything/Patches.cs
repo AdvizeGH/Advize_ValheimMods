@@ -153,7 +153,7 @@ namespace Advize_PlantEverything
 
 			private static void RemoveObject(Piece piece, Player player)
 			{
-				ZNetView znv = piece.GetComponent<ZNetView>();
+				ZNetView znv = piece.m_nview;
 				WearNTear wnt = piece.GetComponent<WearNTear>();
 
 				if (wnt)
@@ -185,25 +185,17 @@ namespace Advize_PlantEverything
 		{
 			public static void Postfix(Piece __instance)
 			{
-				if (IsModdedPrefabOrSapling(__instance))
+				if (!IsModdedPrefabOrSapling(__instance.m_name)) return;
+				
+				if (config.ResourcesSpawnEmpty && __instance.GetComponent<Pickable>() && !__instance.m_name.Contains("Stone"))
 				{
-					ZNetView znv = __instance.GetComponent<ZNetView>();
+					__instance.m_nview.InvokeRPC(ZNetView.Everybody, "SetPicked", true);
+				}
 
-					if (config.ResourcesSpawnEmpty && __instance.GetComponent<Pickable>() && !__instance.m_name.Contains("Stone"))
-					{
-						znv.InvokeRPC(ZNetView.Everybody, "SetPicked", true);
-					}
-
-					if (config.PlaceAnywhere)
-					{
-						StaticPhysics sp = __instance.GetComponent<StaticPhysics>();
-
-						if (sp)
-						{
-							sp.m_fall = false;
-							znv.GetZDO().Set("pe_placeAnywhere", true);
-						}
-					}
+				if (config.PlaceAnywhere && __instance.TryGetComponent(out StaticPhysics sp))
+				{
+					sp.m_fall = false;
+					__instance.m_nview.GetZDO().Set("pe_placeAnywhere", true);
 				}
 			}
 		}
@@ -212,20 +204,12 @@ namespace Advize_PlantEverything
 		public static class CheckZDOPatches
 		{
 			[HarmonyPatch(typeof(Piece), nameof(Piece.Awake))]
-			public static void Postfix(Piece __instance) => CheckZDO(__instance);
-
 			[HarmonyPatch(typeof(TreeBase), nameof(TreeBase.Awake))]
-			public static void Postfix(TreeBase __instance) => CheckZDO(__instance);
-
-			public static void CheckZDO(Component instance)
+			public static void Postfix(ZNetView ___m_nview)
 			{
-				ZNetView znv = instance.GetComponent<ZNetView>();
-				if (!znv || znv.GetZDO() == null) return;
+				if (!___m_nview || ___m_nview.GetZDO() == null || !___m_nview.GetZDO().GetBool("pe_placeAnywhere")) return;
 
-				if (znv.GetZDO().GetBool("pe_placeAnywhere"))
-				{
-					instance.GetComponent<StaticPhysics>().m_fall = false;
-				}
+				___m_nview.GetComponent<StaticPhysics>().m_fall = false;
 			}
 		}
 
@@ -234,7 +218,7 @@ namespace Advize_PlantEverything
 		{
 			public static bool Prefix(Plant __instance, ref bool __result)
 			{
-				if ((!config.CropRequireSunlight && __instance.m_name.StartsWith("$piece_sapling")) || (config.PlaceAnywhere && IsModdedPrefabOrSapling(__instance)))
+				if ((!config.CropRequireSunlight && __instance.m_name.StartsWith("$piece_sapling")) || (config.PlaceAnywhere && IsModdedPrefabOrSapling(__instance.m_name)))
 					return __result = false;
 
 				return true;
@@ -246,7 +230,7 @@ namespace Advize_PlantEverything
 		{
 			public static bool Prefix(Plant __instance, ref bool __result)
 			{
-				if ((!config.CropRequireGrowthSpace && __instance.m_name.StartsWith("$piece_sapling")) || (config.PlaceAnywhere && IsModdedPrefabOrSapling(__instance)))
+				if ((!config.CropRequireGrowthSpace && __instance.m_name.StartsWith("$piece_sapling")) || (config.PlaceAnywhere && IsModdedPrefabOrSapling(__instance.m_name)))
 				{
 					__result = true;
 					return false;
