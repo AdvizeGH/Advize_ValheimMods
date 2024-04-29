@@ -169,7 +169,7 @@ namespace Advize_PlantEverything
 
 					if (piece.GetComponent<Pickable>())
 					{
-						znv.InvokeRPC("Pick");
+						znv.InvokeRPC("RPC_Pick");
 					}
 
 					ZNetScene.instance.Destroy(piece.gameObject);
@@ -189,7 +189,7 @@ namespace Advize_PlantEverything
 				
 				if (config.ResourcesSpawnEmpty && __instance.GetComponent<Pickable>() && !__instance.m_name.Contains("Stone"))
 				{
-					__instance.m_nview.InvokeRPC(ZNetView.Everybody, "SetPicked", true);
+					__instance.m_nview.InvokeRPC(ZNetView.Everybody, "RPC_SetPicked", true);
 				}
 
 				if (config.PlaceAnywhere && __instance.TryGetComponent(out StaticPhysics sp))
