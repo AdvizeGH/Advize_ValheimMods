@@ -187,7 +187,7 @@ namespace Advize_PlantEverything
 			{
 				if (!IsModdedPrefabOrSapling(__instance.m_name)) return;
 				
-				if (config.ResourcesSpawnEmpty && __instance.GetComponent<Pickable>() && !__instance.m_name.Contains("Stone"))
+				if (config.ResourcesSpawnEmpty && __instance.GetComponent<Pickable>() && __instance.m_name != "Pickable_Stone")
 				{
 					__instance.m_nview.InvokeRPC(ZNetView.Everybody, "RPC_SetPicked", true);
 				}
