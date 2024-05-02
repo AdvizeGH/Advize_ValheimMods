@@ -990,6 +990,10 @@ namespace Advize_PlantEverything.Configuration
 			yggaGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
 			yggaMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
 			yggaMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
+			autumnBirchGrowRadius.SettingChanged += PlantEverything.SaplingSettingChanged;
+			autumnBirchGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
+			autumnBirchMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
+			autumnBirchMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
 			ashwoodGrowRadius.SettingChanged += PlantEverything.SaplingSettingChanged;
 			ashwoodGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
 			ashwoodMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
