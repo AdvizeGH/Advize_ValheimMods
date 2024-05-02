@@ -25,11 +25,12 @@ namespace Advize_PlantEverything.Configuration
 		private readonly ConfigEntry<string> language; //local
 		private readonly ConfigEntry<string> disabledResourceNames;
 
-		//Difficulty 7
+		//Difficulty 8
 		private readonly ConfigEntry<bool> requireCultivation;
 		private readonly ConfigEntry<bool> placeAnywhere;
 		private readonly ConfigEntry<bool> enforceBiomes;
 		private readonly ConfigEntry<bool> enforceBiomesVanilla;
+		private readonly ConfigEntry<bool> plantsRequireShielding;
 		private readonly ConfigEntry<bool> recoverResources;
 		private readonly ConfigEntry<bool> resourcesSpawnEmpty;
 		private readonly ConfigEntry<bool> enemiesTargetPieces;
@@ -259,6 +260,11 @@ namespace Advize_PlantEverything.Configuration
 				"EnforceBiomesVanilla",
 				true,
 				"Restrict vanilla plantables (crops and saplings) to being placed in their respective biome.");
+			plantsRequireShielding = Config(
+				"Difficulty",
+				"PlantsRequireShielding",
+				true,
+				"Controls whether plants need shielding to survive in hostile environments.");
 			recoverResources = Config(
 				"Difficulty",
 				"RecoverResources",
@@ -820,6 +826,7 @@ namespace Advize_PlantEverything.Configuration
 			placeAnywhere.SettingChanged += PlantEverything.CoreSettingChanged;
 			enforceBiomes.SettingChanged += PlantEverything.CoreSettingChanged;
 			enforceBiomesVanilla.SettingChanged += PlantEverything.CoreSettingChanged;
+			plantsRequireShielding.SettingChanged += PlantEverything.CoreSettingChanged;
 			recoverResources.SettingChanged += PlantEverything.CoreSettingChanged;
 			//resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
 			enemiesTargetPieces.SettingChanged += PlantEverything.PieceSettingChanged;
@@ -960,6 +967,7 @@ namespace Advize_PlantEverything.Configuration
 		internal bool PlaceAnywhere => placeAnywhere.Value;
 		internal bool EnforceBiomes => enforceBiomes.Value;
 		internal bool EnforceBiomesVanilla => enforceBiomesVanilla.Value;
+		internal bool PlantsRequireShielding => plantsRequireShielding.Value;
 		internal bool RecoverResources => recoverResources.Value;
 		internal bool ResourcesSpawnEmpty => resourcesSpawnEmpty.Value;
 		internal bool EnemiesTargetPieces => enemiesTargetPieces.Value;

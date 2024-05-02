@@ -629,6 +629,7 @@ namespace Advize_PlantEverything
 				plant.m_maxScale = sdb.maxScale;
 
 				piece.m_onlyInBiome = plant.m_biome = sdb.biome;
+				plant.m_tolerateCold = plant.m_tolerateHeat = !config.PlantsRequireShielding;
 				plant.m_destroyIfCantGrow = piece.m_groundOnly = !config.PlaceAnywhere;
 
 				if (!saplingRefs.Contains(sdb)) continue;
@@ -778,6 +779,7 @@ namespace Advize_PlantEverything
 				piece.m_primaryTarget = piece.m_randomTarget = config.EnemiesTargetCrops;
 
 				plant.m_biome = pdb.biome;
+				plant.m_tolerateCold = plant.m_tolerateHeat = !config.PlantsRequireShielding;
 
 				plant.m_minScale = overridesEnabled ? config.CropMinScale : 0.9f;
 				plant.m_maxScale = overridesEnabled ? config.CropMaxScale : 1.1f;
