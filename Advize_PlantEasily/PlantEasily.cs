@@ -127,13 +127,13 @@ namespace Advize_PlantEasily
 
         private static float PickableSnapRadius(string name)
         {
-            if (name.EndsWith("berryBush"))
+            if (berries.Contains(name))
                 return config.BerryBushSnapRadius;
-            if (name.StartsWith("Pickable_Mushroom"))
+            if (mushrooms.Contains(name))
                 return config.MushroomSnapRadius;
-            if (name.Contains("Dandelion") || name.Contains("Thistle"))
+            if (flowers.Contains(name))
                 return config.FlowerSnapRadius;
-            
+
             return config.PickableSnapRadius;
         }
         
@@ -159,22 +159,37 @@ namespace Advize_PlantEasily
             Heightmap heightmap = Heightmap.FindHeightmap(position);
 
             bool cultivatedGroundOnly = plant?.m_needCultivatedGround ?? piece.m_cultivatedGroundOnly;
-            Heightmap.Biome biome = plant?.m_biome ?? piece.m_onlyInBiome;
+            Heightmap.Biome allowedBiomes = plant?.m_biome ?? piece.m_onlyInBiome;
+            Heightmap.Biome currentBiome = heightmap.GetBiome(position);
 
             if (cultivatedGroundOnly && heightmap && !heightmap.IsCultivated(position))
                 placementStatus = Status.NotCultivated;
 
-            if (biome != 0 && (Heightmap.FindBiome(position) & biome) == 0)
+            if (allowedBiomes != 0 && (currentBiome & allowedBiomes) == 0)
                 placementStatus = Status.WrongBiome;
 
-            if (plant && !HasGrowSpace(plant, ghost.transform.position))
-                placementStatus = Status.NoSpace;
+            if (plant)
+            {
+                if (!HasGrowSpace(plant, position))
+                    placementStatus = Status.NoSpace;
 
-            if (plant && (bool)Traverse.Create(plant).Method("HaveRoof").GetValue())
-                placementStatus = Status.NoSun;
+                if (plant.HaveRoof())
+                    placementStatus = Status.NoSun;
 
-            if (!plant && config.PreventOverlappingPlacements && PositionHasCollisions(position))
-                placementStatus = Status.NoSpace;
+                if (plant.m_attachDistance > 0.0 && !plant.GetClosestAttachPosRot(out plant.m_attachPos, out plant.m_attachRot, out plant.m_attachNormal))
+                    placementStatus = Status.NoWall;
+
+                if (!plant.m_tolerateHeat && currentBiome == Heightmap.Biome.AshLands && !ShieldGenerator.IsInsideShield(position))
+                    placementStatus = Status.TooHot;
+
+                if (!plant.m_tolerateCold && (currentBiome == Heightmap.Biome.DeepNorth || currentBiome == Heightmap.Biome.Mountain) && !ShieldGenerator.IsInsideShield(position))
+                    placementStatus = Status.TooCold;
+            }
+            else
+            {
+                if (config.PreventOverlappingPlacements && PositionHasCollisions(position))
+                    placementStatus = Status.NoSpace;
+            }
             
             return placementStatus;
         }
@@ -237,7 +252,10 @@ namespace Advize_PlantEasily
             WrongBiome,     // 3
             NoSpace,        // 4
             NoSun,          // 5
-            Invalid         // 6
+            Invalid,        // 6
+            NoWall,         // 7
+            TooHot,         // 8
+            TooCold         // 9
         }
 
         private static readonly Dictionary<int, string> statusMessage = new()
@@ -247,7 +265,10 @@ namespace Advize_PlantEasily
             { 3, "$piece_plant_wrongbiome" },
             { 4, "$piece_plant_nospace" },
             { 5, "$piece_plant_nosun" },
-            { 6, "$msg_invalidplacement" }
+            { 6, "$msg_invalidplacement" },
+            { 7, "$piece_plant_nowall" },
+            { 8, "$piece_plant_toohot" },
+            { 9, "$piece_plant_toocold" }
         };
 
         private static readonly Dictionary<string, string> pickablesToPlants = new()
@@ -263,6 +284,10 @@ namespace Advize_PlantEasily
             { "Pickable_Mushroom_Magecap", "sapling_magecap" },
             { "Pickable_SeedTurnip", "sapling_seedturnip" }
         };
+
+        private static readonly string[] berries = { "RaspberryBush", "BlueberryBush", "CloudberryBush" };
+        private static readonly string[] mushrooms = { "Pickable_Mushroom", "Pickable_Mushroom_yellow", "Pickable_Mushroom_blue", "Pickable_SmokePuff" };
+        private static readonly string[] flowers = { "Pickable_Dandelion", "Pickable_Thistle", "Pickable_Fiddlehead" };
 
         private static void InitPrefabRefs()
         {

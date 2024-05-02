@@ -52,17 +52,12 @@ namespace Advize_PlantEasily
         }
 
         [HarmonyPatch(typeof(HotkeyBar), "Update")]
-        public class HotKeyBarUpdate
-        {
-            public static void Prefix(ref bool __runOriginal) => __runOriginal = !OverrideGamepadInput;
-        }
-        
         [HarmonyPatch(typeof(Player), "StartGuardianPower")]
-        public class PlayerStartGuardianPower
+        public class GamepadInputOverridePatches
         {
             public static void Prefix(ref bool __runOriginal) => __runOriginal = !OverrideGamepadInput;
         }
-        
+
         [HarmonyPatch(typeof(Player), "SetupPlacementGhost")]
         public class PlayerSetupPlacementGhost
         {
@@ -379,10 +374,9 @@ namespace Advize_PlantEasily
                 {
                     foreach (Interactable extraInteractable in FindResourcesInRadius(go))
                     {
-                        if (config.ReplantOnHarvest)
+                        if (config.ReplantOnHarvest && pickablesToPlants.ContainsKey(GetPrefabName(extraInteractable)))
                         {
-                            if (pickablesToPlants.ContainsKey(GetPrefabName(extraInteractable)))
-                                instanceIDS.Add(((Pickable)extraInteractable).GetInstanceID());
+                            instanceIDS.Add(((Pickable)extraInteractable).GetInstanceID());
                         }
                         extraInteractable.Interact(__instance, hold, alt);
                     }
