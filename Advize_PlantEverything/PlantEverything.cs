@@ -522,14 +522,14 @@ namespace Advize_PlantEverything
 					}
 				};
 
-				if (pdb.points != null)
+				if (pdb.snapPoints != null)
 				{
 					Transform sp = pdb.Prefab.transform.Find("_snappoint");
 					if (config.SnappableVines)
 					{
 						if (!sp)
 						{
-							foreach (Vector3 point in pdb.points)
+							foreach (Vector3 point in pdb.snapPoints)
 							{
 								GameObject snapPoint = new("_snappoint");
 								snapPoint.tag = "snappoint";
@@ -635,8 +635,17 @@ namespace Advize_PlantEverything
 
 				plant.m_grownPrefabs = sdb.grownPrefabs;
 
-				piece.m_resources[0].m_resItem = prefabRefs[sdb.resource].GetComponent<ItemDrop>();
-				piece.m_resources[0].m_amount = sdb.resourceCost;
+				List<Piece.Requirement> resources = new();
+				foreach (string item in sdb.Resources.Keys)
+				{
+					resources.Add(new Piece.Requirement
+					{
+						m_resItem = ObjectDB.instance.GetItemPrefab(item).GetComponent<ItemDrop>(),
+						m_amount = sdb.Resources[item],
+						m_recover = false
+					});
+				}
+				piece.m_resources = resources.ToArray();
 
 				if (config.DisabledResourceNames.Contains(sdb.key))
 				{

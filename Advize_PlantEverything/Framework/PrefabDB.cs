@@ -8,6 +8,7 @@ namespace Advize_PlantEverything.Framework
 	{
 		internal string key;
 		internal Heightmap.Biome biome;
+		protected Dictionary<string, int> resources;
 		internal int resourceCost;
 		internal int resourceReturn;
 		internal bool extraDrops;
@@ -15,15 +16,26 @@ namespace Advize_PlantEverything.Framework
 		internal bool enabled = true;
 
 		internal GameObject Prefab => PlantEverything.prefabRefs[key];
+
+		internal KeyValuePair<string, int> Resource
+		{
+			get { return Resources.Count > 0 ? Resources.First() : new KeyValuePair<string, int>(Prefab.GetComponent<Pickable>().m_itemPrefab.name, resourceCost); }
+			set { if (resources == null) { resources = new Dictionary<string, int>(); } resources.Add(value.Key, value.Value); }
+		}
+
+		internal Dictionary<string, int> Resources
+		{
+			get { return resources ?? new Dictionary<string, int>(); }
+			set { resources = value; }
+		}
 	}
 
 	internal sealed class PieceDB : PrefabDB
 	{
-		private Dictionary<string, int> resources;
 		internal int respawnTime;
 		internal bool recover;
 		private Piece piece;
-		internal List<Vector3> points;
+		internal List<Vector3> snapPoints;
 		private string name;
 		internal string pieceName;
 		internal string pieceDescription;
@@ -39,18 +51,6 @@ namespace Advize_PlantEverything.Framework
 			set { name = value; }
 		}
 
-		internal KeyValuePair<string, int> Resource
-		{
-			get { return Resources.Count > 0 ? Resources.First() : new KeyValuePair<string, int>(Prefab.GetComponent<Pickable>().m_itemPrefab.name, resourceCost); }
-			set { if (resources == null) { resources = new Dictionary<string, int>(); } if (!resources.ContainsKey(value.Key)) resources.Add(value.Key, value.Value); }
-		}
-
-		internal Dictionary<string, int> Resources
-		{
-			get { return resources ?? new Dictionary<string, int>(); }
-			set { resources = value; }
-		}
-
 		internal int ResourceCost
 		{
 			get { return resourceCost; }
@@ -61,7 +61,6 @@ namespace Advize_PlantEverything.Framework
 	internal sealed class SaplingDB : PrefabDB
 	{
 		internal string source;
-		internal string resource;
 		internal float growTime;
 		internal float growRadius;
 		internal float minScale;

@@ -388,7 +388,7 @@ namespace Advize_PlantEverything.Framework
 						recover = true,
 						Name = "Vines",
 						isGrounded = false,
-						points = new()
+						snapPoints = new()
 						{
 							{ new Vector3(1f, 0.5f, 0) },
 							{ new Vector3(-1f, 0.5f, 0) },
@@ -492,8 +492,7 @@ namespace Advize_PlantEverything.Framework
 					key = "Ygga_Sapling",
 					biome = Config.EnforceBiomes ? TemperateBiomes | Heightmap.Biome.Mistlands : AllBiomes,
 					source = "YggaShoot_small1",
-					resource = "Sap",
-					resourceCost = 1,
+					Resource = new KeyValuePair<string, int>("Sap", 1),
 					icon = true,
 					growTime = Config.YggaGrowthTime,
 					growRadius = Config.YggaGrowRadius,
@@ -506,8 +505,7 @@ namespace Advize_PlantEverything.Framework
 					key = "Ancient_Sapling",
 					biome = Config.EnforceBiomes ? TemperateBiomes | Heightmap.Biome.Swamp : AllBiomes,
 					source = "SwampTree1",
-					resource = "AncientSeed",
-					resourceCost = 1,
+					Resource = new KeyValuePair<string, int>("AncientSeed", 1),
 					icon = true,
 					growTime = Config.AncientGrowthTime,
 					growRadius = Config.AncientGrowRadius,
@@ -520,8 +518,7 @@ namespace Advize_PlantEverything.Framework
 					key = "Autumn_Birch_Sapling",
 					biome = Config.EnforceBiomes ? TemperateBiomes : AllBiomes,
 					source = "Birch1_aut",
-					resource = "BirchSeeds",
-					resourceCost = 1,
+					Resource = new KeyValuePair<string, int>("BirchSeeds", 1),
 					icon = true,
 					growTime = Config.AutumnBirchGrowthTime,
 					growRadius = Config.AutumnBirchGrowRadius,
