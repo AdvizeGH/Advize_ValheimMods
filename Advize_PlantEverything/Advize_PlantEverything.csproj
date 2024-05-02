@@ -151,6 +151,9 @@
     <EmbeddedResource Include="Assets\Ancient_SaplingPieceIcon.png" />
     <EmbeddedResource Include="Assets\Ygga_SaplingPieceIcon.png" />
     <EmbeddedResource Include="Assets\Autumn_Birch_SaplingPieceIcon.png" />
+    <EmbeddedResource Include="Assets\Ashwood_SaplingPieceIcon.png" />
+    <EmbeddedResource Include="Assets\FernAshlandsPieceIcon.png" />
+    <EmbeddedResource Include="Assets\Pickable_FiddleheadPieceIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ILRepack.targets" />

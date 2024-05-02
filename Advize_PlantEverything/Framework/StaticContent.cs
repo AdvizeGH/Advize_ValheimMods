@@ -302,6 +302,29 @@ namespace Advize_PlantEverything.Framework
 					recover = Config.RecoverResources,
 					Name = "PickableDandelion",
 					isGrounded = true
+				},
+				new PieceDB
+				{
+					key = "Pickable_SmokePuff",
+					ResourceCost = Config.SmokePuffCost,
+					resourceReturn = Config.SmokePuffReturn,
+					respawnTime = Config.SmokePuffRespawnTime,
+					recover = Config.RecoverResources,
+					Name = "PickableSmokePuff",
+					isGrounded = true,
+					extraDrops = true
+				},
+				new PieceDB
+				{
+					key = "Pickable_Fiddlehead",
+					ResourceCost = Config.FiddleheadCost,
+					resourceReturn = Config.FiddleheadReturn,
+					respawnTime = Config.FiddleheadRespawnTime,
+					icon = true,
+					recover = Config.RecoverResources,
+					Name = "PickableFiddlehead",
+					isGrounded = true,
+					extraDrops = true
 				}
 			};
 
@@ -395,6 +418,14 @@ namespace Advize_PlantEverything.Framework
 							{ new Vector3(1f, -1f, 0) },
 							{ new Vector3(-1f, -1f, 0) }
 						}
+					},
+					new PieceDB
+					{
+						key = "FernAshlands",
+						Resource = new KeyValuePair<string, int>("Wood", 2),
+						icon = true,
+						Name = "AshlandsFern",
+						canBeRemoved = false
 					},
 					new PieceDB
 					{
@@ -525,6 +556,19 @@ namespace Advize_PlantEverything.Framework
 					minScale = Config.AutumnBirchMinScale,
 					maxScale = Config.AutumnBirchMaxScale,
 					grownPrefabs = new GameObject[] { PE.prefabRefs["Birch1_aut"], PE.prefabRefs["Birch2_aut"] }
+				},
+				new SaplingDB
+				{
+					key = "Ashwood_Sapling",
+					biome = Config.EnforceBiomes ? TemperateBiomes | Heightmap.Biome.AshLands : AllBiomes,
+					source = "AshlandsTree3",
+					Resources = new Dictionary<string, int>() { { "BeechSeeds", 1 }, { "SulfurStone", 1 } },
+					icon = true,
+					growTime = Config.AshwoodGrowthTime,
+					growRadius = Config.AshwoodGrowRadius,
+					minScale = Config.AshwoodMinScale,
+					maxScale = Config.AshwoodMaxScale,
+					grownPrefabs = new GameObject[] { PE.prefabRefs["AshlandsTree3"], PE.prefabRefs["AshlandsTree4"], PE.prefabRefs["AshlandsTree5"], PE.prefabRefs["AshlandsTree6_big"] }
 				}
 			};
 		}

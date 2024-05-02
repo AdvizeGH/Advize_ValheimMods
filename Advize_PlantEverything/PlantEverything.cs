@@ -593,6 +593,11 @@ namespace Advize_PlantEverything
 							vanillaPickedChild.SetParent(prefabRefs[pdb.key + "_Picked"].transform);
 						}
 					}
+
+					if (pdb.extraDrops)
+					{
+						pickable.m_extraDrops.m_drops.Clear();
+					}
 				}
 			}
 
@@ -659,8 +664,15 @@ namespace Advize_PlantEverything
 				string[] p = { "healthy", "unhealthy" };
 				Transform t = prefabRefs["Birch_Sapling"].transform.Find(p[0]);
 
-				foreach (string parent in p)
-					sdb.Prefab.transform.Find(parent).GetComponent<MeshFilter>().mesh = t.Find("Birch_Sapling").GetComponent<MeshFilter>().mesh;
+				AssetID.TryParse("f6de4704e075b4095ae641aed283b641", out AssetID id);
+				SoftReference<Shader> pieceShader = new(id);
+				pieceShader.Load();
+
+				if (sdb.source != "AshlandsTree3")
+				{
+					foreach (string parent in p)
+						sdb.Prefab.transform.Find(parent).GetComponent<MeshFilter>().mesh = t.Find("Birch_Sapling").GetComponent<MeshFilter>().mesh;
+				}
 
 				switch (sdb.source) // Cases are in {} code blocks to re-use variable names and contain them within a local scope. Why did I do this? -> Don't know, just stop trying to delete them
 				{
@@ -687,9 +699,6 @@ namespace Advize_PlantEverything
 					case "SwampTree1":
 					{
 						Material[] m = new Material[] { prefabRefs[sdb.source].transform.Find("swamptree1").GetComponent<MeshRenderer>().sharedMaterials[0] };
-						AssetID.TryParse("f6de4704e075b4095ae641aed283b641", out AssetID id);
-						SoftReference<Shader> pieceShader = new(id);
-						pieceShader.Load();
 						m[0].shader = pieceShader.Asset;// Shader.Find("Custom/Piece");
 
 						foreach (string parent in p)
@@ -713,6 +722,23 @@ namespace Advize_PlantEverything
 								sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshFilter>().mesh = t.Find(child).GetComponent<MeshFilter>().mesh;
 								sdb.Prefab.transform.Find(parent).Find(child).GetComponent<MeshRenderer>().sharedMaterials = m;
 							}
+						}
+					}
+					break;
+
+					case "AshlandsTree3":
+					{
+						Transform t2 = prefabRefs[sdb.source].transform.Find("default");
+						MeshRenderer renderer = t2.GetComponent<MeshRenderer>();
+
+						Material[] m = new Material[] { renderer.sharedMaterials[0] };
+						m[0].shader = pieceShader.Asset;
+						m[0].SetTexture("_EmissionMap", renderer.sharedMaterials[0].GetTexture("_EmissiveTex"));
+
+						foreach (string parent in p)
+						{
+							sdb.Prefab.transform.Find(parent).GetComponent<MeshFilter>().mesh = t2.GetComponent<MeshFilter>().mesh;
+							sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m;
 						}
 					}
 					break;

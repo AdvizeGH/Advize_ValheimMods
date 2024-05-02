@@ -86,26 +86,32 @@ namespace Advize_PlantEverything.Configuration
 		private readonly ConfigEntry<int> pickableFlintCost;
 		private readonly ConfigEntry<int> pickableFlintReturn;
 
-		//Mushrooms 9
+		//Mushrooms 12
 		private readonly ConfigEntry<int> mushroomCost;
 		private readonly ConfigEntry<int> yellowMushroomCost;
 		private readonly ConfigEntry<int> blueMushroomCost;
+		private readonly ConfigEntry<int> smokePuffCost;
 		private readonly ConfigEntry<int> mushroomRespawnTime;
 		private readonly ConfigEntry<int> yellowMushroomRespawnTime;
 		private readonly ConfigEntry<int> blueMushroomRespawnTime;
+		private readonly ConfigEntry<int> smokePuffRespawnTime;
 		private readonly ConfigEntry<int> mushroomReturn;
 		private readonly ConfigEntry<int> yellowMushroomReturn;
 		private readonly ConfigEntry<int> blueMushroomReturn;
+		private readonly ConfigEntry<int> smokePuffReturn;
 
-		//Flowers 6
+		//Flowers 9
 		private readonly ConfigEntry<int> thistleCost;
 		private readonly ConfigEntry<int> dandelionCost;
+		private readonly ConfigEntry<int> fiddleheadCost;
 		private readonly ConfigEntry<int> thistleRespawnTime;
 		private readonly ConfigEntry<int> dandelionRespawnTime;
+		private readonly ConfigEntry<int> fiddleheadRespawnTime;
 		private readonly ConfigEntry<int> thistleReturn;
 		private readonly ConfigEntry<int> dandelionReturn;
+		private readonly ConfigEntry<int> fiddleheadReturn;
 
-		//Saplings 32
+		//Saplings 36
 		private readonly ConfigEntry<float> birchMinScale;
 		private readonly ConfigEntry<float> birchMaxScale;
 		private readonly ConfigEntry<float> oakMinScale;
@@ -138,6 +144,10 @@ namespace Advize_PlantEverything.Configuration
 		private readonly ConfigEntry<float> autumnBirchMaxScale;
 		private readonly ConfigEntry<float> autumnBirchGrowthTime;
 		private readonly ConfigEntry<float> autumnBirchGrowRadius;
+		private readonly ConfigEntry<float> ashwoodMinScale;
+		private readonly ConfigEntry<float> ashwoodMaxScale;
+		private readonly ConfigEntry<float> ashwoodGrowthTime;
+		private readonly ConfigEntry<float> ashwoodGrowRadius;
 
 		//Seeds 7
 		private readonly ConfigEntry<bool> enableSeedOverrides;
@@ -528,6 +538,11 @@ namespace Advize_PlantEverything.Configuration
 				"BlueMushroomCost",
 				5,
 				"Number of blue mushrooms required to place a pickable blue mushroom spawner. Set to 0 to disable the ability to plant this resource.");
+			smokePuffCost = Config(
+				"Mushrooms",
+				"SmokePuffCost",
+				15,
+				"Number of smoke puffs required to place a pickable smoke puff spawner. Set to 0 to disable the ability to plant this resource.");
 			mushroomRespawnTime = Config(
 				"Mushrooms",
 				"MushroomRespawnTime",
@@ -543,6 +558,11 @@ namespace Advize_PlantEverything.Configuration
 				"BlueMushroomRespawnTime",
 				240,
 				"Number of minutes it takes for blue mushrooms to respawn.");
+			smokePuffRespawnTime = Config(
+				"Mushrooms",
+				"SmokePuffRespawnTime",
+				240,
+				"Number of minutes it takes for smoke puffs to respawn.");
 			mushroomReturn = Config(
 				"Mushrooms",
 				"MushroomReturn",
@@ -558,6 +578,11 @@ namespace Advize_PlantEverything.Configuration
 				"BlueMushroomReturn",
 				1,
 				"Number of blue mushrooms a pickable blue mushroom spawner will spawn.");
+			smokePuffReturn = Config(
+				"Mushrooms",
+				"SmokePuffReturn",
+				3,
+				"Number of smoke puffs a pickable smoke puff spawner will spawn.");
 
 			//Flowers
 			thistleCost = Config(
@@ -570,6 +595,11 @@ namespace Advize_PlantEverything.Configuration
 				"DandelionCost",
 				5,
 				"Number of dandelion required to place a pickable dandelion spawner. Set to 0 to disable the ability to plant this resource.");
+			fiddleheadCost = Config(
+				"Flowers",
+				"FiddleheadCost",
+				15,
+				"Number of fiddlehead required to place a pickable fiddlehead spawner. Set to 0 to disable the ability to plant this resource.");
 			thistleRespawnTime = Config(
 				"Flowers",
 				"ThistleRespawnTime",
@@ -580,6 +610,11 @@ namespace Advize_PlantEverything.Configuration
 				"DandelionRespawnTime",
 				240,
 				"Number of minutes it takes for dandelion to respawn.");
+			fiddleheadRespawnTime = Config(
+				"Flowers",
+				"FiddleheadRespawnTime",
+				300,
+				"Number of minutes it takes for fiddlehead to respawn.");
 			thistleReturn = Config(
 				"Flowers",
 				"ThistleReturn",
@@ -590,6 +625,11 @@ namespace Advize_PlantEverything.Configuration
 				"DandelionReturn",
 				1,
 				"Number of dandelion a pickable dandelion spawner will spawn.");
+			fiddleheadReturn = Config(
+				"Flowers",
+				"FiddleheadReturn",
+				3,
+				"Number of fiddlehead a pickable fiddlehead spawner will spawn.");
 
 			//Saplings
 			birchMinScale = Config(
@@ -752,6 +792,26 @@ namespace Advize_PlantEverything.Configuration
 				"AutumnBirchGrowRadius",
 				2f,
 				"Radius of free space required for an autumn birch sapling to grow.");
+			ashwoodMinScale = Config(
+				"Saplings",
+				"AshwoodMinScale",
+				0.5f,
+				"The minimum scaling factor used to scale an ashwood tree upon growth.");
+			ashwoodMaxScale = Config(
+				"Saplings",
+				"AshwoodMaxScale",
+				2f,
+				"The minimum scaling factor used to scale an ashwood tree upon growth.");
+			ashwoodGrowthTime = Config(
+				"Saplings",
+				"AshwoodGrowthTime",
+				3000f,
+				"Number of seconds it takes for an ashwood tree to grow from an ashwood sapling (will take at least 10 seconds after planting to grow).");
+			ashwoodGrowRadius = Config(
+				"Saplings",
+				"AshwoodGrowRadius",
+				2f,
+				"Radius of free space required for an ashwood sapling to grow.");
 
 			//Seeds
 			enableSeedOverrides = Config(
@@ -880,20 +940,26 @@ namespace Advize_PlantEverything.Configuration
 			mushroomCost.SettingChanged += PlantEverything.PieceSettingChanged;
 			yellowMushroomCost.SettingChanged += PlantEverything.PieceSettingChanged;
 			blueMushroomCost.SettingChanged += PlantEverything.PieceSettingChanged;
+			smokePuffCost.SettingChanged += PlantEverything.PieceSettingChanged;
 			mushroomRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
 			yellowMushroomRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
 			blueMushroomRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
+			smokePuffRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
 			mushroomReturn.SettingChanged += PlantEverything.PieceSettingChanged;
 			yellowMushroomReturn.SettingChanged += PlantEverything.PieceSettingChanged;
 			blueMushroomReturn.SettingChanged += PlantEverything.PieceSettingChanged;
+			smokePuffReturn.SettingChanged += PlantEverything.PieceSettingChanged;
 
 			//Flowers
 			thistleCost.SettingChanged += PlantEverything.PieceSettingChanged;
 			dandelionCost.SettingChanged += PlantEverything.PieceSettingChanged;
+			fiddleheadCost.SettingChanged += PlantEverything.PieceSettingChanged;
 			thistleRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
 			dandelionRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
+			fiddleheadRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
 			thistleReturn.SettingChanged += PlantEverything.PieceSettingChanged;
 			dandelionReturn.SettingChanged += PlantEverything.PieceSettingChanged;
+			fiddleheadReturn.SettingChanged += PlantEverything.PieceSettingChanged;
 
 			//Saplings
 			ancientGrowRadius.SettingChanged += PlantEverything.SaplingSettingChanged;
@@ -924,6 +990,10 @@ namespace Advize_PlantEverything.Configuration
 			yggaGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
 			yggaMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
 			yggaMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
+			ashwoodGrowRadius.SettingChanged += PlantEverything.SaplingSettingChanged;
+			ashwoodGrowthTime.SettingChanged += PlantEverything.SaplingSettingChanged;
+			ashwoodMinScale.SettingChanged += PlantEverything.SaplingSettingChanged;
+			ashwoodMaxScale.SettingChanged += PlantEverything.SaplingSettingChanged;
 
 			//Seeds
 			enableSeedOverrides.SettingChanged += PlantEverything.SeedSettingChanged;
@@ -1019,18 +1089,24 @@ namespace Advize_PlantEverything.Configuration
 		internal int MushroomCost => mushroomCost.Value;
 		internal int YellowMushroomCost => yellowMushroomCost.Value;
 		internal int BlueMushroomCost => blueMushroomCost.Value;
+		internal int SmokePuffCost => smokePuffCost.Value;
 		internal int MushroomRespawnTime => mushroomRespawnTime.Value;
 		internal int YellowMushroomRespawnTime => yellowMushroomRespawnTime.Value;
 		internal int BlueMushroomRespawnTime => blueMushroomRespawnTime.Value;
+		internal int SmokePuffRespawnTime => smokePuffRespawnTime.Value;
 		internal int MushroomReturn => mushroomReturn.Value;
 		internal int YellowMushroomReturn => yellowMushroomReturn.Value;
 		internal int BlueMushroomReturn => blueMushroomReturn.Value;
+		internal int SmokePuffReturn => smokePuffReturn.Value;
 		internal int ThistleCost => thistleCost.Value;
 		internal int DandelionCost => dandelionCost.Value;
+		internal int FiddleheadCost => fiddleheadCost.Value;
 		internal int ThistleRespawnTime => thistleRespawnTime.Value;
 		internal int DandelionRespawnTime => dandelionRespawnTime.Value;
+		internal int FiddleheadRespawnTime => fiddleheadRespawnTime.Value;
 		internal int ThistleReturn => thistleReturn.Value;
 		internal int DandelionReturn => dandelionReturn.Value;
+		internal int FiddleheadReturn => fiddleheadReturn.Value;
 		internal float BirchMinScale => birchMinScale.Value;
 		internal float BirchMaxScale => birchMaxScale.Value;
 		internal float OakMinScale => oakMinScale.Value;
@@ -1063,6 +1139,10 @@ namespace Advize_PlantEverything.Configuration
 		internal float AutumnBirchMaxScale => autumnBirchMaxScale.Value;
 		internal float AutumnBirchGrowthTime => autumnBirchGrowthTime.Value;
 		internal float AutumnBirchGrowRadius => autumnBirchGrowRadius.Value;
+		internal float AshwoodMinScale => ashwoodMinScale.Value;
+		internal float AshwoodMaxScale => ashwoodMaxScale.Value;
+		internal float AshwoodGrowthTime => ashwoodGrowthTime.Value;
+		internal float AshwoodGrowRadius => ashwoodGrowRadius.Value;
 		internal bool EnableSeedOverrides => enableSeedOverrides.Value;
 		internal int SeedDropMin => seedDropMin.Value;
 		internal int SeedDropMax => seedDropMax.Value;
