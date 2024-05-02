@@ -36,6 +36,8 @@ namespace Advize_PlantEverything.Framework
 			{ "YggaSaplingDescription", "" },
 			{ "AutumnBirchSaplingName", "Autumn Birch Sapling" },
 			{ "AutumnBirchSaplingDescription", "Plains Variant" },
+			{ "AshwoodSaplingName", "Ashwood Sapling" },
+			{ "AshwoodSaplingDescription", "" },
 			{ "RaspberryBushName", "Raspberry Bush" },
 			{ "RaspberryBushDescription", "Plant raspberries to grow raspberry bushes." },
 			{ "BlueberryBushName", "Blueberry Bush" },
@@ -72,6 +74,8 @@ namespace Advize_PlantEverything.Framework
 			{ "YggaShootDescription", "Plant a small ygga shoot." },
 			{ "VinesName", "Vines" },
 			{ "VinesDescription", "Plant vines." },
+			{ "AshlandsFernName", "Ashlands Fern" },
+			{ "AshlandsFernDescription", "Plant a fern native to the ashlands." },
 			{ "GlowingMushroomName", "Glowing Mushroom" },
 			{ "GlowingMushroomDescription", "Plant a large glowing mushroom." },
 			{ "PickableBranchName", "Pickable Branch" },
@@ -79,15 +83,15 @@ namespace Advize_PlantEverything.Framework
 			{ "PickableStoneName", "Pickable Stone" },
 			{ "PickableStoneDescription", "Plant pickable stone." },
 			{ "PickableFlintName", "Pickable Flint" },
-			{ "PickableFlintDescription", "Plant respawning pickable flint." }
+			{ "PickableFlintDescription", "Plant respawning pickable flint." },
+			{ "PickableSmokePuffName", "Pickable Smoke Puff" },
+			{ "PickableSmokePuffDescription", "Plant smoke puffs to grow more pickable smoke puffs." },
+			{ "PickableFiddleheadName", "Pickable Fiddlehead" },
+			{ "PickableFiddleheadDescription", "Plant fiddlehead to grow more pickable fiddlehead." }
 		};
 
 		internal static readonly List<string> VanillaPrefabRefs = new()
 		{
-			{ "vfx_Place_wood_pole" },
-			{ "vines" },
-			{ "RaspberryBush" },
-			{ "Pickable_Mushroom_yellow" },
 			{ "Acorn" },
 			{ "AncientSeed" },
 			{ "BeechSeeds" },
@@ -97,13 +101,17 @@ namespace Advize_PlantEverything.Framework
 			{ "Sap" },
 			{ "Pickable_Branch" },
 			{ "Pickable_Dandelion" },
+			{ "Pickable_Fiddlehead" },
 			{ "Pickable_Flint" },
 			{ "Pickable_Mushroom" },
 			{ "Pickable_Mushroom_blue" },
+			{ "Pickable_Mushroom_yellow" },
+			{ "Pickable_SmokePuff" },
 			{ "Pickable_Stone" },
 			{ "Pickable_Thistle" },
 			{ "Cultivator" },
 			{ "sfx_build_cultivator" },
+			{ "vfx_Place_wood_pole" },
 			{ "sapling_barley" },
 			{ "sapling_carrot" },
 			{ "sapling_flax" },
@@ -114,6 +122,11 @@ namespace Advize_PlantEverything.Framework
 			{ "sapling_seedonion" },
 			{ "sapling_seedturnip" },
 			{ "sapling_turnip" },
+			{ "FernAshlands" },
+			{ "AshlandsTree3" },
+			{ "AshlandsTree4" },
+			{ "AshlandsTree5" },
+			{ "AshlandsTree6_big" },
 			{ "Beech1" },
 			{ "Beech_Sapling" },
 			{ "Beech_small1" },
@@ -126,6 +139,7 @@ namespace Advize_PlantEverything.Framework
 			{ "Bush01" },
 			{ "Bush01_heath" },
 			{ "Bush02_en" },
+			{ "RaspberryBush" },
 			{ "CloudberryBush" },
 			{ "FirTree" },
 			{ "FirTree_Sapling" },
@@ -140,9 +154,12 @@ namespace Advize_PlantEverything.Framework
 			{ "shrub_2" },
 			{ "shrub_2_heath" },
 			{ "SwampTree1" },
+			{ "vines" },
+			{ "VineAsh" },
+			{ "VineAsh_sapling" },
 			{ "GlowingMushroom" },
 			{ "Oak1" },
-			{ "Oak_Sapling" }
+			{ "Oak_Sapling" }			
 		};
 
 		internal static readonly List<string> CustomPrefabRefs = new()
@@ -150,11 +167,14 @@ namespace Advize_PlantEverything.Framework
 			{ "Ancient_Sapling" },
 			{ "Ygga_Sapling" },
 			{ "Autumn_Birch_Sapling" },
+			{ "Ashwood_Sapling" },
 			{ "Pickable_Dandelion_Picked" },
 			{ "Pickable_Thistle_Picked" },
 			{ "Pickable_Mushroom_Picked" },
 			{ "Pickable_Mushroom_yellow_Picked" },
-			{ "Pickable_Mushroom_blue_Picked" }
+			{ "Pickable_Mushroom_blue_Picked" },
+			{ "Pickable_SmokePuff_Picked" },
+			{ "Pickable_Fiddlehead_Picked" }
 		};
 
 		private static Dictionary<GameObject, GameObject> treesToSeeds;
