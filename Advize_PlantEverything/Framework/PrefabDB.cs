@@ -12,6 +12,8 @@ namespace Advize_PlantEverything.Framework
 		internal int resourceCost;
 		internal int resourceReturn;
 		internal bool extraDrops;
+		internal bool tolerateCold;
+		internal bool tolerateHeat;
 		internal bool icon;
 		internal bool enabled = true;
 

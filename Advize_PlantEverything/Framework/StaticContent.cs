@@ -520,6 +520,20 @@ namespace Advize_PlantEverything.Framework
 			{
 				new SaplingDB
 				{
+					key = "Ashwood_Sapling",
+					biome = Config.EnforceBiomes ? TemperateBiomes | Heightmap.Biome.AshLands : AllBiomes,
+					source = "AshlandsTree3",
+					Resources = new Dictionary<string, int>() { { "BeechSeeds", 1 }, { "SulfurStone", 1 } },
+					icon = true,
+					growTime = Config.AshwoodGrowthTime,
+					growRadius = Config.AshwoodGrowRadius,
+					minScale = Config.AshwoodMinScale,
+					maxScale = Config.AshwoodMaxScale,
+					grownPrefabs = new GameObject[] { PE.prefabRefs["AshlandsTree3"], PE.prefabRefs["AshlandsTree4"], PE.prefabRefs["AshlandsTree5"], PE.prefabRefs["AshlandsTree6_big"] },
+					tolerateHeat = true
+				},
+				new SaplingDB
+				{
 					key = "Ygga_Sapling",
 					biome = Config.EnforceBiomes ? TemperateBiomes | Heightmap.Biome.Mistlands : AllBiomes,
 					source = "YggaShoot_small1",
@@ -556,19 +570,6 @@ namespace Advize_PlantEverything.Framework
 					minScale = Config.AutumnBirchMinScale,
 					maxScale = Config.AutumnBirchMaxScale,
 					grownPrefabs = new GameObject[] { PE.prefabRefs["Birch1_aut"], PE.prefabRefs["Birch2_aut"] }
-				},
-				new SaplingDB
-				{
-					key = "Ashwood_Sapling",
-					biome = Config.EnforceBiomes ? TemperateBiomes | Heightmap.Biome.AshLands : AllBiomes,
-					source = "AshlandsTree3",
-					Resources = new Dictionary<string, int>() { { "BeechSeeds", 1 }, { "SulfurStone", 1 } },
-					icon = true,
-					growTime = Config.AshwoodGrowthTime,
-					growRadius = Config.AshwoodGrowRadius,
-					minScale = Config.AshwoodMinScale,
-					maxScale = Config.AshwoodMaxScale,
-					grownPrefabs = new GameObject[] { PE.prefabRefs["AshlandsTree3"], PE.prefabRefs["AshlandsTree4"], PE.prefabRefs["AshlandsTree5"], PE.prefabRefs["AshlandsTree6_big"] }
 				}
 			};
 		}
@@ -602,7 +603,8 @@ namespace Advize_PlantEverything.Framework
 					growTime = Config.FirGrowthTime,
 					growRadius = Config.FirGrowRadius,
 					minScale = Config.FirMinScale,
-					maxScale = Config.FirMaxScale
+					maxScale = Config.FirMaxScale,
+					tolerateCold = true
 				},
 				new SaplingDB
 				{
