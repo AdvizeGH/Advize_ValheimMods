@@ -14,6 +14,41 @@ namespace Advize_PlantEverything.Framework
 		private const Heightmap.Biome TemperateBiomes = Heightmap.Biome.Meadows | Heightmap.Biome.BlackForest | Heightmap.Biome.Plains;
 		internal const Heightmap.Biome AllBiomes = (Heightmap.Biome)895/*GetBiomeMask((Heightmap.Biome[])System.Enum.GetValues(typeof(Heightmap.Biome)))*/;
 
+		internal static readonly int ModdedVineHash = "pe_ModdedVine".GetStableHashCode();
+		internal static readonly int VineColorHash = "pe_VineColor".GetStableHashCode();
+		internal static readonly int BerryColor1Hash = "pe_BerryColor1".GetStableHashCode();
+		internal static readonly int BerryColor2Hash = "pe_BerryColor2".GetStableHashCode();
+		internal static readonly int BerryColor3Hash = "pe_BerryColor3".GetStableHashCode();
+		internal static readonly Vector3 ColorBlackVector3 = new(0.00012345f, 0.00012345f, 0.00012345f);
+
+		internal static readonly Color ColorVineGreen = new(0.729f, 1, 0.525f, 1);
+		internal static readonly Color ColorVineRed = new(0.867f, 0, 0.278f, 1);
+		internal static readonly Color ColorBerryGreen = new(1, 1, 1, 1);
+		internal static readonly Color ColorBerryRed = new(1, 0, 0, 1);
+
+		internal static Color VineColorFromConfig => Config.AshVineStyle == AshVineStyle.Custom ?
+				Config.VinesColor : Config.AshVineStyle == AshVineStyle.MeadowsGreen ?
+				ColorVineGreen : ColorVineRed;
+
+		internal static List<Color> BerryColorsFromConfig => Config.VineBerryStyle == VineBerryStyle.Custom ?
+				Config.BerryColors.Select(x => x.Value).ToList() : Config.VineBerryStyle == VineBerryStyle.RedGrapes ?
+				Enumerable.Repeat(ColorBerryRed, 3).ToList() : Enumerable.Repeat(ColorBerryGreen, 1).ToList();
+
+		internal static Vector3 ColorToVector3(Color color) => color == Color.black ? ColorBlackVector3 : new(color.r, color.g, color.b);
+		internal static Color Vector3ToColor(Vector3 vector3) => vector3 == ColorBlackVector3 ? Color.black : new(vector3.x, vector3.y, vector3.z);
+
+		//public static bool TryGetVector3(this ZDO zdo, int keyHashCode, out Vector3 value)
+		//{
+		//	if (ZDOExtraData.s_vec3.TryGetValue(zdo.m_uid, out BinarySearchDictionary<int, Vector3> values)
+		//		&& values.TryGetValue(keyHashCode, out value))
+		//	{
+		//		return true;
+		//	}
+
+		//	value = default;
+		//	return false;
+		//}
+
 		//private static Heightmap.Biome GetBiomeMask(Heightmap.Biome[] biomes)
 		//{
 		//	Heightmap.Biome biomeMask = 0;
@@ -38,6 +73,8 @@ namespace Advize_PlantEverything.Framework
 			{ "AutumnBirchSaplingDescription", "Plains Variant" },
 			{ "AshwoodSaplingName", "Ashwood Sapling" },
 			{ "AshwoodSaplingDescription", "" },
+			{ "VineAshSaplingName", "Custom Ashvine" },
+			{ "VineAshSaplingDescription", "Plants an Ashvine sapling with the colours defined in the mod config." },
 			{ "RaspberryBushName", "Raspberry Bush" },
 			{ "RaspberryBushDescription", "Plant raspberries to grow raspberry bushes." },
 			{ "BlueberryBushName", "Blueberry Bush" },

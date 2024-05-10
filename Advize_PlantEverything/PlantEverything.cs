@@ -30,6 +30,7 @@ namespace Advize_PlantEverything
 
 		private static bool piecesInitialized = false;
 		private static bool saplingsInitialized = false;
+		private static bool vinesInitialized = false;
 		internal static bool resolveMissingReferences = false;
 
 		private static AssetBundle assetBundle;
@@ -826,6 +827,164 @@ namespace Advize_PlantEverything
 				}
 			}
 		}
+		//TODO: Fix this up once everythig works as expected
+		private static void InitVines()
+		{
+			Dbgl("InitVinesTEMP");
+
+			if (!vinesInitialized)
+			{
+				GameObject cloneContainer = new("PE_VineAsh_sapling");
+				cloneContainer.SetActive(false);
+				//Dbgl($"2{cloneContainer.activeSelf} + {cloneContainer.activeInHierarchy}");
+				DontDestroyOnLoad(cloneContainer);
+
+				GameObject VineAsh_saplingClone = Instantiate(prefabRefs["VineAsh_sapling"], cloneContainer.transform);
+				VineAsh_saplingClone.name = cloneContainer.name;
+				VineAsh_saplingClone.GetComponent<Piece>().m_name = "$peVineAshSaplingName";
+				VineAsh_saplingClone.GetComponent<Piece>().m_description = "$peVineAshSaplingDescription";
+				VineAsh_saplingClone.GetComponent<Plant>().m_name = "$peVineAshSaplingName";
+				prefabRefs.Add("PE_VineAsh_sapling", VineAsh_saplingClone);
+
+				Dbgl("Adding initial VineColor component to VineAsh & VineAsh_sapling prefabs");
+				prefabRefs["VineAsh"].AddComponent<VineColor>();
+				prefabRefs["VineAsh_sapling"].AddComponent<VineColor>();
+
+				vinesInitialized = true;
+
+				//VineAsh_saplingClone.GetComponent<Piece>().m_icon = VineAsh_saplingClone.GetComponent<Piece>().m_resources[0].m_resItem.m_itemData.GetIcon();
+
+				Sprite baseSprite = VineAsh_saplingClone.GetComponent<Piece>().m_icon;
+				Texture2D baseSpriteTexture = DuplicateTexture(baseSprite);;
+
+				var sprite = ModifyTextureColor(baseSpriteTexture);
+				VineAsh_saplingClone.GetComponent<Piece>().m_icon = sprite;
+
+				PieceTable pieceTable = prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
+				pieceTable.m_pieces.Add(VineAsh_saplingClone);
+			}
+
+			Dbgl("Updating Color");
+			VineColor.UpdateColors(config.AshVineStyle != AshVineStyle.Custom, config.VineBerryStyle != VineBerryStyle.Custom);
+			ApplyVinesSettings();
+		}
+
+		private static Sprite ModifyTextureColor(Texture2D baseTexture)
+		{
+			int width = 64;
+			int height = 64;
+			Texture2D modified = new(width, height);
+
+			//Color greenVineColor = new(0.729f, 1, 0.525f, 1);
+
+			//List<Color> rainbow = new()
+			//{
+			//	Color.red,
+			//	new(255, 128, 0),
+			//	Color.yellow,
+			//	Color.green,
+			//	Color.cyan,
+			//	Color.blue,
+			//	new(128, 0, 255),
+			//	Color.magenta
+			//};
+
+			for (int x = 0; x < width; x++)
+			{
+				for (int y = 0; y < height; y++)
+				{
+					Color color = baseTexture.GetPixel(x, y);
+					//Color grayscale = color.grayscale * color;
+					//Color32 grayscaleToRGB = grayscale;
+
+					//float tintFactor = 0.25f;
+
+					//float r = (255 - grayscaleToRGB.r) * tintFactor;
+					//float g = (255 - grayscaleToRGB.g) * tintFactor;
+					//float b = (255 - grayscaleToRGB.b) * tintFactor;
+
+					//grayscale.r += r;
+					//grayscale.g += g;
+					//grayscale.b += b;
+					modified.SetPixel(x, y, Color.clear);
+					if (color.a != 0)
+					{
+						modified.SetPixel(x, y, color * Color.green);
+					}
+					
+				}
+			}
+
+			modified.Apply();
+
+			return Sprite.Create(modified, new(0, 0, width, height), Vector2.zero);
+		}
+
+		private static Texture2D DuplicateTexture(Sprite sprite)
+		{
+			// The resulting sprite dimensions
+			int width = (int)sprite.textureRect.width;
+			int height = (int)sprite.textureRect.height;
+
+			// The whole sprite atlas
+			var texture = sprite.texture;
+
+			RenderTexture previous = RenderTexture.active;
+
+			// Our RenderTexture for displaying the whole sprite atlas.
+			RenderTexture renderTex = RenderTexture.GetTemporary(
+				texture.width,
+				texture.height,
+				0,
+				RenderTextureFormat.Default,
+				RenderTextureReadWrite.sRGB);
+
+			Graphics.Blit(texture, renderTex);
+			RenderTexture.active = renderTex;
+
+			// Create a copy of the texture that is readable
+			Texture2D readableTexture = new(texture.width, texture.height);
+			readableTexture.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
+			readableTexture.Apply();
+			RenderTexture.active = previous;
+			RenderTexture.ReleaseTemporary(renderTex);
+
+			// Crop to the needed texture
+			Texture2D smallTexture = new(width, height);
+			var colors = readableTexture.GetPixels((int)sprite.textureRect.x, (int)sprite.textureRect.y, width, height);
+			smallTexture.SetPixels(colors);
+			smallTexture.Apply();
+
+			return smallTexture;
+		}
+
+		//TODO: This is all temporary garbage that can be refactored to piggyback off existing code. Need to decide what settings to expose as well.
+		private static void ApplyVinesSettings()
+		{
+			Plant plant = prefabRefs["VineAsh_sapling"].GetComponent<Plant>();
+			Plant plant2 = prefabRefs["PE_VineAsh_sapling"].GetComponent<Plant>();
+
+			plant2.m_biome = config.EnforceBiomesVanilla ? /*All but mountain and deep north*/(Heightmap.Biome)827 : (Heightmap.Biome)895;
+			plant2.m_needCultivatedGround = prefabRefs["VineAsh_sapling"].GetComponent<Piece>().m_cultivatedGroundOnly = !config.EnableCropOverrides || config.CropRequireCultivation;
+			plant2.m_growTime = config.EnableVineOverrides ? config.VinesGrowthTime : 200f;
+			plant2.m_growTimeMax = config.EnableVineOverrides ? config.VinesGrowthTime : 300f;
+			plant2.m_attachDistance = config.EnableVineOverrides ? config.VinesAttachDistance : 1.8f;
+			plant2.m_tolerateCold = plant.m_tolerateHeat = !config.PlantsRequireShielding;
+
+			Pickable pickable = prefabRefs["VineAsh"].GetComponent<Pickable>();
+			Vine vine = prefabRefs["VineAsh"].GetComponent<Vine>();
+
+			plant.m_biome = config.EnforceBiomesVanilla ? /*All but mountain and deep north*/(Heightmap.Biome)827 : (Heightmap.Biome)895;
+			plant.m_needCultivatedGround = prefabRefs["VineAsh_sapling"].GetComponent<Piece>().m_cultivatedGroundOnly = !config.EnableCropOverrides || config.CropRequireCultivation;
+			plant.m_growTime = config.EnableVineOverrides ? config.VinesGrowthTime : 200f;
+			plant.m_growTimeMax = config.EnableVineOverrides ? config.VinesGrowthTime : 300f;
+			plant.m_attachDistance = config.EnableVineOverrides ? config.VinesAttachDistance : 1.8f;
+			plant.m_tolerateCold = plant.m_tolerateHeat = !config.PlantsRequireShielding;
+			pickable.m_amount = config.EnableVineOverrides ? config.VineBerryReturn : 3;
+			pickable.m_respawnTimeInitMax = config.EnableVineOverrides ? 0 : 150;
+			pickable.m_respawnTimeMinutes = config.EnableVineOverrides ? config.VineBerryRespawnTime : 200;
+			vine.m_growTime = vine.m_growTimePerBranch = vine.m_growCheckTime = 15;
+		}
 
 		private static void InitCultivator()
 		{
@@ -873,6 +1032,7 @@ namespace Advize_PlantEverything
 			InitSaplingRefs();
 			InitSaplings();
 			InitCrops();
+			InitVines();
 			InitCultivator();
 
 			if (StaticContent.DefaultLocalizedStrings.Count > 0)
@@ -927,6 +1087,12 @@ namespace Advize_PlantEverything
 		{
 			Dbgl("Config setting changed, re-initializing crops");
 			InitCrops();
+		}
+
+		internal static void VineSettingChanged(object o, EventArgs e)
+		{
+			Dbgl("Config setting changed, re-initializing vines");
+			InitVines();
 		}
 
 		public static void InitLocalization()

@@ -163,6 +163,20 @@ namespace Advize_PlantEverything.Configuration
 		private readonly ConfigEntry<bool> enablePlantTimers; //local
 		private readonly ConfigEntry<bool> growthAsPercentage; //local
 
+		//Vines ??
+		private readonly ConfigEntry<bool> enableVineOverrides;
+		private readonly ConfigEntry<AshVineStyle> ashVineStyle;
+		private readonly ConfigEntry<VineBerryStyle> vineBerryStyle;
+		private readonly ConfigEntry<float> vineAttachDistance;
+		private readonly ConfigEntry<float> vineGrowthTime;
+		private readonly ConfigEntry<int> vineBerryRespawnTime;
+		private readonly ConfigEntry<int> vineBerryReturn;
+
+		private readonly ConfigEntry<Color> ashVineCustomColor;
+		private readonly ConfigEntry<Color> leftBerryColor;
+		private readonly ConfigEntry<Color> centerBerryColor;
+		private readonly ConfigEntry<Color> rightBerryColor;
+
 		//CustomSyncedValue
 		private readonly CustomSyncedValue<List<string>> extraResources;
 
@@ -870,6 +884,70 @@ namespace Advize_PlantEverything.Configuration
 				"Enables display of growth time as a percentage instead of time remaining.",
 				false);
 
+			//Vines
+			enableVineOverrides = Config(
+				"Vines",
+				"EnableVineOverrides",
+				false,
+				new ConfigDescription("Enables the [Vines] section of this config.", null, new ConfigurationManagerAttributes { Order = 10 }),
+				true);
+			ashVineStyle = Config(
+				"Vines",
+				"AshVineStyle",
+				AshVineStyle.MeadowsGreen,
+				"",
+				false);
+			vineBerryStyle = Config(
+				"Vines",
+				"VineBerryStyle",
+				VineBerryStyle.VanillaGreen,
+				"",
+				false);
+			vineAttachDistance = Config(
+				"Vines",
+				"VineAttachDistance",
+				1.8f,
+				"");
+			vineGrowthTime = Config(
+				"Vines",
+				"VineGrowthTime",
+				200f,
+				"");
+			vineBerryRespawnTime = Config(
+				"Vines",
+				"VineBerryRespawnTime",
+				200,
+				"");
+			vineBerryReturn = Config(
+				"Vines",
+				"VineBerryReturn",
+				3,
+				"");
+			ashVineCustomColor = Config(
+				"Vines",
+				"AshVineCustomColor",
+				new Color(0.867f, 0, 0.278f, 1),
+				"",
+				false);
+			leftBerryColor = Config(
+				"Vines",
+				"LeftBerryColor",
+				new Color(1, 1, 1, 1),
+				"",
+				false);
+			centerBerryColor = Config(
+				"Vines",
+				"CenterBerryColor",
+				new Color(1, 1, 1, 1),
+				"",
+				false);
+			rightBerryColor = Config(
+				"Vines",
+				"RightBerryColor",
+				new Color(1, 1, 1, 1),
+				"",
+				false);
+
 			configFile.Save();
 			configFile.SaveOnConfigSet = true;
 
@@ -1007,6 +1085,20 @@ namespace Advize_PlantEverything.Configuration
 			treeDropMax.SettingChanged += PlantEverything.SeedSettingChanged;
 			dropChance.SettingChanged += PlantEverything.SeedSettingChanged;
 			oneOfEach.SettingChanged += PlantEverything.SeedSettingChanged;
+
+			//Vines
+			enableVineOverrides.SettingChanged += PlantEverything.VineSettingChanged;
+			ashVineStyle.SettingChanged += PlantEverything.VineSettingChanged;
+			vineBerryStyle.SettingChanged += PlantEverything.VineSettingChanged;
+
+			vineAttachDistance.SettingChanged += PlantEverything.VineSettingChanged;
+			vineGrowthTime.SettingChanged += PlantEverything.VineSettingChanged;
+			vineBerryReturn.SettingChanged += PlantEverything.VineSettingChanged;
+
+			ashVineCustomColor.SettingChanged += PlantEverything.VineSettingChanged;
+			leftBerryColor.SettingChanged += PlantEverything.VineSettingChanged;
+			centerBerryColor.SettingChanged += PlantEverything.VineSettingChanged;
+			rightBerryColor.SettingChanged += PlantEverything.VineSettingChanged;
 
 			//CustomSyncedValue
 			extraResources = new(configSync, "PE_ExtraResources", new());
@@ -1157,6 +1249,17 @@ namespace Advize_PlantEverything.Configuration
 		internal bool EnablePickableTimers => enablePickableTimers.Value;
 		internal bool EnablePlantTimers => enablePlantTimers.Value;
 		internal bool GrowthAsPercentage => growthAsPercentage.Value;
+		internal bool EnableVineOverrides => enableVineOverrides.Value;
+		internal float VinesAttachDistance => vineAttachDistance.Value;
+		internal float VinesGrowthTime => vineGrowthTime.Value;
+		internal int VineBerryRespawnTime => vineBerryRespawnTime.Value;
+		internal int VineBerryReturn => vineBerryReturn.Value;
+		internal Color VinesColor => ashVineCustomColor.Value;
+
+		private List<ConfigEntry<Color>> _BerryColors;
+		internal List<ConfigEntry<Color>> BerryColors => _BerryColors ??= new(3) { { rightBerryColor }, { centerBerryColor }, { leftBerryColor } };
+		internal AshVineStyle AshVineStyle => ashVineStyle.Value;
+		internal VineBerryStyle VineBerryStyle => vineBerryStyle.Value;
 		internal CustomSyncedValue<List<string>> SyncedExtraResources => extraResources;
 
 		internal bool IsSourceOfTruth => ConfigSync.IsSourceOfTruth;
@@ -1178,4 +1281,7 @@ namespace Advize_PlantEverything.Configuration
 		}
 #nullable disable
 	}
+
+	internal enum AshVineStyle { AshlandsRed, MeadowsGreen, Custom }
+	internal enum VineBerryStyle { VanillaGreen, RedGrapes, Custom }
 }
