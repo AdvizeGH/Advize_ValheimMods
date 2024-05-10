@@ -1257,7 +1257,7 @@ namespace Advize_PlantEverything.Configuration
 		internal Color VinesColor => ashVineCustomColor.Value;
 
 		private List<ConfigEntry<Color>> _BerryColors;
-		internal List<ConfigEntry<Color>> BerryColors => _BerryColors ??= new(3) { { rightBerryColor }, { centerBerryColor }, { leftBerryColor } };
+		internal List<ConfigEntry<Color>> BerryColors => _BerryColors ??= new(3) { rightBerryColor , centerBerryColor, leftBerryColor };
 		internal AshVineStyle AshVineStyle => ashVineStyle.Value;
 		internal VineBerryStyle VineBerryStyle => vineBerryStyle.Value;
 		internal CustomSyncedValue<List<string>> SyncedExtraResources => extraResources;
