@@ -10,7 +10,7 @@
     <RootNamespace>Advize_PlantEasily</RootNamespace>
     <AssemblyName>Advize_PlantEasily</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>12</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -94,7 +94,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\ModConfig.cs" />
-    <Compile Include="Patches.cs" />
+    <Compile Include="Patches\PlacementPatches.cs" />
+    <Compile Include="Patches\InputPatches.cs" />
+    <Compile Include="Patches\InteractPatches.cs" />
+    <Compile Include="Patches\ModInitPatches.cs" />
+    <Compile Include="Patches\UIPatches.cs" />
     <Compile Include="PlantEasily.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -10,7 +10,7 @@
     <RootNamespace>Advize_PlantEverything</RootNamespace>
     <AssemblyName>Advize_PlantEverything</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>12</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -127,7 +127,14 @@
     <Compile Include="Configuration\ModConfig.cs" />
     <Compile Include="Framework\PrefabDB.cs" />
     <Compile Include="Framework\VineColor.cs" />
-    <Compile Include="Patches.cs" />
+    <Compile Include="Patches\ApplyZDOPatches.cs" />
+    <Compile Include="Patches\HoverTextPatches.cs" />
+    <Compile Include="Patches\ModInitPatches.cs" />
+    <Compile Include="Patches\PieceCreationPatches.cs" />
+    <Compile Include="Patches\PieceRemovalPatches.cs" />
+    <Compile Include="Patches\PlantPatches.cs" />
+    <Compile Include="Patches\ShowPickableSpawnerPatches.cs" />
+    <Compile Include="Patches\CheckZDOPatches.cs" />
     <Compile Include="PlantEverything.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

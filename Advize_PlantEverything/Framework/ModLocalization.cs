@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
+﻿namespace Advize_PlantEverything;
 
-namespace Advize_PlantEverything.Framework
+using System.Collections.Generic;
+
+sealed class ModLocalization
 {
-	sealed class ModLocalization
-	{
-		public List<string> LocalizedStrings = new();
-	}
+    public List<string> LocalizedStrings = [];
 }
