@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using static InventoryGrid;
 using static StaticContent;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -835,13 +836,17 @@ public sealed class PlantEverything : BaseUnityPlugin
         {
             GameObject cloneContainer = new("PE_VineAsh_sapling");
             cloneContainer.SetActive(false);
-            //Dbgl($"2{cloneContainer.activeSelf} + {cloneContainer.activeInHierarchy}");
             DontDestroyOnLoad(cloneContainer);
 
             GameObject VineAsh_saplingClone = Instantiate(prefabRefs["VineAsh_sapling"], cloneContainer.transform);
             VineAsh_saplingClone.name = cloneContainer.name;
-            VineAsh_saplingClone.GetComponent<Piece>().m_name = "$peVineAshSaplingName";
-            VineAsh_saplingClone.GetComponent<Piece>().m_description = "$peVineAshSaplingDescription";
+
+            Piece piece = VineAsh_saplingClone.GetComponent<Piece>();
+            piece.m_name = "$peVineAshSaplingName";
+            piece.m_description = "$peVineAshSaplingDescription";
+
+            Texture2D pieceIcon = DuplicateTexture(piece.m_icon);
+            cachedTextures.Add("PE_VineAsh_saplingPieceIcon.png", pieceIcon);
             VineAsh_saplingClone.GetComponent<Plant>().m_name = "$peVineAshSaplingName";
             prefabRefs.Add("PE_VineAsh_sapling", VineAsh_saplingClone);
 
@@ -851,14 +856,6 @@ public sealed class PlantEverything : BaseUnityPlugin
 
             vinesInitialized = true;
 
-            //VineAsh_saplingClone.GetComponent<Piece>().m_icon = VineAsh_saplingClone.GetComponent<Piece>().m_resources[0].m_resItem.m_itemData.GetIcon();
-
-            Sprite baseSprite = VineAsh_saplingClone.GetComponent<Piece>().m_icon;
-            Texture2D baseSpriteTexture = DuplicateTexture(baseSprite); ;
-
-            var sprite = ModifyTextureColor(baseSpriteTexture);
-            VineAsh_saplingClone.GetComponent<Piece>().m_icon = sprite;
-
             PieceTable pieceTable = prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
             pieceTable.m_pieces.Add(VineAsh_saplingClone);
         }
@@ -866,55 +863,17 @@ public sealed class PlantEverything : BaseUnityPlugin
         Dbgl("Updating Color");
         VineColor.UpdateColors();
         ApplyVinesSettings();
-        //prefabRefs["PE_VineAsh_sapling"].GetComponent<Piece>().m_icon
-        //Sprite baseSprite = prefabRefs["PE_VineAsh_sapling"].GetComponent<Piece>().m_icon;
-        //Texture2D baseSpriteTexture = DuplicateTexture(baseSprite); ;
 
-        //var sprite = ModifyTextureColor(baseSpriteTexture);
-        //prefabRefs["PE_VineAsh_sapling"].GetComponent<Piece>().m_icon = sprite;
-    }
-
-    private static Sprite ModifyTextureColor(Texture2D baseTexture)
-    {
-        int width = 64;
-        int height = 64;
-        Texture2D modified = new(width, height);
-
-        Color vineColor = config.VinesColor;
-        Color[] val = new Color[width * height];
-        for (int i = 0; i < width * height; ++i)
-        {
-            int row = (int)(i / (float)width);
-            float norm_row = row / (float)height;
-            Color newColor = new(norm_row, norm_row, norm_row, 1);
-            val[i] = vineColor * newColor;
-        }
-
-        for (int x = 4; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                Color color = baseTexture.GetPixel(x, y);
-                modified.SetPixel(x, y, Color.clear);
-                if (color.a != 0)
-                {
-                    modified.SetPixel(x, y, val[x + y * width]);
-                }
-            }
-        }
-
-        modified.Apply();
-
-        return Sprite.Create(modified, new(0, 0, width, height), Vector2.zero);
+        //Update custom piece icon
+        Texture2D baseSpriteTexture = cachedTextures["PE_VineAsh_saplingPieceIcon.png"];
+        prefabRefs["PE_VineAsh_sapling"].GetComponent<Piece>().m_icon = ModifyTextureColor(baseSpriteTexture, 64, 64, VineColorFromConfig);
     }
 
     private static Texture2D DuplicateTexture(Sprite sprite)
     {
         // The resulting sprite dimensions
         int width = (int)sprite.textureRect.width;
-        Dbgl($"width {width}");
         int height = (int)sprite.textureRect.height;
-        Dbgl($"height {height}");
 
         // The whole sprite atlas
         var texture = sprite.texture;
@@ -948,28 +907,67 @@ public sealed class PlantEverything : BaseUnityPlugin
         return smallTexture;
     }
 
+    private static Sprite ModifyTextureColor(Texture2D baseTexture, int width, int height, Color targetColor)
+    {
+        Texture2D modified = new(width, height);
+
+        Color.RGBToHSV(targetColor, out float vineColorHue, out float vineColorSaturation, out float vineColorValue);
+
+        Color[] allPixels = baseTexture.GetPixels();
+        float[] hueDifferences = new float[width * height];
+        float[] saturationDifferences = new float[width * height];
+        float[] valueDifferences = new float[width * height];
+
+        for (int i = 0; i < width * height; i++)
+        {
+            Color.RGBToHSV(allPixels[i], out float H, out float S, out float V);
+            hueDifferences[i] = vineColorHue - H;
+            saturationDifferences[i] = vineColorSaturation - S;
+            valueDifferences[i] = vineColorValue - V;
+        }
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                Color color = baseTexture.GetPixel(x, y);
+                float originalAlpha = color.a;
+                modified.SetPixel(x, y, Color.clear);
+
+                if (color.a != 0)
+                {
+                    Color.RGBToHSV(color, out float H, out float S, out float V);
+                    H += hueDifferences[x + y * width];
+                    S += saturationDifferences[x + y * width];
+                    V += valueDifferences[x + y * width] / 8;
+                    color = Color.HSVToRGB(H, S, V);
+                    color.a = originalAlpha;
+                    modified.SetPixel(x, y, color);
+                }
+            }
+        }
+
+        modified.Apply();
+
+        return Sprite.Create(modified, new(0, 0, width, height), Vector2.zero);
+    }
+
     //TODO: This is all temporary garbage that can be refactored to piggyback off existing code. Need to decide what settings to expose as well.
     private static void ApplyVinesSettings()
     {
         Plant plant = prefabRefs["VineAsh_sapling"].GetComponent<Plant>();
         Plant plant2 = prefabRefs["PE_VineAsh_sapling"].GetComponent<Plant>();
 
-        plant2.m_biome = config.EnforceBiomesVanilla ? /*All but mountain and deep north*/(Heightmap.Biome)827 : (Heightmap.Biome)895;
-        plant2.m_needCultivatedGround = prefabRefs["VineAsh_sapling"].GetComponent<Piece>().m_cultivatedGroundOnly = !config.EnableCropOverrides || config.CropRequireCultivation;
-        plant2.m_growTime = config.EnableVineOverrides ? config.VinesGrowthTime : 200f;
-        plant2.m_growTimeMax = config.EnableVineOverrides ? config.VinesGrowthTime : 300f;
-        plant2.m_attachDistance = config.EnableVineOverrides ? config.VinesAttachDistance : 1.8f;
-        plant2.m_tolerateCold = plant.m_tolerateHeat = !config.PlantsRequireShielding;
-
         Pickable pickable = prefabRefs["VineAsh"].GetComponent<Pickable>();
         Vine vine = prefabRefs["VineAsh"].GetComponent<Vine>();
 
-        plant.m_biome = config.EnforceBiomesVanilla ? /*All but mountain and deep north*/(Heightmap.Biome)827 : (Heightmap.Biome)895;
-        plant.m_needCultivatedGround = prefabRefs["VineAsh_sapling"].GetComponent<Piece>().m_cultivatedGroundOnly = !config.EnableCropOverrides || config.CropRequireCultivation;
+        plant.m_biome = plant2.m_biome = config.EnforceBiomesVanilla ? /*All but mountain and deep north*/(Heightmap.Biome)827 : (Heightmap.Biome)895;
+        plant.m_needCultivatedGround = plant2.m_needCultivatedGround = prefabRefs["VineAsh_sapling"].GetComponent<Piece>().m_cultivatedGroundOnly = !config.EnableCropOverrides || config.CropRequireCultivation;
         plant.m_growTime = config.EnableVineOverrides ? config.VinesGrowthTime : 200f;
         plant.m_growTimeMax = config.EnableVineOverrides ? config.VinesGrowthTime : 300f;
         plant.m_attachDistance = config.EnableVineOverrides ? config.VinesAttachDistance : 1.8f;
-        plant.m_tolerateCold = plant.m_tolerateHeat = !config.PlantsRequireShielding;
+        plant.m_tolerateCold = plant2.m_tolerateCold = !config.PlantsRequireShielding;
+
         pickable.m_amount = config.EnableVineOverrides ? config.VineBerryReturn : 3;
         pickable.m_respawnTimeInitMax = config.EnableVineOverrides ? 0 : 150;
         pickable.m_respawnTimeMinutes = config.EnableVineOverrides ? config.VineBerryRespawnTime : 200;
