@@ -10,9 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using static InventoryGrid;
 using static StaticContent;
-using static System.Net.Mime.MediaTypeNames;
 
 [BepInPlugin(PluginID, PluginName, Version)]
 public sealed class PlantEverything : BaseUnityPlugin
