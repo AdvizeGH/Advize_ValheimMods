@@ -354,6 +354,90 @@ public sealed class PlantEverything : BaseUnityPlugin
         return result;
     }
 
+    internal static Texture2D DuplicateTexture(Sprite sprite)
+    {
+        // The resulting sprite dimensions
+        int width = (int)sprite.textureRect.width;
+        int height = (int)sprite.textureRect.height;
+
+        // The whole sprite atlas
+        var texture = sprite.texture;
+
+        RenderTexture previous = RenderTexture.active;
+
+        // Our RenderTexture for displaying the whole sprite atlas.
+        RenderTexture renderTex = RenderTexture.GetTemporary(
+            texture.width,
+            texture.height,
+            0,
+            RenderTextureFormat.Default,
+            RenderTextureReadWrite.sRGB);
+
+        Graphics.Blit(texture, renderTex);
+        RenderTexture.active = renderTex;
+
+        // Create a copy of the texture that is readable
+        Texture2D readableTexture = new(texture.width, texture.height);
+        readableTexture.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
+        readableTexture.Apply();
+        RenderTexture.active = previous;
+        RenderTexture.ReleaseTemporary(renderTex);
+
+        // Crop to the needed texture
+        Texture2D smallTexture = new(width, height);
+        var colors = readableTexture.GetPixels((int)sprite.textureRect.x, (int)sprite.textureRect.y, width, height);
+        smallTexture.SetPixels(colors);
+        smallTexture.Apply();
+
+        return smallTexture;
+    }
+
+    internal static Sprite ModifyTextureColor(Texture2D baseTexture, int width, int height, Color targetColor)
+    {
+        Texture2D modified = new(width, height);
+
+        Color.RGBToHSV(targetColor, out float vineColorHue, out float vineColorSaturation, out float vineColorValue);
+
+        Color[] allPixels = baseTexture.GetPixels();
+        float[] hueDifferences = new float[width * height];
+        float[] saturationDifferences = new float[width * height];
+        float[] valueDifferences = new float[width * height];
+
+        for (int i = 0; i < width * height; i++)
+        {
+            Color.RGBToHSV(allPixels[i], out float H, out float S, out float V);
+            hueDifferences[i] = vineColorHue - H;
+            saturationDifferences[i] = vineColorSaturation - S;
+            valueDifferences[i] = vineColorValue - V;
+        }
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                Color color = baseTexture.GetPixel(x, y);
+                float originalAlpha = color.a;
+                modified.SetPixel(x, y, Color.clear);
+
+                if (color.a != 0)
+                {
+                    Color.RGBToHSV(color, out float H, out float S, out float V);
+                    H += hueDifferences[x + y * width];
+                    S += saturationDifferences[x + y * width];
+                    // 1.5f Magic number discovered through random trial and error. I don't understand color space math but this works well for my use case.
+                    V += valueDifferences[x + y * width] * 1.5f * V;
+                    color = Color.HSVToRGB(H, S, V);
+                    color.a = originalAlpha;
+                    modified.SetPixel(x, y, color);
+                }
+            }
+        }
+
+        modified.Apply();
+
+        return Sprite.Create(modified, new(0, 0, width, height), Vector2.zero);
+    }
+
     internal static void InitPrefabRefs()
     {
         Dbgl("InitPrefabRefs");
@@ -865,89 +949,6 @@ public sealed class PlantEverything : BaseUnityPlugin
         //Update custom piece icon
         Texture2D baseSpriteTexture = cachedTextures["PE_VineAsh_saplingPieceIcon.png"];
         prefabRefs["PE_VineAsh_sapling"].GetComponent<Piece>().m_icon = ModifyTextureColor(baseSpriteTexture, 64, 64, VineColorFromConfig);
-    }
-
-    private static Texture2D DuplicateTexture(Sprite sprite)
-    {
-        // The resulting sprite dimensions
-        int width = (int)sprite.textureRect.width;
-        int height = (int)sprite.textureRect.height;
-
-        // The whole sprite atlas
-        var texture = sprite.texture;
-
-        RenderTexture previous = RenderTexture.active;
-
-        // Our RenderTexture for displaying the whole sprite atlas.
-        RenderTexture renderTex = RenderTexture.GetTemporary(
-            texture.width,
-            texture.height,
-            0,
-            RenderTextureFormat.Default,
-            RenderTextureReadWrite.sRGB);
-
-        Graphics.Blit(texture, renderTex);
-        RenderTexture.active = renderTex;
-
-        // Create a copy of the texture that is readable
-        Texture2D readableTexture = new(texture.width, texture.height);
-        readableTexture.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
-        readableTexture.Apply();
-        RenderTexture.active = previous;
-        RenderTexture.ReleaseTemporary(renderTex);
-
-        // Crop to the needed texture
-        Texture2D smallTexture = new(width, height);
-        var colors = readableTexture.GetPixels((int)sprite.textureRect.x, (int)sprite.textureRect.y, width, height);
-        smallTexture.SetPixels(colors);
-        smallTexture.Apply();
-
-        return smallTexture;
-    }
-
-    private static Sprite ModifyTextureColor(Texture2D baseTexture, int width, int height, Color targetColor)
-    {
-        Texture2D modified = new(width, height);
-
-        Color.RGBToHSV(targetColor, out float vineColorHue, out float vineColorSaturation, out float vineColorValue);
-
-        Color[] allPixels = baseTexture.GetPixels();
-        float[] hueDifferences = new float[width * height];
-        float[] saturationDifferences = new float[width * height];
-        float[] valueDifferences = new float[width * height];
-
-        for (int i = 0; i < width * height; i++)
-        {
-            Color.RGBToHSV(allPixels[i], out float H, out float S, out float V);
-            hueDifferences[i] = vineColorHue - H;
-            saturationDifferences[i] = vineColorSaturation - S;
-            valueDifferences[i] = vineColorValue - V;
-        }
-
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                Color color = baseTexture.GetPixel(x, y);
-                float originalAlpha = color.a;
-                modified.SetPixel(x, y, Color.clear);
-
-                if (color.a != 0)
-                {
-                    Color.RGBToHSV(color, out float H, out float S, out float V);
-                    H += hueDifferences[x + y * width];
-                    S += saturationDifferences[x + y * width];
-                    V += valueDifferences[x + y * width] / 8;
-                    color = Color.HSVToRGB(H, S, V);
-                    color.a = originalAlpha;
-                    modified.SetPixel(x, y, color);
-                }
-            }
-        }
-
-        modified.Apply();
-
-        return Sprite.Create(modified, new(0, 0, width, height), Vector2.zero);
     }
 
     //TODO: This is all temporary garbage that can be refactored to piggyback off existing code. Need to decide what settings to expose as well.
