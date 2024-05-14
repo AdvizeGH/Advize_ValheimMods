@@ -424,8 +424,8 @@ public sealed class PlantEverything : BaseUnityPlugin
                     Color.RGBToHSV(color, out float H, out float S, out float V);
                     H += hueDifferences[x + y * width];
                     S += saturationDifferences[x + y * width];
-                    // 1.5f Magic number discovered through random trial and error. I don't understand color space math but this works well for my use case.
-                    V += valueDifferences[x + y * width] * 1.5f * V;
+                    float tintFactor = valueDifferences[x + y * width] > 0 ? 1.5f : 1f / 3f;
+                    V *= V + valueDifferences[x + y * width] * tintFactor; // Weird formula but most accurate one I've found so far
                     color = Color.HSVToRGB(H, S, V);
                     color.a = originalAlpha;
                     modified.SetPixel(x, y, color);
@@ -909,10 +909,10 @@ public sealed class PlantEverything : BaseUnityPlugin
             }
         }
     }
-    //TODO: Fix this up once everythig works as expected
+    //TODO: This is mostly temporary garbage that can be refactored to piggyback off existing code. Need to decide what settings to expose as well.
     private static void InitVines()
     {
-        Dbgl("InitVinesTEMP");
+        Dbgl("InitVines");
 
         if (!vinesInitialized)
         {
@@ -932,45 +932,63 @@ public sealed class PlantEverything : BaseUnityPlugin
             VineAsh_saplingClone.GetComponent<Plant>().m_name = "$peVineAshSaplingName";
             prefabRefs.Add("PE_VineAsh_sapling", VineAsh_saplingClone);
 
-            Dbgl("Adding initial VineColor component to VineAsh & VineAsh_sapling prefabs");
+            //Dbgl("Adding initial VineColor component to VineAsh & VineAsh_sapling prefabs");
             prefabRefs["VineAsh"].AddComponent<VineColor>();
             prefabRefs["VineAsh_sapling"].AddComponent<VineColor>();
 
             vinesInitialized = true;
-
-            PieceTable pieceTable = prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
-            pieceTable.m_pieces.Add(VineAsh_saplingClone);
         }
 
-        Dbgl("Updating Color");
-        VineColor.UpdateColors();
-        ApplyVinesSettings();
+        
 
-        //Update custom piece icon
-        Texture2D baseSpriteTexture = cachedTextures["PE_VineAsh_saplingPieceIcon.png"];
-        prefabRefs["PE_VineAsh_sapling"].GetComponent<Piece>().m_icon = ModifyTextureColor(baseSpriteTexture, 64, 64, VineColorFromConfig);
-    }
+        PieceTable pieceTable = prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
+        if (!config.EnableCustomVinePiece && pieceTable.m_pieces.Contains(prefabRefs["PE_VineAsh_sapling"]))
+        {
+            TempFixRemoveMeInNextUpdate();
+            pieceTable.m_pieces.Remove(prefabRefs["PE_VineAsh_sapling"]);
+        }
 
-    //TODO: This is all temporary garbage that can be refactored to piggyback off existing code. Need to decide what settings to expose as well.
-    private static void ApplyVinesSettings()
-    {
+        if (config.EnableCustomVinePiece && !pieceTable.m_pieces.Contains(prefabRefs["PE_VineAsh_sapling"]))
+        {
+            TempFixRemoveMeInNextUpdate();
+            int index = pieceTable.m_pieces.IndexOf(prefabRefs["VineAsh_sapling"]);
+            pieceTable.m_pieces.Insert(index + 1, prefabRefs["PE_VineAsh_sapling"]);
+        }
+
         Plant plant = prefabRefs["VineAsh_sapling"].GetComponent<Plant>();
         Plant plant2 = prefabRefs["PE_VineAsh_sapling"].GetComponent<Plant>();
 
         Pickable pickable = prefabRefs["VineAsh"].GetComponent<Pickable>();
-        Vine vine = prefabRefs["VineAsh"].GetComponent<Vine>();
+        //Vine vine = prefabRefs["VineAsh"].GetComponent<Vine>();
 
         plant.m_biome = plant2.m_biome = config.EnforceBiomesVanilla ? /*All but mountain and deep north*/(Heightmap.Biome)827 : (Heightmap.Biome)895;
         plant.m_needCultivatedGround = plant2.m_needCultivatedGround = prefabRefs["VineAsh_sapling"].GetComponent<Piece>().m_cultivatedGroundOnly = !config.EnableCropOverrides || config.CropRequireCultivation;
         plant.m_growTime = config.EnableVineOverrides ? config.VinesGrowthTime : 200f;
         plant.m_growTimeMax = config.EnableVineOverrides ? config.VinesGrowthTime : 300f;
         plant.m_attachDistance = config.EnableVineOverrides ? config.VinesAttachDistance : 1.8f;
+        plant.m_growRadiusVines = config.EnableVineOverrides ? config.VineGrowRadius : 1.8f;
         plant.m_tolerateCold = plant2.m_tolerateCold = !config.PlantsRequireShielding;
 
         pickable.m_amount = config.EnableVineOverrides ? config.VineBerryReturn : 3;
         pickable.m_respawnTimeInitMax = config.EnableVineOverrides ? 0 : 150;
         pickable.m_respawnTimeMinutes = config.EnableVineOverrides ? config.VineBerryRespawnTime : 200;
-        vine.m_growTime = vine.m_growTimePerBranch = vine.m_growCheckTime = 15;
+        //vine.m_growTime = vine.m_growTimePerBranch = vine.m_growCheckTime = 15;
+
+        //Update colors on existing vines
+        VineColor.UpdateColors();
+
+        //Update custom piece icon
+        Texture2D baseSpriteTexture = cachedTextures["PE_VineAsh_saplingPieceIcon.png"];
+        prefabRefs["PE_VineAsh_sapling"].GetComponent<Piece>().m_icon = ModifyTextureColor(baseSpriteTexture, 64, 64, VineColorFromConfig);
+    }
+
+    private static void TempFixRemoveMeInNextUpdate()
+    {
+        if (ZNetScene.instance && Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator")
+        {
+            PELogger.LogWarning("Cultivator updated through config change, unequipping cultivator");
+            Player.m_localPlayer.HideHandItems();
+        }
     }
 
     private static void InitCultivator()

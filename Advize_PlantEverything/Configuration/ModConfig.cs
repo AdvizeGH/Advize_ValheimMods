@@ -163,11 +163,13 @@ sealed class ModConfig
     private readonly ConfigEntry<bool> enablePlantTimers; //local
     private readonly ConfigEntry<bool> growthAsPercentage; //local
 
-    //Vines ??
+    //Vines 7
     private readonly ConfigEntry<bool> enableVineOverrides;
+    private readonly ConfigEntry<bool> enableCustomVinePiece;
     private readonly ConfigEntry<AshVineStyle> ashVineStyle; //local
     private readonly ConfigEntry<VineBerryStyle> vineBerryStyle; //local
     private readonly ConfigEntry<float> vineAttachDistance;
+    private readonly ConfigEntry<float> vineGrowRadius;
     private readonly ConfigEntry<float> vineGrowthTime;
     private readonly ConfigEntry<int> vineBerryRespawnTime;
     private readonly ConfigEntry<int> vineBerryReturn;
@@ -889,62 +891,72 @@ sealed class ModConfig
             "Vines",
             "EnableVineOverrides",
             false,
-            new ConfigDescription("Enables the [Vines] section of this config.", null, new ConfigurationManagerAttributes { Order = 10 }));
+            new ConfigDescription("Enables/Disables the [Vines] section of this config with the exception of color related settings.", null, new ConfigurationManagerAttributes { Order = 12 }));
+        enableCustomVinePiece = Config(
+            "Vines",
+            "EnableCustomVinePiece",
+            true,
+            new ConfigDescription("Adds/Removes the color customizable vine piece from the cultivator.", null, new ConfigurationManagerAttributes { Order = 11 }));
         ashVineStyle = Config(
             "Vines",
             "AshVineStyle",
             AshVineStyle.MeadowsGreen,
-            "",
+            new ConfigDescription("Defines how the color customizable vines will appear for you, and also what colors are saved on the vines when a sapling is placed. Select custom to display the colors selected at the time of placement.", null, new ConfigurationManagerAttributes { Order = 5 }),
             false);
         vineBerryStyle = Config(
             "Vines",
             "VineBerryStyle",
             VineBerryStyle.VanillaGreen,
-            "",
+            new ConfigDescription("Defines how the color customizable vine berries will appear for you, and also what colors are saved on the vines when a sapling is placed. Select custom to display the colors selected at the time of placement.", null, new ConfigurationManagerAttributes { Order = 3 }),
             false);
         vineAttachDistance = Config(
             "Vines",
             "VineAttachDistance",
             1.8f,
-            "");
+            "Distance at which vine saplings can attach to walls.");
+        vineGrowRadius = Config(
+            "Vines",
+            "VineGrowRadius",
+            1.8f,
+            "Distance from existing wall-attached vines required for an ashvine sapling to mature and attach to a wall.");
         vineGrowthTime = Config(
             "Vines",
             "VineGrowthTime",
             200f,
-            "");
+            "Length of time (in seconds) that it takes for a vine ash sapling to mature.");
         vineBerryRespawnTime = Config(
             "Vines",
             "VineBerryRespawnTime",
             200,
-            "");
+            "Length of time (in minutes) that it takes for vine berries to regrow");
         vineBerryReturn = Config(
             "Vines",
             "VineBerryReturn",
             3,
-            "");
+            "Resources gained upon harvesting vine berries.");
         ashVineCustomColor = Config(
             "Vines",
             "AshVineCustomColor",
             new Color(0.867f, 0, 0.278f, 1),
-            "",
+            new ConfigDescription("The customizable color for the leaf portion of color customizable vines.", null, new ConfigurationManagerAttributes { Order = 4 }),
             false);
         leftBerryColor = Config(
             "Vines",
             "LeftBerryColor",
             new Color(1, 1, 1, 1),
-            "",
+            new ConfigDescription("The customizable color for the left-most vine berry cluster on color customizable vines.", null, new ConfigurationManagerAttributes { Order = 2 }),
             false);
         centerBerryColor = Config(
             "Vines",
             "CenterBerryColor",
             new Color(1, 1, 1, 1),
-            "",
+            new ConfigDescription("The customizable color for the center vine berry cluster on color customizable vines.", null, new ConfigurationManagerAttributes { Order = 1 }),
             false);
         rightBerryColor = Config(
             "Vines",
             "RightBerryColor",
             new Color(1, 1, 1, 1),
-            "",
+            new ConfigDescription("The customizable color for the right-most vine berry cluster on color customizable vines.", null, new ConfigurationManagerAttributes { Order = 0 }),
             false);
 
         configFile.Save();
@@ -1087,11 +1099,14 @@ sealed class ModConfig
 
         //Vines
         enableVineOverrides.SettingChanged += PlantEverything.VineSettingChanged;
+        enableCustomVinePiece.SettingChanged += PlantEverything.VineSettingChanged;
         ashVineStyle.SettingChanged += PlantEverything.VineSettingChanged;
         vineBerryStyle.SettingChanged += PlantEverything.VineSettingChanged;
 
         vineAttachDistance.SettingChanged += PlantEverything.VineSettingChanged;
+        vineGrowRadius.SettingChanged += PlantEverything.VineSettingChanged;
         vineGrowthTime.SettingChanged += PlantEverything.VineSettingChanged;
+        vineBerryRespawnTime.SettingChanged += PlantEverything.VineSettingChanged;
         vineBerryReturn.SettingChanged += PlantEverything.VineSettingChanged;
 
         ashVineCustomColor.SettingChanged += PlantEverything.VineSettingChanged;
@@ -1249,7 +1264,9 @@ sealed class ModConfig
     internal bool EnablePlantTimers => enablePlantTimers.Value;
     internal bool GrowthAsPercentage => growthAsPercentage.Value;
     internal bool EnableVineOverrides => enableVineOverrides.Value;
+    internal bool EnableCustomVinePiece => enableCustomVinePiece.Value;
     internal float VinesAttachDistance => vineAttachDistance.Value;
+    internal float VineGrowRadius => vineGrowRadius.Value;
     internal float VinesGrowthTime => vineGrowthTime.Value;
     internal int VineBerryRespawnTime => vineBerryRespawnTime.Value;
     internal int VineBerryReturn => vineBerryReturn.Value;
