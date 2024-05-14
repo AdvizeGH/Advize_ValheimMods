@@ -31,8 +31,8 @@ static class StaticContent
             ColorVineGreen : ColorVineRed;
 
     internal static List<Color> BerryColorsFromConfig => config.VineBerryStyle == VineBerryStyle.Custom ?
-            config.            BerryColors.Select(x => x.Value).ToList() : config.VineBerryStyle == VineBerryStyle.RedGrapes ?
-            Enumerable.Repeat(ColorBerryRed, 3).ToList() : Enumerable.Repeat(ColorBerryGreen, 1).ToList();
+            config.BerryColors.Select(x => x.Value).ToList() : config.VineBerryStyle == VineBerryStyle.RedGrapes ?
+            Enumerable.Repeat(ColorBerryRed, 3).ToList() : Enumerable.Repeat(ColorBerryGreen, 3).ToList();
 
     internal static Vector3 ColorToVector3(Color color) => color == Color.black ? ColorBlackVector3 : new(color.r, color.g, color.b);
     internal static Color Vector3ToColor(Vector3 vector3) => vector3 == ColorBlackVector3 ? Color.black : new(vector3.x, vector3.y, vector3.z);

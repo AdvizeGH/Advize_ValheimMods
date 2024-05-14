@@ -17,7 +17,7 @@ public sealed class PlantEverything : BaseUnityPlugin
 {
     public const string PluginID = "advize.PlantEverything";
     public const string PluginName = "PlantEverything";
-    public const string Version = "1.17.0";
+    public const string Version = "1.17.1";
 
     internal static ManualLogSource PELogger = new($" {PluginName}");
 
@@ -42,7 +42,7 @@ public sealed class PlantEverything : BaseUnityPlugin
         Runtime.MakeAllAssetsLoadable();
         BepInEx.Logging.Logger.Sources.Add(PELogger);
         assetBundle = LoadAssetBundle("planteverything");
-        config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.17.0" });
+        config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.17.1" });
         SetupWatcher();
         if (config.EnableExtraResources)
             ExtraResourcesFileOrSettingChanged(null, null);
