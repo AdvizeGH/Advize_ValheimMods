@@ -2,6 +2,7 @@
 
 using HarmonyLib;
 using static PlantEverything;
+using static PluginUtils;
 using static StaticContent;
 
 [HarmonyPatch(typeof(Piece), nameof(Piece.SetCreator))]

@@ -45,7 +45,7 @@ internal sealed class PieceDB : PrefabDB
     internal bool? canBeRemoved;
     internal bool extraResource;
 
-    internal Piece Piece => piece ??= PlantEverything.CreatePiece(this);
+    internal Piece Piece => piece ??= PluginUtils.CreatePiece(this);
 
     internal string Name
     {

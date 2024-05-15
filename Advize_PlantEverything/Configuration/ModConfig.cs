@@ -963,7 +963,6 @@ sealed class ModConfig
         configFile.SaveOnConfigSet = true;
 
         //General
-        //resourcesSpawnEmpty.SettingChanged += PlantEverything.ConfigurationSettingChanged;
         showPickableSpawners.SettingChanged += PlantEverything.CoreSettingChanged;
         enableMiscFlora.SettingChanged += PlantEverything.CoreSettingChanged;
         snappableVines.SettingChanged += PlantEverything.CoreSettingChanged;

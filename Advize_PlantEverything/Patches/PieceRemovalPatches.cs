@@ -3,6 +3,7 @@
 using HarmonyLib;
 using UnityEngine;
 using static PlantEverything;
+using static PluginUtils;
 using static StaticContent;
 
 [HarmonyPatch]
