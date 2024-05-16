@@ -113,8 +113,6 @@ static class StaticContent
         { "VinesDescription", "Plant vines." },
         { "AshlandsFernName", "Ashlands Fern" },
         { "AshlandsFernDescription", "Plant a fern native to the ashlands." },
-        { "GlowingMushroomName", "Glowing Mushroom" },
-        { "GlowingMushroomDescription", "Plant a large glowing mushroom." },
         { "PickableBranchName", "Pickable Branch" },
         { "PickableBranchDescription", "Plant respawning pickable branches." },
         { "PickableStoneName", "Pickable Stone" },
@@ -166,7 +164,7 @@ static class StaticContent
         { "AshlandsTree6_big" },
         { "Beech1" },
         { "Beech_Sapling" },
-        { "Beech_small1" },
+        { "Beech_small1" }, // There is apparently a Beech_small2 that I never added. How did that happen?
         { "Birch1" },
         { "Birch1_aut" },
         { "Birch2" },
@@ -194,7 +192,6 @@ static class StaticContent
         { "vines" },
         { "VineAsh" },
         { "VineAsh_sapling" },
-        { "GlowingMushroom" },
         { "Oak1" },
         { "Oak_Sapling" }
     };
@@ -463,14 +460,6 @@ static class StaticContent
                     icon = true,
                     Name = "AshlandsFern",
                     canBeRemoved = false
-                },
-                new()
-                {
-                    key = "GlowingMushroom",
-                    Resources = new Dictionary<string, int>() { { "MushroomYellow", 3 }, { "BoneFragments", 1 }, { "Ooze", 1 } },
-                    icon = true,
-                    recover = true,
-                    isGrounded = true
                 },
                 new()
                 {
