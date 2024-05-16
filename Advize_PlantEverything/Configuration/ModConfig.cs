@@ -25,12 +25,13 @@ sealed class ModConfig
     private readonly ConfigEntry<string> language; //local
     private readonly ConfigEntry<string> disabledResourceNames;
 
-    //Difficulty 8
+    //Difficulty 9
     private readonly ConfigEntry<bool> requireCultivation;
     private readonly ConfigEntry<bool> placeAnywhere;
     private readonly ConfigEntry<bool> enforceBiomes;
     private readonly ConfigEntry<bool> enforceBiomesVanilla;
     private readonly ConfigEntry<bool> plantsRequireShielding;
+    private readonly ConfigEntry<bool> canRemoveFlora;
     private readonly ConfigEntry<bool> recoverResources;
     private readonly ConfigEntry<bool> resourcesSpawnEmpty;
     private readonly ConfigEntry<bool> enemiesTargetPieces;
@@ -291,6 +292,11 @@ sealed class ModConfig
             "PlantsRequireShielding",
             true,
             "Controls whether plants need shielding to survive in hostile environments.");
+        canRemoveFlora = Config(
+            "Difficulty",
+            "CanRemoveFlora",
+            false,
+            "Allows the cultivator to deconstruct decorative flora placed by a player. Useful for creative game types.");
         recoverResources = Config(
             "Difficulty",
             "RecoverResources",
@@ -1147,6 +1153,7 @@ sealed class ModConfig
     internal bool EnforceBiomes => enforceBiomes.Value;
     internal bool EnforceBiomesVanilla => enforceBiomesVanilla.Value;
     internal bool PlantsRequireShielding => plantsRequireShielding.Value;
+    internal bool CanRemoveFlora => canRemoveFlora.Value;
     internal bool RecoverResources => recoverResources.Value;
     internal bool ResourcesSpawnEmpty => resourcesSpawnEmpty.Value;
     internal bool EnemiesTargetPieces => enemiesTargetPieces.Value;

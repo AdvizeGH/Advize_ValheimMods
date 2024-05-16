@@ -41,7 +41,7 @@ static class PieceRemovalPatches
 
         static bool CanRemove(Piece piece, Player instance)
         {
-            bool canRemove = piece.m_canBeRemoved;
+            bool canRemove = piece.m_canBeRemoved || (config.CanRemoveFlora && piece.IsPlacedByPlayer() && !piece.m_name.Contains("sapling"));
 
             if (canRemove && !PrivateArea.CheckAccess(piece.transform.position))
             {
