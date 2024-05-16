@@ -466,7 +466,7 @@ static class StaticContent
                     key = "Pickable_Branch",
                     ResourceCost = config.PickableBranchCost,
                     resourceReturn = config.PickableBranchReturn,
-                    respawnTime = 240,
+                    respawnTime = config.PickableBranchRespawnTime,
                     recover = config.RecoverResources,
                     Name = "PickableBranch",
                     isGrounded = true
@@ -486,7 +486,7 @@ static class StaticContent
                     key = "Pickable_Flint",
                     ResourceCost = config.PickableFlintCost,
                     resourceReturn = config.PickableFlintReturn,
-                    respawnTime = 240,
+                    respawnTime = config.PickableFlintRespawnTime,
                     recover = config.RecoverResources,
                     Name = "PickableFlint",
                     isGrounded = true

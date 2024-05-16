@@ -79,13 +79,15 @@ sealed class ModConfig
     private readonly ConfigEntry<int> jotunPuffsCost;
     private readonly ConfigEntry<int> jotunPuffsReturn;
 
-    //Debris 6
+    //Debris 8
     private readonly ConfigEntry<int> pickableBranchCost;
     private readonly ConfigEntry<int> pickableBranchReturn;
+    private readonly ConfigEntry<int> pickableBranchRespawnTime;
     private readonly ConfigEntry<int> pickableStoneCost;
     private readonly ConfigEntry<int> pickableStoneReturn;
     private readonly ConfigEntry<int> pickableFlintCost;
     private readonly ConfigEntry<int> pickableFlintReturn;
+    private readonly ConfigEntry<int> pickableFlintRespawnTime;
 
     //Mushrooms 12
     private readonly ConfigEntry<int> mushroomCost;
@@ -523,6 +525,11 @@ sealed class ModConfig
             "PickableBranchReturn",
             1,
             "Amount of wood that branch debris drops when picked.");
+        pickableBranchRespawnTime = Config(
+            "Debris",
+            "PickableBranchRespawnTime",
+            240,
+            "Number of minutes it takes for a pickable branch to respawn.");
         pickableStoneCost = Config(
             "Debris",
             "PickableStoneCost",
@@ -543,6 +550,11 @@ sealed class ModConfig
             "PickableFlintReturn",
             1,
             "Amount of flint that flint debris drops when picked.");
+        pickableFlintRespawnTime = Config(
+            "Debris",
+            "PickableFlintRespawnTime",
+            240,
+            "Number of minutes it takes for pickable flint to respawn.");
 
         //Mushrooms
         mushroomCost = Config(
@@ -1025,10 +1037,12 @@ sealed class ModConfig
         //Debris
         pickableBranchCost.SettingChanged += PlantEverything.PieceSettingChanged;
         pickableBranchReturn.SettingChanged += PlantEverything.PieceSettingChanged;
+        pickableBranchRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
         pickableStoneCost.SettingChanged += PlantEverything.PieceSettingChanged;
         pickableStoneReturn.SettingChanged += PlantEverything.PieceSettingChanged;
         pickableFlintCost.SettingChanged += PlantEverything.PieceSettingChanged;
         pickableFlintReturn.SettingChanged += PlantEverything.PieceSettingChanged;
+        pickableFlintRespawnTime.SettingChanged += PlantEverything.PieceSettingChanged;
 
         //Mushrooms
         mushroomCost.SettingChanged += PlantEverything.PieceSettingChanged;
@@ -1198,10 +1212,12 @@ sealed class ModConfig
     internal int JotunPuffsReturn => jotunPuffsReturn.Value;
     internal int PickableBranchCost => pickableBranchCost.Value;
     internal int PickableBranchReturn => pickableBranchReturn.Value;
+    internal int PickableBranchRespawnTime => pickableBranchRespawnTime.Value;
     internal int PickableStoneCost => pickableStoneCost.Value;
     internal int PickableStoneReturn => pickableStoneReturn.Value;
     internal int PickableFlintCost => pickableFlintCost.Value;
     internal int PickableFlintReturn => pickableFlintReturn.Value;
+    internal int PickableFlintRespawnTime => pickableFlintRespawnTime.Value;
     internal int MushroomCost => mushroomCost.Value;
     internal int YellowMushroomCost => yellowMushroomCost.Value;
     internal int BlueMushroomCost => blueMushroomCost.Value;
