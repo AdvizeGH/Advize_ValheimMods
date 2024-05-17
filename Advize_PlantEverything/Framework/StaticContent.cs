@@ -346,7 +346,6 @@ static class StaticContent
                 recover = config.RecoverResources,
                 Name = "PickableSmokePuff",
                 isGrounded = true,
-                extraDrops = true
             },
             new PieceDB
             {

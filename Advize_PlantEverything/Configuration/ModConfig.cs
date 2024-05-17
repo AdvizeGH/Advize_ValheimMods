@@ -574,8 +574,8 @@ sealed class ModConfig
             "Number of blue mushrooms required to place a pickable blue mushroom spawner. Set to 0 to disable the ability to plant this resource.");
         smokePuffCost = Config(
             "Mushrooms",
-            "SmokePuffCost",
-            15,
+            "SmokepuffCost",
+            5,
             "Number of smoke puffs required to place a pickable smoke puff spawner. Set to 0 to disable the ability to plant this resource.");
         mushroomRespawnTime = Config(
             "Mushrooms",
@@ -594,7 +594,7 @@ sealed class ModConfig
             "Number of minutes it takes for blue mushrooms to respawn.");
         smokePuffRespawnTime = Config(
             "Mushrooms",
-            "SmokePuffRespawnTime",
+            "SmokepuffRespawnTime",
             240,
             "Number of minutes it takes for smoke puffs to respawn.");
         mushroomReturn = Config(
@@ -614,8 +614,8 @@ sealed class ModConfig
             "Number of blue mushrooms a pickable blue mushroom spawner will spawn.");
         smokePuffReturn = Config(
             "Mushrooms",
-            "SmokePuffReturn",
-            3,
+            "SmokepuffReturn",
+            1,
             "Number of smoke puffs a pickable smoke puff spawner will spawn.");
 
         //Flowers
