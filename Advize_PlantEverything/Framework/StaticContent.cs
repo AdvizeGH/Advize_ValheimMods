@@ -9,7 +9,7 @@ using static PlantEverything;
 static class StaticContent
 {
     private const Heightmap.Biome TemperateBiomes = Heightmap.Biome.Meadows | Heightmap.Biome.BlackForest | Heightmap.Biome.Plains;
-    private const Heightmap.Biome AllBiomes = (Heightmap.Biome)895/*GetBiomeMask((Heightmap.Biome[])System.Enum.GetValues(typeof(Heightmap.Biome)))*/;
+    internal const Heightmap.Biome AllBiomes = (Heightmap.Biome)895/*GetBiomeMask((Heightmap.Biome[])System.Enum.GetValues(typeof(Heightmap.Biome)))*/;
 
     internal static readonly int ModdedVineHash = "pe_ModdedVine".GetStableHashCode();
     internal static readonly int VineColorHash = "pe_VineColor".GetStableHashCode();
@@ -732,5 +732,37 @@ static class StaticContent
                 extraDrops = true
             }
         ];
+    }
+
+    internal static List<CustomPlantDB> GenerateCustomPlantRefs(List<GameObject> customPlants)
+    {
+        List<CustomPlantDB> newList = [];
+
+        foreach (GameObject customPlant in customPlants)
+        {
+            if (!customPlant.TryGetComponent<Plant>(out var plant) || !customPlant.TryGetComponent<Piece>(out _) || !plant.m_grownPrefabs[0].TryGetComponent<Pickable>(out _))
+                continue;
+
+            newList.Add(new CustomPlantDB
+            {
+                key = customPlant.name,
+                biome = plant.m_biome,
+                //resourceCost = piece.m_resources[0].m_amount,
+                //resourceReturn = pickable.m_amount,
+                tolerateCold = plant.m_tolerateCold,
+                tolerateHeat = plant.m_tolerateHeat,
+                //needCultivatedGround = plant.m_needCultivatedGround,
+                minScale = plant.m_minScale,
+                maxScale = plant.m_maxScale,
+                growTime = plant.m_growTime,
+                growTimeMax = plant.m_growTimeMax,
+                growRadius = plant.m_growRadius,
+                //extraDrops = pickable.m_extraDrops
+            });
+
+            prefabRefs[customPlant.name] = customPlant;
+        }
+
+        return newList;
     }
 }

@@ -25,6 +25,7 @@ public sealed class PlantEverything : BaseUnityPlugin
     private static List<PieceDB> pieceRefs = [];
     private static List<SaplingDB> saplingRefs = [];
     internal static List<ExtraResource> deserializedExtraResources = [];
+    internal static List<CustomPlantDB> customPlantRefs = [];
 
     private static bool piecesInitialized = false;
     private static bool saplingsInitialized = false;
@@ -738,7 +739,41 @@ public sealed class PlantEverything : BaseUnityPlugin
                 pickable.m_extraDrops.m_drops.Add(new DropTable.DropData { m_item = pickable.m_itemPrefab, m_stackMin = 1, m_stackMax = 1, m_weight = 0 });
             }
         }
+
+        if (customPlantRefs.Count == 0) return;
+
+        overridesEnabled = overridesEnabled && config.OverrideModdedCrops;
+
+        foreach (CustomPlantDB cdb in customPlantRefs)
+        {
+            Piece piece = cdb.Prefab.GetComponent<Piece>();
+            Plant plant = cdb.Prefab.GetComponent<Plant>();
+            //Pickable pickable = plant.m_grownPrefabs[0].GetComponent<Pickable>();
+
+            //piece.m_resources[0].m_amount = overridesEnabled ? 1 : cdb.resourceCost;
+            piece.m_primaryTarget = piece.m_randomTarget = config.EnemiesTargetCrops;
+
+            plant.m_biome = overridesEnabled && !config.EnforceBiomesVanilla ? AllBiomes : cdb.biome;
+            plant.m_tolerateCold = cdb.tolerateCold || !config.PlantsRequireShielding;
+            plant.m_tolerateHeat = cdb.tolerateHeat || !config.PlantsRequireShielding;
+
+            plant.m_minScale = overridesEnabled ? config.CropMinScale : cdb.minScale;
+            plant.m_maxScale = overridesEnabled ? config.CropMaxScale : cdb.maxScale;
+            plant.m_growTime = overridesEnabled ? config.CropGrowTimeMin : cdb.growTime;
+            plant.m_growTimeMax = overridesEnabled ? config.CropGrowTimeMax : cdb.growTimeMax;
+            plant.m_growRadius = overridesEnabled ? config.CropGrowRadius : cdb.growRadius;
+            plant.m_needCultivatedGround = piece.m_cultivatedGroundOnly = !overridesEnabled || config.CropRequireCultivation;
+
+            //pickable.m_amount = overridesEnabled ? 3 : cdb.resourceReturn;
+
+            //pickable.m_extraDrops.m_drops.Clear();
+            //if (!overridesEnabled)
+            //{
+            //    pickable.m_extraDrops = cdb.extraDrops;
+            //}
+        }
     }
+
     //TODO: This is mostly temporary garbage that can be refactored to piggyback off existing code. Need to decide what settings to expose as well.
     private static void InitVines()
     {

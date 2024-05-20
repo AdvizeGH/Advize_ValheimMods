@@ -47,8 +47,9 @@ sealed class ModConfig
     private readonly ConfigEntry<int> blueberryReturn;
     private readonly ConfigEntry<int> cloudberryReturn;
 
-    //Crops 30
+    //Crops 31
     private readonly ConfigEntry<bool> enableCropOverrides;
+    private readonly ConfigEntry<bool> overrideModdedCrops;
     private readonly ConfigEntry<bool> cropRequireCultivation;
     private readonly ConfigEntry<bool> cropRequireSunlight;
     private readonly ConfigEntry<bool> cropRequireGrowthSpace;
@@ -368,6 +369,11 @@ sealed class ModConfig
             "EnableCropOverrides",
             false,
             new ConfigDescription("Enables the [Crops] section of this config.", null, new ConfigurationManagerAttributes { Order = 28 }));
+        overrideModdedCrops = Config(
+            "Crops",
+            "OverrideModdedCrops",
+            false,
+            new ConfigDescription("Applies all [Crops] settings to 3rd party modded crops.", null, cropSettingAttributes[1]));
         cropMinScale = Config(
             "Crops",
             "CropMinScale",
@@ -1010,6 +1016,7 @@ sealed class ModConfig
 
         //Crops
         enableCropOverrides.SettingChanged += PlantEverything.CropSettingChanged;
+        overrideModdedCrops.SettingChanged += PlantEverything.CropSettingChanged;
         cropMinScale.SettingChanged += PlantEverything.CropSettingChanged;
         cropMaxScale.SettingChanged += PlantEverything.CropSettingChanged;
         cropGrowTimeMin.SettingChanged += PlantEverything.CropSettingChanged;
@@ -1181,6 +1188,7 @@ sealed class ModConfig
     internal int BlueberryReturn => blueberryReturn.Value;
     internal int CloudberryReturn => cloudberryReturn.Value;
     internal bool EnableCropOverrides => enableCropOverrides.Value;
+    internal bool OverrideModdedCrops => overrideModdedCrops.Value;
     internal float CropMinScale => cropMinScale.Value;
     internal float CropMaxScale => cropMaxScale.Value;
     internal float CropGrowTimeMin => Mathf.Max(cropGrowTimeMin.Value, 10);

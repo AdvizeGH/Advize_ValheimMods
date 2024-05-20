@@ -69,3 +69,14 @@ internal sealed class SaplingDB : PrefabDB
     internal float maxScale;
     internal GameObject[] grownPrefabs;
 }
+
+internal sealed class CustomPlantDB : PrefabDB
+{
+    //internal bool needCultivatedGround;
+    internal float minScale;
+    internal float maxScale;
+    internal float growTime;
+    internal float growTimeMax;
+    internal float growRadius;
+    //internal new DropTable extraDrops;
+}
