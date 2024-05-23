@@ -24,8 +24,8 @@ public sealed class PlantEverything : BaseUnityPlugin
     internal static readonly Dictionary<string, GameObject> prefabRefs = [];
     private static List<PieceDB> pieceRefs = [];
     internal static List<SaplingDB> saplingRefs = [];
-    internal static List<ExtraResource> deserializedExtraResources = [];
     internal static List<CustomPlantDB> customPlantRefs = [];
+    internal static List<ExtraResource> deserializedExtraResources = [];
 
     private static bool piecesInitialized = false;
     private static bool saplingsInitialized = false;
@@ -37,6 +37,7 @@ public sealed class PlantEverything : BaseUnityPlugin
     internal static readonly Dictionary<Texture2D, Sprite> cachedSprites = [];
 
     internal static ModConfig config;
+    internal static string CustomConfigPath;
 
     public void Awake()
     {
@@ -44,9 +45,10 @@ public sealed class PlantEverything : BaseUnityPlugin
         BepInEx.Logging.Logger.Sources.Add(PELogger);
         assetBundle = LoadAssetBundle("planteverything");
         config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.17.3" });
+        CustomConfigPath = SetupConfigDirectory();
         SetupWatcher();
         if (config.EnableExtraResources)
-            ExtraResourcesFileOrSettingChanged(null, null);
+            ConfigEventHandlers.ExtraResourcesFileOrSettingChanged(null, null);
         if (config.EnableLocalization)
             LoadLocalizedStrings();
         Harmony harmony = new(PluginID);
@@ -55,7 +57,7 @@ public sealed class PlantEverything : BaseUnityPlugin
         Dbgl("PlantEverything has loaded. Set [General]EnableDebugMessages to false to disable these messages.", level: LogLevel.Message);
     }
 
-    private static string ModConfigDirectory()
+    private static string SetupConfigDirectory()
     {
         string path = Path.Combine(Paths.ConfigPath, PluginName);
         if (!Directory.Exists(path))
@@ -67,178 +69,13 @@ public sealed class PlantEverything : BaseUnityPlugin
 
     private void SetupWatcher()
     {
-        FileSystemWatcher watcher = new(ModConfigDirectory(), $"{PluginName}_ExtraResources.cfg");
-        watcher.Changed += ExtraResourcesFileOrSettingChanged;
-        watcher.Created += ExtraResourcesFileOrSettingChanged;
-        watcher.Renamed += ExtraResourcesFileOrSettingChanged;
+        FileSystemWatcher watcher = new(CustomConfigPath, $"{PluginName}_ExtraResources.cfg");
+        watcher.Changed += ConfigEventHandlers.ExtraResourcesFileOrSettingChanged;
+        watcher.Created += ConfigEventHandlers.ExtraResourcesFileOrSettingChanged;
+        watcher.Renamed += ConfigEventHandlers.ExtraResourcesFileOrSettingChanged;
         watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
         watcher.IncludeSubdirectories = true;
         watcher.EnableRaisingEvents = true;
-    }
-    //Tidy up these events related to extra resources in followup updates, code flow is getting ridiculous. Clean up all the log messages too while you're at it.
-    internal static void ExtraResourcesFileOrSettingChanged(object sender, EventArgs e)
-    {
-        Dbgl($"ExtraResources file or setting has changed");
-        if (config.IsSourceOfTruth)
-        {
-            if (config.EnableExtraResources)
-            {
-                Dbgl("IsSourceOfTruth: true, loading extra resources from disk");
-                LoadExtraResources();
-            }
-            else
-            {
-                config.SyncedExtraResources.AssignLocalValue([]);
-            }
-        }
-        else
-        {
-            Dbgl("IsSourceOfTruth: false, extra resources will not be loaded from disk");
-            // Currently if a client changes their local ExtraResources.cfg while on a server, their new data won't be loaded.
-            // If they then leave server and join a single player game their originally loaded ExtraResources.cfg data is used, not the updated file.
-        }
-    }
-
-    private static string SerializeExtraResource(ExtraResource extraResource, bool prettyPrint = true) => JsonUtility.ToJson(extraResource, prettyPrint);
-
-    private static ExtraResource DeserializeExtraResource(string extraResource) => JsonUtility.FromJson<ExtraResource>(extraResource);
-
-    private static void SaveExtraResources()
-    {
-        string filePath = Path.Combine(ModConfigDirectory(), $"{PluginName}_ExtraResources.cfg");
-        Dbgl($"deserializedExtraResources.Count is {deserializedExtraResources.Count}");
-
-        string fullContent = "";
-        //foreach (ExtraResource test in deserializedExtraResources)
-        //{
-        //    fullContent += SerializeExtraResource(test) + ";\n";
-        //}
-        fullContent += SerializeExtraResource(deserializedExtraResources[0]) + ";\n\n";
-        fullContent += SerializeExtraResource(deserializedExtraResources[1], false) + ";\n";
-
-        File.WriteAllText(filePath, fullContent);
-        Dbgl($"Serialized extraResources to {filePath}", true);
-    }
-
-    private static void LoadExtraResources()
-    {
-        Dbgl("LoadExtraResources");
-        deserializedExtraResources.Clear();
-        string fileName = $"{PluginName}_ExtraResources.cfg";
-        string filePath = Path.Combine(ModConfigDirectory(), fileName);
-
-        try
-        {
-            string jsonText = File.ReadAllText(filePath);
-            string[] split = jsonText.Split(';');
-
-            foreach (string value in split)
-            {
-                if (value.IsNullOrWhiteSpace()) continue;
-                ExtraResource er = DeserializeExtraResource(value);
-                if (er.IsValid())
-                {
-                    deserializedExtraResources.Add(er);
-                    //Dbgl($"er1 {er.prefabName}, {er.resourceName}, {er.resourceCost}, {er.groundOnly}, {er.pieceName}, {er.pieceDescription}");
-                }
-                else
-                {
-                    if (er.prefabName.StartsWith("PE_Fake")) continue;
-                    Dbgl($"Invalid resource, {er.prefabName}, configured in {fileName}, skipping entry", true, LogLevel.Warning);
-                }
-            }
-
-            Dbgl($"Loaded extra resources from {filePath}", true);
-            //Dbgl($"deserializedExtraResources.Count is {deserializedExtraResources.Count}");
-            Dbgl($"Assigning local value from deserializedExtraResources");
-
-            List<string> resourcesToSync = [];
-            deserializedExtraResources.ForEach(er => resourcesToSync.Add(SerializeExtraResource(er)));
-            config.SyncedExtraResources.AssignLocalValue(resourcesToSync);
-            return;
-        }
-        catch (Exception e)
-        {
-            //Dbgl(e.GetType().FullName, true, LogLevel.Error);
-            if (e is FileNotFoundException)
-            {
-                Dbgl($"Error loading data from {fileName}. Generating new file with example values", true, LogLevel.Warning);
-                deserializedExtraResources = GenerateExampleResources();
-                SaveExtraResources();
-            }
-            else
-            {
-                Dbgl($"Error loading data from {fileName}. Additional resources have not been added", level: LogLevel.Warning);
-                deserializedExtraResources.Clear();
-            }
-        }
-    }
-    //CustomSyncedValue value changed event handler
-    internal static void ExtraResourcesChanged()
-    {
-        Dbgl("ExtraResourcesChanged");
-        //Dbgl($"deserializedExtraResources.Count is currently {deserializedExtraResources.Count}");
-        //Dbgl($"config.SyncedExtraResources.Count is currently {config.SyncedExtraResources.Value.Count}");
-
-        deserializedExtraResources.Clear();
-        foreach (string s in config.SyncedExtraResources.Value)
-        {
-            ExtraResource er = DeserializeExtraResource(s);
-            deserializedExtraResources.Add(er);
-            //Dbgl($"er2 {er.prefabName}, {er.resourceName}, {er.resourceCost}, {er.groundOnly}");
-        }
-
-        //Dbgl($"deserializedExtraResources.Count is now {deserializedExtraResources.Count}");
-
-        //Dbgl("Attempting to call InitExtraResources");
-        if (ZNetScene.s_instance)
-        {
-            //Dbgl("Calling InitExtraResources");
-            InitExtraResourceRefs(ZNetScene.s_instance);
-            PieceSettingChanged(null, null);
-        }
-    }
-
-    private void LoadLocalizedStrings()
-    {
-        string fileName = $"{config.Language}_{PluginName}.json";
-        string filePath = Path.Combine(ModConfigDirectory(), fileName);
-
-        try
-        {
-            string jsonText = File.ReadAllText(filePath);
-            ModLocalization ml = JsonUtility.FromJson<ModLocalization>(jsonText);
-
-            foreach (string value in ml.LocalizedStrings)
-            {
-                string[] split = value.Split(':');
-                DefaultLocalizedStrings.Remove(split[0]);
-                DefaultLocalizedStrings.Add(split[0], split[1]);
-            }
-
-            Dbgl($"Loaded localized strings from {filePath}");
-            return;
-        }
-        catch
-        {
-            Dbgl("EnableLocalization is true but unable to load localized text file, generating new one from default English values", true);
-        }
-        SerializeDict();
-    }
-
-    private void SerializeDict()
-    {
-        string filePath = Path.Combine(ModConfigDirectory(), $"english_{PluginName}.json");
-
-        ModLocalization ml = new();
-        foreach (KeyValuePair<string, string> kvp in DefaultLocalizedStrings)
-        {
-            ml.LocalizedStrings.Add($"{kvp.Key}:{kvp.Value}");
-        }
-
-        File.WriteAllText(filePath, JsonUtility.ToJson(ml, true));
-
-        Dbgl($"Saved english localized strings to {filePath}");
     }
 
     internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)
@@ -366,7 +203,7 @@ public sealed class PlantEverything : BaseUnityPlugin
         return addedExtraResources;
     }
 
-    private static void InitPieceRefs()
+    internal static void InitPieceRefs()
     {
         Dbgl("InitPieceRefs");
 
@@ -379,7 +216,7 @@ public sealed class PlantEverything : BaseUnityPlugin
         pieceRefs = GeneratePieceRefs();
     }
 
-    private static void InitPieces()
+    internal static void InitPieces()
     {
         Dbgl("InitPieces");
 
@@ -518,7 +355,7 @@ public sealed class PlantEverything : BaseUnityPlugin
         piecesInitialized = true;
     }
 
-    private static void InitSaplingRefs()
+    internal static void InitSaplingRefs()
     {
         Dbgl("InitSaplingRefs");
 
@@ -531,7 +368,7 @@ public sealed class PlantEverything : BaseUnityPlugin
         saplingRefs = GenerateCustomSaplingRefs();
     }
 
-    private static void InitSaplings()
+    internal static void InitSaplings()
     {
         Dbgl("InitSaplings");
 
@@ -670,7 +507,7 @@ public sealed class PlantEverything : BaseUnityPlugin
         saplingsInitialized = true;
     }
 
-    private static void ModifyTreeDrops()
+    internal static void ModifyTreeDrops()
     {
         if (!config.EnableSeedOverrides) return;
 
@@ -704,7 +541,7 @@ public sealed class PlantEverything : BaseUnityPlugin
         }
     }
 
-    private static void InitCrops()
+    internal static void InitCrops()
     {
         Dbgl("InitCrops");
 
@@ -775,7 +612,7 @@ public sealed class PlantEverything : BaseUnityPlugin
     }
 
     //TODO: This is mostly temporary garbage that can be refactored to piggyback off existing code. Need to decide what settings to expose as well.
-    private static void InitVines()
+    internal static void InitVines()
     {
         Dbgl("InitVines");
 
@@ -845,7 +682,7 @@ public sealed class PlantEverything : BaseUnityPlugin
         prefabRefs["PE_VineAsh_sapling"].GetComponent<Piece>().m_icon = ModifyTextureColor(baseSpriteTexture, 64, 64, VineColorFromConfig);
     }
 
-    private static void InitCultivator()
+    internal static void InitCultivator()
     {
         Dbgl("InitCultivator");
 
@@ -869,20 +706,16 @@ public sealed class PlantEverything : BaseUnityPlugin
         pieceTable.m_canRemovePieces = true;
     }
 
-    private static void RemoveFromCultivator(List<PrefabDB> prefabs)
+    public static void InitLocalization()
     {
-        if (HoldingCultivator) SheatheCultivator();
+        Dbgl("InitLocalization");
 
-        PieceTable pieceTable = prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
-        prefabs.ForEach(x => pieceTable.m_pieces.Remove(x.Prefab));
-    }
+        foreach (KeyValuePair<string, string> kvp in DefaultLocalizedStrings)
+        {
+            Localization.instance.AddWord($"pe{kvp.Key}", kvp.Value);
+        }
 
-    internal static bool HoldingCultivator => Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator";
-
-    private static void SheatheCultivator()
-    {
-        PELogger.LogWarning("Cultivator updated through config change, unequipping cultivator");
-        Player.m_localPlayer.HideHandItems();
+        DefaultLocalizedStrings.Clear();
     }
 
     internal static void FinalInit(ZNetScene instance)
@@ -910,63 +743,5 @@ public sealed class PlantEverything : BaseUnityPlugin
                 instance.m_namedPrefabs.Add(instance.GetPrefabHash(go), go);
             }
         }
-    }
-
-    internal static void CoreSettingChanged(object o, EventArgs e)
-    {
-        Dbgl("Config setting changed, re-initializing mod");
-        InitPieceRefs();
-        InitPieces();
-        InitSaplingRefs();
-        InitSaplings();
-        InitCrops();
-        InitVines();
-        InitCultivator();
-    }
-
-    internal static void PieceSettingChanged(object o, EventArgs e)
-    {
-        Dbgl("Config setting changed, re-initializing pieces");
-        InitPieceRefs();
-        InitPieces();
-        InitCultivator();
-    }
-
-    internal static void SaplingSettingChanged(object o, EventArgs e)
-    {
-        Dbgl("Config setting changed, re-initializing saplings");
-        InitSaplingRefs();
-        InitSaplings();
-        InitCultivator();
-    }
-
-    internal static void SeedSettingChanged(object o, EventArgs e)
-    {
-        Dbgl("Config setting changed, modifying TreeBase drop tables");
-        ModifyTreeDrops();
-    }
-
-    internal static void CropSettingChanged(object o, EventArgs e)
-    {
-        Dbgl("Config setting changed, re-initializing crops");
-        InitCrops();
-    }
-
-    internal static void VineSettingChanged(object o, EventArgs e)
-    {
-        Dbgl("Config setting changed, re-initializing vines");
-        InitVines();
-    }
-
-    public static void InitLocalization()
-    {
-        Dbgl("InitLocalization");
-
-        foreach (KeyValuePair<string, string> kvp in DefaultLocalizedStrings)
-        {
-            Localization.instance.AddWord($"pe{kvp.Key}", kvp.Value);
-        }
-
-        DefaultLocalizedStrings.Clear();
     }
 }

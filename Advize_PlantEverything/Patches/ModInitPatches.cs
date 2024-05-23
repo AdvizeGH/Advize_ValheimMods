@@ -29,7 +29,6 @@ static class ModInitPatches
             if (__state != null)
             {
                 List<GameObject> filteredPrefabs = __instance.m_prefabs.Except(__state).ToList();
-                __state.Clear();
 
                 filteredPrefabs.RemoveAll(x => !x.GetComponent<Plant>());
                 filteredPrefabs.RemoveAll(saplingRefs.Select(x => x.Prefab).ToList().Contains);
@@ -38,7 +37,7 @@ static class ModInitPatches
 
                 if (customPlantRefs.Count > 0)
                 {
-                    CropSettingChanged(null, null);
+                    ConfigEventHandlers.CropSettingChanged(null, null);
                 }
             }
 
@@ -51,7 +50,7 @@ static class ModInitPatches
                 if (InitExtraResourceRefs(__instance, true))
                 {
                     Dbgl("One or more missing references for configured ExtraResources were successfully resolved", true);
-                    PieceSettingChanged(null, null);
+                    ConfigEventHandlers.PieceSettingChanged(null, null);
                 }
             }
         }

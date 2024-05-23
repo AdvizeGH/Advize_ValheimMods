@@ -1,10 +1,14 @@
 ﻿namespace Advize_PlantEverything;
 
+using BepInEx;
 using BepInEx.Logging;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
 using static PlantEverything;
+using static StaticContent;
 
 static class PluginUtils
 {
@@ -29,6 +33,22 @@ static class PluginUtils
     internal static bool IsModdedPrefab(Component c) => c && prefabRefs.ContainsKey(GetPrefabName(c));
 
     internal static bool IsModdedPrefabOrSapling(string s) => s.StartsWith("$pe") || s.EndsWith("_sapling");
+
+    internal static bool HoldingCultivator => Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator";
+
+    internal static void RemoveFromCultivator(List<PrefabDB> prefabs)
+    {
+        if (HoldingCultivator) SheatheCultivator();
+
+        PieceTable pieceTable = prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
+        prefabs.ForEach(x => pieceTable.m_pieces.Remove(x.Prefab));
+    }
+
+    internal static void SheatheCultivator()
+    {
+        PELogger.LogWarning("Cultivator updated through config change, unequipping cultivator");
+        Player.m_localPlayer.HideHandItems();
+    }
 
     internal static Piece CreatePiece(PieceDB pdb)
     {
@@ -176,5 +196,122 @@ static class PluginUtils
         modified.Apply();
 
         return Sprite.Create(modified, new(0, 0, width, height), Vector2.zero);
+    }
+
+    private static string SerializeExtraResource(ExtraResource extraResource, bool prettyPrint = true) => JsonUtility.ToJson(extraResource, prettyPrint);
+
+    internal static ExtraResource DeserializeExtraResource(string extraResource) => JsonUtility.FromJson<ExtraResource>(extraResource);
+
+    private static void SaveExtraResources()
+    {
+        string filePath = Path.Combine(CustomConfigPath, $"{PluginName}_ExtraResources.cfg");
+        Dbgl($"deserializedExtraResources.Count is {deserializedExtraResources.Count}");
+
+        string fullContent = "";
+        //foreach (ExtraResource test in deserializedExtraResources)
+        //{
+        //    fullContent += SerializeExtraResource(test) + ";\n";
+        //}
+        fullContent += SerializeExtraResource(deserializedExtraResources[0]) + ";\n\n";
+        fullContent += SerializeExtraResource(deserializedExtraResources[1], false) + ";\n";
+
+        File.WriteAllText(filePath, fullContent);
+        Dbgl($"Serialized extraResources to {filePath}", true);
+    }
+
+    internal static void LoadExtraResources()
+    {
+        Dbgl("LoadExtraResources");
+        deserializedExtraResources.Clear();
+        string fileName = $"{PluginName}_ExtraResources.cfg";
+        string filePath = Path.Combine(CustomConfigPath, fileName);
+
+        try
+        {
+            string jsonText = File.ReadAllText(filePath);
+            string[] split = jsonText.Split(';');
+
+            foreach (string value in split)
+            {
+                if (value.IsNullOrWhiteSpace()) continue;
+                ExtraResource er = DeserializeExtraResource(value);
+                if (er.IsValid())
+                {
+                    deserializedExtraResources.Add(er);
+                    //Dbgl($"er1 {er.prefabName}, {er.resourceName}, {er.resourceCost}, {er.groundOnly}, {er.pieceName}, {er.pieceDescription}");
+                }
+                else
+                {
+                    if (er.prefabName.StartsWith("PE_Fake")) continue;
+                    Dbgl($"Invalid resource, {er.prefabName}, configured in {fileName}, skipping entry", true, LogLevel.Warning);
+                }
+            }
+
+            Dbgl($"Loaded extra resources from {filePath}", true);
+            //Dbgl($"deserializedExtraResources.Count is {deserializedExtraResources.Count}");
+            Dbgl($"Assigning local value from deserializedExtraResources");
+
+            List<string> resourcesToSync = [];
+            deserializedExtraResources.ForEach(er => resourcesToSync.Add(SerializeExtraResource(er)));
+            config.SyncedExtraResources.AssignLocalValue(resourcesToSync);
+            return;
+        }
+        catch (Exception e)
+        {
+            //Dbgl(e.GetType().FullName, true, LogLevel.Error);
+            if (e is FileNotFoundException)
+            {
+                Dbgl($"Error loading data from {fileName}. Generating new file with example values", true, LogLevel.Warning);
+                deserializedExtraResources = GenerateExampleResources();
+                SaveExtraResources();
+            }
+            else
+            {
+                Dbgl($"Error loading data from {fileName}. Additional resources have not been added", level: LogLevel.Warning);
+                deserializedExtraResources.Clear();
+            }
+        }
+    }
+
+    internal static void LoadLocalizedStrings()
+    {
+        string fileName = $"{config.Language}_{PluginName}.json";
+        string filePath = Path.Combine(CustomConfigPath, fileName);
+
+        try
+        {
+            string jsonText = File.ReadAllText(filePath);
+            ModLocalization ml = JsonUtility.FromJson<ModLocalization>(jsonText);
+
+            foreach (string value in ml.LocalizedStrings)
+            {
+                string[] split = value.Split(':');
+                DefaultLocalizedStrings.Remove(split[0]);
+                DefaultLocalizedStrings.Add(split[0], split[1]);
+            }
+
+            Dbgl($"Loaded localized strings from {filePath}");
+            return;
+        }
+        catch
+        {
+            Dbgl("EnableLocalization is true but unable to load localized text file, generating new one from default English values", true);
+        }
+        SerializeDict();
+    }
+
+    private static void SerializeDict()
+    {
+        string filePath = Path.Combine(CustomConfigPath, $"english_{PluginName}.json");
+
+        ModLocalization ml = new();
+        foreach (KeyValuePair<string, string> kvp in DefaultLocalizedStrings)
+        {
+            ml.LocalizedStrings.Add($"{kvp.Key}:{kvp.Value}");
+        }
+
+        File.WriteAllText(filePath, JsonUtility.ToJson(ml, true));
+
+        Dbgl($"Saved english localized strings to {filePath}");
     }
 }

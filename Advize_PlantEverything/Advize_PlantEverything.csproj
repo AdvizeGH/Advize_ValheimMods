@@ -116,6 +116,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\ConfigEventHandlers.cs" />
     <Compile Include="Framework\ExtraResource.cs" />
     <Compile Include="Localization\ModLocalization.cs" />
     <Compile Include="Framework\PluginUtils.cs" />
