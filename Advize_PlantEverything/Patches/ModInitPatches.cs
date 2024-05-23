@@ -31,7 +31,8 @@ static class ModInitPatches
                 List<GameObject> filteredPrefabs = __instance.m_prefabs.Except(__state).ToList();
                 __state.Clear();
 
-                filteredPrefabs.RemoveAll(x => !x.name.ToLower().StartsWith("sapling")/* && x.GetComponent<Plant>() != null*/);
+                filteredPrefabs.RemoveAll(x => !x.GetComponent<Plant>());
+                filteredPrefabs.RemoveAll(saplingRefs.Select(x => x.Prefab).ToList().Contains);
 
                 customPlantRefs = StaticContent.GenerateCustomPlantRefs(filteredPrefabs);
 

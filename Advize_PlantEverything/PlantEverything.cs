@@ -23,7 +23,7 @@ public sealed class PlantEverything : BaseUnityPlugin
 
     internal static readonly Dictionary<string, GameObject> prefabRefs = [];
     private static List<PieceDB> pieceRefs = [];
-    private static List<SaplingDB> saplingRefs = [];
+    internal static List<SaplingDB> saplingRefs = [];
     internal static List<ExtraResource> deserializedExtraResources = [];
     internal static List<CustomPlantDB> customPlantRefs = [];
 

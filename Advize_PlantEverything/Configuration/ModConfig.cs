@@ -372,7 +372,7 @@ sealed class ModConfig
         overrideModdedCrops = Config(
             "Crops",
             "OverrideModdedCrops",
-            false,
+            true,
             new ConfigDescription("Applies all [Crops] settings to 3rd party modded crops.", null, cropSettingAttributes[1]));
         cropMinScale = Config(
             "Crops",
