@@ -307,6 +307,11 @@ public sealed class PlantEverything : BaseUnityPlugin
                 pickable.m_amount = pdb.resourceReturn;
                 pdb.Piece.m_onlyInBiome = pdb.biome;
 
+                if (pdb.hideWhenPicked)
+                {
+                    pickable.m_hideWhenPicked = pdb.respawnTime > 0 ? pickable.gameObject : null;
+                }
+
                 Transform vanillaVisualChild = pdb.Prefab.transform.Find("visual");
 
                 if (!vanillaVisualChild) continue;

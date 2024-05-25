@@ -14,12 +14,13 @@ sealed class ModConfig
     private readonly ConfigFile ConfigFile;
     private readonly ConfigSync ConfigSync;
 
-    //General 4
+    //General 5
     private readonly ConfigEntry<bool> serverConfigLocked;
     internal readonly ConfigEntry<int> nexusID; //local
     private readonly ConfigEntry<bool> enableDebugMessages; //local
     private readonly ConfigEntry<bool> showPickableSpawners; //local
     private readonly ConfigEntry<bool> enableMiscFlora;
+    private readonly ConfigEntry<bool> enableDebris;
     private readonly ConfigEntry<bool> enableExtraResources;
     private readonly ConfigEntry<bool> snappableVines; //local
     private readonly ConfigEntry<bool> enableLocalization; //local
@@ -81,12 +82,13 @@ sealed class ModConfig
     private readonly ConfigEntry<int> jotunPuffsCost;
     private readonly ConfigEntry<int> jotunPuffsReturn;
 
-    //Debris 8
+    //Debris 9
     private readonly ConfigEntry<int> pickableBranchCost;
     private readonly ConfigEntry<int> pickableBranchReturn;
     private readonly ConfigEntry<int> pickableBranchRespawnTime;
     private readonly ConfigEntry<int> pickableStoneCost;
     private readonly ConfigEntry<int> pickableStoneReturn;
+    private readonly ConfigEntry<int> pickableStoneRespawnTime;
     private readonly ConfigEntry<int> pickableFlintCost;
     private readonly ConfigEntry<int> pickableFlintReturn;
     private readonly ConfigEntry<int> pickableFlintRespawnTime;
@@ -240,6 +242,11 @@ sealed class ModConfig
             "EnableMiscFlora",
             true,
             "Enables small trees, bushes, shrubs, vines, and large mushrooms.");
+        enableDebris = Config(
+            "General",
+            "EnableDebris",
+            true,
+            "Allows for the placement of debris such as branches, flint, and stone.");
         enableExtraResources = Config(
             "General",
             "EnableExtraResources",
@@ -547,6 +554,11 @@ sealed class ModConfig
             "PickableStoneReturn",
             1,
             "Amount of stones that stone debris drops when picked.");
+        pickableStoneRespawnTime = Config(
+            "Debris",
+            "PickableStoneRespawnTime",
+            0,
+            "Number of minutes it takes for a pickable Stone to respawn.");
         pickableFlintCost = Config(
             "Debris",
             "PickableFlintCost",
@@ -989,7 +1001,8 @@ sealed class ModConfig
 
         //General
         showPickableSpawners.SettingChanged += CoreSettingChanged;
-        enableMiscFlora.SettingChanged += CoreSettingChanged;
+        enableMiscFlora.SettingChanged += PieceSettingChanged;
+        enableDebris.SettingChanged += PieceSettingChanged;
         snappableVines.SettingChanged += CoreSettingChanged;
         enableExtraResources.SettingChanged += ExtraResourcesFileOrSettingChanged;
         disabledResourceNames.SettingChanged += CoreSettingChanged;
@@ -1048,6 +1061,7 @@ sealed class ModConfig
         pickableBranchRespawnTime.SettingChanged += PieceSettingChanged;
         pickableStoneCost.SettingChanged += PieceSettingChanged;
         pickableStoneReturn.SettingChanged += PieceSettingChanged;
+        pickableStoneRespawnTime.SettingChanged += PieceSettingChanged;
         pickableFlintCost.SettingChanged += PieceSettingChanged;
         pickableFlintReturn.SettingChanged += PieceSettingChanged;
         pickableFlintRespawnTime.SettingChanged += PieceSettingChanged;
@@ -1165,6 +1179,7 @@ sealed class ModConfig
     internal bool EnableDebugMessages => enableDebugMessages.Value;
     internal bool ShowPickableSpawners => showPickableSpawners.Value;
     internal bool EnableMiscFlora => enableMiscFlora.Value;
+    internal bool EnableDebris => enableDebris.Value;
     internal bool EnableExtraResources => enableExtraResources.Value;
     internal bool SnappableVines => snappableVines.Value;
     internal bool EnableLocalization => enableLocalization.Value;
@@ -1224,6 +1239,7 @@ sealed class ModConfig
     internal int PickableBranchRespawnTime => pickableBranchRespawnTime.Value;
     internal int PickableStoneCost => pickableStoneCost.Value;
     internal int PickableStoneReturn => pickableStoneReturn.Value;
+    internal int PickableStoneRespawnTime => pickableStoneRespawnTime.Value;
     internal int PickableFlintCost => pickableFlintCost.Value;
     internal int PickableFlintReturn => pickableFlintReturn.Value;
     internal int PickableFlintRespawnTime => pickableFlintRespawnTime.Value;

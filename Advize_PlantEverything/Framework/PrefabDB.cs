@@ -44,6 +44,7 @@ internal sealed class PieceDB : PrefabDB
     internal bool? isGrounded;
     internal bool? canBeRemoved;
     internal bool extraResource;
+    internal bool hideWhenPicked;
 
     internal Piece Piece => piece ??= PluginUtils.CreatePiece(this);
 

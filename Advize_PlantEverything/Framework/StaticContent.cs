@@ -459,7 +459,14 @@ static class StaticContent
                     icon = true,
                     Name = "AshlandsFern",
                     canBeRemoved = false
-                },
+                }
+            ]);
+        }
+
+        if (config.EnableDebris)
+        {
+            newList.AddRange(
+            [
                 new()
                 {
                     key = "Pickable_Branch",
@@ -475,10 +482,11 @@ static class StaticContent
                     key = "Pickable_Stone",
                     ResourceCost = config.PickableStoneCost,
                     resourceReturn = config.PickableStoneReturn,
-                    respawnTime = 0,
+                    respawnTime = config.PickableStoneRespawnTime,
                     recover = config.RecoverResources,
                     Name = "PickableStone",
-                    isGrounded = true
+                    isGrounded = true,
+                    hideWhenPicked = true
                 },
                 new()
                 {
