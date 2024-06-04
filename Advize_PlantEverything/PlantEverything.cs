@@ -588,6 +588,12 @@ public sealed class PlantEverything : BaseUnityPlugin
 
         foreach (CustomPlantDB cdb in customPlantRefs)
         {
+            if (!cdb.Prefab)
+            {
+                Dbgl($"{cdb.key} reference is null, skipping application of crop override settings", true, LogLevel.Warning);
+                continue;
+            }
+
             Piece piece = cdb.Prefab.GetComponent<Piece>();
             Plant plant = cdb.Prefab.GetComponent<Plant>();
             //Pickable pickable = plant.m_grownPrefabs[0].GetComponent<Pickable>();
