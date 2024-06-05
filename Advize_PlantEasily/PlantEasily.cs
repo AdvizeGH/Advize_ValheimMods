@@ -225,21 +225,21 @@ public sealed class PlantEasily : BaseUnityPlugin
 
     internal static void PlacePiece(Player player, GameObject go, Piece piece)
     {
+        GameObject prefab = piece.gameObject;
         Vector3 position = go.transform.position;
         Quaternion rotation = config.RandomizeRotation ? Quaternion.Euler(0f, 22.5f * UnityEngine.Random.Range(0, 16), 0f) : go.transform.rotation;
-        GameObject gameObject = piece.gameObject;
 
         TerrainModifier.SetTriggerOnPlaced(trigger: true);
-        GameObject gameObject2 = Instantiate(gameObject, position, rotation);
+        GameObject clone = Instantiate(prefab, position, rotation);
         TerrainModifier.SetTriggerOnPlaced(trigger: false);
 
-        gameObject2.GetComponent<Piece>().SetCreator(player.GetPlayerID());
-        //Disable this when placing tons of things at once??
-        piece.m_placeEffect.Create(position, rotation, gameObject2.transform, 1f);
-        player.AddNoise(50f);
+        clone.GetComponent<Piece>().SetCreator(player.GetPlayerID());
+        //Disable this, it's already applied to root placement ghost and impacts placement performance
+        //piece.m_placeEffect.Create(position, rotation, gameObject2.transform, 1f);
+        //player.AddNoise(50f);
 
         Game.instance.IncrementPlayerStat(PlayerStatType.Builds);
-        Gogan.LogEvent("Game", "PlacedPiece", gameObject.name, 0L);
+        Gogan.LogEvent("Game", "PlacedPiece", prefab.name, 0L);
     }
 
     internal enum Status
