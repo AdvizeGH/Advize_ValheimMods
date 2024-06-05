@@ -202,11 +202,7 @@ sealed class ModConfig
     private ConfigEntry<T> Config<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => Config(group, name, value, new ConfigDescription(description), synchronizedSetting);
 
     private readonly ConfigurationManagerAttributes seedSettingAtrributes = new();
-    private readonly List<ConfigurationManagerAttributes> cropSettingAttributes = new()
-        {
-            { new() },
-            { new() { Order = 27 } }
-        };
+    private readonly List<ConfigurationManagerAttributes> cropSettingAttributes = [new(), new() { Order = 27 }];
 
     internal ModConfig(ConfigFile configFile, ConfigSync configSync)
     {

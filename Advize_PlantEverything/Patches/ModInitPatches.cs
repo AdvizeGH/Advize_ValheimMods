@@ -16,7 +16,7 @@ static class ModInitPatches
     static class ZNetScenePatches
     {
         [HarmonyPriority(Priority.First)]
-        static void Prefix(ZNetScene __instance, out List<GameObject> __state)
+        static void Prefix(ZNetScene __instance, ref List<GameObject> __state)
         {
             __state = customPlantRefs.Count == 0 ? new(__instance.m_prefabs) : null;
         }

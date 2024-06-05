@@ -4,7 +4,6 @@ using BepInEx.Configuration;
 using UnityEngine;
 using Attributes = ModConfig.ConfigurationManagerAttributes;
 
-
 sealed class ModConfig
 {
     private readonly ConfigFile Config;
@@ -162,10 +161,7 @@ sealed class ModConfig
         columns.SettingChanged += PlantEasily.GridSizeChanged;
     }
 
-    internal bool EnableDebugMessages
-    {
-        get { return enableDebugMessages.Value; }
-    }
+    internal bool EnableDebugMessages => enableDebugMessages.Value;
     internal int Rows
     {
         get { return Mathf.Max(rows.Value, 1); }
@@ -186,139 +182,44 @@ sealed class ModConfig
         get { return snapActive.Value; }
         set { snapActive.BoxedValue = value; }
     }
-    internal float PickableSnapRadius
-    {
-        get { return pickableSnapRadius.Value; }
-    }
-    internal float BerryBushSnapRadius
-    {
-        get { return berryBushSnapRadius.Value; }
-    }
-    internal float MushroomSnapRadius
-    {
-        get { return mushroomSnapRadius.Value; }
-    }
-    internal float FlowerSnapRadius
-    {
-        get { return flowerSnapRadius.Value; }
-    }
-    internal bool PreventOverlappingPlacements
-    {
-        get { return preventOverlappingPlacements.Value; }
-    }
-    internal bool PreventPartialPlanting
-    {
-        get { return preventPartialPlanting.Value; }
-    }
-    internal bool PreventInvalidPlanting
-    {
-        get { return preventInvalidPlanting.Value; }
-    }
-    internal bool RandomizeRotation
-    {
-        get { return randomizeRotation.Value; }
-    }
-    internal bool UseStamina
-    {
-        get { return useStamina.Value; }
-    }
-    internal bool UseDurability
-    {
-        get { return useDurability.Value; }
-    }
-    internal float ExtraCropSpacing
-    {
-        get { return extraCropSpacing.Value; }
-    }
-    internal float ExtraSaplingSpacing
-    {
-        get { return extraSaplingSpacing.Value; }
-    }
-    internal GridSnappingStyle GridSnappingStyle
-    {
-        get { return gridSnappingStyle.Value; }
-    }
-    internal bool StandardizeGridRotations
-    {
-        get { return standardizeGridRotations.Value; }
-    }
-    internal bool MinimizeGridSpacing
-    {
-        get { return minimizeGridSpacing.Value; }
-    }
-    internal bool GloballyAlignGridDirections
-    {
-        get { return globallyAlignGridDirections.Value; }
-    }
-    internal bool EnableBulkHarvest
-    {
-        get { return enableBulkHarvest.Value; }
-    }
-    internal HarvestStyle HarvestStyle
-    {
-        get { return harvestStyle.Value; }
-    }
-    internal float HarvestRadius
-    {
-        get { return harvestRadius.Value; }
-    }
+    internal float PickableSnapRadius => pickableSnapRadius.Value;
+    internal float BerryBushSnapRadius => berryBushSnapRadius.Value;
+    internal float MushroomSnapRadius => mushroomSnapRadius.Value;
+    internal float FlowerSnapRadius => flowerSnapRadius.Value;
+    internal bool PreventOverlappingPlacements => preventOverlappingPlacements.Value;
+    internal bool PreventPartialPlanting => preventPartialPlanting.Value;
+    internal bool PreventInvalidPlanting => preventInvalidPlanting.Value;
+    internal bool RandomizeRotation => randomizeRotation.Value;
+    internal bool UseStamina => useStamina.Value;
+    internal bool UseDurability => useDurability.Value;
+    internal float ExtraCropSpacing => extraCropSpacing.Value;
+    internal float ExtraSaplingSpacing => extraSaplingSpacing.Value;
+    internal GridSnappingStyle GridSnappingStyle => gridSnappingStyle.Value;
+    internal bool StandardizeGridRotations => standardizeGridRotations.Value;
+    internal bool MinimizeGridSpacing => minimizeGridSpacing.Value;
+    internal bool GloballyAlignGridDirections => globallyAlignGridDirections.Value;
+    internal bool EnableBulkHarvest => enableBulkHarvest.Value;
+    internal HarvestStyle HarvestStyle => harvestStyle.Value;
+    internal float HarvestRadius => harvestRadius.Value;
     internal bool ReplantOnHarvest
     {
         get { return replantOnHarvest.Value; }
         set { replantOnHarvest.BoxedValue = value; }
     }
-    internal KeyboardShortcut EnableModKey
-    {
-        get { return enableModKey.Value; }
-    }
-    internal KeyboardShortcut EnableSnappingKey
-    {
-        get { return enableSnappingKey.Value; }
-    }
-    internal KeyCode IncreaseXKey
-    {
-        get { return increaseXKey.Value.MainKey; }
-    }
-    internal KeyCode IncreaseYKey
-    {
-        get { return increaseYKey.Value.MainKey; }
-    }
-    internal KeyCode DecreaseXKey
-    {
-        get { return decreaseXKey.Value.MainKey; }
-    }
-    internal KeyCode DecreaseYKey
-    {
-        get { return decreaseYKey.Value.MainKey; }
-    }
-    internal KeyCode KeyboardModifierKey
-    {
-        get { return keyboardModifierKey.Value.MainKey; }
-    }
-    internal KeyCode GamepadModifierKey
-    {
-        get { return gamepadModifierKey.Value.MainKey; }
-    }
-    internal KeyCode KeyboardHarvestModifierKey
-    {
-        get { return keyboardHarvestModifierKey.Value.MainKey; }
-    }
-    internal KeyboardShortcut ToggleAutoReplantKey
-    {
-        get { return toggleAutoReplantKey.Value; }
-    }
-    internal bool ShowCost
-    {
-        get { return showCost.Value; }
-    }
-    internal CostDisplayStyle CostDisplayStyle
-    {
-        get { return costDisplayStyle.Value; }
-    }
-    internal CostDisplayLocation CostDisplayLocation
-    {
-        get { return costDisplayLocation.Value; }
-    }
+    internal KeyboardShortcut EnableModKey => enableModKey.Value;
+    internal KeyboardShortcut EnableSnappingKey => enableSnappingKey.Value;
+    internal KeyCode IncreaseXKey => increaseXKey.Value.MainKey;
+    internal KeyCode IncreaseYKey => increaseYKey.Value.MainKey;
+    internal KeyCode DecreaseXKey => decreaseXKey.Value.MainKey;
+    internal KeyCode DecreaseYKey => decreaseYKey.Value.MainKey;
+    internal KeyCode KeyboardModifierKey => keyboardModifierKey.Value.MainKey;
+    internal KeyCode GamepadModifierKey => gamepadModifierKey.Value.MainKey;
+    internal KeyCode KeyboardHarvestModifierKey => keyboardHarvestModifierKey.Value.MainKey;
+    internal KeyboardShortcut ToggleAutoReplantKey => toggleAutoReplantKey.Value;
+    internal bool ShowCost => showCost.Value;
+    internal CostDisplayStyle CostDisplayStyle => costDisplayStyle.Value;
+    internal CostDisplayLocation CostDisplayLocation => costDisplayLocation.Value;
+
 #nullable enable
     internal class ConfigurationManagerAttributes
     {
