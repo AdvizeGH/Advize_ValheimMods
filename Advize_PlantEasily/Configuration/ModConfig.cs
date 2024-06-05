@@ -27,6 +27,7 @@ sealed class ModConfig
     private readonly ConfigEntry<bool> standardizeGridRotations;
     private readonly ConfigEntry<bool> minimizeGridSpacing;
     private readonly ConfigEntry<bool> globallyAlignGridDirections;
+    private readonly ConfigEntry<int> maxConcurrentPlacements;
 
     //Pickables
     private readonly ConfigEntry<float> pickableSnapRadius;
@@ -83,6 +84,7 @@ sealed class ModConfig
         standardizeGridRotations = Config.Bind("General", "StandardizeGridRotations", true, "When set to true, this setting will prevent the diagonal snapping of new grids to existing grids.");
         minimizeGridSpacing = Config.Bind("General", "MinimizeGridSpacing", false, "Allows for tighter grids, but with varying spacing used between diverse/distinct plants. ");
         globallyAlignGridDirections = Config.Bind("General", "GloballyAlignGridDirections", true, "When set to true, new grid placements will have their column and row directions align with the global grid.");
+        maxConcurrentPlacements = Config.Bind("General", "MaxConcurrentPlacements", 500, new ConfigDescription("Maximum amount of pieces that can be placed at once with the cultivator.", new AcceptableValueRange<int>(2, 10000)));
 
         //Pickables
         pickableSnapRadius = Config.Bind("Pickables", "PickableSnapRadius", 1.0f, "Determines default distance/spacing between pickable resources when planting.");
@@ -159,6 +161,7 @@ sealed class ModConfig
 
         rows.SettingChanged += PlantEasily.GridSizeChanged;
         columns.SettingChanged += PlantEasily.GridSizeChanged;
+        maxConcurrentPlacements.SettingChanged += PlantEasily.GridSizeChanged;
     }
 
     internal bool EnableDebugMessages => enableDebugMessages.Value;
@@ -198,6 +201,7 @@ sealed class ModConfig
     internal bool StandardizeGridRotations => standardizeGridRotations.Value;
     internal bool MinimizeGridSpacing => minimizeGridSpacing.Value;
     internal bool GloballyAlignGridDirections => globallyAlignGridDirections.Value;
+    internal int MaxConcurrentPlacements => maxConcurrentPlacements.Value;
     internal bool EnableBulkHarvest => enableBulkHarvest.Value;
     internal HarvestStyle HarvestStyle => harvestStyle.Value;
     internal float HarvestRadius => harvestRadius.Value;

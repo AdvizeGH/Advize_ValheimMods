@@ -20,7 +20,7 @@ public sealed class PlantEasily : BaseUnityPlugin
 
     internal static readonly Dictionary<string, GameObject> prefabRefs = [];
 
-    private static GameObject placementGhost;
+    internal static GameObject placementGhost;
     internal static readonly List<GameObject> extraGhosts = [];
     internal static readonly List<Status> ghostPlacementStatus = [];
     internal static readonly List<int> instanceIDS = [];
@@ -71,6 +71,8 @@ public sealed class PlantEasily : BaseUnityPlugin
                     ghostPlacementStatus.Add(Status.Healthy);
                     continue;
                 }
+
+                if (extraGhosts.Count >= config.MaxConcurrentPlacements - 1) return;
 
                 ZNetView.m_forceDisableInit = true;
                 GameObject newGhost = Instantiate(rootGhost);

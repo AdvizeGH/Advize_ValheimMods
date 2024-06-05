@@ -200,10 +200,14 @@ static class PlacementPatches
             {
                 for (int column = 0; column < config.Columns; column++)
                 {
-                    currentCost += cost;
-                    piece.m_resources[0].m_amount = currentCost;
                     bool isRoot = (column == 0 && row == 0);
                     int ghostIndex = row * config.Columns + column;
+
+                    if (ghostIndex > extraGhosts.Count) break;
+
+                    currentCost += cost;
+                    piece.m_resources[0].m_amount = currentCost;
+
                     GameObject ghost = isRoot ? ___m_placementGhost : extraGhosts[ghostIndex - 1];
 
                     Vector3 ghostPosition = isRoot ? basePosition : basePosition + rowDirection * row + columnDirection * column;
