@@ -690,27 +690,27 @@ sealed class ModConfig
             "Saplings",
             "OverrideModdedSaplings",
             false,
-            new ConfigDescription("Applies all [Saplings]Modded* settings to 3rd party modded saplings.", null, new ConfigurationManagerAttributes { Order = 37 }));
+            new ConfigDescription("Applies all [Saplings]Modded* settings to 3rd party modded saplings.", null, new ConfigurationManagerAttributes { Order = 41 }));
         moddedSaplingMinScale = Config(
             "Saplings",
             "ModdedSaplingMinScale",
             0.5f,
-            "The minimum scaling factor used to scale a 3rd party modded tree upon growth.");
+            new ConfigDescription("The minimum scaling factor used to scale a 3rd party modded tree upon growth.", null, new ConfigurationManagerAttributes { Order = 37 }));
         moddedSaplingMaxScale = Config(
             "Saplings",
             "ModdedSaplingMaxScale",
             2f,
-            "The minimum scaling factor used to scale a 3rd party modded tree upon growth.");
+            new ConfigDescription("The maximum scaling factor used to scale a 3rd party modded tree upon growth.", null, new ConfigurationManagerAttributes { Order = 38 }));
         moddedSaplingGrowthTime = Config(
             "Saplings",
             "ModdedSaplingGrowthTime",
             3000f,
-            "Number of seconds it takes for a 3rd party modded tree to grow from its modded sapling (will take at least 10 seconds after planting to grow).");
+            new ConfigDescription("Number of seconds it takes for a 3rd party modded tree to grow from its modded sapling (will take at least 10 seconds after planting to grow).", null, new ConfigurationManagerAttributes { Order = 39 }));
         moddedSaplingGrowRadius = Config(
             "Saplings",
             "ModdedSaplingGrowRadius",
             2f,
-            "Radius of free space required for a 3rd party modded sapling to grow.");
+            new ConfigDescription("Radius of free space required for a 3rd party modded sapling to grow.", null, new ConfigurationManagerAttributes { Order = 40 }));
         birchMinScale = Config(
             "Saplings",
             "BirchMinScale",

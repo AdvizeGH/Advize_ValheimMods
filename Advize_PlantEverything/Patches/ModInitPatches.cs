@@ -21,7 +21,7 @@ static class ModInitPatches
             __state = moddedCropRefs.Count == 0 && moddedSaplingRefs.Count == 0 ? new(__instance.m_prefabs) : null;
         }
 
-        static void Postfix(ZNetScene __instance) => FinalInit(__instance);
+        static void Postfix(ZNetScene __instance) => FullInit(__instance);
 
         [HarmonyPostfix, HarmonyPriority(Priority.Last)]
         static void LastPostfix(ZNetScene __instance, List<GameObject> __state)
@@ -37,22 +37,24 @@ static class ModInitPatches
                 {
                     if (moddedPlant.Prefab.GetComponent<Plant>().m_grownPrefabs.Any(x => x.GetComponent<TreeBase>()))
                     {
+                        Dbgl($"Adding modded sapling reference {moddedPlant.key}");
                         moddedSaplingRefs.Add(moddedPlant);
                     }
                     else
                     {
+                        Dbgl($"Adding modded crop reference {moddedPlant.key}");
                         moddedCropRefs.Add(moddedPlant);
                     }
                 }
 
                 if (moddedCropRefs.Count > 0)
                 {
-                    Dbgl($"Added {moddedCropRefs.Count} modded crop refs");
+                    Dbgl($"Added {moddedCropRefs.Count} modded crop references");
                     ConfigEventHandlers.CropSettingChanged(null, null);
                 }
                 if (moddedSaplingRefs.Count > 0)
                 {
-                    Dbgl($"Added {moddedSaplingRefs.Count} modded sapling refs");
+                    Dbgl($"Added {moddedSaplingRefs.Count} modded sapling references");
                     ConfigEventHandlers.SaplingSettingChanged(null, null);
                 }
             }
