@@ -36,7 +36,7 @@ static class PieceCreationPatches
         if (config.PlaceAnywhere && __instance.TryGetComponent(out StaticPhysics sp))
         {
             sp.m_fall = false;
-            __instance.m_nview.GetZDO().Set("pe_placeAnywhere", true);
+            __instance.m_nview.GetZDO().Set(PlaceAnywhereHash, true);
         }
     }
 }

@@ -16,11 +16,11 @@ static class ApplyZDOPatches
 
     static void ModifyPlantGrow(Plant plant, GameObject grownTree)
     {
-        if (!plant.m_nview.GetZDO().GetBool("pe_placeAnywhere") || !grownTree.TryGetComponent(out TreeBase tb) || !tb.TryGetComponent(out StaticPhysics sp))
+        if (!plant.m_nview.GetZDO().GetBool(PlaceAnywhereHash) || !grownTree.TryGetComponent(out TreeBase tb) || !tb.TryGetComponent(out StaticPhysics sp))
             return;
 
         sp.m_fall = false;
-        tb.m_nview.GetZDO().Set("pe_placeAnywhere", true);
+        tb.m_nview.GetZDO().Set(PlaceAnywhereHash, true);
     }
 
     static void ModifyVineGrow(Vine existingVine, Vine newVine)

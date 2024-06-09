@@ -11,6 +11,7 @@ static class StaticContent
     private const Heightmap.Biome TemperateBiomes = Heightmap.Biome.Meadows | Heightmap.Biome.BlackForest | Heightmap.Biome.Plains;
     internal const Heightmap.Biome AllBiomes = (Heightmap.Biome)895/*GetBiomeMask((Heightmap.Biome[])System.Enum.GetValues(typeof(Heightmap.Biome)))*/;
 
+    internal static readonly int PlaceAnywhereHash = "pe_placeAnywhere".GetStableHashCode();
     internal static readonly int ModdedVineHash = "pe_ModdedVine".GetStableHashCode();
     internal static readonly int VineColorHash = "pe_VineColor".GetStableHashCode();
     internal static readonly int BerryColor1Hash = "pe_BerryColor1".GetStableHashCode();
