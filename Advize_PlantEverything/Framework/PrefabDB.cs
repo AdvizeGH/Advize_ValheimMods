@@ -71,7 +71,7 @@ internal sealed class SaplingDB : PrefabDB
     internal GameObject[] grownPrefabs;
 }
 
-internal sealed class CustomPlantDB : PrefabDB
+internal sealed class ModdedPlantDB : PrefabDB
 {
     //internal bool needCultivatedGround;
     internal float minScale;

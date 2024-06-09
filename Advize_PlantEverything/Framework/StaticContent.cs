@@ -746,9 +746,9 @@ static class StaticContent
         ];
     }
 
-    internal static List<CustomPlantDB> GenerateCustomPlantRefs(List<GameObject> customPlants)
+    internal static List<ModdedPlantDB> GenerateCustomPlantRefs(List<GameObject> customPlants)
     {
-        List<CustomPlantDB> newList = [];
+        List<ModdedPlantDB> newList = [];
 
         foreach (GameObject customPlant in customPlants)
         {
@@ -756,7 +756,7 @@ static class StaticContent
 			//    continue;
 			Plant plant = customPlant.GetComponent<Plant>();
 
-            newList.Add(new CustomPlantDB
+            newList.Add(new ModdedPlantDB
             {
                 key = customPlant.name,
                 biome = plant.m_biome,

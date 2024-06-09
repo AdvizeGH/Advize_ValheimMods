@@ -118,7 +118,12 @@ sealed class ModConfig
     private readonly ConfigEntry<int> dandelionReturn;
     private readonly ConfigEntry<int> fiddleheadReturn;
 
-    //Saplings 36
+    //Saplings 41
+    private readonly ConfigEntry<bool> overrideModdedSaplings;
+    private readonly ConfigEntry<float> moddedSaplingMinScale;
+    private readonly ConfigEntry<float> moddedSaplingMaxScale;
+    private readonly ConfigEntry<float> moddedSaplingGrowthTime;
+    private readonly ConfigEntry<float> moddedSaplingGrowRadius;
     private readonly ConfigEntry<float> birchMinScale;
     private readonly ConfigEntry<float> birchMaxScale;
     private readonly ConfigEntry<float> oakMinScale;
@@ -681,6 +686,31 @@ sealed class ModConfig
             "Number of fiddlehead a pickable fiddlehead spawner will spawn.");
 
         //Saplings
+        overrideModdedSaplings = Config(
+            "Saplings",
+            "OverrideModdedSaplings",
+            false,
+            new ConfigDescription("Applies all [Saplings]Modded* settings to 3rd party modded saplings.", null, new ConfigurationManagerAttributes { Order = 37 }));
+        moddedSaplingMinScale = Config(
+            "Saplings",
+            "ModdedSaplingMinScale",
+            0.5f,
+            "The minimum scaling factor used to scale a 3rd party modded tree upon growth.");
+        moddedSaplingMaxScale = Config(
+            "Saplings",
+            "ModdedSaplingMaxScale",
+            2f,
+            "The minimum scaling factor used to scale a 3rd party modded tree upon growth.");
+        moddedSaplingGrowthTime = Config(
+            "Saplings",
+            "ModdedSaplingGrowthTime",
+            3000f,
+            "Number of seconds it takes for a 3rd party modded tree to grow from its modded sapling (will take at least 10 seconds after planting to grow).");
+        moddedSaplingGrowRadius = Config(
+            "Saplings",
+            "ModdedSaplingGrowRadius",
+            2f,
+            "Radius of free space required for a 3rd party modded sapling to grow.");
         birchMinScale = Config(
             "Saplings",
             "BirchMinScale",
@@ -1088,6 +1118,11 @@ sealed class ModConfig
         fiddleheadReturn.SettingChanged += PieceSettingChanged;
 
         //Saplings
+        overrideModdedSaplings.SettingChanged += SaplingSettingChanged;
+        moddedSaplingMinScale.SettingChanged += SaplingSettingChanged;
+        moddedSaplingMaxScale.SettingChanged += SaplingSettingChanged;
+        moddedSaplingGrowthTime.SettingChanged += SaplingSettingChanged;
+        moddedSaplingGrowRadius.SettingChanged += SaplingSettingChanged;
         ancientGrowRadius.SettingChanged += SaplingSettingChanged;
         ancientGrowthTime.SettingChanged += SaplingSettingChanged;
         ancientMinScale.SettingChanged += SaplingSettingChanged;
@@ -1260,6 +1295,11 @@ sealed class ModConfig
     internal int ThistleReturn => thistleReturn.Value;
     internal int DandelionReturn => dandelionReturn.Value;
     internal int FiddleheadReturn => fiddleheadReturn.Value;
+    internal bool OverrideModdedSaplings => overrideModdedSaplings.Value;
+    internal float ModdedSaplingMinScale => moddedSaplingMinScale.Value;
+    internal float ModdedSaplingMaxScale => moddedSaplingMaxScale.Value;
+    internal float ModdedSaplingGrowthTime => moddedSaplingGrowthTime.Value;
+    internal float ModdedSaplingGrowRadius => moddedSaplingGrowRadius.Value;
     internal float BirchMinScale => birchMinScale.Value;
     internal float BirchMaxScale => birchMaxScale.Value;
     internal float OakMinScale => oakMinScale.Value;

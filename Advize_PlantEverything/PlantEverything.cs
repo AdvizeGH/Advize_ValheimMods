@@ -24,7 +24,8 @@ public sealed class PlantEverything : BaseUnityPlugin
     internal static readonly Dictionary<string, GameObject> prefabRefs = [];
     private static List<PieceDB> pieceRefs = [];
     internal static List<SaplingDB> saplingRefs = [];
-    internal static List<CustomPlantDB> customPlantRefs = [];
+    internal static List<ModdedPlantDB> moddedCropRefs = [];
+    internal static List<ModdedPlantDB> moddedSaplingRefs = [];
     internal static List<ExtraResource> deserializedExtraResources = [];
 
     private static bool piecesInitialized = false;
@@ -510,6 +511,33 @@ public sealed class PlantEverything : BaseUnityPlugin
         }
 
         saplingsInitialized = true;
+
+        if (moddedSaplingRefs.Count == 0) return;
+
+        bool overridesEnabled = config.OverrideModdedSaplings;
+
+        foreach (ModdedPlantDB sdb in moddedSaplingRefs)
+        {
+            if (!sdb.Prefab)
+            {
+                Dbgl($"{sdb.key} reference is null, skipping application of modded sapling override settings", true, LogLevel.Warning);
+                continue;
+            }
+
+            Piece piece = sdb.Prefab.GetComponent<Piece>();
+            Plant plant = sdb.Prefab.GetComponent<Plant>();
+            
+            plant.m_growTime = overridesEnabled ? config.ModdedSaplingGrowthTime : sdb.growTime;
+            plant.m_growTimeMax = overridesEnabled ? config.ModdedSaplingGrowthTime : sdb.growTimeMax;
+            plant.m_growRadius = overridesEnabled ? config.ModdedSaplingGrowRadius : sdb.growRadius;
+            plant.m_minScale = overridesEnabled ? config.ModdedSaplingMinScale : sdb.minScale;
+            plant.m_maxScale = overridesEnabled ? config.ModdedSaplingMaxScale : sdb.maxScale;
+
+            piece.m_onlyInBiome = plant.m_biome = overridesEnabled && !config.EnforceBiomes ? AllBiomes : sdb.biome;
+            plant.m_tolerateCold = sdb.tolerateCold || !config.PlantsRequireShielding;
+            plant.m_tolerateHeat = sdb.tolerateHeat || !config.PlantsRequireShielding;
+            plant.m_destroyIfCantGrow = piece.m_groundOnly = !config.PlaceAnywhere;
+        }
     }
 
     internal static void ModifyTreeDrops()
@@ -582,11 +610,11 @@ public sealed class PlantEverything : BaseUnityPlugin
             }
         }
 
-        if (customPlantRefs.Count == 0) return;
+        if (moddedCropRefs.Count == 0) return;
 
         overridesEnabled = overridesEnabled && config.OverrideModdedCrops;
 
-        foreach (CustomPlantDB cdb in customPlantRefs)
+        foreach (ModdedPlantDB cdb in moddedCropRefs)
         {
             if (!cdb.Prefab)
             {
