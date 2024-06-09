@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
-using static PlantEverything;
 using static StaticContent;
 
 [HarmonyPatch]
@@ -25,7 +24,6 @@ static class ApplyZDOPatches
 
     static void ModifyVineGrow(Vine existingVine, Vine newVine)
     {
-        //Dbgl("ModifyGrow for vine was called");
         if (existingVine.m_nview.GetZDO().GetBool(ModdedVineHash))
         {
             VineColor component = newVine.GetComponent<VineColor>();
@@ -41,6 +39,7 @@ static class ApplyZDOPatches
     {
         return new CodeMatcher(instructions)
         .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(TreeBase), nameof(TreeBase.Grow))))
+        .ThrowIfInvalid("Could not patch Plant.Grow() ([Difficulty]PlaceAnywhere)")
         .Advance(1)
         .InsertAndAdvance(instructions: [new(OpCodes.Ldarg_0), new(OpCodes.Ldloc_1), new(OpCodes.Call, ModifyPlantGrowMethod)])
         .InstructionEnumeration();
@@ -52,6 +51,7 @@ static class ApplyZDOPatches
     {
         return new CodeMatcher(instructions)
         .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(ZDO), nameof(ZDO.Set), parameters: [typeof(int), typeof(long)])))
+        .ThrowIfInvalid("Could not patch Vine.Grow() (Custom Vine Color Propagation)")
         .Advance(1)
         .InsertAndAdvance(instructions: [new(OpCodes.Ldarg_0), new(OpCodes.Ldloc_0), new(OpCodes.Call, ModifyVineGrowMethod)])
         .InstructionEnumeration();
