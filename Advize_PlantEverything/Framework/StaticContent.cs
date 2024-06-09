@@ -461,6 +461,7 @@ static class StaticContent
                     Resource = new KeyValuePair<string, int>("Wood", 2),
                     icon = true,
                     Name = "AshlandsFern",
+                    isGrounded = true,
                     canBeRemoved = false
                 }
             ]);
