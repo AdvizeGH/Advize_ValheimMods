@@ -158,6 +158,8 @@ public sealed class PlantEasily : BaseUnityPlugin
         Vector3 position = ghost.transform.position;
         Heightmap heightmap = Heightmap.FindHeightmap(position);
 
+        if (heightmap == null) return Status.Invalid;
+
         bool cultivatedGroundOnly = plant?.m_needCultivatedGround ?? piece.m_cultivatedGroundOnly;
         Heightmap.Biome allowedBiomes = plant?.m_biome ?? piece.m_onlyInBiome;
         Heightmap.Biome currentBiome = heightmap.GetBiome(position);
