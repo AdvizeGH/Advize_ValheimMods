@@ -36,6 +36,9 @@ static class PlacementPatches
     [HarmonyPatch(typeof(Player), nameof(Player.UpdatePlacementGhost))]
     static class PlayerUpdatePlacementGhost
     {
+        static readonly Collider[] primaryObstructions = new Collider[50];
+        static readonly Collider[] secondaryObstructions = new Collider[50];
+
         sealed class SnapPosition
         {
             internal Vector3 rowDirection;
@@ -131,32 +134,32 @@ static class PlacementPatches
                 List<SnapPosition> snapPoints = [];
                 Plant plant = ___m_placementGhost.GetComponent<Plant>();
 
-                Collider[] obstructions = Physics.OverlapSphere(___m_placementGhost.transform.position, pieceSpacing, CollisionMask);
+                int primaryObstructionCount = Physics.OverlapSphereNonAlloc(___m_placementGhost.transform.position, pieceSpacing, primaryObstructions, CollisionMask);
                 int validFirstOrderCollisions = 0;
 
-                foreach (Collider collider in obstructions)
+                for (int i = 0; i < primaryObstructionCount; i++)
                 {
-                    if (!IsPlantOrPickable(collider.transform.root.gameObject)) continue;
+                    if (!IsPlantOrPickable(primaryObstructions[i].transform.root.gameObject)) continue;
                     validFirstOrderCollisions++;
                     if (validFirstOrderCollisions > 8) break;
 
-                    Collider[] secondaryObstructions = Physics.OverlapSphere(collider.transform.position, pieceSpacing, CollisionMask);
+                    int secondaryObstructionCount = Physics.OverlapSphereNonAlloc(___m_placementGhost.transform.position, pieceSpacing, secondaryObstructions, CollisionMask);
                     int validSecondOrderCollisions = 0;
 
-                    foreach (Collider secondaryCollider in secondaryObstructions)
+                    for (int j = 0; j < secondaryObstructionCount; j++)
                     {
-                        if (!IsPlantOrPickable(secondaryCollider.transform.root.gameObject)) continue;
-                        if (secondaryCollider.transform.root == collider.transform.root) continue;
+                        if (!IsPlantOrPickable(secondaryObstructions[i].transform.root.gameObject)) continue;
+                        if (secondaryObstructions[i].transform.root == primaryObstructions[i].transform.root) continue;
                         validSecondOrderCollisions++;
                         if (validSecondOrderCollisions > 8) break;
 
-                        rowDirection = Utils.DirectionXZ(secondaryCollider.transform.position - collider.transform.position);
+                        rowDirection = Utils.DirectionXZ(secondaryObstructions[i].transform.position - primaryObstructions[i].transform.position);
                         columnDirection = Vector3.Cross(Vector3.up, rowDirection);
 
                         rowDirection = (config.StandardizeGridRotations ? fixedRotation : baseRotation) * rowDirection * pieceSpacing;
                         columnDirection = (config.StandardizeGridRotations ? fixedRotation : baseRotation) * columnDirection * pieceSpacing;
 
-                        foundSnaps = FindSnapPoints(snapPoints, collider, rowDirection, columnDirection, plant);
+                        foundSnaps = FindSnapPoints(snapPoints, primaryObstructions[i], rowDirection, columnDirection, plant);
                     }
 
                     if (!foundSnaps)
@@ -164,7 +167,7 @@ static class PlacementPatches
                         rowDirection = baseRotation * rowDirection * pieceSpacing;
                         columnDirection = baseRotation * columnDirection * pieceSpacing;
 
-                        foundSnaps = FindSnapPoints(snapPoints, collider, rowDirection, columnDirection, plant);
+                        foundSnaps = FindSnapPoints(snapPoints, primaryObstructions[i], rowDirection, columnDirection, plant);
                     }
                 }
 
