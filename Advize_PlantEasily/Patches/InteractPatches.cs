@@ -56,4 +56,30 @@ static class InteractPatches
         PlacePiece(player, __instance.gameObject, piece);
         player.ConsumeResources(piece.m_resources, 0);
     }
+
+    [HarmonyPatch(typeof(Beehive), nameof(Beehive.GetHoverText))]
+    static void Postfix(Beehive __instance, ref string __result)
+    {
+        if (!config.EnableBulkHarvest) return;
+
+        // only add our hover text if honey can actually be extracted
+        var isPrivate = !PrivateArea.CheckAccess(__instance.transform.position, 0f, flash: false);
+        var hasHoney = __instance.GetHoneyLevel() > 0;
+        if (isPrivate || !hasHoney) return;
+
+        var hoverTextSuffix = $"\n[<b><color=yellow>{config.KeyboardHarvestModifierKey.ToLocalizableString()}</color> + <color=yellow>$KEY_Use</color></b>] {__instance.m_extractText} (area)";
+        __result += Localization.instance.Localize(hoverTextSuffix);
+    }
+
+    [HarmonyPatch(typeof(Pickable), nameof(Pickable.GetHoverText))]
+    static void Postfix(Pickable __instance, ref string __result)
+    {
+        if (!config.EnableBulkHarvest) return;
+
+        // only add our hover text if the pickable can actually be picked
+        if (__instance.GetPicked() || __instance.GetEnabled == 0) return;
+
+        var hoverTextSuffix = $"\n[<b><color=yellow>{config.KeyboardHarvestModifierKey.ToLocalizableString()}</color> + <color=yellow>$KEY_Use</color></b>] $inventory_pickup (area)";
+        __result += Localization.instance.Localize(hoverTextSuffix);
+    }
 }
