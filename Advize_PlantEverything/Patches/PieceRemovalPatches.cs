@@ -84,9 +84,8 @@ static class PieceRemovalPatches
     [HarmonyPatch(typeof(Piece), nameof(Piece.DropResources))]
     static class PieceDropResources
     {
-        static void Prefix(Piece __instance, out Piece.Requirement[] __state)
+        static void Prefix(Piece __instance, ref Piece.Requirement[] __state)
         {
-            __state = null;
             if (!config.RecoverResources || !IsModdedPrefab(__instance) || !__instance.TryGetComponent(out Pickable pickable)) return;
 
             __state = __instance.m_resources;
