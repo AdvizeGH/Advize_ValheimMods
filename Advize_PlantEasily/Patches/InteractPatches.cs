@@ -67,7 +67,9 @@ static class InteractPatches
         var hasHoney = __instance.GetHoneyLevel() > 0;
         if (isPrivate || !hasHoney) return;
 
-        var hoverTextSuffix = $"\n[<b><color=yellow>{config.KeyboardHarvestModifierKey.ToLocalizableString()}</color> + <color=yellow>$KEY_Use</color></b>] {__instance.m_extractText} (area)";
+        KeyCode currentModifierKey = ZInput.GamepadActive ? config.GamepadModifierKey : config.KeyboardHarvestModifierKey;
+
+        var hoverTextSuffix = $"\n[<b><color=yellow>{currentModifierKey.ToLocalizableString()}</color> + <color=yellow>$KEY_Use</color></b>] {__instance.m_extractText} (area)";
         __result += Localization.instance.Localize(hoverTextSuffix);
     }
 
@@ -79,7 +81,9 @@ static class InteractPatches
         // only add our hover text if the pickable can actually be picked
         if (__instance.GetPicked() || __instance.GetEnabled == 0) return;
 
-        var hoverTextSuffix = $"\n[<b><color=yellow>{config.KeyboardHarvestModifierKey.ToLocalizableString()}</color> + <color=yellow>$KEY_Use</color></b>] $inventory_pickup (area)";
+        KeyCode currentModifierKey = ZInput.GamepadActive ? config.GamepadModifierKey : config.KeyboardHarvestModifierKey;
+
+        var hoverTextSuffix = $"\n[<b><color=yellow>{currentModifierKey.ToLocalizableString()}</color> + <color=yellow>$KEY_Use</color></b>] $inventory_pickup (area)";
         __result += Localization.instance.Localize(hoverTextSuffix);
     }
 }

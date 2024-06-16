@@ -56,11 +56,11 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="assembly_guiutils">
-      <HintPath>$(GamePath)\valheim_Data\Managed\assembly_guiutils_publicized.dll</HintPath>
+      <HintPath>$(GamePath)\valheim_Data\Managed\assembly_guiutils.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="assembly_utils">
-      <HintPath>$(GamePath)\valheim_Data\Managed\assembly_utils.dll</HintPath>
+    <Reference Include="assembly_utils_publicized">
+      <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_utils_publicized.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="assembly_valheim_publicized">
@@ -102,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\ModConfig.cs" />
+    <Compile Include="Extensions\KeyCode.cs" />
     <Compile Include="Patches\PlacementPatches.cs" />
     <Compile Include="Patches\InputPatches.cs" />
     <Compile Include="Patches\InteractPatches.cs" />
