@@ -20,8 +20,8 @@ public sealed class VineColor : MonoBehaviour
     private int _cacheIndex;
     private readonly List<MeshRenderer> _vineRenderers = [];
     private List<MeshRenderer> _berryRenderers = [];
-    private readonly MaterialPropertyBlock _vineColorProperty = new();
-    private readonly List<MaterialPropertyBlock> _berryColorProperties = [new(), new(), new()];
+    private MaterialPropertyBlock _vineColorProperty;
+    private List<MaterialPropertyBlock> _berryColorProperties;
 
     //This is for updating existing vines
     internal static void UpdateColors()
@@ -38,15 +38,14 @@ public sealed class VineColor : MonoBehaviour
 
     internal void Awake()
     {
-        //PlantEverything.Dbgl("Awake called");
+        _vineColorProperty = new();
+        _berryColorProperties = [new(), new(), new()];
         _nView = GetComponent<ZNetView>();
 
         if (!_nView || !_nView.IsValid()) return;
 
         _cacheIndex = VineColorCache.Count;
-        //PlantEverything.Dbgl(_cacheIndex.ToString());
         VineColorCache.Add(this);
-
         CacheRenderers();
         ApplyColor(fromAwake: true);
     }

@@ -44,6 +44,7 @@ public sealed class PlantEverything : BaseUnityPlugin
     {
         Runtime.MakeAllAssetsLoadable();
         BepInEx.Logging.Logger.Sources.Add(PELogger);
+        System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(VineColor).TypeHandle);
         assetBundle = LoadAssetBundle("planteverything");
         config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.18.1" });
         CustomConfigPath = SetupConfigDirectory();
