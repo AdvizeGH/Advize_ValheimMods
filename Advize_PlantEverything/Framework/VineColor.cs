@@ -144,10 +144,10 @@ public sealed class VineColor : MonoBehaviour
 
     private List<Color> GetColorsFromZDO(ZDO zdo)
     {
-        zdo.GetVec3(VineColorHash, out var color1);
-        zdo.GetVec3(BerryColor1Hash, out var color2);
-        zdo.GetVec3(BerryColor2Hash, out var color3);
-        zdo.GetVec3(BerryColor3Hash, out var color4);
+        zdo.GetVec3(VineColorHash, out Vector3 color1);
+        zdo.GetVec3(BerryColor1Hash, out Vector3 color2);
+        zdo.GetVec3(BerryColor2Hash, out Vector3 color3);
+        zdo.GetVec3(BerryColor3Hash, out Vector3 color4);
 
         return [Vector3ToColor(color1), Vector3ToColor(color2), Vector3ToColor(color3), Vector3ToColor(color4)];
     }

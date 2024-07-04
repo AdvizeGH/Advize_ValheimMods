@@ -105,7 +105,7 @@ namespace Advize_Spyglass
                 Vector3 scopeLevel = Vector3.forward * zoomLevel * config.ZoomMultiplier;
 
                 // Try to prevent zooming through things
-                if (Physics.Raycast(__instance.transform.position, __instance.transform.forward, out var hitInfo, scopeLevel.magnitude, __instance.m_blockCameraMask))
+                if (Physics.Raycast(__instance.transform.position, __instance.transform.forward, out RaycastHit hitInfo, scopeLevel.magnitude, __instance.m_blockCameraMask))
                 {
                     scopeLevel = Vector3.forward * Vector3.Distance(hitInfo.point, __instance.transform.position) * 0.75f;
                 }

@@ -752,7 +752,7 @@ static class StaticContent
 
         foreach (GameObject customPlant in customPlants)
         {
-			//if (!customPlant.TryGetComponent<Plant>(out var plant) || !customPlant.TryGetComponent<Piece>(out _) || !plant.m_grownPrefabs[0].TryGetComponent<Pickable>(out _))
+			//if (!customPlant.TryGetComponent<Plant>(out Plant plant) || !customPlant.TryGetComponent<Piece>(out _) || !plant.m_grownPrefabs[0].TryGetComponent<Pickable>(out _))
 			//    continue;
 			Plant plant = customPlant.GetComponent<Plant>();
 

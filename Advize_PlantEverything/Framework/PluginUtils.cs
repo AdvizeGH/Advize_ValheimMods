@@ -121,7 +121,7 @@ static class PluginUtils
         int height = (int)sprite.textureRect.height;
 
         // The whole sprite atlas
-        var texture = sprite.texture;
+        Texture2D texture = sprite.texture;
 
         RenderTexture previous = RenderTexture.active;
 
@@ -145,7 +145,7 @@ static class PluginUtils
 
         // Crop to the needed texture
         Texture2D smallTexture = new(width, height);
-        var colors = readableTexture.GetPixels((int)sprite.textureRect.x, (int)sprite.textureRect.y, width, height);
+        Color[] colors = readableTexture.GetPixels((int)sprite.textureRect.x, (int)sprite.textureRect.y, width, height);
         smallTexture.SetPixels(colors);
         smallTexture.Apply();
 

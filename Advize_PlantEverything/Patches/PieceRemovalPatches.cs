@@ -20,7 +20,7 @@ static class PieceRemovalPatches
             if (__instance.GetRightItem().m_shared.m_name == "$item_cultivator")
             {
                 Transform t = GameCamera.instance.transform;
-                if (Physics.Raycast(t.position, t.forward, out var hitInfo, 50f, LayerMask.GetMask(layersForPieceRemoval)) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
+                if (Physics.Raycast(t.position, t.forward, out RaycastHit hitInfo, 50f, LayerMask.GetMask(layersForPieceRemoval)) && Vector3.Distance(hitInfo.point, __instance.m_eye.position) < __instance.m_maxPlaceDistance)
                 {
                     Piece piece = hitInfo.collider.GetComponentInParent<Piece>();
 
