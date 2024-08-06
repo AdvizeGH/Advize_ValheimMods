@@ -37,7 +37,7 @@ static class KeyHintPatches
 
     [HarmonyPatch(typeof(KeyHints), nameof(KeyHints.UpdateHints))]
     [HarmonyTranspiler]
-    static IEnumerable<CodeInstruction> KeyHintTranspiler(IEnumerable<CodeInstruction> instructions)
+    static IEnumerable<CodeInstruction> UpdateHintsTranspiler(IEnumerable<CodeInstruction> instructions)
     {
         return new CodeMatcher(instructions)
         .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(PlayerCustomizaton), nameof(PlayerCustomizaton.IsBarberGuiVisible))))
@@ -54,12 +54,10 @@ static class KeyHintPatches
         keyboardHint = Object.Instantiate(Keyboard.Find("Copy").gameObject, Keyboard); // Copy the "Copy" KeyHint
         keyboardHint.name = "Resize Grid";
         keyboardHint.transform.SetSiblingIndex(3);
-
-        GameObject hintKey = Object.Instantiate(keyboardHint.transform.GetChild(1).gameObject);
-
         keyboardHint.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Grid Size";
         keyboardHint.transform.GetChild(0).GetComponent<LayoutElement>().preferredWidth = 75;
 
+        GameObject hintKey = Object.Instantiate(keyboardHint.transform.GetChild(1).gameObject);
         Object.Instantiate(hintKey, keyboardHint.transform);
         Object.Instantiate(hintKey, keyboardHint.transform);
         Object.Instantiate(hintKey, keyboardHint.transform);
