@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
@@ -32,13 +32,10 @@ public static class KeyCodeExtensions
                 _ => GamepadInput.None
             };
 
-            ZInput.ButtonDef definedButton = ZInput.instance.m_buttons.Values.Where(buttonDef => buttonDef.m_gamepadInput == keyCodeToGamepadInput).First();
-
+            ZInput.ButtonDef definedButton = ZInput.instance.m_buttons.Values.Where(x => x.m_gamepadInput == keyCodeToGamepadInput).First();
             string controllerPlatform = ZInput.PlayStationGlyphs ? "ps5" : "xbox";
-            if (definedButton.TryGetButtonSprite(controllerPlatform, out var result))
-            {
-                return result;
-            }
+
+            return definedButton.TryGetButtonSprite(controllerPlatform, out string result) ? result : ZInput.KeyCodeToString(keyCode);
         }
 
         (bool isMouseButton, MouseButton mouseButton) = ZInput.KeyCodeToMouseButton(keyCode, logWarning: false);
@@ -70,6 +67,10 @@ public static class KeyCodeExtensions
             Key.RightCtrl => "$button_rctrl",
             Key.Enter => "$button_return",
             Key.NumpadEnter => "$button_return",
+            Key.UpArrow => "↑",
+            Key.RightArrow => "→",
+            Key.DownArrow => "↓",
+            Key.LeftArrow => "←",
             Key.None => "$menu_none",
             _ => Keyboard.current?[key].displayName ?? key.ToString(),
         };

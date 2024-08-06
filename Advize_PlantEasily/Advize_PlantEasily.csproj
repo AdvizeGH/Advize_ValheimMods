@@ -99,10 +99,16 @@
       <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\ModConfig.cs" />
     <Compile Include="Extensions\KeyCode.cs" />
+    <Compile Include="Patches\HoverTextPatches.cs" />
+    <Compile Include="Patches\KeyHintPatches.cs" />
     <Compile Include="Patches\PlacementPatches.cs" />
     <Compile Include="Patches\InputPatches.cs" />
     <Compile Include="Patches\InteractPatches.cs" />

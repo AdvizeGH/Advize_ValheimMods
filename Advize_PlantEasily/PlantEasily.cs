@@ -48,6 +48,8 @@ public sealed class PlantEasily : BaseUnityPlugin
 
     internal static void GridSizeChanged(object sender, EventArgs e) => DestroyGhosts();
 
+    internal static void KeybindsChanged(object sender, EventArgs e) => KeyHintPatches.UpdateKeyHintText();
+
     internal static void DestroyGhosts()
     {
         if (extraGhosts.Count > 0)

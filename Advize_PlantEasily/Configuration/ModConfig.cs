@@ -61,6 +61,8 @@ sealed class ModConfig
     private readonly ConfigEntry<bool> showCost;
     private readonly ConfigEntry<CostDisplayStyle> costDisplayStyle;
     private readonly ConfigEntry<CostDisplayLocation> costDisplayLocation;
+    private readonly ConfigEntry<bool> showHUDKeyHints;
+    private readonly ConfigEntry<bool> showHoverKeyHints;
 
     internal ModConfig(ConfigFile configFile)
     {
@@ -155,6 +157,8 @@ sealed class ModConfig
         showCost = Config.Bind("UI", "ShowCost", true, new ConfigDescription("Update resource cost in build UI.", null, new Attributes { Order = 3 }));
         costDisplayStyle = Config.Bind("UI", "CostDisplayStyle", CostDisplayStyle.TotalCount, "Determines display style of the ShowCost setting. TotalCount shows total number of pieces to be placed. FullCost shows combined resoure cost of all pieces.");
         costDisplayLocation = Config.Bind("UI", "CostDisplayLocation", CostDisplayLocation.RightSide, "Determines whether to prepend or append text to the resource cost in build UI. LeftSide or RightSide will prepend or append respectively.");
+        showHUDKeyHints = Config.Bind("UI", "ShowHUDKeyHints", true, "Show KeyHints in build HUD.");
+        showHoverKeyHints = Config.Bind("UI", "ShowHoverKeyHints", true, "Show KeyHints in hover text.");
 
         configFile.Save();
         configFile.SaveOnConfigSet = true;
@@ -162,6 +166,12 @@ sealed class ModConfig
         rows.SettingChanged += PlantEasily.GridSizeChanged;
         columns.SettingChanged += PlantEasily.GridSizeChanged;
         maxConcurrentPlacements.SettingChanged += PlantEasily.GridSizeChanged;
+        increaseXKey.SettingChanged += PlantEasily.KeybindsChanged;
+        increaseYKey.SettingChanged += PlantEasily.KeybindsChanged;
+        decreaseXKey.SettingChanged += PlantEasily.KeybindsChanged;
+        decreaseYKey.SettingChanged += PlantEasily.KeybindsChanged;
+        keyboardModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
+        gamepadModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
     }
 
     internal bool EnableDebugMessages => enableDebugMessages.Value;
@@ -223,6 +233,8 @@ sealed class ModConfig
     internal bool ShowCost => showCost.Value;
     internal CostDisplayStyle CostDisplayStyle => costDisplayStyle.Value;
     internal CostDisplayLocation CostDisplayLocation => costDisplayLocation.Value;
+    internal bool ShowHUDKeyHints => showHUDKeyHints.Value;
+    internal bool ShowHoverKeyHints => showHoverKeyHints.Value;
 
 #nullable enable
     internal class ConfigurationManagerAttributes
