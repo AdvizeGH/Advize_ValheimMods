@@ -21,5 +21,4 @@ static class UIPatches
 
         component.text = config.CostDisplayLocation == 0 ? formattedCost + component.text : component.text + formattedCost;
     }
-
 }

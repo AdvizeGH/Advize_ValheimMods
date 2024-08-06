@@ -186,9 +186,9 @@ public sealed class PlantEverything : BaseUnityPlugin
         foreach (ExtraResource er in deserializedExtraResources)
         {
             //Dbgl($"er3 {er.prefabName}, {er.resourceName}, {er.resourceCost}, {er.groundOnly}");
-            if (!prefabRefs.ContainsKey(er.prefabName) || !prefabRefs[er.prefabName])
+            if (!prefabRefs.TryGetValue(er.prefabName, out GameObject targetPrefab))
             {
-                GameObject targetPrefab = instance.GetPrefab(er.prefabName);
+                targetPrefab = instance.GetPrefab(er.prefabName);
                 if (targetPrefab)
                 {
                     prefabRefs[er.prefabName] = targetPrefab;
@@ -533,7 +533,6 @@ public sealed class PlantEverything : BaseUnityPlugin
             plant.m_growRadius = overridesEnabled ? config.ModdedSaplingGrowRadius : sdb.growRadius;
             plant.m_minScale = overridesEnabled ? config.ModdedSaplingMinScale : sdb.minScale;
             plant.m_maxScale = overridesEnabled ? config.ModdedSaplingMaxScale : sdb.maxScale;
-
             piece.m_onlyInBiome = plant.m_biome = overridesEnabled && !config.EnforceBiomes ? AllBiomes : sdb.biome;
             plant.m_tolerateCold = sdb.tolerateCold || !config.PlantsRequireShielding;
             plant.m_tolerateHeat = sdb.tolerateHeat || !config.PlantsRequireShielding;
@@ -682,10 +681,9 @@ public sealed class PlantEverything : BaseUnityPlugin
         }
 
         PieceTable pieceTable = prefabRefs["Cultivator"].GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces;
-        if (!config.EnableCustomVinePiece && pieceTable.m_pieces.Contains(prefabRefs["PE_VineAsh_sapling"]))
+        if (!config.EnableCustomVinePiece && pieceTable.m_pieces.Remove(prefabRefs["PE_VineAsh_sapling"]) && HoldingCultivator)
         {
-            if (HoldingCultivator) SheatheCultivator();
-            pieceTable.m_pieces.Remove(prefabRefs["PE_VineAsh_sapling"]);
+            SheatheCultivator();
         }
 
         if (config.EnableCustomVinePiece && !pieceTable.m_pieces.Contains(prefabRefs["PE_VineAsh_sapling"]))

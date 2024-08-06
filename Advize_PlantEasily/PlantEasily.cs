@@ -243,7 +243,7 @@ public sealed class PlantEasily : BaseUnityPlugin
         //player.AddNoise(50f);
 
         Game.instance.IncrementPlayerStat(PlayerStatType.Builds);
-        Gogan.LogEvent("Game", "PlacedPiece", prefab.name, 0L);
+        //Gogan.LogEvent("Game", "PlacedPiece", prefab.name, 0L);
     }
 
     internal enum Status
