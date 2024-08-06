@@ -17,8 +17,8 @@ static class KeyHintPatches
 
     internal static void UpdateKeyHintText()
     {
-        UpdateKeyboardHints();
-        UpdateGamepadHints();
+        if (keyboardHint) UpdateKeyboardHints();
+        if (gamepadHint) UpdateGamepadHints();
     }
 
     [HarmonyPatch(typeof(KeyHints), nameof(KeyHints.Start))]
