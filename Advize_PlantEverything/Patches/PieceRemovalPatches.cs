@@ -15,7 +15,7 @@ static class PieceRemovalPatches
     [HarmonyPatch(typeof(Player), nameof(Player.RemovePiece))]
     static class PlayerRemovePiece
     {
-        static bool Prefix(Player __instance, ref bool __result)
+        static bool Prefix(Player __instance)
         {
             if (__instance.GetRightItem().m_shared.m_name == "$item_cultivator")
             {
@@ -29,7 +29,6 @@ static class PieceRemovalPatches
                         if (!CanRemove(piece, __instance)) return false;
 
                         RemoveObject(piece, __instance);
-                        __result = true;
                     }
                 }
 
@@ -68,9 +67,20 @@ static class PieceRemovalPatches
                 piece.DropResources();
                 piece.m_placeEffect.Create(piece.transform.position, piece.transform.rotation);
 
-                if (piece.GetComponent<Pickable>())
+                if (piece.TryGetComponent(out Pickable pickable))
                 {
-                    znv.InvokeRPC("RPC_Pick");
+                    int num = 0;
+                    if (!pickable.m_picked && pickable.m_pickRaiseSkill != Skills.SkillType.None)
+                    {
+                        player.RaiseSkill(pickable.m_pickRaiseSkill, 1f);
+                        if (Random.value < (double)player.GetSkillFactor(pickable.m_pickRaiseSkill) * pickable.m_maxLevelBonusChance)
+                        {
+                            num = pickable.m_bonusYieldAmount;
+                            DamageText.instance.ShowText(DamageText.TextType.Bonus, pickable.transform.position + Vector3.up * pickable.m_spawnOffset, string.Format("+{0}", num), true);
+                            pickable.m_bonusEffect.Create(pickable.transform.position, Quaternion.identity);
+                        }
+                    }
+                    pickable.m_nview.InvokeRPC("RPC_Pick", num);
                 }
 
                 ZNetScene.instance.Destroy(piece.gameObject);
