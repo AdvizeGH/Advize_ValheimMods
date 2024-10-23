@@ -24,12 +24,14 @@ public sealed class PlantEasily : BaseUnityPlugin
     internal static readonly List<GameObject> extraGhosts = [];
     internal static readonly List<Status> ghostPlacementStatus = [];
     internal static readonly List<int> instanceIDS = [];
+    internal static string keyboardHarvestModifierKeyLocalized;
+    internal static string gamepadModifierKeyLocalized;
 
     internal static readonly int CollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid", "item");
 
     internal static bool HoldingCultivator => Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator";
 
-    internal static bool OverrideGamepadInput => placementGhost && ZInput.GetKey(config.GamepadModifierKey, false);
+    internal static bool OverrideGamepadInput => placementGhost && ZInput.GetKey(config.GamepadModifierKey, logWarning: false);
 
     public void Awake()
     {
@@ -245,7 +247,7 @@ public sealed class PlantEasily : BaseUnityPlugin
         //player.AddNoise(50f);
 
         Game.instance.IncrementPlayerStat(PlayerStatType.Builds);
-        //Gogan.LogEvent("Game", "PlacedPiece", prefab.name, 0L);
+        player.RaiseSkill(player.m_buildPieces.m_skill, 1f);
     }
 
     internal enum Status

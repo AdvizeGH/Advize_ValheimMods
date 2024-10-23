@@ -1,13 +1,12 @@
 ﻿namespace Advize_PlantEasily;
 
 using HarmonyLib;
-using UnityEngine;
 using static PlantEasily;
 
 [HarmonyPatch]
 static class HoverTextPatches
 {
-    static KeyCode CurrentModifierKey => ZInput.GamepadActive ? config.GamepadModifierKey : config.KeyboardHarvestModifierKey;
+    static string CurrentModifierKey => ZInput.GamepadActive ? gamepadModifierKeyLocalized : keyboardHarvestModifierKeyLocalized;
 
     [HarmonyPatch(typeof(Beehive), nameof(Beehive.GetHoverText))]
     static void Postfix(Beehive __instance, ref string __result)
@@ -19,7 +18,7 @@ static class HoverTextPatches
         bool hasHoney = __instance.GetHoneyLevel() > 0;
         if (isPrivate || !hasHoney) return;
 
-        string hoverTextSuffix = $"\n[<b><color=yellow>{CurrentModifierKey.ToLocalizableString()}</color> + <color=yellow>$KEY_Use</color></b>] {__instance.m_extractText} (area)";
+        string hoverTextSuffix = $"\n[<b><color=yellow>{CurrentModifierKey}</color> + <color=yellow>$KEY_Use</color></b>] {__instance.m_extractText} (area)";
         __result += Localization.instance.Localize(hoverTextSuffix);
     }
 
@@ -31,7 +30,7 @@ static class HoverTextPatches
         // only add our hover text if the pickable can actually be picked
         if (__instance.GetPicked() || __instance.GetEnabled == 0) return;
 
-        string hoverTextSuffix = $"\n[<b><color=yellow>{CurrentModifierKey.ToLocalizableString()}</color> + <color=yellow>$KEY_Use</color></b>] $inventory_pickup (area)";
+        string hoverTextSuffix = $"\n[<b><color=yellow>{CurrentModifierKey}</color> + <color=yellow>$KEY_Use</color></b>] $inventory_pickup (area)";
         __result += Localization.instance.Localize(hoverTextSuffix);
     }
 }

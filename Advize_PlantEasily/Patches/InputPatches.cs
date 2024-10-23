@@ -30,7 +30,7 @@ static class InputPatches
             __instance.Message(MessageHud.MessageType.TopLeft, $"PlantEasily.ReplantOnHarvest: {config.ReplantOnHarvest}");
         }
 
-        if (ZInput.GetKey(config.KeyboardModifierKey) || ZInput.GetKey(config.GamepadModifierKey))
+        if (ZInput.GetKey(config.KeyboardModifierKey, logWarning: false) || ZInput.GetKey(config.GamepadModifierKey, logWarning: false))
         {
             if (ZInput.GetKeyDown(config.IncreaseXKey, false) || ZInput.GetButtonDown("JoyDPadRight"))
                 config.Columns += 1;

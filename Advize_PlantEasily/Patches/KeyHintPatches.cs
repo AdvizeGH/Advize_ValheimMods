@@ -14,6 +14,7 @@ static class KeyHintPatches
 {
     static GameObject keyboardHint;
     static GameObject gamepadHint;
+    static readonly Dictionary<string, string> inputBindingPathToButtonDefNames = [];
 
     internal static void UpdateKeyHintText()
     {
@@ -24,6 +25,10 @@ static class KeyHintPatches
     [HarmonyPatch(typeof(KeyHints), nameof(KeyHints.Start))]
     [HarmonyPostfix]
     static void Start() => CreateKeyBoardHints();
+
+    [HarmonyPatch(typeof(KeyHints), nameof(KeyHints.ApplySettings))]
+    [HarmonyPrefix]
+    static void ApplySettings() => UpdateKeyHintText();
 
     [HarmonyPatch(typeof(KeyHints), nameof(KeyHints.SetGamePadBindings))]
     [HarmonyPostfix]
@@ -46,6 +51,11 @@ static class KeyHintPatches
         .InsertAndAdvance(instructions: [new(OpCodes.Call, AccessTools.Method(typeof(KeyHintPatches), nameof(SetKeyHintsActive)))])
         .InstructionEnumeration();
     }
+
+    //Patch to a completely different class to support all of this thanks to bog witch update
+    [HarmonyPatch(typeof(ZInput), nameof(ZInput.AddButton))]
+    [HarmonyPrefix]
+    static void AddButton(string name, string path) => inputBindingPathToButtonDefNames[path] = name;
 
     static void CreateKeyBoardHints()
     {
@@ -78,24 +88,65 @@ static class KeyHintPatches
 
     static void UpdateKeyboardHints()
     {
-        keyboardHint.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(config.KeyboardModifierKey.ToLocalizableString());
-        keyboardHint.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(config.DecreaseXKey.ToLocalizableString());
-        keyboardHint.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(config.IncreaseYKey.ToLocalizableString());
-        keyboardHint.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(config.IncreaseXKey.ToLocalizableString());
-        keyboardHint.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(config.DecreaseYKey.ToLocalizableString());
+        keyboardHarvestModifierKeyLocalized = KeyCodeToLocalizableString(config.KeyboardHarvestModifierKey);
+
+        keyboardHint.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(KeyCodeToLocalizableString(config.KeyboardModifierKey));
+        keyboardHint.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(KeyCodeToLocalizableString(config.DecreaseXKey));
+        keyboardHint.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(KeyCodeToLocalizableString(config.IncreaseYKey));
+        keyboardHint.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(KeyCodeToLocalizableString(config.IncreaseXKey));
+        keyboardHint.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(KeyCodeToLocalizableString(config.DecreaseYKey));
+    }
+
+    static string KeyCodeToLocalizableString(KeyCode keyCode)
+    {
+        string keyCodeToPath = ZInput.KeyCodeToPath(keyCode);
+        string key = ZInput.instance.MapKeyFromPath(keyCodeToPath);
+        string modifiedKey = key.Substring(0, 1).ToLower() + key.Substring(1);
+        string buttonDefBindingToName = inputBindingPathToButtonDefNames.TryGetValue(keyCodeToPath, out string buttonDefName) ? buttonDefName : "";
+        string localizableKeyString = ZInput.instance.GetBoundKeyString(buttonDefBindingToName, true);
+
+        if (modifiedKey.EndsWith("Arrow"))
+        {
+            switch(modifiedKey)
+            {
+                case "upArrow":
+                    localizableKeyString = "↑";
+                    break;
+                case "rightArrow":
+                    localizableKeyString = "→";
+                    break;
+                case "downArrow":
+                    localizableKeyString = "↓";
+                    break;
+                case "leftArrow":
+                    localizableKeyString = "←";
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return localizableKeyString switch
+        {
+            "" => ZInput.s_keyLocalizationMap.TryGetValue(modifiedKey, out string keyStringToken) ? keyStringToken : ZInput.KeyCodeToDisplayName(keyCode),
+            _ => localizableKeyString
+        };
     }
 
     static void UpdateGamepadHints()
     {
+        string keyCodeToPath = ZInput.KeyCodeToPath(config.GamepadModifierKey);
+        string buttonDefBindingToName = inputBindingPathToButtonDefNames[keyCodeToPath];
+        gamepadModifierKeyLocalized = ZInput.instance.GetBoundKeyString(buttonDefBindingToName);
+
         if (gamepadHint.TryGetComponent<TextMeshProUGUI>(out var gamepadKeyText))
         {
-            string controllerPlatform = ZInput.PlayStationGlyphs ? "ps5" : "xbox";
-            string[] gamepadKeys = ["dpad_left", "dpad_up", "dpad_right", "dpad_down"];
+            string[] gamepadKeys = ["JoyDPadLeft", "JoyDPadUp", "JoyDPadRight", "JoyDPadDown"];
             string full = "";
 
-            System.Array.ForEach(gamepadKeys, gamepadKey => full += $"<sprite=\"{controllerPlatform}\" name=\"{gamepadKey}\">");
+            System.Array.ForEach(gamepadKeys, gamepadKey => full += ZInput.instance.GetBoundKeyString(gamepadKey));
 
-            gamepadKeyText.text = $"Resize Grid {config.GamepadModifierKey.ToLocalizableString()} + {full}";
+            gamepadKeyText.text = $"Resize Grid {gamepadModifierKeyLocalized} + {full}";
             Localization.instance.Localize(gamepadKeyText.transform);
         }
     }

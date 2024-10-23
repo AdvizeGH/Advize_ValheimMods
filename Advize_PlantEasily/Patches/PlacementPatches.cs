@@ -232,19 +232,13 @@ static class PlacementPatches
         }
     }
 
-    [HarmonyPatch(typeof(Player), nameof(Player.PlacePiece))]
-    static class PlayerPlacePiece
+    [HarmonyPatch(typeof(Player), nameof(Player.TryPlacePiece))]
+    static class PlayerTryPlacePiece
     {
-        static int placementRotation;
-
-        static bool Prefix(Player __instance, Piece piece, ref bool __result, ref bool __state)
+        static bool Prefix(Player __instance, Piece piece, ref bool __result)
         {
-            //Dbgl("Player.PlacePiece Prefix");
             if (!config.ModActive || !piece || !HoldingCultivator || !IsPlantOrPickable(piece.gameObject))
                 return true;
-
-            __state = true;
-            placementRotation = __instance.m_placeRotation;
 
             if (config.PreventInvalidPlanting)
             {
@@ -252,34 +246,32 @@ static class PlacementPatches
                 if (rootPlacementStatus > 1)
                 {
                     __instance.Message(MessageHud.MessageType.Center, statusMessage[rootPlacementStatus]);
-                    return __state = __result = false;
+                    return __result = false;
                 }
             }
 
             if (config.PreventPartialPlanting)
             {
-                //foreach (int i in ghostPlacementStatus)
-                //{
-                //    if (i != 0 && !(i == 1 && __instance.m_noPlacementCost))
-                //    {
-                //        __instance.Message(MessageHud.MessageType.Center, statusMessage[i]);
-                //        return __state = __result = false;
-                //    }
-                //}
-
                 foreach (int i in ghostPlacementStatus.Where(i => i != 0 && !((int)i == 1 && __instance.m_noPlacementCost)).Select(v => (int)v))
                 {
                     __instance.Message(MessageHud.MessageType.Center, statusMessage[i]);
-                    return __state = __result = false;
+                    return __result = false;
                 }
             }
             return true;
         }
+    }
 
-        static void Postfix(Player __instance, Piece piece, bool __state)
+    [HarmonyPatch(typeof(Player), nameof(Player.PlacePiece))]
+    static class PlayerPlacePiece
+    {
+        static int placementRotation;
+
+        static void Prefix(Player __instance) => placementRotation = __instance.m_placeRotation;
+
+        static void Postfix(Player __instance, Piece piece)
         {
-            //Dbgl("Player.PlacePiece Postfix" + $"\n __state is {__state}");
-            if (!config.ModActive || !__state || !piece || !HoldingCultivator || !IsPlantOrPickable(piece.gameObject))
+            if (!config.ModActive || !piece || !HoldingCultivator || !IsPlantOrPickable(piece.gameObject))
                 return;
             //This doesn't apply to the root placement ghost.
             __instance.m_placeRotation = placementRotation;
@@ -304,13 +296,15 @@ static class PlacementPatches
             count = __instance.m_noPlacementCost ? 0 : count;
 
             for (int i = 0; i < count; i++)
+            {
                 __instance.ConsumeResources(piece.m_resources, 0);
 
-            if (config.UseStamina)
-                __instance.UseStamina(rightItem.m_shared.m_attack.m_attackStamina * count, true);
+                if (config.UseStamina)
+                    __instance.UseStamina(__instance.GetBuildStamina());
 
-            if (rightItem.m_shared.m_useDurability && config.UseDurability)
-                rightItem.m_durability -= rightItem.m_shared.m_useDurabilityDrain * count;
+                if (config.UseDurability && rightItem.m_shared.m_useDurability)
+                    rightItem.m_durability -= __instance.GetPlaceDurability(rightItem);
+            }
         }
     }
 }

@@ -106,7 +106,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\ModConfig.cs" />
-    <Compile Include="Extensions\KeyCode.cs" />
     <Compile Include="Patches\HoverTextPatches.cs" />
     <Compile Include="Patches\KeyHintPatches.cs" />
     <Compile Include="Patches\PlacementPatches.cs" />

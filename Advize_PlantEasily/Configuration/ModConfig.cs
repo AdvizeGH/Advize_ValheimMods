@@ -170,6 +170,7 @@ sealed class ModConfig
         increaseYKey.SettingChanged += PlantEasily.KeybindsChanged;
         decreaseXKey.SettingChanged += PlantEasily.KeybindsChanged;
         decreaseYKey.SettingChanged += PlantEasily.KeybindsChanged;
+        keyboardHarvestModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
         keyboardModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
         gamepadModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
     }
