@@ -13,7 +13,7 @@ public sealed class PlantEasily : BaseUnityPlugin
 {
     public const string PluginID = "advize.PlantEasily";
     public const string PluginName = "PlantEasily";
-    public const string Version = "1.9.0";
+    public const string Version = "1.9.1";
 
     private static readonly ManualLogSource PELogger = new($" {PluginName}");
     internal static ModConfig config;
@@ -247,7 +247,7 @@ public sealed class PlantEasily : BaseUnityPlugin
         //player.AddNoise(50f);
 
         Game.instance.IncrementPlayerStat(PlayerStatType.Builds);
-        player.RaiseSkill(player.m_buildPieces.m_skill, 1f);
+        player.RaiseSkill(Skills.SkillType.Farming, 1f);
     }
 
     internal enum Status
