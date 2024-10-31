@@ -293,6 +293,7 @@ static class PlacementPatches
                 PlacePiece(__instance, extraGhosts[i], piece);
             }
 
+            __instance.RaiseSkill(Skills.SkillType.Farming, count);
             count = __instance.m_noPlacementCost ? 0 : count;
 
             for (int i = 0; i < count; i++)
