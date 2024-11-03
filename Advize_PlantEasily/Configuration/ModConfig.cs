@@ -28,6 +28,7 @@ sealed class ModConfig
     private readonly ConfigEntry<bool> minimizeGridSpacing;
     private readonly ConfigEntry<bool> globallyAlignGridDirections;
     private readonly ConfigEntry<int> maxConcurrentPlacements;
+    private readonly ConfigEntry<int> bulkPlantingBatchSize;
 
     //Pickables
     private readonly ConfigEntry<float> pickableSnapRadius;
@@ -87,6 +88,7 @@ sealed class ModConfig
         minimizeGridSpacing = Config.Bind("General", "MinimizeGridSpacing", false, "Allows for tighter grids, but with varying spacing used between diverse/distinct plants. ");
         globallyAlignGridDirections = Config.Bind("General", "GloballyAlignGridDirections", true, "When set to true, new grid placements will have their column and row directions align with the global grid.");
         maxConcurrentPlacements = Config.Bind("General", "MaxConcurrentPlacements", 500, new ConfigDescription("Maximum amount of pieces that can be placed at once with the cultivator.", new AcceptableValueRange<int>(2, 10000)));
+        bulkPlantingBatchSize = Config.Bind("General", "BulkPlantingBatchSize", 50, new ConfigDescription("This value determines how many concurrent pieces can be placed per frame. Reduce this value if the game hangs when placing too many pieces at once.", new AcceptableValueRange<int>(2, 10000)));
 
         //Pickables
         pickableSnapRadius = Config.Bind("Pickables", "PickableSnapRadius", 1.0f, "Determines default distance/spacing between pickable resources when planting.");
@@ -213,6 +215,7 @@ sealed class ModConfig
     internal bool MinimizeGridSpacing => minimizeGridSpacing.Value;
     internal bool GloballyAlignGridDirections => globallyAlignGridDirections.Value;
     internal int MaxConcurrentPlacements => maxConcurrentPlacements.Value;
+    internal int BulkPlantingBatchSize => bulkPlantingBatchSize.Value;
     internal bool EnableBulkHarvest => enableBulkHarvest.Value;
     internal HarvestStyle HarvestStyle => harvestStyle.Value;
     internal float HarvestRadius => harvestRadius.Value;
