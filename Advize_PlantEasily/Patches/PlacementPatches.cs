@@ -22,7 +22,7 @@ static class PlacementPatches
 
         static void Postfix(GameObject ___m_placementGhost, ref int ___m_placeRotation)
         {
-            //Dbgl("SetupPlacementGhost");
+            if (isPlanting) return;
             DestroyGhosts();
 
             if (!config.ModActive || !___m_placementGhost || !HoldingCultivator || !IsPlantOrPickable(___m_placementGhost))
@@ -99,7 +99,7 @@ static class PlacementPatches
 
         static void Postfix(Player __instance, ref GameObject ___m_placementGhost, ref int ___m_placementStatus)
         {
-            if (!config.ModActive || !___m_placementGhost || !HoldingCultivator || !IsPlantOrPickable(___m_placementGhost))
+            if (!config.ModActive || !___m_placementGhost || !HoldingCultivator || !IsPlantOrPickable(___m_placementGhost) || isPlanting)
                 return;
 
             for (int i = 0; i < extraGhosts.Count; i++)
@@ -289,11 +289,10 @@ static class PlacementPatches
                         continue;
                     }
                 }
-
-                PlacePiece(__instance, extraGhosts[i], piece);
+                currentValidGhosts.Add(extraGhosts[i]);
             }
 
-            __instance.RaiseSkill(Skills.SkillType.Farming, count);
+            pluginInstance.StartCoroutine("BulkPlanting", piece.gameObject);
             count = __instance.m_noPlacementCost ? 0 : count;
 
             for (int i = 0; i < count; i++)

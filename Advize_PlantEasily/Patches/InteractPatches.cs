@@ -48,12 +48,12 @@ static class InteractPatches
         instanceIDS.Remove(instanceID);
 
         Player player = Player.m_localPlayer;
-        GameObject plantObject = prefabRefs[pickablesToPlants[__instance.name.Replace("(Clone)", "")]];
-        Piece piece = plantObject.GetComponent<Piece>();
+        GameObject plantPrefab = prefabRefs[pickablesToPlants[__instance.name.Replace("(Clone)", "")]];
+        Piece piece = plantPrefab.GetComponent<Piece>();
 
         if (!player.HaveRequirements(piece, Player.RequirementMode.CanBuild) && !Player.m_localPlayer.m_noPlacementCost) return;
 
-        PlacePiece(player, __instance.gameObject, piece);
+        PlacePiece(player, __instance.gameObject, plantPrefab);
         player.ConsumeResources(piece.m_resources, 0);
     }
 }

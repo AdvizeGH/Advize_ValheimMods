@@ -4,8 +4,10 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 [BepInPlugin(PluginID, PluginName, Version)]
@@ -13,19 +15,22 @@ public sealed class PlantEasily : BaseUnityPlugin
 {
     public const string PluginID = "advize.PlantEasily";
     public const string PluginName = "PlantEasily";
-    public const string Version = "1.9.2";
+    public const string Version = "1.10.0";
 
     private static readonly ManualLogSource PELogger = new($" {PluginName}");
     internal static ModConfig config;
+    internal static PlantEasily pluginInstance;
 
     internal static readonly Dictionary<string, GameObject> prefabRefs = [];
 
     internal static GameObject placementGhost;
     internal static readonly List<GameObject> extraGhosts = [];
+    internal static readonly List<GameObject> currentValidGhosts = [];
     internal static readonly List<Status> ghostPlacementStatus = [];
     internal static readonly List<int> instanceIDS = [];
     internal static string keyboardHarvestModifierKeyLocalized;
     internal static string gamepadModifierKeyLocalized;
+    internal static bool isPlanting = false;
 
     internal static readonly int CollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid", "item");
 
@@ -42,8 +47,8 @@ public sealed class PlantEasily : BaseUnityPlugin
             return;
         }
         config = new ModConfig(Config);
-        Harmony harmony = new(PluginID);
-        harmony.PatchAll();
+        pluginInstance = this;
+        Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginID);
     }
 
     internal static bool IsPlantOrPickable(GameObject go) => go.GetComponent<Plant>() || go.GetComponent<Pickable>();
@@ -231,14 +236,13 @@ public sealed class PlantEasily : BaseUnityPlugin
         return extraInteractables;
     }
 
-    internal static void PlacePiece(Player player, GameObject go, Piece piece)
+    internal static void PlacePiece(Player player, GameObject go, GameObject piecePrefab)
     {
-        GameObject prefab = piece.gameObject;
         Vector3 position = go.transform.position;
         Quaternion rotation = config.RandomizeRotation ? Quaternion.Euler(0f, 22.5f * UnityEngine.Random.Range(0, 16), 0f) : go.transform.rotation;
 
         TerrainModifier.SetTriggerOnPlaced(trigger: true);
-        GameObject clone = Instantiate(prefab, position, rotation);
+        GameObject clone = Instantiate(piecePrefab, position, rotation);
         TerrainModifier.SetTriggerOnPlaced(trigger: false);
 
         clone.GetComponent<Piece>().SetCreator(player.GetPlayerID());
@@ -247,8 +251,24 @@ public sealed class PlantEasily : BaseUnityPlugin
         //player.AddNoise(50f);
 
         Game.instance.IncrementPlayerStat(PlayerStatType.Builds);
-        if(!player.InPlaceMode())
-            player.RaiseSkill(Skills.SkillType.Farming, 1f);
+        player.RaiseSkill(Skills.SkillType.Farming, 1f);
+    }
+
+    internal IEnumerator BulkPlanting(GameObject piecePrefab)
+    {
+        Player player = Player.m_localPlayer;
+        isPlanting = true;
+        int count = 0;
+
+        foreach (GameObject go in currentValidGhosts)
+        {
+            count++;
+            PlacePiece(player, go, piecePrefab);
+            if (count % config.BulkPlantingBatchSize == 0) yield return null;
+        }
+
+        currentValidGhosts.Clear();
+        isPlanting = false;
     }
 
     internal enum Status
