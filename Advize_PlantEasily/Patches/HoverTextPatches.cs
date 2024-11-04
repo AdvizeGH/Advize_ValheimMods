@@ -1,12 +1,14 @@
 ﻿namespace Advize_PlantEasily;
 
 using HarmonyLib;
+using System.Linq;
 using static PlantEasily;
 
 [HarmonyPatch]
 static class HoverTextPatches
 {
     static string CurrentModifierKey => ZInput.GamepadActive ? gamepadModifierKeyLocalized : keyboardHarvestModifierKeyLocalized;
+    static string GetPrefabName(Pickable p) => p.name.Replace("(Clone)", "");
 
     [HarmonyPatch(typeof(Beehive), nameof(Beehive.GetHoverText))]
     static void Postfix(Beehive __instance, ref string __result)
@@ -31,6 +33,11 @@ static class HoverTextPatches
         if (__instance.GetPicked() || __instance.GetEnabled == 0) return;
 
         string hoverTextSuffix = $"\n[<b><color=yellow>{CurrentModifierKey}</color> + <color=yellow>$KEY_Use</color></b>] $inventory_pickup (area)";
+        if (config.ReplantOnHarvest && config.ShowHoverReplantHint && pickableNamesToReplantDB.ContainsKey(GetPrefabName(__instance)))
+        {
+            string hoverName = string.IsNullOrEmpty(lastPlacementGhost) ? __instance.GetHoverName() : pickableNamesToReplantDB[lastPlacementGhost].pickable.GetHoverName();
+            hoverTextSuffix += $"\nReplant as: <color=green>{hoverName}</color>";
+        }
         __result += Localization.instance.Localize(hoverTextSuffix);
     }
 }

@@ -22,8 +22,10 @@ public sealed class PlantEasily : BaseUnityPlugin
     internal static PlantEasily pluginInstance;
 
     internal static readonly Dictionary<string, GameObject> prefabRefs = [];
+    internal static Dictionary<string, ReplantDB> pickableNamesToReplantDB = [];
 
     internal static GameObject placementGhost;
+    internal static string lastPlacementGhost = "";
     internal static readonly List<GameObject> extraGhosts = [];
     internal static readonly List<GameObject> currentValidGhosts = [];
     internal static readonly List<Status> ghostPlacementStatus = [];
@@ -31,6 +33,10 @@ public sealed class PlantEasily : BaseUnityPlugin
     internal static string keyboardHarvestModifierKeyLocalized;
     internal static string gamepadModifierKeyLocalized;
     internal static bool isPlanting = false;
+
+    //Might need these later
+    //internal static List<ReplantDB> vanillaCropRefs = [];
+    //internal static List<ReplantDB> moddedCropRefs = [];
 
     internal static readonly int CollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid", "item");
 
@@ -77,6 +83,7 @@ public sealed class PlantEasily : BaseUnityPlugin
                 if (row == 0 && column == 0)
                 {
                     placementGhost = rootGhost;
+                    lastPlacementGhost = pickableNamesToReplantDB.Where(kvp => kvp.Value.plantName == rootGhost.name).Select(kvp => kvp.Key).FirstOrDefault();
                     ghostPlacementStatus.Add(Status.Healthy);
                     continue;
                 }
@@ -298,20 +305,6 @@ public sealed class PlantEasily : BaseUnityPlugin
         { 9, "$piece_plant_toocold" }
     };
 
-    internal static readonly Dictionary<string, string> pickablesToPlants = new()
-    {
-        { "Pickable_SeedOnion", "sapling_seedonion" },
-        { "Pickable_Onion", "sapling_onion" },
-        { "Pickable_Turnip", "sapling_turnip" },
-        { "Pickable_Barley", "sapling_barley" },
-        { "Pickable_Mushroom_JotunPuffs", "sapling_jotunpuffs" },
-        { "Pickable_Carrot", "sapling_carrot" },
-        { "Pickable_SeedCarrot", "sapling_seedcarrot" },
-        { "Pickable_Flax", "sapling_flax" },
-        { "Pickable_Mushroom_Magecap", "sapling_magecap" },
-        { "Pickable_SeedTurnip", "sapling_seedturnip" }
-    };
-
     private static readonly string[] berries = ["RaspberryBush", "BlueberryBush", "CloudberryBush"];
     private static readonly string[] mushrooms = ["Pickable_Mushroom", "Pickable_Mushroom_yellow", "Pickable_Mushroom_blue", "Pickable_SmokePuff"];
     private static readonly string[] flowers = ["Pickable_Dandelion", "Pickable_Thistle", "Pickable_Fiddlehead"];
@@ -319,10 +312,12 @@ public sealed class PlantEasily : BaseUnityPlugin
     internal static void InitPrefabRefs()
     {
         Dbgl("InitPrefabRefs");
-        if (prefabRefs.Count > 0) return;
 
-        foreach (string prefabName in pickablesToPlants.Values)
-            prefabRefs.Add(prefabName, null);
+        foreach (string pickablePrefab in pickableNamesToReplantDB.Keys)
+        {
+            prefabRefs.Add(pickablePrefab, null);
+            prefabRefs.Add(pickableNamesToReplantDB[pickablePrefab].plantName, null);
+        }
 
         UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
         for (int i = 0; i < array.Length; i++)

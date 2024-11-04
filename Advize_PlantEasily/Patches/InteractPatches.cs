@@ -18,7 +18,7 @@ static class InteractPatches
         Interactable interactable = go.GetComponentInParent<Interactable>();
         if (interactable == null) return;
 
-        if (interactable as Pickable && config.ReplantOnHarvest && pickablesToPlants.ContainsKey(GetPrefabName(interactable)))
+        if (interactable as Pickable && config.ReplantOnHarvest && pickableNamesToReplantDB.ContainsKey(GetPrefabName(interactable)))
             instanceIDS.Add(((Pickable)interactable).GetInstanceID());
 
         if (!config.EnableBulkHarvest || (!ZInput.GetKey(config.KeyboardHarvestModifierKey, false) && !ZInput.GetKey(config.GamepadModifierKey, false)))
@@ -28,7 +28,7 @@ static class InteractPatches
         {
             foreach (Interactable extraInteractable in FindResourcesInRadius(go))
             {
-                if (config.ReplantOnHarvest && pickablesToPlants.ContainsKey(GetPrefabName(extraInteractable)))
+                if (config.ReplantOnHarvest && pickableNamesToReplantDB.ContainsKey(GetPrefabName(extraInteractable)))
                 {
                     instanceIDS.Add(((Pickable)extraInteractable).GetInstanceID());
                 }
@@ -48,12 +48,14 @@ static class InteractPatches
         instanceIDS.Remove(instanceID);
 
         Player player = Player.m_localPlayer;
-        GameObject plantPrefab = prefabRefs[pickablesToPlants[__instance.name.Replace("(Clone)", "")]];
-        Piece piece = plantPrefab.GetComponent<Piece>();
+        string plantPrefabName = string.IsNullOrEmpty(lastPlacementGhost) ? 
+            pickableNamesToReplantDB[__instance.name.Replace("(Clone)", "")].plantName : 
+            pickableNamesToReplantDB[lastPlacementGhost].plantName;
+        Piece piece = prefabRefs[plantPrefabName].GetComponent<Piece>();
 
         if (!player.HaveRequirements(piece, Player.RequirementMode.CanBuild) && !Player.m_localPlayer.m_noPlacementCost) return;
 
-        PlacePiece(player, __instance.gameObject, plantPrefab);
+        PlacePiece(player, __instance.gameObject, piece.gameObject);
         player.ConsumeResources(piece.m_resources, 0);
     }
 }
