@@ -66,6 +66,7 @@ sealed class ModConfig
     private readonly ConfigEntry<CostDisplayLocation> costDisplayLocation;
     private readonly ConfigEntry<bool> showHUDKeyHints;
     private readonly ConfigEntry<bool> showHoverKeyHints;
+    private readonly ConfigEntry<bool> showHoverReplantHint;
 
     internal ModConfig(ConfigFile configFile)
     {
@@ -165,6 +166,7 @@ sealed class ModConfig
         costDisplayLocation = Config.Bind("UI", "CostDisplayLocation", CostDisplayLocation.RightSide, "Determines whether to prepend or append text to the resource cost in build UI. LeftSide or RightSide will prepend or append respectively.");
         showHUDKeyHints = Config.Bind("UI", "ShowHUDKeyHints", true, "Show KeyHints in build HUD.");
         showHoverKeyHints = Config.Bind("UI", "ShowHoverKeyHints", true, "Show KeyHints in hover text.");
+        showHoverReplantHint = Config.Bind("UI", "ShowHoverReplantHint", true, "Show crop to be replanted upon harvest in hover text.");
 
         configFile.Save();
         configFile.SaveOnConfigSet = true;
@@ -243,6 +245,7 @@ sealed class ModConfig
     internal CostDisplayLocation CostDisplayLocation => costDisplayLocation.Value;
     internal bool ShowHUDKeyHints => showHUDKeyHints.Value;
     internal bool ShowHoverKeyHints => showHoverKeyHints.Value;
+    internal bool ShowHoverReplantHint => showHoverReplantHint.Value;
 
 #nullable enable
     internal class ConfigurationManagerAttributes
