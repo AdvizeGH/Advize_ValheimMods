@@ -215,6 +215,14 @@ static class PlacementPatches
 
                     Vector3 ghostPosition = isRoot ? basePosition : basePosition + rowDirection * row + columnDirection * column;
 
+                    if (isRoot && config.ShowGridDirections)
+                    {
+                        gridRenderer.SetActive(true);
+                        Vector3 vertex = ghostPosition + (Vector3.up / 2);
+                        lineRenderers[0].SetPositions([vertex, vertex + (rowDirection * (config.Rows - 1))]);
+                        lineRenderers[1].SetPositions([vertex, vertex + (columnDirection * (config.Columns - 1))]);
+                    }
+
                     Heightmap.GetHeight(ghostPosition, out float height);
                     ghostPosition.y = height;
 

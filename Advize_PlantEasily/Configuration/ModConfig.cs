@@ -67,6 +67,7 @@ sealed class ModConfig
     private readonly ConfigEntry<bool> showHUDKeyHints;
     private readonly ConfigEntry<bool> showHoverKeyHints;
     private readonly ConfigEntry<bool> showHoverReplantHint;
+    private readonly ConfigEntry<bool> showGridDirections;
 
     internal ModConfig(ConfigFile configFile)
     {
@@ -167,6 +168,7 @@ sealed class ModConfig
         showHUDKeyHints = Config.Bind("UI", "ShowHUDKeyHints", true, "Show KeyHints in build HUD.");
         showHoverKeyHints = Config.Bind("UI", "ShowHoverKeyHints", true, "Show KeyHints in hover text.");
         showHoverReplantHint = Config.Bind("UI", "ShowHoverReplantHint", true, "Show crop to be replanted upon harvest in hover text.");
+        showGridDirections = Config.Bind("UI", "ShowGridDirections", true, "Render lines indicating direction of rows and columns.");
 
         configFile.Save();
         configFile.SaveOnConfigSet = true;
@@ -181,6 +183,7 @@ sealed class ModConfig
         keyboardHarvestModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
         keyboardModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
         gamepadModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
+        showGridDirections.SettingChanged += (_, _) => PlantEasily.gridRenderer?.SetActive(false);
     }
 
     internal bool EnableDebugMessages => enableDebugMessages.Value;
@@ -246,6 +249,7 @@ sealed class ModConfig
     internal bool ShowHUDKeyHints => showHUDKeyHints.Value;
     internal bool ShowHoverKeyHints => showHoverKeyHints.Value;
     internal bool ShowHoverReplantHint => showHoverReplantHint.Value;
+    internal bool ShowGridDirections => showGridDirections.Value;
 
 #nullable enable
     internal class ConfigurationManagerAttributes

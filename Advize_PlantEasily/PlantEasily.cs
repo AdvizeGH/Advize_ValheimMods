@@ -34,6 +34,9 @@ public sealed class PlantEasily : BaseUnityPlugin
     internal static string gamepadModifierKeyLocalized;
     internal static bool isPlanting = false;
 
+    internal static GameObject gridRenderer;
+    internal static List<LineRenderer> lineRenderers = [];
+
     //Might need these later
     //internal static List<ReplantDB> vanillaCropRefs = [];
     //internal static List<ReplantDB> moddedCropRefs = [];
@@ -72,6 +75,7 @@ public sealed class PlantEasily : BaseUnityPlugin
             extraGhosts.Clear();
         }
         ghostPlacementStatus.Clear();
+        gridRenderer.SetActive(false);
     }
 
     internal static void CreateGhosts(GameObject rootGhost)
@@ -334,6 +338,29 @@ public sealed class PlantEasily : BaseUnityPlugin
                 break;
             }
         }
+
+        CreateLineRenderers();
+    }
+
+    private static void CreateLineRenderers()
+    {
+        Material material = Resources.FindObjectsOfTypeAll<Material>().First(m => m.name == "Default-Line");
+        gridRenderer = new();
+        DontDestroyOnLoad(gridRenderer);
+
+        for (int i = 0; i < 2; i++)
+        {
+            GameObject child = new();
+            child.transform.SetParent(gridRenderer.transform);
+            lineRenderers.Add(child.AddComponent<LineRenderer>());
+            lineRenderers[i].material = material;
+            lineRenderers[i].widthMultiplier = 0.025f;
+        }
+
+        lineRenderers[0].startColor = Color.blue;
+        lineRenderers[0].endColor = Color.cyan;
+        lineRenderers[1].startColor = Color.green;
+        lineRenderers[1].endColor = Color.yellow;
     }
 
     internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)
