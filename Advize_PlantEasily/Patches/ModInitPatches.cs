@@ -34,6 +34,10 @@ static class ModInitPatches
     {
         if (__state != null)
         {
+            List<GameObject> plantablePickables = new(__state);
+            plantablePickables.RemoveAll(go => !go.GetComponent<Pickable>() || !go.GetComponent<Piece>());
+            plantablePickables.ForEach(go => pickableRefs.Add(new(go.name)));
+
             List<GameObject> filteredPrefabs = __instance.m_prefabs.Except(__state).ToList();
             filteredPrefabs.RemoveAll(go => !go.TryGetComponent(out Plant p) || p.m_grownPrefabs.Any(tb => tb.GetComponent<TreeBase>()));
 

@@ -15,7 +15,7 @@ public sealed class PlantEasily : BaseUnityPlugin
 {
     public const string PluginID = "advize.PlantEasily";
     public const string PluginName = "PlantEasily";
-    public const string Version = "1.10.0";
+    public const string Version = "2.0.0";
 
     private static readonly ManualLogSource PELogger = new($" {PluginName}");
     internal static ModConfig config;
@@ -23,9 +23,10 @@ public sealed class PlantEasily : BaseUnityPlugin
 
     internal static readonly Dictionary<string, GameObject> prefabRefs = [];
     internal static Dictionary<string, ReplantDB> pickableNamesToReplantDB = [];
+    internal static List<PickableDB> pickableRefs = [];
 
     internal static GameObject placementGhost;
-    internal static string lastPlacementGhost = "";
+    internal static string lastPlacementGhost = ""; // more like lastPlantGhost, only used for replant on harvest
     internal static readonly List<GameObject> extraGhosts = [];
     internal static readonly List<GameObject> currentValidGhosts = [];
     internal static readonly List<Status> ghostPlacementStatus = [];
@@ -66,6 +67,8 @@ public sealed class PlantEasily : BaseUnityPlugin
 
     internal static void KeybindsChanged(object sender, EventArgs e) => KeyHintPatches.UpdateKeyHintText();
 
+    internal static void GridSpacingChanged(object sender, EventArgs e) => PickableDB.InitPickableSpacingConfig();
+
     internal static void DestroyGhosts()
     {
         if (extraGhosts.Count > 0)
@@ -75,7 +78,7 @@ public sealed class PlantEasily : BaseUnityPlugin
             extraGhosts.Clear();
         }
         ghostPlacementStatus.Clear();
-        gridRenderer.SetActive(false);
+        gridRenderer?.SetActive(false);
     }
 
     internal static void CreateGhosts(GameObject rootGhost)
@@ -113,7 +116,7 @@ public sealed class PlantEasily : BaseUnityPlugin
 
     internal static bool HasGrowSpace(Plant plant, Vector3 position) => Physics.OverlapSphere(position, plant.m_growRadius, Plant.m_spaceMask).Length == 0;
 
-    internal static bool PositionHasCollisions(Vector3 position) => Physics.CheckCapsule(position, position + (Vector3.up / 2), 0.0001f, CollisionMask);
+    internal static bool PositionHasCollisions(Vector3 position) => Physics.CheckCapsule(position, position + (Vector3.up / 3), 0.0001f, CollisionMask);
 
     internal static float GetPieceSpacing(GameObject go)
     {
@@ -140,24 +143,14 @@ public sealed class PlantEasily : BaseUnityPlugin
             colliderRadius += isSapling ? config.ExtraSaplingSpacing : config.ExtraCropSpacing;
         }
 
-        float growRadius = isSapling ? plant.m_growRadius * 2.2f : plant?.m_growRadius * (config.MinimizeGridSpacing ? 1.1f : 2f) ?? PickableSnapRadius(go.name);
+        float growRadius = isSapling ? plant.m_growRadius * 2.2f : plant?.m_growRadius * (config.MinimizeGridSpacing ? 1.1f : 2f) ?? PickableSnapRadius(go.GetComponent<Piece>());
 
         return growRadius + colliderRadius;
     }
 
-    private static float PickableSnapRadius(string name)
-    {
-        if (berries.Contains(name))
-            return config.BerryBushSnapRadius;
-        if (mushrooms.Contains(name))
-            return config.MushroomSnapRadius;
-        if (flowers.Contains(name))
-            return config.FlowerSnapRadius;
+    private static float PickableSnapRadius(Piece p) => p?.m_harvestRadius > 0 ? p.m_harvestRadius : config.DefaultGridSpacing;
 
-        return config.PickableSnapRadius;
-    }
-
-    internal static void SetPlacementGhostStatus(GameObject ghost, int index, Status placementStatus, ref int m_placementStatus)
+    internal static void SetPlacementGhostStatus(GameObject ghost, int index, Status placementStatus)
     {
         ghost.GetComponent<Piece>().SetInvalidPlacementHeightlight(placementStatus != Status.Healthy);
 
@@ -166,7 +159,13 @@ public sealed class PlantEasily : BaseUnityPlugin
             ghostPlacementStatus[index] = placementStatus;
             if (index == 0 && placementStatus == Status.Healthy)
             {
-                m_placementStatus = 0;
+                if (config.HighlightRootPlacementGhost && ghostPlacementStatus.Count > 1)
+                {
+                    MaterialMan.instance.SetValue(ghost.gameObject, ShaderProps._Color, config.RootGhostHighlightColor);
+                    MaterialMan.instance.SetValue(ghost.gameObject, ShaderProps._EmissionColor, config.RootGhostHighlightColor * 0.7f);
+                }
+
+                Player.m_localPlayer.m_placementStatus = 0;
             }
         }
     }
@@ -309,10 +308,6 @@ public sealed class PlantEasily : BaseUnityPlugin
         { 9, "$piece_plant_toocold" }
     };
 
-    private static readonly string[] berries = ["RaspberryBush", "BlueberryBush", "CloudberryBush"];
-    private static readonly string[] mushrooms = ["Pickable_Mushroom", "Pickable_Mushroom_yellow", "Pickable_Mushroom_blue", "Pickable_SmokePuff"];
-    private static readonly string[] flowers = ["Pickable_Dandelion", "Pickable_Thistle", "Pickable_Fiddlehead"];
-
     internal static void InitPrefabRefs()
     {
         Dbgl("InitPrefabRefs");
@@ -322,6 +317,8 @@ public sealed class PlantEasily : BaseUnityPlugin
             prefabRefs.Add(pickablePrefab, null);
             prefabRefs.Add(pickableNamesToReplantDB[pickablePrefab].plantName, null);
         }
+
+        pickableRefs.ForEach(s => prefabRefs.Add(s.key, null));
 
         UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
         for (int i = 0; i < array.Length; i++)
@@ -338,11 +335,12 @@ public sealed class PlantEasily : BaseUnityPlugin
                 break;
             }
         }
-
-        CreateLineRenderers();
+        
+        InitLineRenderers();
+        PickableDB.InitPickableSpacingConfig();
     }
 
-    private static void CreateLineRenderers()
+    private static void InitLineRenderers()
     {
         Material material = Resources.FindObjectsOfTypeAll<Material>().First(m => m.name == "Default-Line");
         gridRenderer = new();

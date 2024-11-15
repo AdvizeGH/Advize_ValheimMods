@@ -1,6 +1,7 @@
 ﻿namespace Advize_PlantEasily;
 
 using BepInEx.Configuration;
+using System.Collections.Generic;
 using UnityEngine;
 using Attributes = ModConfig.ConfigurationManagerAttributes;
 
@@ -27,16 +28,14 @@ sealed class ModConfig
     private readonly ConfigEntry<bool> standardizeGridRotations;
     private readonly ConfigEntry<bool> minimizeGridSpacing;
     private readonly ConfigEntry<bool> globallyAlignGridDirections;
+    private readonly ConfigEntry<bool> offsetOddRows;
 
     //Performance
     private readonly ConfigEntry<int> maxConcurrentPlacements;
     private readonly ConfigEntry<int> bulkPlantingBatchSize;
 
     //Pickables
-    private readonly ConfigEntry<float> pickableSnapRadius;
-    private readonly ConfigEntry<float> berryBushSnapRadius;
-    private readonly ConfigEntry<float> mushroomSnapRadius;
-    private readonly ConfigEntry<float> flowerSnapRadius;
+    private readonly ConfigEntry<float> defaultGridSpacing;
     private readonly ConfigEntry<bool> preventOverlappingPlacements;
 
     //Harvesting
@@ -68,6 +67,8 @@ sealed class ModConfig
     private readonly ConfigEntry<bool> showHoverKeyHints;
     private readonly ConfigEntry<bool> showHoverReplantHint;
     private readonly ConfigEntry<bool> showGridDirections;
+    private readonly ConfigEntry<bool> highlightRootPlacementGhost;
+    private readonly ConfigEntry<Color> rootGhostHighlightColor;
 
     internal ModConfig(ConfigFile configFile)
     {
@@ -91,17 +92,15 @@ sealed class ModConfig
         standardizeGridRotations = Config.Bind("General", "StandardizeGridRotations", true, "When set to true, this setting will prevent the diagonal snapping of new grids to existing grids.");
         minimizeGridSpacing = Config.Bind("General", "MinimizeGridSpacing", false, "Allows for tighter grids, but with varying spacing used between diverse/distinct plants. ");
         globallyAlignGridDirections = Config.Bind("General", "GloballyAlignGridDirections", true, "When set to true, new grid placements will have their column and row directions align with the global grid.");
+        offsetOddRows = Config.Bind("General", "OffsetOddRows", false, "When enabled, alters grid formation by offsetting each odd row.");
 
         //Performance
         maxConcurrentPlacements = Config.Bind("Performance", "MaxConcurrentPlacements", 500, new ConfigDescription("Maximum amount of pieces that can be placed at once with the cultivator.", new AcceptableValueRange<int>(2, 10000)));
         bulkPlantingBatchSize = Config.Bind("Performance", "BulkPlantingBatchSize", 50, new ConfigDescription("This value determines how many concurrent pieces can be placed per frame. Reduce this value if the game hangs when placing too many pieces at once.", new AcceptableValueRange<int>(2, 10000)));
 
         //Pickables
-        pickableSnapRadius = Config.Bind("Pickables", "PickableSnapRadius", 1.0f, "Determines default distance/spacing between pickable resources when planting.");
-        berryBushSnapRadius = Config.Bind("Pickables", "BerryBushSnapRadius", 1.5f, "Determines distance/spacing between berry bushes when planting.");
-        mushroomSnapRadius = Config.Bind("Pickables", "MushroomSnapRadius", 0.5f, "Determines distance/spacing between mushrooms when planting.");
-        flowerSnapRadius = Config.Bind("Pickables", "FlowerSnapRadius", 1.0f, "Determines distance/spacing between flowers when planting.");
-        preventOverlappingPlacements = Config.Bind("Pickables", "PreventOverlappingPlacements", true, new ConfigDescription("Prevents placement of pickable resources on top of colliding obstructions.", null, new Attributes { Order = 5 }));
+        defaultGridSpacing = Config.Bind("Pickables", "DefaultGridSpacing", 1.0f, new ConfigDescription("Determines default distance/spacing between pickable resources when planting.", null, new Attributes { Order = 1 }));
+        preventOverlappingPlacements = Config.Bind("Pickables", "PreventOverlappingPlacements", true, new ConfigDescription("Prevents placement of pickable resources on top of colliding obstructions.", null, new Attributes { Order = 2 }));
 
         //Harvesting
         enableBulkHarvest = Config.Bind("Harvesting", "EnableBulkHarvest", true, "Enables the ability to harvest multiple resources at once.");
@@ -169,6 +168,8 @@ sealed class ModConfig
         showHoverKeyHints = Config.Bind("UI", "ShowHoverKeyHints", true, "Show KeyHints in hover text.");
         showHoverReplantHint = Config.Bind("UI", "ShowHoverReplantHint", true, "Show crop to be replanted upon harvest in hover text.");
         showGridDirections = Config.Bind("UI", "ShowGridDirections", true, "Render lines indicating direction of rows and columns.");
+        highlightRootPlacementGhost = Config.Bind("UI", "HighlightRootGhost", true, "Highlight the root placement ghost while bulk planting.");
+        rootGhostHighlightColor = Config.Bind("UI", "RootGhostHighlightColor", Color.green, "Highlight color for root placement ghost when [UI]HighlightRootGhost is enabled.");
 
         configFile.Save();
         configFile.SaveOnConfigSet = true;
@@ -184,6 +185,37 @@ sealed class ModConfig
         keyboardModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
         gamepadModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
         showGridDirections.SettingChanged += (_, _) => PlantEasily.gridRenderer?.SetActive(false);
+    }
+
+    internal void BindPickableSpacingSettings()
+    {
+        Config.SaveOnConfigSet = false;
+
+        Dictionary<string, float> predefinedSpacingDefaults = new()
+        {
+            { "Pickable_Dandelion", 0.75f },
+            { "Pickable_Fiddlehead", 1.0f },
+            { "Pickable_Mushroom", 0.5f },
+            { "Pickable_Mushroom_blue", 0.5f },
+            { "Pickable_Mushroom_yellow", 0.5f },
+            { "Pickable_SmokePuff", 0.75f },
+            { "Pickable_Thistle", 0.75f },
+            { "BlueberryBush", 1.5f },
+            { "RaspberryBush", 1.5f },
+            { "CloudberryBush", 1.0f }
+        };
+
+        foreach (PickableDB pdb in PlantEasily.pickableRefs)
+        {
+            float gridSpacing = predefinedSpacingDefaults.TryGetValue(pdb.key, out float spacing) ? spacing : DefaultGridSpacing;
+            pdb.itemName = Localization.instance.Localize(pdb.Prefab.GetComponent<Pickable>().m_itemPrefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_name);
+            pdb.configEntry = Config.Bind("Pickables", $"{pdb.key} GridSpacing", gridSpacing, $"Determines distance/spacing between {pdb.itemName} when planting.");
+            pdb.configEntry.SettingChanged += PlantEasily.GridSpacingChanged;
+        }
+
+        predefinedSpacingDefaults.Clear();
+        Config.Save();
+        Config.SaveOnConfigSet = true;
     }
 
     internal bool EnableDebugMessages => enableDebugMessages.Value;
@@ -207,10 +239,7 @@ sealed class ModConfig
         get { return snapActive.Value; }
         set { snapActive.BoxedValue = value; }
     }
-    internal float PickableSnapRadius => pickableSnapRadius.Value;
-    internal float BerryBushSnapRadius => berryBushSnapRadius.Value;
-    internal float MushroomSnapRadius => mushroomSnapRadius.Value;
-    internal float FlowerSnapRadius => flowerSnapRadius.Value;
+    internal float DefaultGridSpacing => defaultGridSpacing.Value;
     internal bool PreventOverlappingPlacements => preventOverlappingPlacements.Value;
     internal bool PreventPartialPlanting => preventPartialPlanting.Value;
     internal bool PreventInvalidPlanting => preventInvalidPlanting.Value;
@@ -223,6 +252,7 @@ sealed class ModConfig
     internal bool StandardizeGridRotations => standardizeGridRotations.Value;
     internal bool MinimizeGridSpacing => minimizeGridSpacing.Value;
     internal bool GloballyAlignGridDirections => globallyAlignGridDirections.Value;
+    internal bool OffsetOddRows => offsetOddRows.Value;
     internal int MaxConcurrentPlacements => maxConcurrentPlacements.Value;
     internal int BulkPlantingBatchSize => bulkPlantingBatchSize.Value;
     internal bool EnableBulkHarvest => enableBulkHarvest.Value;
@@ -250,6 +280,8 @@ sealed class ModConfig
     internal bool ShowHoverKeyHints => showHoverKeyHints.Value;
     internal bool ShowHoverReplantHint => showHoverReplantHint.Value;
     internal bool ShowGridDirections => showGridDirections.Value;
+    internal bool HighlightRootPlacementGhost => highlightRootPlacementGhost.Value;
+    internal Color RootGhostHighlightColor => rootGhostHighlightColor.Value;
 
 #nullable enable
     internal class ConfigurationManagerAttributes

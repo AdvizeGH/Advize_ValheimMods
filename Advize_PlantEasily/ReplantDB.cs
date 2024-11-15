@@ -1,4 +1,5 @@
 ﻿namespace Advize_PlantEasily;
+
 using UnityEngine;
 
 internal class ReplantDB(GameObject plantPrefab)
