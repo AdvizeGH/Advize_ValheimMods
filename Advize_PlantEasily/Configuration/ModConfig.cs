@@ -113,52 +113,52 @@ sealed class ModConfig
             new ConfigDescription(
                 "Key to toggle on/off all mod features. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                 null,
-                new Attributes { Description = "Key to toggle on/off all mod features." }));
+                new Attributes { Description = "Key to toggle on/off all mod features.", Order = 10 }));
         enableSnappingKey = Config.Bind("Controls", "EnableSnappingKey", new KeyboardShortcut(KeyCode.F10),
             new ConfigDescription(
                 "Key to toggle on/off piece snapping functionality. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                 null,
-                new Attributes { Description = "Key to toggle on/off piece snapping functionality." }));
+                new Attributes { Description = "Key to toggle on/off piece snapping functionality.", Order = 9 }));
         increaseXKey = Config.Bind("Controls", "IncreaseXKey", new KeyboardShortcut(KeyCode.RightArrow),
             new ConfigDescription(
                 "Key to increase number of grid columns. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                 null,
-                new Attributes { Description = "Key to increase number of grid columns." }));
+                new Attributes { Description = "Key to increase number of grid columns.", Order = 7 }));
         increaseYKey = Config.Bind("Controls", "IncreaseYKey", new KeyboardShortcut(KeyCode.UpArrow),
             new ConfigDescription(
                 "Key to increase number of grid rows. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                 null,
-                new Attributes { Description = "Key to increase number of grid rows." }));
+                new Attributes { Description = "Key to increase number of grid rows.", Order = 6 }));
         decreaseXKey = Config.Bind("Controls", "DecreaseXKey", new KeyboardShortcut(KeyCode.LeftArrow),
             new ConfigDescription(
                 "Key to decrease number of grid columns. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                 null,
-                new Attributes { Description = "Key to decrease number of grid columns." }));
+                new Attributes { Description = "Key to decrease number of grid columns.", Order = 5 }));
         decreaseYKey = Config.Bind("Controls", "DecreaseYKey", new KeyboardShortcut(KeyCode.DownArrow),
             new ConfigDescription(
                 "Key to decrease number of grid rows. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                 null,
-                new Attributes { Description = "Key to decrease number of grid rows." }));
+                new Attributes { Description = "Key to decrease number of grid rows.", Order = 4 }));
         keyboardModifierKey = Config.Bind("Controls", "KeyboardModifierKey", new KeyboardShortcut(KeyCode.RightControl),
             new ConfigDescription(
                 "Modifier key when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                 null,
-                new Attributes { Description = "Modifier key when using keyboard controls." }));
+                new Attributes { Description = "Modifier key when using keyboard controls.", Order = 3 }));
         gamepadModifierKey = Config.Bind("Controls", "GamepadModifierKey", new KeyboardShortcut(KeyCode.JoystickButton4),
             new ConfigDescription(
                 "Modifier key when using gamepad controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                 null,
-                new Attributes { Description = "Modifier key when using gamepad controls." }));
+                new Attributes { Description = "Modifier key when using gamepad controls.", Order = 2 }));
         keyboardHarvestModifierKey = Config.Bind("Controls", "KeyboardHarvestModifierKey", new KeyboardShortcut(KeyCode.LeftShift),
             new ConfigDescription(
                 "Modifier key to enable bulk harvest when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                 null,
-                new Attributes { Description = "Modifier key to enable bulk harvest when using keyboard controls." }));
+                new Attributes { Description = "Modifier key to enable bulk harvest when using keyboard controls.", Order = 1 }));
         toggleAutoReplantKey = Config.Bind("Controls", "ToggleAutoReplantKey", new KeyboardShortcut(KeyCode.None),
             new ConfigDescription(
                 "Key to toggle on/off the [Harvesting]ReplantOnHarvest setting. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
                 null,
-                new Attributes { Description = "Key to toggle on/off the [Harvesting]ReplantOnHarvest setting." }));
+                new Attributes { Description = "Key to toggle on/off the [Harvesting]ReplantOnHarvest setting.", Order = 8 }));
 
         //UI
         showCost = Config.Bind("UI", "ShowCost", true, new ConfigDescription("Update resource cost in build UI.", null, new Attributes { Order = 3 }));
