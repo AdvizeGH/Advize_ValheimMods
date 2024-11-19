@@ -43,8 +43,10 @@ static class PlacementPatches
         static Vector3 basePosition = Vector3.zero;
         static Vector3 rowDirection = Vector3.zero;
         static Vector3 columnDirection = Vector3.zero;
-        static Quaternion baseRotation = default;
-        static Quaternion fixedRotation = default;
+        static Quaternion baseRotation = Quaternion.identity;
+        static Quaternion fixedRotation = Quaternion.identity;
+
+        static bool altPlacement;
 
         sealed private class SnapPoint(Vector3 p, Vector3 rd, Vector3 cd)
         {
@@ -55,6 +57,16 @@ static class PlacementPatches
 
         static void UpdateGhosts(Vector3 playerPosition)
         {
+            altPlacement = config.ForceAltPlacement || ((ZInput.IsNonClassicFunctionality() && ZInput.IsGamepadActive()) ? Player.m_localPlayer.m_altPlace : (ZInput.GetButton("AltPlace") || (ZInput.GetButton("JoyAltPlace") && !ZInput.GetButton("JoyRotate"))));
+
+            void ResetGridDirections()
+            {
+                // Subtracts player position from placement ghost position to get a vector between the two and facing out from the player, normalizes it
+                rowDirection = config.GloballyAlignGridDirections ? Vector3.forward : Utils.DirectionXZ(basePosition - playerPosition);
+                // Cross product of a vertical vector and the forward facing normalized vector, producing a perpendicular lateral vector
+                columnDirection = Vector3.Cross(Vector3.up, rowDirection);
+            }
+
             basePosition = placementGhost.transform.position;
             baseRotation = fixedRotation = placementGhost.transform.rotation;
 
@@ -64,24 +76,13 @@ static class PlacementPatches
 
             float pieceSpacing = GetPieceSpacing(placementGhost);
 
-            // Takes position of ghost, subtracts position of player to get vector between the two and facing out from the player, normalizes that vector to have a magnitude of 1.0f
-            rowDirection = config.GloballyAlignGridDirections ? Vector3.forward : Utils.DirectionXZ(basePosition - playerPosition);
-            // Cross product of a vertical vector and the forward facing normalized vector, producing a perpendicular lateral vector
-            columnDirection = Vector3.Cross(Vector3.up, rowDirection);
+            ResetGridDirections();
 
-            bool foundSnaps = false;
-
-            if (config.SnapActive)
-            {
-                foundSnaps = FindSnapPoints(pieceSpacing);
-            }
-
-            if (!foundSnaps)
+            if (!(config.SnapActive && FindSnapPoints(pieceSpacing)))
             {
                 if (config.SnapActive)
                 {
-                    rowDirection = config.GloballyAlignGridDirections ? Vector3.forward : Utils.DirectionXZ(basePosition - playerPosition);
-                    columnDirection = Vector3.Cross(Vector3.up, rowDirection);
+                    ResetGridDirections();
                 }
 
                 rowDirection = baseRotation * rowDirection * pieceSpacing;
@@ -118,23 +119,29 @@ static class PlacementPatches
                     if (++validSecondOrderCollisions > 8) break;
                     if (!(Math.Round(Utils.DistanceXZ(t2.position, t1.position), 2) <= Math.Round(pieceSpacing2, 2))) continue;
 
-                    //gridFound = true;
+                    gridFound = true;
 
-                    rowDirection = fixedRotation * Utils.DirectionXZ(t2.position - t1.position) * pieceSpacing;
+                    rowDirection = fixedRotation * Utils.DirectionXZ(t1.position - t2.position) * pieceSpacing;
                     columnDirection = Vector3.Cross(Vector3.up, rowDirection);
-
                     foundSnaps = ValidateSnapPoints(snapPoints, t1.position, plant, gridDetected: true);
+                    break;
                 }
 
                 if (!gridFound && !foundSnaps)
                 {
-                    if (config.StandardizeGridRotations)
+                    rowDirection = Utils.DirectionXZ(basePosition - t1.position) * pieceSpacing;
+
+                    if (!altPlacement)
                     {
-                        rowDirection = fixedRotation * rowDirection * pieceSpacing;
-                    }
-                    else
-                    {
-                        rowDirection = Utils.DirectionXZ(t1.position - basePosition) * pieceSpacing;
+                        //Find the nearest angle that is a valid 22.5 degree rotation
+                        float nearestRotationAngle = Mathf.Round(Vector3.Angle(Vector3.forward, rowDirection) / 22.5f) * 22.5f;
+                        //Find out if the rowDirection points to the left of Vector3.forward (left 2 quadrants)
+                        if (Vector3.Angle(Vector3.right, rowDirection) > 90)
+                        {
+                            nearestRotationAngle = -nearestRotationAngle;
+                        }
+                        
+                        rowDirection = fixedRotation * Quaternion.Euler(0, nearestRotationAngle, 0) * Vector3.forward * pieceSpacing;
                     }
 
                     columnDirection = Vector3.Cross(Vector3.up, rowDirection);
@@ -144,10 +151,8 @@ static class PlacementPatches
 
             if (foundSnaps)
             {
-                //List<SnapPosition> gdSnaps = snapPoints.Where(x => x.gridDetected).ToList();
-                //List<SnapPosition> ngdSnaps = snapPoints.Where(x => !x.gridDetected).ToList();
-                //Dbgl($"Found {snapPoints.Count} snap points ({gdSnaps.Count},{ngdSnaps.Count})");
-                SnapPoint nearestSnapPoint = snapPoints.OrderBy(o => (o.pos - basePosition).magnitude).First();
+                //Dbgl($"Found {snapPoints.Count} snap points");
+                SnapPoint nearestSnapPoint = snapPoints.OrderBy(o => (o.pos - basePosition).sqrMagnitude).First();
                 basePosition = placementGhost.transform.position = nearestSnapPoint.pos;
                 if (config.GridSnappingStyle == 0)
                 {
@@ -180,17 +185,17 @@ static class PlacementPatches
             }
             else
             {
-                if (config.StandardizeGridRotations)
+                if (altPlacement)
+                {
+                    potentialPositions.Add(snapFromPos + rowDirection);
+                    potentialPositions.Add(snapFromPos - rowDirection);
+                }
+                else
                 {
                     for (int r = 0; r < maxRotations; r++)
                     {
                         potentialPositions.Add(snapFromPos + Quaternion.Euler(0, (360f / maxRotations) * r, 0) * rowDirection);
                     }
-                }
-                else
-                {
-                    potentialPositions.Add(snapFromPos + rowDirection);
-                    potentialPositions.Add(snapFromPos + -rowDirection);
                 }
             }
 
@@ -205,10 +210,8 @@ static class PlacementPatches
 
                     if (config.GridSnappingStyle == 0)
                     {
-                        if (config.Rows > 1 && !config.OffsetOddRows ? PositionHasCollisions(pos + rowDirection) : PositionHasCollisions(pos + rowDirection + (columnDirection / 2)))
-                            invertRowDirection = true;
-                        if (config.Columns > 1 && !config.OffsetOddRows ? PositionHasCollisions(pos + columnDirection) : PositionHasCollisions(pos + columnDirection))
-                            invertColumnDirection = true;
+                        invertRowDirection = config.Rows > 1 && PositionHasCollisions(pos + rowDirection);
+                        invertColumnDirection = config.Columns > 1 && PositionHasCollisions(pos + columnDirection);
                     }
 
                     snapPoints.Add(new SnapPoint(pos, !invertRowDirection ? rowDirection : -rowDirection, !invertColumnDirection ? columnDirection : -columnDirection));
@@ -223,26 +226,12 @@ static class PlacementPatches
             int cost = piece.m_resources[0].m_amount;
             int currentCost = 0;
 
-            float adjustedRowAngle = Mathf.Abs(Vector3.Angle(Vector3.forward, rowDirection) - 90);
-            float adjustedColumnAngle = Mathf.Abs(Vector3.Angle(Vector3.forward, columnDirection) - 90);
-
-            //float adjustedRowAngle2 = Mathf.Abs(Vector3.Angle(Vector3.back, rowDirection) - 90);
-            //Dbgl($"aRa: {adjustedRowAngle}, aCa: {adjustedColumnAngle}");
-
-            bool swapDirections = false;
-
-            if (adjustedColumnAngle > adjustedRowAngle)
-            {
-                swapDirections = true;
-                (rowDirection, columnDirection) = (columnDirection, rowDirection);
-            }
-
             if (config.ShowGridDirections)
             {
                 gridRenderer.SetActive(placementGhost.activeSelf);
                 Vector3 vertex = basePosition + (Vector3.up / 2);
-                lineRenderers[0].SetPositions([vertex, vertex + (rowDirection * (swapDirections ? (config.Columns - 1) : (config.Rows - 1)))]);
-                lineRenderers[1].SetPositions([vertex, vertex + (columnDirection * (swapDirections ? (config.Rows - 1) : (config.Columns - 1)))]);
+                lineRenderers[0].SetPositions([vertex, vertex + (rowDirection * (config.Rows - 1))]);
+                lineRenderers[1].SetPositions([vertex, vertex + (columnDirection * (config.Columns - 1))]);
             }
 
             for (int row = 0; row < config.Rows; row++)
@@ -257,13 +246,7 @@ static class PlacementPatches
                     piece.m_resources[0].m_amount = currentCost;
 
                     GameObject ghost = ghostIndex == 0 ? placementGhost : extraGhosts[ghostIndex - 1];
-                    Vector3 ghostPosition = ghostIndex == 0 ? basePosition : basePosition + rowDirection * (swapDirections ? column : row) + columnDirection * (swapDirections ? row : column); ;
-                    //Vector3 ghostPosition = isRoot ? basePosition : basePosition + rowDirection * row + columnDirection * column;
-
-                    if (config.OffsetOddRows && (swapDirections ? column : row) % 2 == 1)
-                    {
-                        ghostPosition += columnDirection / 2;
-                    }
+                    Vector3 ghostPosition = ghostIndex == 0 ? basePosition : basePosition + rowDirection * row + columnDirection * column;
 
                     Heightmap.GetHeight(ghostPosition, out float height);
                     ghostPosition.y = height;

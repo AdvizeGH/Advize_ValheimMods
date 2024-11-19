@@ -69,6 +69,16 @@ public sealed class PlantEasily : BaseUnityPlugin
 
     internal static void GridSpacingChanged(object sender, EventArgs e) => PickableDB.InitPickableSpacingConfig();
 
+    internal static void GridColorChanged(object sender, EventArgs e)
+    {
+        if (!gridRenderer) return;
+
+        lineRenderers[0].startColor = config.RowStartColor;
+        lineRenderers[0].endColor = config.RowEndColor;
+        lineRenderers[1].startColor = config.ColumnStartColor;
+        lineRenderers[1].endColor = config.ColumnEndColor;
+    }
+
     internal static void DestroyGhosts()
     {
         if (extraGhosts.Count > 0)
@@ -250,6 +260,7 @@ public sealed class PlantEasily : BaseUnityPlugin
     {
         Vector3 position = go.transform.position;
         Quaternion rotation = config.RandomizeRotation ? Quaternion.Euler(0f, 22.5f * UnityEngine.Random.Range(0, 16), 0f) : go.transform.rotation;
+        go.SetActive(false);
 
         TerrainModifier.SetTriggerOnPlaced(trigger: true);
         GameObject clone = Instantiate(piecePrefab, position, rotation);
@@ -270,6 +281,16 @@ public sealed class PlantEasily : BaseUnityPlugin
         isPlanting = true;
         int count = 0;
 
+        if (config.ShowGhostsDuringPlacement)
+        {
+            extraGhosts.Except(currentValidGhosts).ToList().ForEach(ig => Array.ForEach(ig.GetComponentsInChildren<Renderer>(), r => r.enabled = false));
+            currentValidGhosts.ForEach(vg => MaterialMan.instance.SetValue(vg, ShaderProps._Color, Color.gray));
+        }
+        else
+        {
+            extraGhosts.ForEach(eg => Array.ForEach(eg.GetComponentsInChildren<Renderer>(), r => r.enabled = false));
+        }
+
         foreach (GameObject go in currentValidGhosts)
         {
             count++;
@@ -279,6 +300,7 @@ public sealed class PlantEasily : BaseUnityPlugin
 
         currentValidGhosts.Clear();
         isPlanting = false;
+        player.SetupPlacementGhost();
     }
 
     internal enum Status
@@ -355,10 +377,7 @@ public sealed class PlantEasily : BaseUnityPlugin
             lineRenderers[i].widthMultiplier = 0.025f;
         }
 
-        lineRenderers[0].startColor = Color.blue;
-        lineRenderers[0].endColor = Color.cyan;
-        lineRenderers[1].startColor = Color.green;
-        lineRenderers[1].endColor = Color.yellow;
+        GridColorChanged(null, null);
     }
 
     internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)
