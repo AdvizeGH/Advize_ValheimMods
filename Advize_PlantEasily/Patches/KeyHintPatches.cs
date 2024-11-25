@@ -46,7 +46,7 @@ static class KeyHintPatches
     {
         return new CodeMatcher(instructions)
         .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(PlayerCustomizaton), nameof(PlayerCustomizaton.IsBarberGuiVisible))))
-        .ThrowIfInvalid("Could not patch KeyHints.UpdateHints() (BuildHUD Key Hints")
+        .ThrowIfInvalid("Could not patch KeyHints.UpdateHints() (BuildHUD Key Hints)")
         .Advance(-2)
         .InsertAndAdvance(instructions: [new(OpCodes.Call, AccessTools.Method(typeof(KeyHintPatches), nameof(SetKeyHintsActive)))])
         .InstructionEnumeration();
