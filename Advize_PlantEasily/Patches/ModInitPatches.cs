@@ -9,12 +9,14 @@ using static PlantEasily;
 [HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]
 static class ModInitPatches
 {
-    [HarmonyPriority(Priority.First)]
-    static void Prefix(ZNetScene __instance, ref List<GameObject> __state)
-    {
-        __state = prefabRefs.Count == 0 ? new(__instance.m_prefabs) : null;
+    private static List<GameObject> unfilteredPrefabs;
 
-        if (__state != null)
+    [HarmonyPriority(Priority.First)]
+    static void Prefix(ZNetScene __instance)
+    {
+        unfilteredPrefabs = prefabRefs.Count == 0 ? new(__instance.m_prefabs) : null;
+
+        if (unfilteredPrefabs != null)
         {
             List<GameObject> filteredPrefabs = new(__instance.m_prefabs);
             filteredPrefabs.RemoveAll(go => !go.TryGetComponent(out Plant p) || p.m_grownPrefabs.Any(tb => tb.GetComponent<TreeBase>()));
@@ -30,16 +32,16 @@ static class ModInitPatches
     }
 
     [HarmonyPriority(Priority.Last)]
-    static void Postfix(ZNetScene __instance, List<GameObject> __state)
+    static void Postfix(ZNetScene __instance)
     {
-        if (__state != null)
+        if (unfilteredPrefabs != null)
         {
-            List<GameObject> plantablePickables = new(__state);
+            List<GameObject> plantablePickables = new(unfilteredPrefabs);
             plantablePickables.RemoveAll(go => !go.GetComponent<Pickable>() || !go.GetComponent<Piece>());
             plantablePickables.ForEach(go => pickableRefs.Add(new(go.name)));
             Dbgl($"({plantablePickables.Count}) plantable pickables detected");
 
-            List<GameObject> filteredPrefabs = __instance.m_prefabs.Except(__state).ToList();
+            List<GameObject> filteredPrefabs = __instance.m_prefabs.Except(unfilteredPrefabs).ToList();
             filteredPrefabs.RemoveAll(go => !go.TryGetComponent(out Plant p) || p.m_grownPrefabs.Any(tb => tb.GetComponent<TreeBase>()));
 
             Dbgl($"({filteredPrefabs.Count}) modded crops detected");
@@ -51,6 +53,7 @@ static class ModInitPatches
             }
 
             InitPrefabRefs();
+            unfilteredPrefabs.Clear();
         }
     }
 }

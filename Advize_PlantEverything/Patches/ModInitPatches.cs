@@ -15,20 +15,22 @@ static class ModInitPatches
     [HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]
     static class ZNetScenePatches
     {
+        private static List<GameObject> unfilteredPrefabs;
+
         [HarmonyPriority(Priority.First)]
-        static void Prefix(ZNetScene __instance, ref List<GameObject> __state)
+        static void Prefix(ZNetScene __instance)
         {
-            __state = moddedCropRefs.Count == 0 && moddedSaplingRefs.Count == 0 ? new(__instance.m_prefabs) : null;
+            unfilteredPrefabs = moddedCropRefs.Count == 0 && moddedSaplingRefs.Count == 0 ? new(__instance.m_prefabs) : null;
         }
 
         static void Postfix(ZNetScene __instance) => FullInit(__instance);
 
         [HarmonyPostfix, HarmonyPriority(Priority.Last)]
-        static void LastPostfix(ZNetScene __instance, List<GameObject> __state)
+        static void LastPostfix(ZNetScene __instance)
         {
-            if (__state != null)
+            if (unfilteredPrefabs != null)
             {
-                List<GameObject> filteredPrefabs = __instance.m_prefabs.Except(__state).ToList();
+                List<GameObject> filteredPrefabs = __instance.m_prefabs.Except(unfilteredPrefabs).ToList();
 
                 filteredPrefabs.RemoveAll(x => !x.GetComponent<Plant>());
                 filteredPrefabs.RemoveAll(saplingRefs.Select(x => x.Prefab).ToList().Contains);
@@ -57,6 +59,7 @@ static class ModInitPatches
                     Dbgl($"Added {moddedSaplingRefs.Count} modded sapling references");
                     ConfigEventHandlers.SaplingSettingChanged(null, null);
                 }
+                unfilteredPrefabs.Clear();
             }
 
             if (resolveMissingReferences)
