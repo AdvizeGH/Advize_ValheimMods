@@ -19,7 +19,7 @@ static class ModInitPatches
         if (unfilteredPrefabs != null)
         {
             List<GameObject> filteredPrefabs = new(__instance.m_prefabs);
-            filteredPrefabs.RemoveAll(go => !go.TryGetComponent(out Plant p) || p.m_grownPrefabs.Any(tb => tb.GetComponent<TreeBase>()));
+            filteredPrefabs.RemoveAll(go => !go.TryGetComponent(out Plant p) || p.m_grownPrefabs.Any(gp => !gp.GetComponent<Pickable>() || gp.GetComponent<Vine>() || gp.GetComponent<TreeBase>()));
 
             Dbgl($"({filteredPrefabs.Count}) vanilla crops detected");
             foreach (GameObject go in filteredPrefabs)
@@ -42,7 +42,7 @@ static class ModInitPatches
             Dbgl($"({plantablePickables.Count}) plantable pickables detected");
 
             List<GameObject> filteredPrefabs = __instance.m_prefabs.Except(unfilteredPrefabs).ToList();
-            filteredPrefabs.RemoveAll(go => !go.TryGetComponent(out Plant p) || p.m_grownPrefabs.Any(tb => tb.GetComponent<TreeBase>()));
+            filteredPrefabs.RemoveAll(go => !go.TryGetComponent(out Plant p) || p.m_grownPrefabs.Any(gp => !gp.GetComponent<Pickable>() || gp.GetComponent<Vine>() || gp.GetComponent<TreeBase>()));
 
             Dbgl($"({filteredPrefabs.Count}) modded crops detected");
             foreach (GameObject go in filteredPrefabs)
