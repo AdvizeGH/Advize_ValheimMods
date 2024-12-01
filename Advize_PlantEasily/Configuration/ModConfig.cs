@@ -217,7 +217,7 @@ sealed class ModConfig
             { "Pickable_Mushroom", 0.5f },
             { "Pickable_Mushroom_blue", 0.5f },
             { "Pickable_Mushroom_yellow", 0.5f },
-            { "Pickable_SmokePuff", 0.75f },
+            { "Pickable_SmokePuff", 1.0f },
             { "Pickable_Thistle", 0.75f },
             { "BlueberryBush", 1.5f },
             { "RaspberryBush", 1.5f },

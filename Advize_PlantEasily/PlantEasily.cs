@@ -15,7 +15,7 @@ public sealed class PlantEasily : BaseUnityPlugin
 {
     public const string PluginID = "advize.PlantEasily";
     public const string PluginName = "PlantEasily";
-    public const string Version = "2.0.1";
+    public const string Version = "2.0.2";
 
     private static readonly ManualLogSource PELogger = new($" {PluginName}");
     internal static ModConfig config;
@@ -126,7 +126,7 @@ public sealed class PlantEasily : BaseUnityPlugin
 
     internal static bool HasGrowSpace(Plant plant, Vector3 position) => Physics.OverlapSphere(position, plant.m_growRadius, Plant.m_spaceMask).Length == 0;
 
-    internal static bool PositionHasCollisions(Vector3 position) => Physics.CheckCapsule(position, position + (Vector3.up / 3), 0.0001f, CollisionMask);
+    internal static bool PositionHasCollisions(Vector3 position) => Physics.CheckCapsule(position, position + (Vector3.up * 0.1f), Mathf.Epsilon, CollisionMask);
 
     internal static float GetPieceSpacing(GameObject go)
     {
