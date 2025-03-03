@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Target Name="ILRepacker" AfterTargets="Build">
+	
+	<ItemGroup>
+		<InputAssemblies Include="$(TargetPath)" />
+		<InputAssemblies Include="$(OutputPath)..\..\Libraries\ServerSync.dll" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<LibraryPath Include="$(OutputPath)" />
+		<LibraryPath Include="$(GamePath)\valheim_Data\Managed" />
+		<LibraryPath Include="$(GamePath)\BepInEx\core" />
+	</ItemGroup>
+		
+    <ILRepack
+        Parallel="true"
+		DebugInfo="true"
+        Internalize="true"
+        InputAssemblies="@(InputAssemblies)"
+        TargetKind="SameAsPrimaryAssembly"
+        OutputFile="$(TargetPath)"
+		LibraryPath="@(LibraryPath)"
+    />
+	
+    </Target>
+</Project>
