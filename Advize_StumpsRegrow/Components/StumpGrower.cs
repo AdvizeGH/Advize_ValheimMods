@@ -126,7 +126,7 @@ public sealed class StumpGrower : SlowUpdate, Hoverable
 
         string formattedString = config.GrowthAsPercentage ?
             $"(<color={color}>{growthPercentage}%</color>)" : remainingMinutes < 0.0 ?
-            $"(<color={color}>Ready any second now</color>)" : $"(Ready in <color={color}>{timeRemaining}</color>)";
+            $"(<color={color}>About tree fitty</color>)" : $"(Ready in <color={color}>{timeRemaining}</color>)";
 
         return formattedString;
     }

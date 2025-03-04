@@ -12,7 +12,7 @@ public sealed class StumpsRegrow : BaseUnityPlugin
 {
     public const string PluginID = "advize.StumpsRegrow";
     public const string PluginName = "StumpsRegrow";
-    public const string Version = "1.0.0";
+    public const string Version = "1.0.1";
 
     internal static ManualLogSource ModLogger = new($" {PluginName}");
     internal static ModConfig config;
@@ -24,14 +24,12 @@ public sealed class StumpsRegrow : BaseUnityPlugin
     {
         BepInEx.Logging.Logger.Sources.Add(ModLogger);
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(StumpGrower).TypeHandle);
-        config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.0.0" });
+        config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.0.1", ModRequired = true });
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginID);
     }
 
-    internal static void Dbgl(string message, /*bool forceLog = false, */LogLevel level = LogLevel.Info)
+    internal static void Dbgl(string message, LogLevel level = LogLevel.Info)
     {
-        //if (forceLog/* || config.EnableDebugMessages*/)
-        //{
         switch (level)
         {
             case LogLevel.Error:
@@ -53,6 +51,5 @@ public sealed class StumpsRegrow : BaseUnityPlugin
                 ModLogger.LogFatal(message);
                 break;
         }
-        //}
     }
 }
