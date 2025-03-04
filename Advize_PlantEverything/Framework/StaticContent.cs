@@ -264,6 +264,7 @@ static class StaticContent
                 respawnTime = config.RaspberryRespawnTime,
                 biome = enforceBiomes ? Heightmap.Biome.Meadows : 0,
                 icon = true,
+                isGrounded = true,
                 recover = config.RecoverResources
             },
             new PieceDB
@@ -274,6 +275,7 @@ static class StaticContent
                 respawnTime = config.BlueberryRespawnTime,
                 biome = enforceBiomes ? Heightmap.Biome.BlackForest : 0,
                 icon = true,
+                isGrounded = true,
                 recover = config.RecoverResources
             },
             new PieceDB
@@ -284,6 +286,7 @@ static class StaticContent
                 respawnTime = config.CloudberryRespawnTime,
                 biome = enforceBiomes ? Heightmap.Biome.Plains : 0,
                 icon = true,
+                isGrounded = true,
                 recover = config.RecoverResources
             },
             new PieceDB
