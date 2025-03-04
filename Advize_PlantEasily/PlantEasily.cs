@@ -15,7 +15,7 @@ public sealed class PlantEasily : BaseUnityPlugin
 {
     public const string PluginID = "advize.PlantEasily";
     public const string PluginName = "PlantEasily";
-    public const string Version = "2.0.2";
+    public const string Version = "2.0.3";
 
     private static readonly ManualLogSource PELogger = new($" {PluginName}");
     internal static ModConfig config;

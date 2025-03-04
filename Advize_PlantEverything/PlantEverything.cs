@@ -17,7 +17,7 @@ public sealed class PlantEverything : BaseUnityPlugin
 {
     public const string PluginID = "advize.PlantEverything";
     public const string PluginName = "PlantEverything";
-    public const string Version = "1.18.2";
+    public const string Version = "1.18.3";
 
     internal static ManualLogSource PELogger = new($" {PluginName}");
 
