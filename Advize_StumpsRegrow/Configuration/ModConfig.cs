@@ -43,8 +43,8 @@ sealed class ModConfig
         stumpGrowthTime = Config(
             "General",
             "StumpGrowthTime",
-            3000f,
-            "Number of seconds it takes for a stump to regrow into the tree that spawned it (will take at least 10 seconds after spawning to grow). Default is 3000 seconds (50 minutes).");
+            1800f,
+            "Number of seconds it takes for a stump to regrow into the tree that spawned it (will take at least 10 seconds after spawning to grow). Default is 1800 seconds (30 minutes).");
         //[UI]
         enableStumpTimers = Config(
             "UI",

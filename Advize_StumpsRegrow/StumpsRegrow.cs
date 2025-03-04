@@ -17,8 +17,8 @@ public sealed class StumpsRegrow : BaseUnityPlugin
     internal static ManualLogSource ModLogger = new($" {PluginName}");
     internal static ModConfig config;
 
-    internal static readonly Dictionary<string, List<GameObject>> PotentialTrees = [];
-    internal static readonly int TreeBaseHash = "sr_TreeBaseName".GetStableHashCode();
+    internal static readonly Dictionary<string, List<GameObject>> TreesPerStump = [];
+    internal static readonly int HashedZDOName = "sr_TreeBaseName".GetStableHashCode();
 
     internal void Awake()
     {

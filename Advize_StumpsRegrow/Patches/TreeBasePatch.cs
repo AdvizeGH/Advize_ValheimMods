@@ -33,8 +33,7 @@ static class TreeBasePatch
     static ZNetView ModifyStubPrefabNetView(ZNetView netView, TreeBase treeBase)
     {
         string treeBaseName = Utils.GetPrefabName(treeBase.name);
-        //Dbgl(treeBaseName);
-        netView.GetZDO().Set(TreeBaseHash, treeBaseName);
+        netView.GetZDO().Set(HashedZDOName, treeBaseName);
 
         return netView;
     }

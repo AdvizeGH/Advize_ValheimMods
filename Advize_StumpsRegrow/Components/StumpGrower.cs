@@ -20,7 +20,6 @@ public sealed class StumpGrower : SlowUpdate, Hoverable
 
     public override void Awake()
     {
-        //Dbgl("StumpGrower Awake"); //remove me
         base.Awake();
         _nView = GetComponent<ZNetView>();
 
@@ -49,7 +48,6 @@ public sealed class StumpGrower : SlowUpdate, Hoverable
         if (_nView.IsValid() && !(time > _updateTime))
         {
             _updateTime = time + 10f;
-            //Dbgl(TimeSincePlanted.ToString()); //remove me
 
             // If conditions are right to regrow the stump...
             if (_nView.IsOwner() && time - _awakeTime > 10f && TimeSincePlanted > (double)config.StumpGrowthTime)
@@ -71,12 +69,13 @@ public sealed class StumpGrower : SlowUpdate, Hoverable
 
     private GameObject GetTreePrefab()
     {
-        string treeBasePrefabName = _nView.GetZDO().GetString(TreeBaseHash);
-        //Get list of tree prefabs known to spawn this stump
-        List<GameObject> potentialTrees = PotentialTrees[Utils.GetPrefabName(name)];
+        string treeBasePrefabName = _nView.GetZDO().GetString(HashedZDOName);
 
+        // If name of tree that spawned the stump is not stored in zdo
         if (treeBasePrefabName.IsNullOrWhiteSpace())
         {
+            //Get list of tree prefabs known to spawn this stump and select one at random
+            List<GameObject> potentialTrees = TreesPerStump[Utils.GetPrefabName(name)];
             return potentialTrees[UnityEngine.Random.Range(0, potentialTrees.Count)];
         }
 
