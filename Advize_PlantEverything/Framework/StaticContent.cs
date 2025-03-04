@@ -9,7 +9,7 @@ using static PlantEverything;
 static class StaticContent
 {
     private const Heightmap.Biome TemperateBiomes = Heightmap.Biome.Meadows | Heightmap.Biome.BlackForest | Heightmap.Biome.Plains;
-    internal const Heightmap.Biome AllBiomes = (Heightmap.Biome)895/*GetBiomeMask((Heightmap.Biome[])System.Enum.GetValues(typeof(Heightmap.Biome)))*/;
+    internal static Heightmap.Biome AllBiomes = /*(Heightmap.Biome)895*/GetBiomeMask((Heightmap.Biome[])System.Enum.GetValues(typeof(Heightmap.Biome)));
 
     internal static readonly int PlaceAnywhereHash = "pe_placeAnywhere".GetStableHashCode();
     internal static readonly int ModdedVineHash = "pe_ModdedVine".GetStableHashCode();
@@ -50,17 +50,17 @@ static class StaticContent
     //	return false;
     //}
 
-    //private static Heightmap.Biome GetBiomeMask(Heightmap.Biome[] biomes)
-    //{
-    //	Heightmap.Biome biomeMask = 0;
+    private static Heightmap.Biome GetBiomeMask(Heightmap.Biome[] biomes)
+    {
+        Heightmap.Biome biomeMask = 0;
 
-    //	foreach (Heightmap.Biome biome in biomes)
-    //	{
-    //		biomeMask |= biome;
-    //	}
+        foreach (Heightmap.Biome biome in biomes)
+        {
+            biomeMask |= biome;
+        }
 
-    //	return biomeMask;
-    //}
+        return biomeMask;
+    }
 
     internal static string[] layersForPieceRemoval = ["item", "piece_nonsolid", "Default_small", "Default"];
 
