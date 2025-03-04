@@ -48,5 +48,5 @@ static class InputPatches
 
     [HarmonyPatch(typeof(HotkeyBar), nameof(HotkeyBar.Update))]
     [HarmonyPatch(typeof(Player), nameof(Player.StartGuardianPower))]
-    static void Prefix(ref bool __runOriginal) => __runOriginal = !OverrideGamepadInput;
+    static bool Prefix() => !OverrideGamepadInput;
 }
