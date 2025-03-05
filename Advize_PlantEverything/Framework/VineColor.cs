@@ -131,7 +131,7 @@ public sealed class VineColor : MonoBehaviour
 
     internal void OnDestroy()
     {
-        if (_cacheIndex > 0 && _cacheIndex < VineColorCache.Count)
+        if (_cacheIndex >= 0 && _cacheIndex < VineColorCache.Count)
         {
             VineColorCache[_cacheIndex] = VineColorCache[VineColorCache.Count - 1];
             VineColorCache[_cacheIndex]._cacheIndex = _cacheIndex;
