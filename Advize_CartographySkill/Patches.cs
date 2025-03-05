@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,7 +16,7 @@ namespace Advize_CartographySkill
             }
         }
 
-        [HarmonyPatch(typeof(Minimap), "Explore", new Type[] { typeof(int), typeof(int) })]
+        [HarmonyPatch(typeof(Minimap), "Explore", [typeof(int), typeof(int)])]
         public static class MinimapExplore
         {
             private static int tileCount = 0;

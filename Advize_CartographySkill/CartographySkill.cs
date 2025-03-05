@@ -14,7 +14,7 @@ namespace Advize_CartographySkill
     {
         public const string PluginID = "advize.CartographySkill";
         public const string PluginName = "CartographySkill";
-        public const string Version = "3.0.0";
+        public const string Version = "3.0.1";
         public const int SKILL_TYPE = 1337;
 
         private readonly Harmony harmony = new(PluginID);
@@ -22,8 +22,8 @@ namespace Advize_CartographySkill
 
         private static CartographySkillDef cartographySkill;
 
-        private static readonly Dictionary<string, Texture2D> cachedTextures = new();
-        private static readonly Dictionary<Texture2D, Sprite> cachedSprites = new();
+        private static readonly Dictionary<string, Texture2D> cachedTextures = [];
+        private static readonly Dictionary<Texture2D, Sprite> cachedSprites = [];
 
         private static ModConfig config;
 
@@ -36,7 +36,7 @@ namespace Advize_CartographySkill
         public void Awake()
         {
             BepInEx.Logging.Logger.Sources.Add(CSLogger);
-            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.0.0" });
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.0.1" });
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
             cartographySkill = new();
@@ -179,7 +179,7 @@ namespace Advize_CartographySkill
 
         internal class LocalizedStrings
         {
-            public List<string> localizedStrings = new();
+            public List<string> localizedStrings = [];
         }
     }
 }

@@ -35,6 +35,7 @@ namespace Advize_CartographySkill.Configuration
         internal ModConfig(ConfigFile configFile, ConfigSync configSync)
         {
             ConfigFile = configFile; ConfigSync = configSync;
+            configFile.SaveOnConfigSet = false;
 
             serverConfigLocked = Config(
                 "General",
@@ -88,6 +89,8 @@ namespace Advize_CartographySkill.Configuration
             };
 
             configSync.AddLockingConfigEntry(serverConfigLocked);
+            configFile.Save();
+            configFile.SaveOnConfigSet = true;
         }
 
         internal bool EnableSkill
