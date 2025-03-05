@@ -60,6 +60,8 @@ sealed class ModConfig
             false);
 
         configSync.AddLockingConfigEntry(lockConfiguration);
+        configFile.Save();
+        configFile.SaveOnConfigSet = true;
     }
 
     internal float StumpGrowthTime => stumpGrowthTime.Value;
