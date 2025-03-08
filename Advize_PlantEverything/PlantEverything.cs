@@ -32,6 +32,7 @@ public sealed class PlantEverything : BaseUnityPlugin
     private static bool saplingsInitialized = false;
     private static bool vinesInitialized = false;
     internal static bool resolveMissingReferences = false;
+    internal static bool isDedicatedServer = false;
 
     internal static AssetBundle assetBundle;
     internal static readonly Dictionary<string, Texture2D> cachedTextures = [];
@@ -47,6 +48,11 @@ public sealed class PlantEverything : BaseUnityPlugin
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(VineColor).TypeHandle);
         assetBundle = LoadAssetBundle("planteverything");
         config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.18.4" });
+        if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null)
+        {
+            Dbgl("Dedicated Server Detected");
+            isDedicatedServer = true;
+        }
         CustomConfigPath = SetupConfigDirectory();
         SetupWatcher();
         if (config.EnableExtraResources)
@@ -143,27 +149,24 @@ public sealed class PlantEverything : BaseUnityPlugin
 
         if (!foundAllRefs)
         {
-            Dbgl("Could not find all prefab references");
+            Dbgl("Could not find all prefab references, attempting alternate prefab detection method.");
             List<string> nullKeys = prefabRefs.Where(key => !key.Value).Select(kvp => kvp.Key).ToList();
 
-            if (!nullKeys.Any(key => !deserializedExtraResources.Select(x => x.prefabName).ToList().Contains(key)))
+            UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
+
+            for (int i = 0; i < array.Length; i++)
             {
-                Dbgl("All missing prefab references are configured as ExtraResources. Attempting alternate prefab detection method.");
-                UnityEngine.Object[] array = Resources.FindObjectsOfTypeAll(typeof(GameObject));
-                for (int i = 0; i < array.Length; i++)
+                GameObject gameObject = (GameObject)array[i];
+
+                if (!nullKeys.Contains(gameObject.name)) continue;
+
+                prefabRefs[gameObject.name] = gameObject;
+                nullKeys.Remove(gameObject.name);
+
+                if (!nullKeys.Any())
                 {
-                    GameObject gameObject = (GameObject)array[i];
-
-                    if (!nullKeys.Contains(gameObject.name)) continue;
-
-                    prefabRefs[gameObject.name] = gameObject;
-                    nullKeys.Remove(gameObject.name);
-
-                    if (!nullKeys.Any())
-                    {
-                        Dbgl("Found all prefab references");
-                        break;
-                    }
+                    Dbgl("Found all prefab references on second attempt.");
+                    break;
                 }
             }
 
@@ -423,9 +426,18 @@ public sealed class PlantEverything : BaseUnityPlugin
             string[] p = ["healthy", "unhealthy"];
             Transform t = prefabRefs["Birch_Sapling"].transform.Find(p[0]);
 
-            AssetID.TryParse("f6de4704e075b4095ae641aed283b641", out AssetID id);
-            SoftReference<Shader> pieceShader = new(id);
-            pieceShader.Load();
+            Shader pieceShader;
+            if (!isDedicatedServer)
+            {
+                AssetID.TryParse("f6de4704e075b4095ae641aed283b641", out AssetID id);
+                SoftReference<Shader> shader = new(id);
+                shader.Load();
+                pieceShader = shader.Asset;
+            }
+            else
+            {
+                pieceShader = Shader.Find("Custom/Piece");
+            }
 
             if (sdb.source != "AshlandsTree3")
             {
@@ -458,7 +470,7 @@ public sealed class PlantEverything : BaseUnityPlugin
                 case "SwampTree1":
                     {
                         Material[] m = [prefabRefs[sdb.source].transform.Find("swamptree1").GetComponent<MeshRenderer>().sharedMaterials[0]];
-                        m[0].shader = pieceShader.Asset;// Shader.Find("Custom/Piece");
+                        m[0].shader = pieceShader;
 
                         foreach (string parent in p)
                             sdb.Prefab.transform.Find(parent).GetComponent<MeshRenderer>().sharedMaterials = m;
@@ -491,7 +503,7 @@ public sealed class PlantEverything : BaseUnityPlugin
                         MeshRenderer renderer = t2.GetComponent<MeshRenderer>();
 
                         Material[] m = [renderer.sharedMaterials[0]];
-                        m[0].shader = pieceShader.Asset;
+                        m[0].shader = pieceShader;
                         m[0].SetTexture("_EmissionMap", renderer.sharedMaterials[0].GetTexture("_EmissiveTex"));
 
                         foreach (string parent in p)

@@ -10,7 +10,11 @@ using static PlantEverything;
 static class ModInitPatches
 {
     [HarmonyPatch(typeof(ObjectDB), nameof(ObjectDB.Awake))]
-    static void Postfix() => InitPrefabRefs();
+    static void Postfix()
+    {
+        if (!isDedicatedServer)
+            InitPrefabRefs();
+    }
 
     [HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]
     static class ZNetScenePatches
@@ -23,7 +27,13 @@ static class ModInitPatches
             unfilteredPrefabs = moddedCropRefs.Count == 0 && moddedSaplingRefs.Count == 0 ? new(__instance.m_prefabs) : null;
         }
 
-        static void Postfix(ZNetScene __instance) => FullInit(__instance);
+        static void Postfix(ZNetScene __instance)
+        {
+            if (isDedicatedServer)
+                InitPrefabRefs();
+
+            FullInit(__instance);
+        }
 
         [HarmonyPostfix, HarmonyPriority(Priority.Last)]
         static void LastPostfix(ZNetScene __instance)
