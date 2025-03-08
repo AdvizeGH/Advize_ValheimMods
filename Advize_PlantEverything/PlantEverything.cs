@@ -17,7 +17,7 @@ public sealed class PlantEverything : BaseUnityPlugin
 {
     public const string PluginID = "advize.PlantEverything";
     public const string PluginName = "PlantEverything";
-    public const string Version = "1.18.4";
+    public const string Version = "1.19.0";
 
     internal static ManualLogSource PELogger = new($" {PluginName}");
 
@@ -47,7 +47,7 @@ public sealed class PlantEverything : BaseUnityPlugin
         BepInEx.Logging.Logger.Sources.Add(PELogger);
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(VineColor).TypeHandle);
         assetBundle = LoadAssetBundle("planteverything");
-        config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.18.4" });
+        config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.19.0" });
         if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null)
         {
             Dbgl("Dedicated Server Detected");
@@ -141,7 +141,7 @@ public sealed class PlantEverything : BaseUnityPlugin
 
             if (!prefabRefs.Any(key => !key.Value))
             {
-                Dbgl("Found all prefab references");
+                Dbgl("Found all prefab references.");
                 foundAllRefs = true;
                 break;
             }
@@ -200,7 +200,7 @@ public sealed class PlantEverything : BaseUnityPlugin
                 }
                 else
                 {
-                    Dbgl($"Could not find prefab reference for {er.prefabName}, skipping entry", logErrors || config.EnableDebugMessages, LogLevel.Warning);
+                    Dbgl($"Could not find prefab reference for {er.prefabName}, skipping entry.", logErrors || config.EnableDebugMessages, LogLevel.Warning);
                 }
             }
         }
@@ -230,7 +230,7 @@ public sealed class PlantEverything : BaseUnityPlugin
             //_ = pdb.Piece; <-- can use discard to init piece reference, still not happy with this
             if (config.DisabledResourceNames.Contains(pdb.key))
             {
-                Dbgl($"Resource disabled: {pdb.key}, skipping");
+                Dbgl($"Resource disabled: {pdb.key}, skipping.");
                 pdb.enabled = false;
             }
 
