@@ -1362,6 +1362,7 @@ sealed class ModConfig
     internal CustomSyncedValue<List<string>> SyncedExtraResources => extraResources;
 
     internal bool IsSourceOfTruth => ConfigSync.IsSourceOfTruth;
+    internal bool InitialSyncDone => ConfigSync.InitialSyncDone;
 #nullable enable
     internal class ConfigurationManagerAttributes
     {

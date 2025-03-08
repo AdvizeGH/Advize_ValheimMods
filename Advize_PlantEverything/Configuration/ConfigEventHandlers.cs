@@ -1,13 +1,72 @@
 ﻿namespace Advize_PlantEverything;
 
 using System;
+using System.Collections.Generic;
 using static PlantEverything;
 
 static class ConfigEventHandlers
 {
+    private static bool s_reInitQueueInProcess = false;
+    private static bool s_isLocalConfigChange = false;
+    private static readonly HashSet<Action> s_reInitMethodSet = [];
+    private static readonly Queue<Action> s_reInitMethodQueue = [];
+
+    private static bool PerformingLocalConfigChange
+    {
+        get { return s_isLocalConfigChange; }
+        set { Dbgl("Config change is local."); s_isLocalConfigChange = value; }
+    }
+
+    private static bool ShouldQueueMethod => isDedicatedServer || (!isDedicatedServer && !config.IsSourceOfTruth && !PerformingLocalConfigChange);
+
+    static void QueueReInitMethod(Action method)
+    {
+        if (!s_reInitQueueInProcess)
+        {
+            Dbgl("Beginning method queue.");
+            s_reInitQueueInProcess = true;
+        }
+        // Check if the method is not already in the HashSet
+        if (s_reInitMethodSet.Add(method)) // HashSet.Add returns false if the item is already present
+        {
+            Dbgl("Adding method to queue.");
+            s_reInitMethodQueue.Enqueue(method);  // Only add to queue if it's not a duplicate
+        }
+    }
+
+    internal static void ProcessReInitQueue()
+    {
+        if (s_reInitMethodQueue.Count == 0 && !isDedicatedServer && !config.IsSourceOfTruth && config.InitialSyncDone)
+        {
+            PerformingLocalConfigChange = true;
+            return;
+        }
+
+        while (s_reInitMethodQueue.Count > 0)
+        {
+            var method = s_reInitMethodQueue.Dequeue();
+            method.Invoke();
+        }
+        s_reInitMethodSet.Clear();
+        s_reInitQueueInProcess = false;
+    }
+
     internal static void CoreSettingChanged(object o, EventArgs e)
     {
-        Dbgl("Config setting changed, re-initializing mod");
+        Dbgl("Config setting changed, scheduling re-initialization of mod");
+
+        if (ShouldQueueMethod)
+        {
+            QueueReInitMethod(InitPieceRefs);
+            QueueReInitMethod(InitPieces);
+            QueueReInitMethod(InitSaplingRefs);
+            QueueReInitMethod(InitSaplings);
+            QueueReInitMethod(InitCrops);
+            QueueReInitMethod(InitVines);
+            QueueReInitMethod(InitCultivator);
+            return;
+        }
+
         InitPieceRefs();
         InitPieces();
         InitSaplingRefs();
@@ -15,40 +74,91 @@ static class ConfigEventHandlers
         InitCrops();
         InitVines();
         InitCultivator();
+
+        PerformingLocalConfigChange = false;
     }
 
     internal static void PieceSettingChanged(object o, EventArgs e)
     {
-        Dbgl("Config setting changed, re-initializing pieces");
+        Dbgl("Config setting changed, scheduling re-initialization of pieces");
+
+        if (ShouldQueueMethod)
+        {
+            QueueReInitMethod(InitPieceRefs);
+            QueueReInitMethod(InitPieces);
+            QueueReInitMethod(InitCultivator);
+            return;
+        }
+
         InitPieceRefs();
         InitPieces();
         InitCultivator();
+
+        PerformingLocalConfigChange = false;
     }
 
     internal static void SaplingSettingChanged(object o, EventArgs e)
     {
-        Dbgl("Config setting changed, re-initializing saplings");
+        Dbgl("Config setting changed, scheduling re-initialization of saplings");
+
+        if (ShouldQueueMethod)
+        {
+            QueueReInitMethod(InitSaplingRefs);
+            QueueReInitMethod(InitSaplings);
+            QueueReInitMethod(InitCultivator);
+            return;
+        }
+
         InitSaplingRefs();
         InitSaplings();
         InitCultivator();
+
+        PerformingLocalConfigChange = false;
     }
 
     internal static void SeedSettingChanged(object o, EventArgs e)
     {
-        Dbgl("Config setting changed, modifying TreeBase drop tables");
+        Dbgl("Config setting changed, scheduling modification of TreeBase drop tables");
+
+        if (ShouldQueueMethod)
+        {
+            QueueReInitMethod(ModifyTreeDrops);
+            return;
+        }
+
         ModifyTreeDrops();
+
+        PerformingLocalConfigChange = false;
     }
 
     internal static void CropSettingChanged(object o, EventArgs e)
     {
-        Dbgl("Config setting changed, re-initializing crops");
+        Dbgl("Config setting changed, scheduling re-initialization of crops");
+
+        if (ShouldQueueMethod)
+        {
+            QueueReInitMethod(InitCrops);
+            return;
+        }
+
         InitCrops();
+
+        PerformingLocalConfigChange = false;
     }
 
     internal static void VineSettingChanged(object o, EventArgs e)
     {
-        Dbgl("Config setting changed, re-initializing vines");
+        Dbgl("Config setting changed, scheduling re-initialization of vines");
+
+        if (ShouldQueueMethod)
+        {
+            QueueReInitMethod(InitVines);
+            return;
+        }
+
         InitVines();
+
+        PerformingLocalConfigChange = false;
     }
 
     //CustomSyncedValue value changed event handler
@@ -81,6 +191,7 @@ static class ConfigEventHandlers
     internal static void ExtraResourcesFileOrSettingChanged(object sender, EventArgs e)
     {
         Dbgl($"ExtraResources file or setting has changed");
+
         if (config.IsSourceOfTruth)
         {
             if (config.EnableExtraResources)

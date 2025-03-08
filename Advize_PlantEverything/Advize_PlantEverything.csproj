@@ -130,6 +130,7 @@
     <Compile Include="Patches\PieceCreationPatches.cs" />
     <Compile Include="Patches\PieceRemovalPatches.cs" />
     <Compile Include="Patches\PlantPatches.cs" />
+    <Compile Include="Patches\ServerSyncPatches.cs" />
     <Compile Include="Patches\ShowPickableSpawnerPatches.cs" />
     <Compile Include="Patches\CheckZDOPatches.cs" />
     <Compile Include="PlantEverything.cs" />
