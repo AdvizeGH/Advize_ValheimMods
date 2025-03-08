@@ -14,7 +14,7 @@ static class ConfigEventHandlers
     private static bool PerformingLocalConfigChange
     {
         get { return s_isLocalConfigChange; }
-        set { Dbgl("Config change is local."); s_isLocalConfigChange = value; }
+        set { Dbgl("Config change " + (value == true ? "is" : "was") + " local."); s_isLocalConfigChange = value; }
     }
 
     private static bool ShouldQueueMethod => isDedicatedServer || (!isDedicatedServer && !config.IsSourceOfTruth && !PerformingLocalConfigChange);
