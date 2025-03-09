@@ -17,12 +17,12 @@ namespace Advize_Spyglass
     {
         public const string PluginID = "advize.Spyglass";
         public const string PluginName = "Spyglass";
-        public const string Version = "3.1.0";
+        public const string Version = "3.1.1";
 
         private readonly Harmony harmony = new(PluginID);
         public static ManualLogSource SGLogger = new($" {PluginName}");
 
-        private static readonly Dictionary<string, GameObject> prefabRefs = new();
+        private static readonly Dictionary<string, GameObject> prefabRefs = [];
         private static GameObject prefab;
         private static Recipe recipe;
 
@@ -35,8 +35,8 @@ namespace Advize_Spyglass
         private static bool vignetteSettingsChanged;
 
         private static AssetBundle assetBundle;
-        private static readonly Dictionary<string, Texture2D> cachedTextures = new();
-        private static readonly Dictionary<Texture2D, Sprite> cachedSprites = new();
+        private static readonly Dictionary<string, Texture2D> cachedTextures = [];
+        private static readonly Dictionary<Texture2D, Sprite> cachedSprites = [];
 
         private static ModConfig config;
 
@@ -50,7 +50,7 @@ namespace Advize_Spyglass
         {
             BepInEx.Logging.Logger.Sources.Add(SGLogger);
             assetBundle = LoadAssetBundle("spyglass");
-            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.1.0", ModRequired = true });
+            config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.1.1", ModRequired = true });
             if (config.EnableLocalization)
                 LoadLocalizedStrings();
             VignetteSettingChanged(null, null);
@@ -191,8 +191,8 @@ namespace Advize_Spyglass
             recipe.m_enabled = true;
             recipe.m_craftingStation = instance.m_recipes.Where(x => x.m_craftingStation?.m_name == "$piece_workbench").First().m_craftingStation;
 
-            List<Piece.Requirement> requirements = new()
-            {
+            List<Piece.Requirement> requirements =
+            [
                 new Piece.Requirement
                 {
                     m_amount = 2,
@@ -211,8 +211,8 @@ namespace Advize_Spyglass
                     m_resItem = instance.GetItemPrefab("Bronze").GetComponent<ItemDrop>(),
                     m_recover = true
                 }
-            };
-            recipe.m_resources = requirements.ToArray();
+            ];
+            recipe.m_resources = [.. requirements];
 
             instance.m_recipes.Add(recipe);
         }
@@ -315,7 +315,7 @@ namespace Advize_Spyglass
 
         internal class LocalizedStrings
         {
-            public List<string> localizedStrings = new();
+            public List<string> localizedStrings = [];
         }
 
         internal static void VignetteSettingChanged(object o, EventArgs e)

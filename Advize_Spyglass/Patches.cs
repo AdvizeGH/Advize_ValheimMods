@@ -6,7 +6,7 @@ namespace Advize_Spyglass
 {
     public partial class Spyglass
     {
-        [HarmonyPatch(typeof(ObjectDB), "Awake")]
+        [HarmonyPatch(typeof(ObjectDB), nameof(ObjectDB.Awake))]
         public static class ObjectDBAwake
         {
             public static void Prefix(ObjectDB __instance)
@@ -27,7 +27,7 @@ namespace Advize_Spyglass
         }
 
         //Add items and recipes when save games are deserialized and loaded at start scene
-        [HarmonyPatch(typeof(ObjectDB), "CopyOtherDB")]
+        [HarmonyPatch(typeof(ObjectDB), nameof(ObjectDB.CopyOtherDB))]
         public static class ObjectDBCopyOtherDB
         {
             public static void Postfix(ObjectDB __instance)
@@ -43,7 +43,7 @@ namespace Advize_Spyglass
             }
         }
 
-        [HarmonyPatch(typeof(ZNetScene), "Awake")]
+        [HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]
         public static class ZNetSceneAwake
         {
             public static void Postfix(ZNetScene __instance)
@@ -60,7 +60,7 @@ namespace Advize_Spyglass
             }
         }
 
-        [HarmonyPatch(typeof(Player), "Update")]
+        [HarmonyPatch(typeof(Player), nameof(Player.Update))]
         public static class PlayerUpdate
         {
             public static void Postfix(Player __instance)

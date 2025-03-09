@@ -10,10 +10,9 @@
     <RootNamespace>Advize_Spyglass</RootNamespace>
     <AssemblyName>Advize_Spyglass</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>12</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
