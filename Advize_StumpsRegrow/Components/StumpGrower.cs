@@ -45,7 +45,7 @@ public sealed class StumpGrower : SlowUpdate, Hoverable
 
     public override void SUpdate(float time, Vector2i referenceZone)
     {
-        if (_nView.IsValid() && !(time > _updateTime))
+        if (_nView.IsValid() && time > _updateTime)
         {
             _updateTime = time + 10f;
 
