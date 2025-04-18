@@ -40,12 +40,13 @@ public sealed class VineColor : MonoBehaviour
     {
         _vineColorProperty = new();
         _berryColorProperties = [new(), new(), new()];
+        _cacheIndex = -1;
         _nView = GetComponent<ZNetView>();
 
         if (!_nView || !_nView.IsValid()) return;
 
-        _cacheIndex = VineColorCache.Count;
         VineColorCache.Add(this);
+        _cacheIndex = VineColorCache.Count - 1;
         CacheRenderers();
         ApplyColor(fromAwake: true);
     }
@@ -66,23 +67,28 @@ public sealed class VineColor : MonoBehaviour
 
     internal void ApplyColor(bool fromAwake = false)
     {
-        if (!fromAwake && _nView != null && !_nView.GetZDO().GetBool(ModdedVineHash))
+        if (_nView?.GetZDO() is not ZDO zdo) return;
+
+        bool isModdedVine = zdo.GetBool(ModdedVineHash);
+
+        if (!isModdedVine)
         {
-            _vineRenderers.Clear();
-            _berryRenderers.Clear();
+            if (!fromAwake)
+            {
+                _vineRenderers.Clear();
+                _berryRenderers.Clear();
+            }
+
             return;
         }
 
-        if (_nView != null && _nView.GetZDO().GetBool(ModdedVineHash))
+        if (_vineColorProperty.isEmpty)
         {
-            if (_vineColorProperty.isEmpty)
-            {
-                SetColors(GetColorsFromZDO(_nView.GetZDO()));
-            }
-
-            ApplyVineColor();
-            ApplyBerryColor();
+            SetColors(GetColorsFromZDO(zdo));
         }
+
+        ApplyVineColor();
+        ApplyBerryColor();
     }
 
     private void SetColors(List<Color> colors)

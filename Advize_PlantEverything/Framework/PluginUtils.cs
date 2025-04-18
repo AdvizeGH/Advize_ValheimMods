@@ -46,7 +46,7 @@ static class PluginUtils
 
     internal static void SheatheCultivator()
     {
-        PELogger.LogWarning("Cultivator updated through config change, unequipping cultivator");
+        Dbgl("Cultivator updated through config change, unequipping cultivator.", forceLog: true);
         if (!ZNet.instance.HaveStopped) Player.m_localPlayer.HideHandItems();
     }
 
