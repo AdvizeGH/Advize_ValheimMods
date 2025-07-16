@@ -116,6 +116,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compatibility\SeasonsCompatibility.cs" />
     <Compile Include="Configuration\ConfigEventHandlers.cs" />
     <Compile Include="Framework\ExtraResource.cs" />
     <Compile Include="Localization\ModLocalization.cs" />
