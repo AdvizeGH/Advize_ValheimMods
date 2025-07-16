@@ -8,10 +8,10 @@ using static PlantEverything;
 [HarmonyPatch]
 static class HoverTextPatches
 {
-    private static Gradient _hoverGradient;
-    private static Gradient HoverGradient => _hoverGradient ?? InitializeGradient();
+    static Gradient _hoverGradient;
+    static Gradient HoverGradient => _hoverGradient ?? InitializeGradient();
 
-    public static Gradient InitializeGradient()
+    static Gradient InitializeGradient()
     {
         _hoverGradient = new();
         _hoverGradient.SetKeys(

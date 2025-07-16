@@ -69,9 +69,7 @@ public sealed class VineColor : MonoBehaviour
     {
         if (_nView?.GetZDO() is not ZDO zdo) return;
 
-        bool isModdedVine = zdo.GetBool(ModdedVineHash);
-
-        if (!isModdedVine)
+        if (!zdo.GetBool(ModdedVineHash))
         {
             if (!fromAwake)
             {

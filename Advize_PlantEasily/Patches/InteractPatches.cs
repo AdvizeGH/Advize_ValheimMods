@@ -15,8 +15,7 @@ static class InteractPatches
         if (!config.ModActive || (!config.EnableBulkHarvest && !config.ReplantOnHarvest) || __instance.InAttack() || __instance.InDodge() || (hold && Time.time - __instance.m_lastHoverInteractTime < 0.2f))
             return;
 
-        Interactable interactable = go.GetComponentInParent<Interactable>();
-        if (interactable == null) return;
+        if (go.GetComponentInParent<Interactable>() is not Interactable interactable) return;
 
         if (interactable as Pickable && config.ReplantOnHarvest && pickableNamesToReplantDB.ContainsKey(GetPrefabName(interactable)))
             instanceIDS.Add(((Pickable)interactable).GetInstanceID());
