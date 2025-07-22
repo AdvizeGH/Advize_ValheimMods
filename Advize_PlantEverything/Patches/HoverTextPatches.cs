@@ -87,6 +87,6 @@ static class HoverTextPatches
         string timeRemaining = t.Hours <= 0 ? t.Minutes <= 0 ?
             $"{t.Seconds:D2}s" : $"{t.Minutes:D2}m {t.Seconds:D2}s" : $"{t.Hours:D2}h {t.Minutes:D2}m {t.Seconds:D2}s";
 
-        return $"(Ready in <color=#{color}>{timeRemaining}</color>)";
+        return $"({Localization.instance.Localize("$peGrowthTimeHoverPrefix")} <color=#{color}>{timeRemaining}</color>)";
     }
 }

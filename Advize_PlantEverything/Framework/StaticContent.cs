@@ -123,7 +123,8 @@ static class StaticContent
         { "PickableSmokePuffName", "Pickable Smoke Puff" },
         { "PickableSmokePuffDescription", "Plant smoke puffs to grow more pickable smoke puffs." },
         { "PickableFiddleheadName", "Pickable Fiddlehead" },
-        { "PickableFiddleheadDescription", "Plant fiddlehead to grow more pickable fiddlehead." }
+        { "PickableFiddleheadDescription", "Plant fiddlehead to grow more pickable fiddlehead." },
+        { "GrowthTimeHoverPrefix", "Ready in"}
     };
 
     internal static readonly List<string> VanillaPrefabRefs = new()
