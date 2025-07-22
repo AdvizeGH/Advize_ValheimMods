@@ -351,7 +351,9 @@ static class PlacementPatches
                 currentValidGhosts.Add(extraGhosts[i]);
             }
 
-            pluginInstance.StartCoroutine("BulkPlanting", piece.gameObject);
+            if (extraGhosts.Count > 0)
+                pluginInstance.StartCoroutine("BulkPlanting", piece.gameObject);
+
             count = __instance.m_noPlacementCost ? 0 : count;
 
             for (int i = 0; i < count; i++)
