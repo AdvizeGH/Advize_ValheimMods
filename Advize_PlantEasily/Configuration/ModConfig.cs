@@ -37,6 +37,7 @@ sealed class ModConfig
     private readonly ConfigEntry<bool> randomizeRotation;
     private readonly ConfigEntry<bool> enableDebugMessages;
 
+
     //Grid
     private readonly ConfigEntry<bool> globallyAlignGridDirections;
     private readonly ConfigEntry<bool> minimizeGridSpacing;
@@ -261,7 +262,7 @@ sealed class ModConfig
     }
     internal bool SnapActive
     {
-        get { return snapActive.Value; }
+        get { return snapActive.Value && !ZInput.GetButton("AltPlace"); }
         set { snapActive.BoxedValue = value; }
     }
     internal int Rows
