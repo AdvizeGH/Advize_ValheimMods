@@ -19,7 +19,7 @@ public sealed class PlantEverything : BaseUnityPlugin
     public const string PluginName = "PlantEverything";
     public const string Version = "1.19.1";
 
-    internal static ManualLogSource PELogger = new($" {PluginName}");
+    internal static ManualLogSource ModLogger = new($" {PluginName}");
 
     internal static readonly Dictionary<string, GameObject> prefabRefs = [];
     private static List<PieceDB> pieceRefs = [];
@@ -41,10 +41,20 @@ public sealed class PlantEverything : BaseUnityPlugin
     internal static ModConfig config;
     internal static string CustomConfigPath;
 
+    internal static readonly Dictionary<LogLevel, Action<string>> logActions = new()
+    {
+        { LogLevel.Fatal, ModLogger.LogFatal },
+        { LogLevel.Error, ModLogger.LogError },
+        { LogLevel.Warning, ModLogger.LogWarning },
+        { LogLevel.Message, ModLogger.LogMessage },
+        { LogLevel.Info, ModLogger.LogInfo },
+        { LogLevel.Debug, ModLogger.LogDebug }
+    };
+
     public void Awake()
     {
         Runtime.MakeAllAssetsLoadable();
-        BepInEx.Logging.Logger.Sources.Add(PELogger);
+        BepInEx.Logging.Logger.Sources.Add(ModLogger);
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(VineColor).TypeHandle);
         assetBundle = LoadAssetBundle("planteverything");
         config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.19.1" });
@@ -89,29 +99,7 @@ public sealed class PlantEverything : BaseUnityPlugin
     internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)
     {
         if (forceLog || config.EnableDebugMessages)
-        {
-            switch (level)
-            {
-                case LogLevel.Error:
-                    PELogger.LogError(message);
-                    break;
-                case LogLevel.Warning:
-                    PELogger.LogWarning(message);
-                    break;
-                case LogLevel.Info:
-                    PELogger.LogInfo(message);
-                    break;
-                case LogLevel.Message:
-                    PELogger.LogMessage(message);
-                    break;
-                case LogLevel.Debug:
-                    PELogger.LogDebug(message);
-                    break;
-                case LogLevel.Fatal:
-                    PELogger.LogFatal(message);
-                    break;
-            }
-        }
+            logActions[level](message);
     }
 
     internal static void InitPrefabRefs()
