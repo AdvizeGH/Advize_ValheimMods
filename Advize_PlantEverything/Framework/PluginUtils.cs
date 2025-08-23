@@ -1,11 +1,11 @@
 ﻿namespace Advize_PlantEverything;
 
-using BepInEx;
-using BepInEx.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using BepInEx;
+using BepInEx.Logging;
 using UnityEngine;
 using static PlantEverything;
 using static StaticContent;
@@ -102,12 +102,7 @@ static class PluginUtils
         }
         else
         {
-            Stream manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"Advize_{PluginName}.Assets.{fileName}");
-            byte[] array = new byte[manifestResourceStream.Length];
-            manifestResourceStream.Read(array, 0, array.Length);
-            Texture2D texture = new(0, 0);
-            ImageConversion.LoadImage(texture, array);
-            result = texture;
+            result = assetBundle.LoadAsset<Texture2D>(fileName);
             cachedTextures.Add(fileName, result);
         }
 
