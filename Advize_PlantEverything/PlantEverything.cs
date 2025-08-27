@@ -39,7 +39,8 @@ public sealed class PlantEverything : BaseUnityPlugin
     internal static readonly Dictionary<Texture2D, Sprite> cachedSprites = [];
 
     internal static ModConfig config;
-    internal static string CustomConfigPath;
+    private static string customConfigPath;
+    internal static string CustomConfigPath => customConfigPath ??= SetupConfigDirectory();
 
     internal static readonly Dictionary<LogLevel, Action<string>> logActions = new()
     {
@@ -63,8 +64,6 @@ public sealed class PlantEverything : BaseUnityPlugin
             Dbgl("Dedicated Server Detected");
             isDedicatedServer = true;
         }
-        CustomConfigPath = SetupConfigDirectory();
-        SetupWatcher();
         if (config.EnableExtraResources)
             ConfigEventHandlers.ExtraResourcesFileOrSettingChanged(null, null);
         if (config.EnableLocalization)
@@ -83,17 +82,6 @@ public sealed class PlantEverything : BaseUnityPlugin
             Directory.CreateDirectory(path);
         }
         return path;
-    }
-
-    private void SetupWatcher()
-    {
-        FileSystemWatcher watcher = new(CustomConfigPath, $"{PluginName}_ExtraResources.cfg");
-        watcher.Changed += ConfigEventHandlers.ExtraResourcesFileOrSettingChanged;
-        watcher.Created += ConfigEventHandlers.ExtraResourcesFileOrSettingChanged;
-        watcher.Renamed += ConfigEventHandlers.ExtraResourcesFileOrSettingChanged;
-        watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
-        watcher.IncludeSubdirectories = true;
-        watcher.EnableRaisingEvents = true;
     }
 
     internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)

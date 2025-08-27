@@ -199,7 +199,7 @@ static class PluginUtils
 
     private static void SaveExtraResources()
     {
-        string filePath = Path.Combine(CustomConfigPath, $"{PluginName}_ExtraResources.cfg");
+        string filePath = Path.Combine(CustomConfigPath, "ExtraResources.json");
         Dbgl($"deserializedExtraResources.Count is {deserializedExtraResources.Count}");
 
         string fullContent = "";
@@ -218,7 +218,7 @@ static class PluginUtils
     {
         Dbgl("LoadExtraResources");
         deserializedExtraResources.Clear();
-        string fileName = $"{PluginName}_ExtraResources.cfg";
+        string fileName = "ExtraResources.json";
         string filePath = Path.Combine(CustomConfigPath, fileName);
 
         try

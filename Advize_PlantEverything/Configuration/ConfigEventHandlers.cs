@@ -8,13 +8,14 @@ static class ConfigEventHandlers
 {
     private static bool s_reInitQueueInProcess = false;
     private static bool s_isLocalConfigChange = false;
+    private static bool s_reloadFromDisk = true;
     private static readonly HashSet<Action> s_reInitMethodSet = [];
     private static readonly Queue<Action> s_reInitMethodQueue = [];
 
     private static bool PerformingLocalConfigChange
     {
         get { return s_isLocalConfigChange; }
-        set { Dbgl("Config change " + (value == true ? "is" : "was") + " local."); s_isLocalConfigChange = value; }
+        set { Dbgl("Config change " + (value == true ? "is" : "was") + " local."); s_isLocalConfigChange = s_reloadFromDisk = value; }
     }
 
     private static bool ShouldQueueMethod => isDedicatedServer || (!isDedicatedServer && !config.IsSourceOfTruth && !PerformingLocalConfigChange);
@@ -191,6 +192,10 @@ static class ConfigEventHandlers
     internal static void ExtraResourcesFileOrSettingChanged(object sender, EventArgs e)
     {
         Dbgl($"ExtraResources file or setting has changed");
+        if (ConfigWatcher.ExtraResourcesWatcher == null)
+        {
+            ConfigWatcher.InitExtraResourcesWatcher();
+        }
 
         if (config.IsSourceOfTruth)
         {
@@ -209,6 +214,21 @@ static class ConfigEventHandlers
             Dbgl("IsSourceOfTruth: false, extra resources will not be loaded from disk");
             // Currently if a client changes their local ExtraResources.cfg while on a server, their new data won't be loaded.
             // If they then leave server and join a single player game their originally loaded ExtraResources.cfg data is used, not the updated file.
+        }
+    }
+
+    internal static void ConfigFileChanged(object sender, EventArgs e)
+    {
+        //Reloading does not override synced settings in MP
+        if (s_reloadFromDisk)
+        {
+            Dbgl("s_reloadFromDisk: true");
+            config.ReloadFromDisk();
+        }
+        else
+        {
+            Dbgl("s_reloadFromDisk: false");
+            s_reloadFromDisk = true;
         }
     }
 }

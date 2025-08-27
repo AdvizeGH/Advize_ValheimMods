@@ -1,11 +1,11 @@
 ﻿namespace Advize_PlantEverything;
 
-using BepInEx.Configuration;
-using ServerSync;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BepInEx.Configuration;
+using ServerSync;
 using UnityEngine;
 using static ConfigEventHandlers;
 
@@ -15,184 +15,184 @@ sealed class ModConfig
     private readonly ConfigSync ConfigSync;
 
     //General 5
-    private readonly ConfigEntry<bool> serverConfigLocked;
-    internal readonly ConfigEntry<int> nexusID; //local
-    private readonly ConfigEntry<bool> enableDebugMessages; //local
-    private readonly ConfigEntry<bool> showPickableSpawners; //local
-    private readonly ConfigEntry<bool> enableMiscFlora;
-    private readonly ConfigEntry<bool> enableDebris;
-    private readonly ConfigEntry<bool> enableExtraResources;
-    private readonly ConfigEntry<bool> snappableVines; //local
-    private readonly ConfigEntry<bool> enableLocalization; //local
-    private readonly ConfigEntry<string> language; //local
-    private readonly ConfigEntry<string> disabledResourceNames;
+    private ConfigEntry<bool> serverConfigLocked;
+    internal ConfigEntry<int> nexusID; //local
+    private ConfigEntry<bool> enableDebugMessages; //local
+    private ConfigEntry<bool> showPickableSpawners; //local
+    private ConfigEntry<bool> enableMiscFlora;
+    private ConfigEntry<bool> enableDebris;
+    private ConfigEntry<bool> enableExtraResources;
+    private ConfigEntry<bool> snappableVines; //local
+    private ConfigEntry<bool> enableLocalization; //local
+    private ConfigEntry<string> language; //local
+    private ConfigEntry<string> disabledResourceNames;
 
     //Difficulty 9
-    private readonly ConfigEntry<bool> requireCultivation;
-    private readonly ConfigEntry<bool> placeAnywhere;
-    private readonly ConfigEntry<bool> enforceBiomes;
-    private readonly ConfigEntry<bool> enforceBiomesVanilla;
-    private readonly ConfigEntry<bool> plantsRequireShielding;
-    private readonly ConfigEntry<bool> canRemoveFlora;
-    private readonly ConfigEntry<bool> recoverResources;
-    private readonly ConfigEntry<bool> resourcesSpawnEmpty;
-    private readonly ConfigEntry<bool> enemiesTargetPieces;
+    private ConfigEntry<bool> requireCultivation;
+    private ConfigEntry<bool> placeAnywhere;
+    private ConfigEntry<bool> enforceBiomes;
+    private ConfigEntry<bool> enforceBiomesVanilla;
+    private ConfigEntry<bool> plantsRequireShielding;
+    private ConfigEntry<bool> canRemoveFlora;
+    private ConfigEntry<bool> recoverResources;
+    private ConfigEntry<bool> resourcesSpawnEmpty;
+    private ConfigEntry<bool> enemiesTargetPieces;
 
     //Berries 9
-    private readonly ConfigEntry<int> raspberryCost;
-    private readonly ConfigEntry<int> blueberryCost;
-    private readonly ConfigEntry<int> cloudberryCost;
-    private readonly ConfigEntry<int> raspberryRespawnTime;
-    private readonly ConfigEntry<int> blueberryRespawnTime;
-    private readonly ConfigEntry<int> cloudberryRespawnTime;
-    private readonly ConfigEntry<int> raspberryReturn;
-    private readonly ConfigEntry<int> blueberryReturn;
-    private readonly ConfigEntry<int> cloudberryReturn;
+    private ConfigEntry<int> raspberryCost;
+    private ConfigEntry<int> blueberryCost;
+    private ConfigEntry<int> cloudberryCost;
+    private ConfigEntry<int> raspberryRespawnTime;
+    private ConfigEntry<int> blueberryRespawnTime;
+    private ConfigEntry<int> cloudberryRespawnTime;
+    private ConfigEntry<int> raspberryReturn;
+    private ConfigEntry<int> blueberryReturn;
+    private ConfigEntry<int> cloudberryReturn;
 
     //Crops 31
-    private readonly ConfigEntry<bool> enableCropOverrides;
-    private readonly ConfigEntry<bool> overrideModdedCrops;
-    private readonly ConfigEntry<bool> cropRequireCultivation;
-    private readonly ConfigEntry<bool> cropRequireSunlight;
-    private readonly ConfigEntry<bool> cropRequireGrowthSpace;
-    private readonly ConfigEntry<bool> enemiesTargetCrops;
-    private readonly ConfigEntry<float> cropMinScale;
-    private readonly ConfigEntry<float> cropMaxScale;
-    private readonly ConfigEntry<float> cropGrowTimeMin;
-    private readonly ConfigEntry<float> cropGrowTimeMax;
-    private readonly ConfigEntry<float> cropGrowRadius;
-    private readonly ConfigEntry<int> barleyCost;
-    private readonly ConfigEntry<int> barleyReturn;
-    private readonly ConfigEntry<int> carrotCost;
-    private readonly ConfigEntry<int> carrotReturn;
-    private readonly ConfigEntry<int> flaxCost;
-    private readonly ConfigEntry<int> flaxReturn;
-    private readonly ConfigEntry<int> onionCost;
-    private readonly ConfigEntry<int> onionReturn;
-    private readonly ConfigEntry<int> seedCarrotCost;
-    private readonly ConfigEntry<int> seedCarrotReturn;
-    private readonly ConfigEntry<int> seedOnionCost;
-    private readonly ConfigEntry<int> seedOnionReturn;
-    private readonly ConfigEntry<int> seedTurnipCost;
-    private readonly ConfigEntry<int> seedTurnipReturn;
-    private readonly ConfigEntry<int> turnipCost;
-    private readonly ConfigEntry<int> turnipReturn;
-    private readonly ConfigEntry<int> magecapCost;
-    private readonly ConfigEntry<int> magecapReturn;
-    private readonly ConfigEntry<int> jotunPuffsCost;
-    private readonly ConfigEntry<int> jotunPuffsReturn;
+    private ConfigEntry<bool> enableCropOverrides;
+    private ConfigEntry<bool> overrideModdedCrops;
+    private ConfigEntry<bool> cropRequireCultivation;
+    private ConfigEntry<bool> cropRequireSunlight;
+    private ConfigEntry<bool> cropRequireGrowthSpace;
+    private ConfigEntry<bool> enemiesTargetCrops;
+    private ConfigEntry<float> cropMinScale;
+    private ConfigEntry<float> cropMaxScale;
+    private ConfigEntry<float> cropGrowTimeMin;
+    private ConfigEntry<float> cropGrowTimeMax;
+    private ConfigEntry<float> cropGrowRadius;
+    private ConfigEntry<int> barleyCost;
+    private ConfigEntry<int> barleyReturn;
+    private ConfigEntry<int> carrotCost;
+    private ConfigEntry<int> carrotReturn;
+    private ConfigEntry<int> flaxCost;
+    private ConfigEntry<int> flaxReturn;
+    private ConfigEntry<int> onionCost;
+    private ConfigEntry<int> onionReturn;
+    private ConfigEntry<int> seedCarrotCost;
+    private ConfigEntry<int> seedCarrotReturn;
+    private ConfigEntry<int> seedOnionCost;
+    private ConfigEntry<int> seedOnionReturn;
+    private ConfigEntry<int> seedTurnipCost;
+    private ConfigEntry<int> seedTurnipReturn;
+    private ConfigEntry<int> turnipCost;
+    private ConfigEntry<int> turnipReturn;
+    private ConfigEntry<int> magecapCost;
+    private ConfigEntry<int> magecapReturn;
+    private ConfigEntry<int> jotunPuffsCost;
+    private ConfigEntry<int> jotunPuffsReturn;
 
     //Debris 9
-    private readonly ConfigEntry<int> pickableBranchCost;
-    private readonly ConfigEntry<int> pickableBranchReturn;
-    private readonly ConfigEntry<int> pickableBranchRespawnTime;
-    private readonly ConfigEntry<int> pickableStoneCost;
-    private readonly ConfigEntry<int> pickableStoneReturn;
-    private readonly ConfigEntry<int> pickableStoneRespawnTime;
-    private readonly ConfigEntry<int> pickableFlintCost;
-    private readonly ConfigEntry<int> pickableFlintReturn;
-    private readonly ConfigEntry<int> pickableFlintRespawnTime;
+    private ConfigEntry<int> pickableBranchCost;
+    private ConfigEntry<int> pickableBranchReturn;
+    private ConfigEntry<int> pickableBranchRespawnTime;
+    private ConfigEntry<int> pickableStoneCost;
+    private ConfigEntry<int> pickableStoneReturn;
+    private ConfigEntry<int> pickableStoneRespawnTime;
+    private ConfigEntry<int> pickableFlintCost;
+    private ConfigEntry<int> pickableFlintReturn;
+    private ConfigEntry<int> pickableFlintRespawnTime;
 
     //Mushrooms 12
-    private readonly ConfigEntry<int> mushroomCost;
-    private readonly ConfigEntry<int> yellowMushroomCost;
-    private readonly ConfigEntry<int> blueMushroomCost;
-    private readonly ConfigEntry<int> smokePuffCost;
-    private readonly ConfigEntry<int> mushroomRespawnTime;
-    private readonly ConfigEntry<int> yellowMushroomRespawnTime;
-    private readonly ConfigEntry<int> blueMushroomRespawnTime;
-    private readonly ConfigEntry<int> smokePuffRespawnTime;
-    private readonly ConfigEntry<int> mushroomReturn;
-    private readonly ConfigEntry<int> yellowMushroomReturn;
-    private readonly ConfigEntry<int> blueMushroomReturn;
-    private readonly ConfigEntry<int> smokePuffReturn;
+    private ConfigEntry<int> mushroomCost;
+    private ConfigEntry<int> yellowMushroomCost;
+    private ConfigEntry<int> blueMushroomCost;
+    private ConfigEntry<int> smokePuffCost;
+    private ConfigEntry<int> mushroomRespawnTime;
+    private ConfigEntry<int> yellowMushroomRespawnTime;
+    private ConfigEntry<int> blueMushroomRespawnTime;
+    private ConfigEntry<int> smokePuffRespawnTime;
+    private ConfigEntry<int> mushroomReturn;
+    private ConfigEntry<int> yellowMushroomReturn;
+    private ConfigEntry<int> blueMushroomReturn;
+    private ConfigEntry<int> smokePuffReturn;
 
     //Flowers 9
-    private readonly ConfigEntry<int> thistleCost;
-    private readonly ConfigEntry<int> dandelionCost;
-    private readonly ConfigEntry<int> fiddleheadCost;
-    private readonly ConfigEntry<int> thistleRespawnTime;
-    private readonly ConfigEntry<int> dandelionRespawnTime;
-    private readonly ConfigEntry<int> fiddleheadRespawnTime;
-    private readonly ConfigEntry<int> thistleReturn;
-    private readonly ConfigEntry<int> dandelionReturn;
-    private readonly ConfigEntry<int> fiddleheadReturn;
+    private ConfigEntry<int> thistleCost;
+    private ConfigEntry<int> dandelionCost;
+    private ConfigEntry<int> fiddleheadCost;
+    private ConfigEntry<int> thistleRespawnTime;
+    private ConfigEntry<int> dandelionRespawnTime;
+    private ConfigEntry<int> fiddleheadRespawnTime;
+    private ConfigEntry<int> thistleReturn;
+    private ConfigEntry<int> dandelionReturn;
+    private ConfigEntry<int> fiddleheadReturn;
 
     //Saplings 41
-    private readonly ConfigEntry<bool> overrideModdedSaplings;
-    private readonly ConfigEntry<float> moddedSaplingMinScale;
-    private readonly ConfigEntry<float> moddedSaplingMaxScale;
-    private readonly ConfigEntry<float> moddedSaplingGrowthTime;
-    private readonly ConfigEntry<float> moddedSaplingGrowRadius;
-    private readonly ConfigEntry<float> birchMinScale;
-    private readonly ConfigEntry<float> birchMaxScale;
-    private readonly ConfigEntry<float> oakMinScale;
-    private readonly ConfigEntry<float> oakMaxScale;
-    private readonly ConfigEntry<float> ancientMinScale;
-    private readonly ConfigEntry<float> ancientMaxScale;
-    private readonly ConfigEntry<float> birchGrowthTime;
-    private readonly ConfigEntry<float> oakGrowthTime;
-    private readonly ConfigEntry<float> ancientGrowthTime;
-    private readonly ConfigEntry<float> birchGrowRadius;
-    private readonly ConfigEntry<float> oakGrowRadius;
-    private readonly ConfigEntry<float> ancientGrowRadius;
-    private readonly ConfigEntry<float> beechGrowthTime;
-    private readonly ConfigEntry<float> pineGrowthTime;
-    private readonly ConfigEntry<float> firGrowthTime;
-    private readonly ConfigEntry<float> beechMinScale;
-    private readonly ConfigEntry<float> beechMaxScale;
-    private readonly ConfigEntry<float> pineMinScale;
-    private readonly ConfigEntry<float> pineMaxScale;
-    private readonly ConfigEntry<float> firMinScale;
-    private readonly ConfigEntry<float> firMaxScale;
-    private readonly ConfigEntry<float> beechGrowRadius;
-    private readonly ConfigEntry<float> pineGrowRadius;
-    private readonly ConfigEntry<float> firGrowRadius;
-    private readonly ConfigEntry<float> yggaMinScale;
-    private readonly ConfigEntry<float> yggaMaxScale;
-    private readonly ConfigEntry<float> yggaGrowthTime;
-    private readonly ConfigEntry<float> yggaGrowRadius;
-    private readonly ConfigEntry<float> autumnBirchMinScale;
-    private readonly ConfigEntry<float> autumnBirchMaxScale;
-    private readonly ConfigEntry<float> autumnBirchGrowthTime;
-    private readonly ConfigEntry<float> autumnBirchGrowRadius;
-    private readonly ConfigEntry<float> ashwoodMinScale;
-    private readonly ConfigEntry<float> ashwoodMaxScale;
-    private readonly ConfigEntry<float> ashwoodGrowthTime;
-    private readonly ConfigEntry<float> ashwoodGrowRadius;
+    private ConfigEntry<bool> overrideModdedSaplings;
+    private ConfigEntry<float> moddedSaplingMinScale;
+    private ConfigEntry<float> moddedSaplingMaxScale;
+    private ConfigEntry<float> moddedSaplingGrowthTime;
+    private ConfigEntry<float> moddedSaplingGrowRadius;
+    private ConfigEntry<float> birchMinScale;
+    private ConfigEntry<float> birchMaxScale;
+    private ConfigEntry<float> oakMinScale;
+    private ConfigEntry<float> oakMaxScale;
+    private ConfigEntry<float> ancientMinScale;
+    private ConfigEntry<float> ancientMaxScale;
+    private ConfigEntry<float> birchGrowthTime;
+    private ConfigEntry<float> oakGrowthTime;
+    private ConfigEntry<float> ancientGrowthTime;
+    private ConfigEntry<float> birchGrowRadius;
+    private ConfigEntry<float> oakGrowRadius;
+    private ConfigEntry<float> ancientGrowRadius;
+    private ConfigEntry<float> beechGrowthTime;
+    private ConfigEntry<float> pineGrowthTime;
+    private ConfigEntry<float> firGrowthTime;
+    private ConfigEntry<float> beechMinScale;
+    private ConfigEntry<float> beechMaxScale;
+    private ConfigEntry<float> pineMinScale;
+    private ConfigEntry<float> pineMaxScale;
+    private ConfigEntry<float> firMinScale;
+    private ConfigEntry<float> firMaxScale;
+    private ConfigEntry<float> beechGrowRadius;
+    private ConfigEntry<float> pineGrowRadius;
+    private ConfigEntry<float> firGrowRadius;
+    private ConfigEntry<float> yggaMinScale;
+    private ConfigEntry<float> yggaMaxScale;
+    private ConfigEntry<float> yggaGrowthTime;
+    private ConfigEntry<float> yggaGrowRadius;
+    private ConfigEntry<float> autumnBirchMinScale;
+    private ConfigEntry<float> autumnBirchMaxScale;
+    private ConfigEntry<float> autumnBirchGrowthTime;
+    private ConfigEntry<float> autumnBirchGrowRadius;
+    private ConfigEntry<float> ashwoodMinScale;
+    private ConfigEntry<float> ashwoodMaxScale;
+    private ConfigEntry<float> ashwoodGrowthTime;
+    private ConfigEntry<float> ashwoodGrowRadius;
 
     //Seeds 7
-    private readonly ConfigEntry<bool> enableSeedOverrides;
-    private readonly ConfigEntry<int> seedDropMin;
-    private readonly ConfigEntry<int> seedDropMax;
-    private readonly ConfigEntry<int> treeDropMin;
-    private readonly ConfigEntry<int> treeDropMax;
-    private readonly ConfigEntry<float> dropChance;
-    private readonly ConfigEntry<bool> oneOfEach;
+    private ConfigEntry<bool> enableSeedOverrides;
+    private ConfigEntry<int> seedDropMin;
+    private ConfigEntry<int> seedDropMax;
+    private ConfigEntry<int> treeDropMin;
+    private ConfigEntry<int> treeDropMax;
+    private ConfigEntry<float> dropChance;
+    private ConfigEntry<bool> oneOfEach;
 
     //UI 0
-    private readonly ConfigEntry<bool> enablePickableTimers; //local
-    private readonly ConfigEntry<bool> enablePlantTimers; //local
-    private readonly ConfigEntry<bool> growthAsPercentage; //local
+    private ConfigEntry<bool> enablePickableTimers; //local
+    private ConfigEntry<bool> enablePlantTimers; //local
+    private ConfigEntry<bool> growthAsPercentage; //local
 
     //Vines 7
-    private readonly ConfigEntry<bool> enableVineOverrides;
-    private readonly ConfigEntry<bool> enableCustomVinePiece;
-    private readonly ConfigEntry<AshVineStyle> ashVineStyle; //local
-    private readonly ConfigEntry<VineBerryStyle> vineBerryStyle; //local
-    private readonly ConfigEntry<float> vineAttachDistance;
-    private readonly ConfigEntry<float> vineGrowRadius;
-    private readonly ConfigEntry<float> vineGrowthTime;
-    private readonly ConfigEntry<int> vineBerryRespawnTime;
-    private readonly ConfigEntry<int> vineBerryReturn;
+    private ConfigEntry<bool> enableVineOverrides;
+    private ConfigEntry<bool> enableCustomVinePiece;
+    private ConfigEntry<AshVineStyle> ashVineStyle; //local
+    private ConfigEntry<VineBerryStyle> vineBerryStyle; //local
+    private ConfigEntry<float> vineAttachDistance;
+    private ConfigEntry<float> vineGrowRadius;
+    private ConfigEntry<float> vineGrowthTime;
+    private ConfigEntry<int> vineBerryRespawnTime;
+    private ConfigEntry<int> vineBerryReturn;
 
-    private readonly ConfigEntry<Color> ashVineCustomColor; //local
-    private readonly ConfigEntry<Color> leftBerryColor; //local
-    private readonly ConfigEntry<Color> centerBerryColor; //local
-    private readonly ConfigEntry<Color> rightBerryColor; //local
+    private ConfigEntry<Color> ashVineCustomColor; //local
+    private ConfigEntry<Color> leftBerryColor; //local
+    private ConfigEntry<Color> centerBerryColor; //local
+    private ConfigEntry<Color> rightBerryColor; //local
 
     //CustomSyncedValue
-    private readonly CustomSyncedValue<List<string>> extraResources;
+    private CustomSyncedValue<List<string>> extraResources;
 
     private ConfigEntry<T> Config<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true)
     {
@@ -211,9 +211,22 @@ sealed class ModConfig
 
     internal ModConfig(ConfigFile configFile, ConfigSync configSync)
     {
-        ConfigFile = configFile; ConfigSync = configSync;
-        configFile.SaveOnConfigSet = false;
+        ConfigFile = configFile;
+        ConfigSync = configSync;
 
+        configFile.SaveOnConfigSet = false;
+        BindConfigEntries();
+        configFile.Save();
+        configFile.SaveOnConfigSet = true;
+
+        SetupSettingChangedSubscriptions();
+        configSync.AddLockingConfigEntry(serverConfigLocked);
+
+        ConfigWatcher.InitConfigWatcher();
+    }
+
+    private void BindConfigEntries()
+    {
         //General
         serverConfigLocked = Config(
             "General",
@@ -1021,10 +1034,10 @@ sealed class ModConfig
             new Color(1, 1, 1, 1),
             new ConfigDescription("The customizable color for the right-most vine berry cluster on color customizable vines.", null, new ConfigurationManagerAttributes { Order = 0 }),
             false);
+    }
 
-        configFile.Save();
-        configFile.SaveOnConfigSet = true;
-
+    private void SetupSettingChangedSubscriptions()
+    {
         //General
         showPickableSpawners.SettingChanged += CoreSettingChanged;
         enableMiscFlora.SettingChanged += PieceSettingChanged;
@@ -1187,11 +1200,10 @@ sealed class ModConfig
         rightBerryColor.SettingChanged += VineSettingChanged;
 
         //CustomSyncedValue
-        extraResources = new(configSync, "PE_ExtraResources", []);
+        extraResources = new(ConfigSync, "PE_ExtraResources", []);
         extraResources.ValueChanged += ExtraResourcesChanged;
 
-        configSync.AddLockingConfigEntry(serverConfigLocked);
-
+        //Configuration Manager
         cropSettingAttributes.ForEach(attributes => attributes.Browsable = enableCropOverrides.Value);
         seedSettingAtrributes.Browsable = enableSeedOverrides.Value;
 
@@ -1205,6 +1217,13 @@ sealed class ModConfig
             seedSettingAtrributes.Browsable = enableSeedOverrides.Value;
             ConfigManagerHelper.ReloadConfigDisplay();
         };
+    }
+
+    internal void ReloadFromDisk()
+    {
+        ConfigFile.SaveOnConfigSet = false;
+        ConfigFile.Reload();
+        ConfigFile.SaveOnConfigSet = true;
     }
 
     internal bool EnableDebugMessages => enableDebugMessages.Value;

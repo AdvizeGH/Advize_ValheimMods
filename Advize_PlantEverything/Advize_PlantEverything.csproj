@@ -114,6 +114,7 @@
   <ItemGroup>
     <Compile Include="Compatibility\SeasonsCompatibility.cs" />
     <Compile Include="Configuration\ConfigEventHandlers.cs" />
+    <Compile Include="Configuration\ConfigWatcher.cs" />
     <Compile Include="Framework\ExtraResource.cs" />
     <Compile Include="Localization\ModLocalization.cs" />
     <Compile Include="Framework\PluginUtils.cs" />
