@@ -21,7 +21,7 @@ sealed class ConfigWatcher
 
     internal static void InitExtraResourcesWatcher()
     {
-        ExtraResourcesWatcher = new(CustomConfigPath, "ExtraResources.cfg");
+        ExtraResourcesWatcher = new(CustomConfigPath, "ExtraResources.json");
         ExtraResourcesWatcher.Changed += ConfigEventHandlers.ExtraResourcesFileOrSettingChanged;
         ExtraResourcesWatcher.Created += ConfigEventHandlers.ExtraResourcesFileOrSettingChanged;
         ExtraResourcesWatcher.Renamed += ConfigEventHandlers.ExtraResourcesFileOrSettingChanged;

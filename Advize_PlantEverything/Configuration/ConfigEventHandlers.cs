@@ -8,17 +8,18 @@ static class ConfigEventHandlers
 {
     private static bool s_reInitQueueInProcess = false;
     private static bool s_isLocalConfigChange = false;
-    private static bool s_reloadFromDisk = true;
+    private static bool s_configSettingChangedFirst = false;
+    private static bool s_configFileChangedFirst = false;
     private static readonly HashSet<Action> s_reInitMethodSet = [];
     private static readonly Queue<Action> s_reInitMethodQueue = [];
 
     private static bool PerformingLocalConfigChange
     {
         get { return s_isLocalConfigChange; }
-        set { Dbgl("Config change " + (value == true ? "is" : "was") + " local."); s_isLocalConfigChange = s_reloadFromDisk = value; }
+        set { Dbgl("Config change " + (value == true ? "is" : "was") + " local."); s_isLocalConfigChange = value; }
     }
 
-    private static bool ShouldQueueMethod => isDedicatedServer || (!isDedicatedServer && !config.IsSourceOfTruth && !PerformingLocalConfigChange);
+    private static bool ShouldQueueMethod => !isDedicatedServer && !config.IsSourceOfTruth && !PerformingLocalConfigChange;
 
     static void QueueReInitMethod(Action method)
     {
@@ -37,12 +38,13 @@ static class ConfigEventHandlers
 
     internal static void ProcessReInitQueue()
     {
+        Dbgl("Processing ReInit queue.");
         if (s_reInitMethodQueue.Count == 0 && !isDedicatedServer && !config.IsSourceOfTruth && config.InitialSyncDone)
         {
             PerformingLocalConfigChange = true;
             return;
         }
-
+        Dbgl("Processing ReInit queue 2.");
         while (s_reInitMethodQueue.Count > 0)
         {
             var method = s_reInitMethodQueue.Dequeue();
@@ -217,18 +219,31 @@ static class ConfigEventHandlers
         }
     }
 
+    internal static void ConfigSettingChanged(object sender, EventArgs e)
+    {
+        Dbgl("ConfigSettingChanged");
+
+        if (!s_configFileChangedFirst && !ShouldQueueMethod)
+        {
+            s_configSettingChangedFirst = true;
+            Dbgl("SAVING");
+            config.Save();
+        }
+        else s_configFileChangedFirst = false;
+    }
+
     internal static void ConfigFileChanged(object sender, EventArgs e)
     {
-        //Reloading does not override synced settings in MP
-        if (s_reloadFromDisk)
+        Dbgl("ConfigFileChanged");
+        
+        s_configFileChangedFirst = !s_configSettingChangedFirst;
+
+        if (isDedicatedServer || s_configFileChangedFirst)
         {
-            Dbgl("s_reloadFromDisk: true");
-            config.ReloadFromDisk();
+            Dbgl("RELOADING");
+            config.Reload();
         }
-        else
-        {
-            Dbgl("s_reloadFromDisk: false");
-            s_reloadFromDisk = true;
-        }
+        
+        s_configSettingChangedFirst = false;
     }
 }

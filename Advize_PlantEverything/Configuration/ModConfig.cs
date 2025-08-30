@@ -217,7 +217,6 @@ sealed class ModConfig
         configFile.SaveOnConfigSet = false;
         BindConfigEntries();
         configFile.Save();
-        configFile.SaveOnConfigSet = true;
 
         SetupSettingChangedSubscriptions();
         configSync.AddLockingConfigEntry(serverConfigLocked);
@@ -1038,6 +1037,8 @@ sealed class ModConfig
 
     private void SetupSettingChangedSubscriptions()
     {
+        ConfigFile.SettingChanged += ConfigSettingChanged;
+
         //General
         showPickableSpawners.SettingChanged += CoreSettingChanged;
         enableMiscFlora.SettingChanged += PieceSettingChanged;
@@ -1219,12 +1220,8 @@ sealed class ModConfig
         };
     }
 
-    internal void ReloadFromDisk()
-    {
-        ConfigFile.SaveOnConfigSet = false;
-        ConfigFile.Reload();
-        ConfigFile.SaveOnConfigSet = true;
-    }
+    internal void Save() => ConfigFile.Save();
+    internal void Reload() => ConfigFile.Reload();
 
     internal bool EnableDebugMessages => enableDebugMessages.Value;
     internal bool ShowPickableSpawners => showPickableSpawners.Value;
