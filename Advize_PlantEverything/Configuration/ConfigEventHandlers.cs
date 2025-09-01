@@ -142,9 +142,7 @@ static class ConfigEventHandlers
     {
         Dbgl($"ExtraResources file or setting has changed");
         if (ConfigWatcher.ExtraResourcesWatcher == null)
-        {
             ConfigWatcher.InitExtraResourcesWatcher();
-        }
 
         if (config.IsSourceOfTruth)
         {

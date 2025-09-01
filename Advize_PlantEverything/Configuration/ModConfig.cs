@@ -1314,6 +1314,7 @@ sealed class ModConfig
 
     internal bool IsSourceOfTruth => ConfigSync.IsSourceOfTruth;
     internal bool InitialSyncDone => ConfigSync.InitialSyncDone;
+    //internal bool IsAdmin => ConfigSync.IsAdmin;
 #nullable enable
     internal class ConfigurationManagerAttributes
     {
