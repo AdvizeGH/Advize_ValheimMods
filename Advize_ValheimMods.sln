@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Advize_Spyglass", "Advize_S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Advize_StumpsRegrow", "Advize_StumpsRegrow\Advize_StumpsRegrow.csproj", "{90E42161-7156-4C1E-98FA-64F183214D37}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Advize_ColorfulVines", "Advize_ColorfulVines\Advize_ColorfulVines.csproj", "{7A8E3E32-EAC3-48A7-A241-43577E219248}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{90E42161-7156-4C1E-98FA-64F183214D37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90E42161-7156-4C1E-98FA-64F183214D37}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90E42161-7156-4C1E-98FA-64F183214D37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A8E3E32-EAC3-48A7-A241-43577E219248}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A8E3E32-EAC3-48A7-A241-43577E219248}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A8E3E32-EAC3-48A7-A241-43577E219248}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A8E3E32-EAC3-48A7-A241-43577E219248}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
