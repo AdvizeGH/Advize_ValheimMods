@@ -121,7 +121,6 @@
     <Compile Include="Framework\StaticContent.cs" />
     <Compile Include="Configuration\ModConfig.cs" />
     <Compile Include="Framework\PrefabDB.cs" />
-    <Compile Include="Framework\VineColor.cs" />
     <Compile Include="Patches\ApplyZDOPatches.cs" />
     <Compile Include="Patches\HoverTextPatches.cs" />
     <Compile Include="Patches\ModInitPatches.cs" />

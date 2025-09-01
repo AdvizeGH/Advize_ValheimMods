@@ -177,19 +177,11 @@ sealed class ModConfig
 
     //Vines 7
     private ConfigEntry<bool> enableVineOverrides;
-    private ConfigEntry<bool> enableCustomVinePiece;
-    private ConfigEntry<AshVineStyle> ashVineStyle; //local
-    private ConfigEntry<VineBerryStyle> vineBerryStyle; //local
     private ConfigEntry<float> vineAttachDistance;
     private ConfigEntry<float> vineGrowRadius;
     private ConfigEntry<float> vineGrowthTime;
     private ConfigEntry<int> vineBerryRespawnTime;
     private ConfigEntry<int> vineBerryReturn;
-
-    private ConfigEntry<Color> ashVineCustomColor; //local
-    private ConfigEntry<Color> leftBerryColor; //local
-    private ConfigEntry<Color> centerBerryColor; //local
-    private ConfigEntry<Color> rightBerryColor; //local
 
     //CustomSyncedValue
     private CustomSyncedValue<List<string>> extraResources;
@@ -967,23 +959,6 @@ sealed class ModConfig
             "EnableVineOverrides",
             false,
             new ConfigDescription("Enables/Disables the [Vines] section of this config with the exception of color related settings.", null, new ConfigurationManagerAttributes { Order = 12 }));
-        enableCustomVinePiece = Config(
-            "Vines",
-            "EnableCustomVinePiece",
-            true,
-            new ConfigDescription("Adds/Removes the color customizable vine piece from the cultivator.", null, new ConfigurationManagerAttributes { Order = 11 }));
-        ashVineStyle = Config(
-            "Vines",
-            "AshVineStyle",
-            AshVineStyle.MeadowsGreen,
-            new ConfigDescription("Defines how the color customizable vines will appear for you, and also what colors are saved on the vines when a sapling is placed. Select custom to display the colors selected at the time of placement.", null, new ConfigurationManagerAttributes { Order = 5 }),
-            false);
-        vineBerryStyle = Config(
-            "Vines",
-            "VineBerryStyle",
-            VineBerryStyle.VanillaGreen,
-            new ConfigDescription("Defines how the color customizable vine berries will appear for you, and also what colors are saved on the vines when a sapling is placed. Select custom to display the colors selected at the time of placement.", null, new ConfigurationManagerAttributes { Order = 3 }),
-            false);
         vineAttachDistance = Config(
             "Vines",
             "VineAttachDistance",
@@ -1009,30 +984,6 @@ sealed class ModConfig
             "VineBerryReturn",
             3,
             "Resources gained upon harvesting vine berries.");
-        ashVineCustomColor = Config(
-            "Vines",
-            "AshVineCustomColor",
-            new Color(0.867f, 0, 0.278f, 1),
-            new ConfigDescription("The customizable color for the leaf portion of color customizable vines.", null, new ConfigurationManagerAttributes { Order = 4 }),
-            false);
-        leftBerryColor = Config(
-            "Vines",
-            "LeftBerryColor",
-            new Color(1, 1, 1, 1),
-            new ConfigDescription("The customizable color for the left-most vine berry cluster on color customizable vines.", null, new ConfigurationManagerAttributes { Order = 2 }),
-            false);
-        centerBerryColor = Config(
-            "Vines",
-            "CenterBerryColor",
-            new Color(1, 1, 1, 1),
-            new ConfigDescription("The customizable color for the center vine berry cluster on color customizable vines.", null, new ConfigurationManagerAttributes { Order = 1 }),
-            false);
-        rightBerryColor = Config(
-            "Vines",
-            "RightBerryColor",
-            new Color(1, 1, 1, 1),
-            new ConfigDescription("The customizable color for the right-most vine berry cluster on color customizable vines.", null, new ConfigurationManagerAttributes { Order = 0 }),
-            false);
     }
 
     private void SetupSettingChangedSubscriptions()
@@ -1185,20 +1136,11 @@ sealed class ModConfig
 
         //Vines
         enableVineOverrides.SettingChanged += VineSettingChanged;
-        enableCustomVinePiece.SettingChanged += VineSettingChanged;
-        ashVineStyle.SettingChanged += VineSettingChanged;
-        vineBerryStyle.SettingChanged += VineSettingChanged;
-
         vineAttachDistance.SettingChanged += VineSettingChanged;
         vineGrowRadius.SettingChanged += VineSettingChanged;
         vineGrowthTime.SettingChanged += VineSettingChanged;
         vineBerryRespawnTime.SettingChanged += VineSettingChanged;
         vineBerryReturn.SettingChanged += VineSettingChanged;
-
-        ashVineCustomColor.SettingChanged += VineSettingChanged;
-        leftBerryColor.SettingChanged += VineSettingChanged;
-        centerBerryColor.SettingChanged += VineSettingChanged;
-        rightBerryColor.SettingChanged += VineSettingChanged;
 
         //CustomSyncedValue
         extraResources = new(ConfigSync, "PE_ExtraResources", []);
@@ -1363,18 +1305,11 @@ sealed class ModConfig
     internal bool EnablePlantTimers => enablePlantTimers.Value;
     internal bool GrowthAsPercentage => growthAsPercentage.Value;
     internal bool EnableVineOverrides => enableVineOverrides.Value;
-    internal bool EnableCustomVinePiece => enableCustomVinePiece.Value;
     internal float VinesAttachDistance => vineAttachDistance.Value;
     internal float VineGrowRadius => vineGrowRadius.Value;
     internal float VinesGrowthTime => vineGrowthTime.Value;
     internal int VineBerryRespawnTime => vineBerryRespawnTime.Value;
     internal int VineBerryReturn => vineBerryReturn.Value;
-    internal Color VinesColor => ashVineCustomColor.Value;
-
-    private List<ConfigEntry<Color>> _BerryColors;
-    internal List<ConfigEntry<Color>> BerryColors => _BerryColors ??= [rightBerryColor, centerBerryColor, leftBerryColor];
-    internal AshVineStyle AshVineStyle => ashVineStyle.Value;
-    internal VineBerryStyle VineBerryStyle => vineBerryStyle.Value;
     internal CustomSyncedValue<List<string>> SyncedExtraResources => extraResources;
 
     internal bool IsSourceOfTruth => ConfigSync.IsSourceOfTruth;
@@ -1396,6 +1331,3 @@ sealed class ModConfig
         internal static void ReloadConfigDisplay() => ConfigManager?.GetType().GetMethod("BuildSettingList")!.Invoke(ConfigManager, []);
     }
 }
-
-internal enum AshVineStyle { AshlandsRed, MeadowsGreen, Custom }
-internal enum VineBerryStyle { VanillaGreen, RedGrapes, Custom }

@@ -1,10 +1,8 @@
 ﻿namespace Advize_PlantEverything;
 
 using HarmonyLib;
-using UnityEngine;
 using static PlantEverything;
 using static PluginUtils;
-using static StaticContent;
 
 [HarmonyPatch]
 static class PlantPatches
@@ -33,20 +31,6 @@ static class PlantPatches
             }
 
             return true;
-        }
-    }
-
-    [HarmonyPatch(typeof(Plant), nameof(Plant.PlaceAgainst))]
-    static void Postfix(Plant __instance, GameObject obj)
-    {
-        //Dbgl("Vine Sapling Grow");
-        if (__instance.m_nview.GetZDO().GetBool(ModdedVineHash))
-        {
-            //Dbgl("passing zdo from sapling to grown vine");
-            VineColor component = obj.GetComponent<VineColor>();
-
-            component.CopyZDOs(__instance.m_nview.GetZDO());
-            component.ApplyColor();
         }
     }
 }
