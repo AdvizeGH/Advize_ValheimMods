@@ -1,9 +1,6 @@
 ﻿namespace Advize_PlantEverything;
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using BepInEx.Configuration;
 using ServerSync;
 using UnityEngine;
@@ -175,7 +172,7 @@ sealed class ModConfig
     private ConfigEntry<bool> enablePlantTimers; //local
     private ConfigEntry<bool> growthAsPercentage; //local
 
-    //Vines 7
+    //Vines 6
     private ConfigEntry<bool> enableVineOverrides;
     private ConfigEntry<float> vineAttachDistance;
     private ConfigEntry<float> vineGrowRadius;
@@ -214,6 +211,7 @@ sealed class ModConfig
         configSync.AddLockingConfigEntry(serverConfigLocked);
 
         ConfigWatcher.InitConfigWatcher();
+        ConfigManagerHelper.Initialize();
     }
 
     private void BindConfigEntries()
@@ -1315,20 +1313,4 @@ sealed class ModConfig
     internal bool IsSourceOfTruth => ConfigSync.IsSourceOfTruth;
     internal bool InitialSyncDone => ConfigSync.InitialSyncDone;
     //internal bool IsAdmin => ConfigSync.IsAdmin;
-#nullable enable
-    internal class ConfigurationManagerAttributes
-    {
-        public bool? Browsable;
-        public string? Category;
-        public int? Order;
-        public bool? ReadOnly;
-    }
-
-    internal class ConfigManagerHelper
-    {
-        private static Assembly? BepinexConfigManager => AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "ConfigurationManager");
-        private static Type? ConfigManagerType => BepinexConfigManager?.GetType("ConfigurationManager.ConfigurationManager");
-        private static object? ConfigManager => ConfigManagerType == null ? null : BepInEx.Bootstrap.Chainloader.ManagerObject.GetComponent(ConfigManagerType);
-        internal static void ReloadConfigDisplay() => ConfigManager?.GetType().GetMethod("BuildSettingList")!.Invoke(ConfigManager, []);
-    }
 }

@@ -2,9 +2,8 @@
 
 using HarmonyLib;
 using UnityEngine;
-using static PlantEverything;
 using static PluginUtils;
-using static StaticContent;
+using static StaticMembers;
 
 [HarmonyPatch]
 static class PieceRemovalPatches

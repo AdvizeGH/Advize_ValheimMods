@@ -9,6 +9,7 @@ using BepInEx.Logging;
 using UnityEngine;
 using static PlantEverything;
 using static StaticContent;
+using static StaticMembers;
 
 static class PluginUtils
 {
@@ -224,5 +225,27 @@ static class PluginUtils
         File.WriteAllText(filePath, JsonUtility.ToJson(ml, true));
 
         Dbgl($"Saved english localized strings to {filePath}");
+    }
+
+    internal static Heightmap.Biome GetBiomeMask(Heightmap.Biome[] biomes)
+    {
+        Heightmap.Biome biomeMask = 0;
+
+        foreach (Heightmap.Biome biome in biomes)
+        {
+            biomeMask |= biome;
+        }
+
+        return biomeMask;
+    }
+
+    internal static string SetupConfigDirectory()
+    {
+        string path = Path.Combine(Paths.ConfigPath, PluginName);
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        return path;
     }
 }

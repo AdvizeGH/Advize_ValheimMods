@@ -2,7 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using static PlantEverything;
+using static PluginInitUtils;
+using static StaticMembers;
 
 static class ConfigEventHandlers
 {
@@ -53,7 +54,6 @@ static class ConfigEventHandlers
             PerformingLocalConfigChange = true;
             return;
         }
-        Dbgl("Processing ReInit queue 2.");
         while (s_reInitMethodQueue.Count > 0)
         {
             Action method = s_reInitMethodQueue.Dequeue();
@@ -166,8 +166,6 @@ static class ConfigEventHandlers
 
     internal static void ConfigSettingChanged(object sender, EventArgs e)
     {
-        Dbgl("ConfigSettingChanged");
-
         if (!s_configFileChangedFirst && !ShouldQueueMethod)
         {
             s_configSettingChangedFirst = true;
@@ -178,9 +176,7 @@ static class ConfigEventHandlers
     }
 
     internal static void ConfigFileChanged(object sender, EventArgs e)
-    {
-        Dbgl("ConfigFileChanged");
-        
+    {        
         s_configFileChangedFirst = !s_configSettingChangedFirst;
 
         if (isDedicatedServer || s_configFileChangedFirst)
@@ -190,5 +186,14 @@ static class ConfigEventHandlers
         }
         
         s_configSettingChangedFirst = false;
+    }
+    
+    internal static void ConfigManagerDisplayingWindowChanged(object sender, EventArgs e)
+    {
+        //Response to event not yet implemented
+        if (!ConfigManagerHelper.IsConfigManagerWindowActive)
+        {
+            Dbgl("Configuration Manager Window Closed");
+        }
     }
 }

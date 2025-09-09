@@ -1,8 +1,8 @@
 ﻿namespace Advize_PlantEverything;
 
 using HarmonyLib;
-using static PlantEverything;
 using static PluginUtils;
+using static StaticMembers;
 
 [HarmonyPatch]
 static class PlantPatches

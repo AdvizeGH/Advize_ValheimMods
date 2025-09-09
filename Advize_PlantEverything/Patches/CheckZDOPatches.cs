@@ -1,7 +1,7 @@
 ﻿namespace Advize_PlantEverything;
 
 using HarmonyLib;
-using static StaticContent;
+using static StaticMembers;
 
 [HarmonyPatch]
 static class CheckZDOPatches

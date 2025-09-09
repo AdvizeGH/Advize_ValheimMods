@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
 using UnityEngine;
-using static StaticContent;
+using static StaticMembers;
 
 [HarmonyPatch]
 static class ApplyZDOPatches

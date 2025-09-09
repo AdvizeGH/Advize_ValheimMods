@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using UnityEngine;
-using static PlantEverything;
+using static PluginInitUtils;
+using static StaticMembers;
 
 [HarmonyPatch]
 static class ModInitPatches

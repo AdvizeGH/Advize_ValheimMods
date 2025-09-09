@@ -1,9 +1,9 @@
 ﻿namespace Advize_PlantEverything;
 
-using HarmonyLib;
 using System;
+using HarmonyLib;
 using UnityEngine;
-using static PlantEverything;
+using static StaticMembers;
 
 [HarmonyPatch]
 static class HoverTextPatches

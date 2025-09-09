@@ -17,7 +17,7 @@ internal class PrefabDB
     internal bool icon;
     internal bool enabled = true;
 
-    internal GameObject Prefab => PlantEverything.prefabRefs[key];
+    internal GameObject Prefab => StaticMembers.prefabRefs[key];
 
     internal KeyValuePair<string, int> Resource
     {

@@ -4,41 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Logging;
 using UnityEngine;
-using static PlantEverything;
+using static StaticMembers;
 
+//Class full of predefined data. Would eventually like to expose these things externally for users to control.
 static class StaticContent
 {
-    private const Heightmap.Biome TemperateBiomes = Heightmap.Biome.Meadows | Heightmap.Biome.BlackForest | Heightmap.Biome.Plains;
-    internal static Heightmap.Biome AllBiomes = /*(Heightmap.Biome)895*/GetBiomeMask((Heightmap.Biome[])System.Enum.GetValues(typeof(Heightmap.Biome)));
-
-    internal static readonly int PlaceAnywhereHash = "pe_placeAnywhere".GetStableHashCode();
-
-    //public static bool TryGetVector3(this ZDO zdo, int keyHashCode, out Vector3 value)
-    //{
-    //	if (ZDOExtraData.s_vec3.TryGetValue(zdo.m_uid, out BinarySearchDictionary<int, Vector3> values)
-    //		&& values.TryGetValue(keyHashCode, out value))
-    //	{
-    //		return true;
-    //	}
-
-    //	value = default;
-    //	return false;
-    //}
-
-    private static Heightmap.Biome GetBiomeMask(Heightmap.Biome[] biomes)
-    {
-        Heightmap.Biome biomeMask = 0;
-
-        foreach (Heightmap.Biome biome in biomes)
-        {
-            biomeMask |= biome;
-        }
-
-        return biomeMask;
-    }
-
-    internal static string[] layersForPieceRemoval = ["item", "piece_nonsolid", "Default_small", "Default"];
-
     internal static Dictionary<string, string> DefaultLocalizedStrings = new()
     {
         { "AncientSaplingName", "Ancient Sapling" },
@@ -748,7 +718,7 @@ static class StaticContent
                 maxScale = plant.m_maxScale,
                 growTime = plant.m_growTime,
                 growTimeMax = plant.m_growTimeMax,
-                growRadius = plant.m_growRadius,
+                growRadius = plant.m_growRadius
                 //extraDrops = pickable.m_extraDrops
             });
 

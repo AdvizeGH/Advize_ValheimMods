@@ -2,7 +2,7 @@
 
 using HarmonyLib;
 using ServerSync;
-using static PlantEverything;
+using static StaticMembers;
 
 [HarmonyPatch(typeof(ConfigSync))]
 static class ServerSyncPatches

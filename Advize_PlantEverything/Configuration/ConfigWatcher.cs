@@ -3,6 +3,7 @@
 using System.IO;
 using BepInEx;
 using static PlantEverything;
+using static StaticMembers;
 
 sealed class ConfigWatcher
 {

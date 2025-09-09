@@ -1,9 +1,8 @@
 ﻿namespace Advize_PlantEverything;
 
 using HarmonyLib;
-using static PlantEverything;
 using static PluginUtils;
-using static StaticContent;
+using static StaticMembers;
 
 [HarmonyPatch(typeof(Piece), nameof(Piece.SetCreator))]
 static class PieceCreationPatches
