@@ -1,127 +1,123 @@
-﻿using HarmonyLib;
+﻿namespace Advize_CartographySkill;
+
 using System.Collections.Generic;
+using HarmonyLib;
 using UnityEngine;
 
-namespace Advize_CartographySkill
+public partial class CartographySkill
 {
-    public partial class CartographySkill
+    [HarmonyPatch(typeof(Minimap), nameof(Minimap.Awake))]
+    static class MinimapAwake
     {
-        [HarmonyPatch(typeof(Minimap), "Awake")]
-        public static class MinimapAwake
+        static void Postfix(Minimap __instance)
         {
-            public static void Postfix(Minimap __instance)
-            {
-                __instance.m_exploreRadius = config.BaseExploreRadius;
-                Dbgl($"Explore Radius is now: {__instance.m_exploreRadius}");
-            }
+            __instance.m_exploreRadius = config.BaseExploreRadius;
+            Dbgl($"Explore Radius is now: {__instance.m_exploreRadius}");
+        }
+    }
+
+    [HarmonyPatch(typeof(Minimap), nameof(Minimap.Explore), [typeof(int), typeof(int)])]
+    static class MinimapExplore
+    {
+        private static int tileCount;
+
+        static void Postfix(ref bool __result)
+        {
+            //if Explore(int,int) (__result) returns true, it means we have discovered more of the world map
+            if (!config.EnableSkill || !__result) return;
+
+            tileCount++;
+            if (tileCount < config.TilesDiscoveredForXPGain) return;
+
+            int xpGainCount = tileCount / config.TilesDiscoveredForXPGain;
+
+            for (int i = 0; i < xpGainCount; i++)
+                Player.m_localPlayer?.RaiseSkill((Skills.SkillType)SKILL_TYPE, config.SkillIncrease);
+
+            tileCount %= config.TilesDiscoveredForXPGain;
+        }
+    }
+
+    [HarmonyPatch(typeof(Player), nameof(Player.OnSkillLevelup))]
+    static class PlayerOnSkillLevelup
+    {
+        static void Postfix(Skills.SkillType skill, float level)
+        {
+            if ((int)skill != SKILL_TYPE) return;
+
+            UpdateExploreRadius();
+        }
+    }
+
+    [HarmonyPatch(typeof(ZNetScene))]
+    static class ZNetScenePatches
+    {
+        [HarmonyPatch(nameof(ZNetScene.Awake))]
+        static void AwakePostfix()
+        {
+            UpdateLocalization(null, null);
+            Localization.OnLanguageChange += OnLanguageChange;
         }
 
-        [HarmonyPatch(typeof(Minimap), "Explore", [typeof(int), typeof(int)])]
-        public static class MinimapExplore
+        [HarmonyPatch(nameof(ZNetScene.Shutdown))]
+        static void ShutdownPostfix()
         {
-            private static int tileCount = 0;
+            Localization.OnLanguageChange -= OnLanguageChange;
+        }
+    }
 
-            public static void Prefix(Minimap __instance)
-            {
-                if (!Player.m_localPlayer || !config.EnableSkill) return;
+    [HarmonyPatch(typeof(Skills))]
+    static class SkillPatches
+    {
+        [HarmonyPatch(nameof(Skills.GetSkillDef))]
+        [HarmonyPostfix]
+        static void GetSkillDefPostfix(Skills.SkillType type, ref Skills.SkillDef __result, List<Skills.SkillDef> ___m_skills)
+        {
+            if (!config.EnableSkill || __result != null || (int)type != SKILL_TYPE) return;
 
-                float skillLevel = Player.m_localPlayer.GetSkillFactor((Skills.SkillType)SKILL_TYPE) * 100;
-                float newExploreRadius = config.BaseExploreRadius + (config.ExploreRadiusIncrease * skillLevel);
-
-                Dbgl($"Previous explore radius was: {__instance.m_exploreRadius} new radius is: {newExploreRadius}");
-                __instance.m_exploreRadius = newExploreRadius;
-            }
-
-            public static void Postfix(ref bool __result)
-            {
-                if (!Player.m_localPlayer || !config.EnableSkill || !__result) return;
-                //if Explore(int,int) (__result) returns true, it means we have discovered more of the world map
-                tileCount++;
-
-                if (tileCount >= config.TilesDiscoveredForXPGain)
-                {
-                    int num1 = tileCount / config.TilesDiscoveredForXPGain; // gets whole numbers
-                    int num2 = tileCount % config.TilesDiscoveredForXPGain; // gets remainder
-
-                    for (int i = 0; i < num1; i++)
-                    {
-                        Player.m_localPlayer.RaiseSkill((Skills.SkillType)SKILL_TYPE, config.SkillIncrease);
-                    }
-
-                    tileCount = num2;
-                }
-            }
+            ___m_skills.Add(cartographySkillDef);
+            __result = cartographySkillDef;
         }
 
-        [HarmonyPatch(typeof(ZNetScene), "Awake")]
-        public static class ZNetSceneAwake
+        [HarmonyPatch(nameof(Skills.IsSkillValid))]
+        [HarmonyPostfix]
+        static void IsSkillValidPostfix(Skills.SkillType type, ref bool __result)
         {
-            public static void Postfix()
-            {
-                //Dbgl("ZNetScene.Awake() Postfix");
-                if (stringDictionary.Count > 0)
-                    InitLocalization();
-            }
+            if (!config.EnableSkill || __result) return;
+
+            __result = (int)type == SKILL_TYPE;
         }
 
-        [HarmonyPatch(typeof(Skills), "GetSkillDef")]
-        public static class SkillsGetSkillDef
+
+        [HarmonyPatch(nameof(Skills.CheatRaiseSkill))]
+        [HarmonyPrefix]
+        static bool CheatRaiseSkillPrefix(Skills __instance, string name, float value, Player ___m_player)
         {
-            public static void Postfix(Skills.SkillType type, ref Skills.SkillDef __result, List<Skills.SkillDef> ___m_skills)
-            {
-                if (!config.EnableSkill || __result != null || (int)type != SKILL_TYPE) return;
-                
-                ___m_skills.Add(cartographySkill.skillDef);
-                __result = cartographySkill.skillDef;
-            }
+            if (!config.EnableSkill || !IsMatchingSkillName(name)) return true;
+
+            Skills.Skill skill = __instance.GetSkill((Skills.SkillType)SKILL_TYPE);
+            skill.m_level = Mathf.Clamp(skill.m_level + value, 0f, 100f);
+
+            ___m_player.Message(MessageHud.MessageType.TopLeft, $"Skill increased {config.SkillName}: {(int)skill.m_level}", 0, skill.m_info.m_icon);
+            Console.instance.Print($"Skill {config.SkillName} = {skill.m_level}");
+
+            UpdateExploreRadius();
+
+            return false;
         }
 
-        [HarmonyPatch(typeof(Skills), "IsSkillValid")]
-        public static class SkillsIsSkillValid
+        [HarmonyPatch(nameof(Skills.CheatResetSkill))]
+        [HarmonyPrefix]
+        static bool CheatResetSkillPrefix(Skills __instance, string name)
         {
-            public static void Postfix(Skills.SkillType type, ref bool __result)
-            {
-                if (!config.EnableSkill || __result) return;
-                
-                __result = (int)type == SKILL_TYPE;
-            }
-        }
+            if (!config.EnableSkill || !IsMatchingSkillName(name)) return true;
 
-        [HarmonyPatch(typeof(Skills), "CheatRaiseSkill")]
-        public static class SkillsCheatRaiseSkill
-        {
-            public static bool Prefix(Skills __instance, string name, float value, Player ___m_player)
-            {
-                if (!config.EnableSkill) return true;
-                string localizedSkillName = Localization.instance.Localize(cartographySkill.name);
-                if (localizedSkillName.ToLower() == name.ToLower())
-                {
-                    Skills.Skill skill = __instance.GetSkill((Skills.SkillType)SKILL_TYPE);
-                    skill.m_level += value;
-                    skill.m_level = Mathf.Clamp(skill.m_level, 0f, 100f);
-                    ___m_player.Message(MessageHud.MessageType.TopLeft, "Skill increased " + localizedSkillName + ": " + (int)skill.m_level, 0, skill.m_info.m_icon);
-                    Console.instance.Print("Skill " + localizedSkillName + " = " + skill.m_level);
-                    return false;
-                }
-                return true;
-            }
-        }
+            __instance.ResetSkill((Skills.SkillType)SKILL_TYPE);
+            Console.instance.Print("Skill " + config.SkillName + " reset");
 
-        [HarmonyPatch(typeof(Skills), "CheatResetSkill")]
-        public static class SkillsCheatResetSkill
-        {
-            public static bool Prefix(Skills __instance, string name)
-            {
-                if (!config.EnableSkill) return true;
-                string localizedSkillName = Localization.instance.Localize(cartographySkill.name);
-                if (localizedSkillName.ToLower() == name.ToLower())
-                {
-                    __instance.ResetSkill((Skills.SkillType)SKILL_TYPE);
-                    Console.instance.Print("Skill " + localizedSkillName + " reset");
-                    return false;
-                }
-                return true;
-            }
+            UpdateExploreRadius();
+
+            return false;
         }
     }
 }

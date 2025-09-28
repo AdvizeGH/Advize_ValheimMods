@@ -63,6 +63,10 @@
       <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_guiutils_publicized.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="assembly_utils">
+      <HintPath>$(GamePath)\valheim_Data\Managed\assembly_utils.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="assembly_valheim_publicized">
       <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_valheim_publicized.dll</HintPath>
       <Private>False</Private>
@@ -87,12 +91,12 @@
       <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule">
@@ -111,7 +115,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\cartographyicon.png" />
+    <EmbeddedResource Include="Assets\cartographyskill" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ILRepack.targets" />
