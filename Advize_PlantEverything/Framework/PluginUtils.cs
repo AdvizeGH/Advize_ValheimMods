@@ -87,7 +87,7 @@ static class PluginUtils
         }
         catch
         {
-            Dbgl("Unable to load texture", true, LogLevel.Error);
+            Dbgl("Unable to load texture", forceLog: true, level: LogLevel.Error);
         }
 
         return null;
