@@ -14,7 +14,7 @@ public partial class CartographySkill : BaseUnityPlugin
 {
     public const string PluginID = "advize.CartographySkill";
     public const string PluginName = "CartographySkill";
-    public const string Version = "3.1.0";
+    public const string Version = "3.1.1";
     public const int SKILL_TYPE = 1337;
 
     internal static ManualLogSource ModLogger = new($" {PluginName}");
@@ -42,7 +42,7 @@ public partial class CartographySkill : BaseUnityPlugin
     {
         BepInEx.Logging.Logger.Sources.Add(ModLogger);
         assetBundle = LoadAssetBundle("cartographyskill");
-        config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.1.0" });
+        config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.1.1" });
 
         cartographySkillDef = new()
         {

@@ -53,6 +53,7 @@ public partial class CartographySkill
     static class ZNetScenePatches
     {
         [HarmonyPatch(nameof(ZNetScene.Awake))]
+        [HarmonyPostfix]
         static void AwakePostfix()
         {
             UpdateLocalization(null, null);
@@ -60,6 +61,7 @@ public partial class CartographySkill
         }
 
         [HarmonyPatch(nameof(ZNetScene.Shutdown))]
+        [HarmonyPostfix]
         static void ShutdownPostfix()
         {
             Localization.OnLanguageChange -= OnLanguageChange;
