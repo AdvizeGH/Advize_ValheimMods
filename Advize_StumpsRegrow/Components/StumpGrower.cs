@@ -1,9 +1,9 @@
 ﻿namespace Advize_StumpsRegrow;
 
-using BepInEx;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using BepInEx;
 using UnityEngine;
 using static StumpsRegrow;
 
@@ -14,9 +14,6 @@ public sealed class StumpGrower : SlowUpdate, Hoverable
     private float _awakeTime;
     private float _updateTime;
     private DateTime _plantedTime;
-
-    //Properties
-    private double TimeSincePlanted => (ZNet.instance.GetTime() - _plantedTime).TotalSeconds;
 
     public override void Awake()
     {
@@ -50,7 +47,7 @@ public sealed class StumpGrower : SlowUpdate, Hoverable
             _updateTime = time + 10f;
 
             // If conditions are right to regrow the stump...
-            if (_nView.IsOwner() && time - _awakeTime > 10f && TimeSincePlanted > (double)config.StumpGrowthTime)
+            if (_nView.IsOwner() && time - _awakeTime > 10f && GetTimeSincePlanted() > (double)config.StumpGrowthTime)
             {
                 //Regrow stump into tree
                 RegrowStump();
@@ -60,11 +57,21 @@ public sealed class StumpGrower : SlowUpdate, Hoverable
         }
     }
 
+    private double GetTimeSincePlanted() => (ZNet.instance.GetTime() - _plantedTime).TotalSeconds;
+
     private void RegrowStump()
     {
         GameObject spawnedTree = Instantiate(GetTreePrefab(), transform.root.position, transform.root.rotation);
         spawnedTree.GetComponent<TreeBase>().Grow();
-        spawnedTree.GetComponent<ZNetView>().SetLocalScale(transform.localScale);
+        spawnedTree.GetComponent<ZNetView>().SetLocalScale(GetTreeScale());
+    }
+
+    private Vector3 GetTreeScale()
+    {
+        if (SLSCompatibility.TreeScalingEnabled && _nView.GetZDO().GetInt("SLE_Tree", out int level) && level > 1)
+            return transform.localScale / SLSCompatibility.GetScaleFactor(level);
+
+        return transform.localScale;
     }
 
     private GameObject GetTreePrefab()
@@ -109,11 +116,11 @@ public sealed class StumpGrower : SlowUpdate, Hoverable
 
     private string FormatTimeString(float growthTime)
     {
-        TimeSpan t = TimeSpan.FromSeconds(growthTime - TimeSincePlanted);
+        TimeSpan t = TimeSpan.FromSeconds(growthTime - GetTimeSincePlanted());
 
         double remainingMinutes = (growthTime / 60) - (ZNet.instance.GetTime() - _plantedTime).TotalMinutes;
         double remainingRatio = remainingMinutes / (growthTime / 60);
-        int growthPercentage = Math.Min((int)((TimeSincePlanted * 100) / growthTime), 100);
+        int growthPercentage = Math.Min((int)((GetTimeSincePlanted() * 100) / growthTime), 100);
 
         string color = "red";
         if (remainingRatio < 0) color = "#00FFFF"; // cyan

@@ -96,6 +96,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compatibility\SLSCompatibility.cs" />
     <Compile Include="Configuration\ModConfig.cs" />
     <Compile Include="Patches\ModInitPatch.cs" />
     <Compile Include="Patches\TreeBasePatch.cs" />
