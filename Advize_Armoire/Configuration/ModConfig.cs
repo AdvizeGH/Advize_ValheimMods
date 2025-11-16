@@ -48,6 +48,8 @@ sealed class ModConfig
             false,
             "Enable mod debug messages in console.");
 
+        enableOverrides.SettingChanged += (_, _) => { Player.m_localPlayer?.SetupEquipment(); };
+
         excludeDLCItems.SettingChanged += (_, _) =>
         {
             if (Player.m_localPlayer is Player player)
