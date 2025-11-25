@@ -14,6 +14,7 @@ public partial class ArmoireUI : MonoBehaviour
 {
     internal void Initialize()
     {
+        SetupPanelPosition();
         SetupTooltipFonts();
         SetupLabelFonts();
         SetupPanelSprites();
@@ -27,6 +28,8 @@ public partial class ArmoireUI : MonoBehaviour
         SetupSpriteStates();
         SetupButtonListeners();
     }
+
+    private void SetupPanelPosition() => config.UpdateUIPanelPosition(null, null);
 
     private void SetupTooltipFonts()
     {

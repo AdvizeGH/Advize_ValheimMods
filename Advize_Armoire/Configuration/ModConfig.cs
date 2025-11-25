@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using BepInEx.Configuration;
+using UnityEngine;
 
 sealed class ModConfig
 {
@@ -14,6 +15,10 @@ sealed class ModConfig
     private readonly ConfigEntry<bool> excludeDLCItems;
     private readonly ConfigEntry<bool> showUndiscoveredHoverDetails;
     private readonly ConfigEntry<bool> enableDebugMessages;
+
+    //UIPosition
+    private readonly ConfigEntry<bool> allowDragging;
+    private readonly ConfigEntry<Vector2> uiPosition;
 
     internal ModConfig(ConfigFile configFile)
     {
@@ -55,13 +60,34 @@ sealed class ModConfig
             if (Player.m_localPlayer is Player player)
                 AppearanceCategorizer.RecalculateAppearances(player);
 
-            ArmoireUI armoireUI = ArmoireUIController.ArmoireUIInstance;
-            if (ArmoireUIController.IsArmoirePanelActive() && armoireUI.scrollView.activeSelf)
+            if (ArmoireUIController.TryGetArmoirePanel(out ArmoireUI armoireUI) && armoireUI.scrollView.activeSelf)
                 armoireUI.RebuildScrollableGrid();
         };
 
+        allowDragging = ConfigFile.Bind(
+            "UIPosition",
+            "AllowDragging",
+            false,
+            "If set to true, the ArmoireUI panel can be moved by holding left ctrl then clicking and dragging.");
+        uiPosition = ConfigFile.Bind(
+            "UIPosition",
+            "UIPosition",
+            new Vector2(290, 0),
+            "X,Y position of Armoire UI Panel from center-left anchor.");
+
+        uiPosition.SettingChanged += UpdateUIPanelPosition;
+
         configFile.Save();
         configFile.SaveOnConfigSet = true;
+    }
+
+    internal void UpdateUIPanelPosition(object sender, System.EventArgs e)
+    {
+        if (ArmoireUIController.TryGetArmoirePanel(out ArmoireUI armoireUI))
+        {
+            RectTransform rt = armoireUI.GetComponent<RectTransform>();
+            rt.anchoredPosition = uiPosition.Value;
+        }
     }
 
     internal bool EnableOverrides
@@ -83,4 +109,12 @@ sealed class ModConfig
     internal bool ShowUndiscoveredHoverDetails => showUndiscoveredHoverDetails.Value;
 
     internal bool EnableDebugMessages => enableDebugMessages.Value;
+
+    internal bool AllowDragging => allowDragging.Value;
+
+    internal Vector2 UIPosition
+    {
+        get { return uiPosition.Value; }
+        set { uiPosition.BoxedValue = value; }
+    }
 }

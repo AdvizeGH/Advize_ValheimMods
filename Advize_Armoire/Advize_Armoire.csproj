@@ -138,6 +138,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Framework\StaticMembers.cs" />
     <Compile Include="UI\Components\ArmoireUI.Initializer.cs" />
+    <Compile Include="UI\Components\ArmoireUIDragHandler.cs" />
     <Compile Include="UI\UIResources.cs" />
   </ItemGroup>
   <ItemGroup>

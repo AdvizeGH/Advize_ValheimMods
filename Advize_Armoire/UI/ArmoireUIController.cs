@@ -28,6 +28,12 @@ static class ArmoireUIController
 
     internal static bool IsArmoirePanelValid() => ArmoireUIInstance;
 
+    internal static bool TryGetArmoirePanel(out ArmoireUI armoireUI)
+    {
+        armoireUI = ArmoireUIInstance;
+        return armoireUI is not null;
+    }
+
     internal static bool IsArmoirePanelActive() => IsArmoirePanelValid() && ArmoireUIInstance.gameObject.activeSelf;
 
     private static void HideArmoirePanel()
