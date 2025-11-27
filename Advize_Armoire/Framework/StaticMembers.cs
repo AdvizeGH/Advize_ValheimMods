@@ -40,6 +40,8 @@ static class StaticMembers
         { AppearanceSlotType.Legs, new AppearanceSlot(sd => sd.m_itemType == ItemType.Legs && sd.m_skillType == (SkillType)1, canBeHidden: true) },
 
         { AppearanceSlotType.Shoulder, new AppearanceSlot(sd => sd.m_itemType == ItemType.Shoulder && sd.m_skillType == (SkillType)1, canBeHidden: true) },
+        //{ AppearanceSlotType.Shoulder, new AppearanceSlot(sd => sd.m_itemType == ItemType.Shoulder && (sd.m_skillType is (SkillType)1 or SkillType.None), canBeHidden: true) },
+        //The above will be needed if the slotCriteria is ever used for something other than weapons (AdventureBackpacks items are SkillType.None)
 
         { AppearanceSlotType.Utility, new AppearanceSlot(sd => sd.m_itemType == ItemType.Utility && sd.m_skillType == (SkillType)1, canBeHidden: true) },
 

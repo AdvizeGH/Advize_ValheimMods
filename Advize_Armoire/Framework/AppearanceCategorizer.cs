@@ -61,14 +61,14 @@ static class AppearanceCategorizer
 
     private static AppearanceSlotType? MapAppearanceSlot(ItemType type, SkillType skill)
     {
-        if (ArmorTypes.Contains(type) && skill == SkillType.Swords)
+        if (ArmorTypes.Contains(type))
             return type switch
             {
                 ItemType.Helmet => AppearanceSlotType.Helmet,
                 ItemType.Chest => AppearanceSlotType.Chest,
                 ItemType.Legs => AppearanceSlotType.Legs,
                 ItemType.Shoulder => AppearanceSlotType.Shoulder,
-                ItemType.Utility => AppearanceSlotType.Utility,
+                ItemType.Utility when skill == SkillType.Swords => AppearanceSlotType.Utility,
                 ItemType.Trinket => AppearanceSlotType.Trinket,
                 _ => null
             };
