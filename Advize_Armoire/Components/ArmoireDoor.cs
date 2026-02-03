@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using static StaticMembers;
 
@@ -18,6 +19,10 @@ public class ArmoireDoor : MonoBehaviour, Hoverable, Interactable
 
     // Static fields
     private static Gradient _hoverGradient;
+    private static readonly StringBuilder _hoverText = new(128);
+    private static float _lastPercentage = -1f;
+    private static string _lastUseText = null;
+    private static string _cachedHoverText = null;
     internal static List<EffectList> SoundEffects = [];
 
     // Static property
@@ -75,12 +80,39 @@ public class ArmoireDoor : MonoBehaviour, Hoverable, Interactable
 
     public string GetHoverText()
     {
-        if (ArmoireUIController.IsArmoirePanelActive()) return string.Empty;
+        if (ArmoireUIController.IsArmoirePanelActive())
+            return string.Empty;
 
         float clampedPercentage = Mathf.Clamp01((float)AppearanceTracker.UnlockedPercentage);
+        bool percentageChanged = !Mathf.Approximately(clampedPercentage, _lastPercentage);
+
+        string currentUseText = Localization.instance.Localize("[<color=yellow><b>$KEY_Use</b></color>] $piece_use");
+        bool languageChanged = currentUseText != _lastUseText;
+
+        if (!percentageChanged && !languageChanged)
+            return _cachedHoverText;
+
+        _lastPercentage = clampedPercentage;
+        _lastUseText = currentUseText;
+
         string color = ColorUtility.ToHtmlStringRGB(HoverGradient.Evaluate(clampedPercentage));
 
-        return $"{GetHoverName()}\nCollected: <color=#{color}>{AppearanceTracker.TotalUnlocked}/{AppearanceTracker.TotalCollectable}</color>";
+        _hoverText.Clear();
+
+        _hoverText.Append(GetHoverName()).Append('\n');
+
+        _hoverText.Append("Collected: <color=#")
+                  .Append(color)
+                  .Append('>')
+                  .Append(AppearanceTracker.TotalUnlocked)
+                  .Append('/')
+                  .Append(AppearanceTracker.TotalCollectable)
+                  .Append("</color>\n");
+
+        _hoverText.Append(currentUseText);
+
+        _cachedHoverText = _hoverText.ToString();
+        return _cachedHoverText;
     }
 
     public string GetHoverName() => "Armoire";
