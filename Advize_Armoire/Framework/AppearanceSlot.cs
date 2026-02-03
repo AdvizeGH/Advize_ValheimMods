@@ -2,9 +2,9 @@
 
 namespace Advize_Armoire;
 
-public sealed class AppearanceSlot(Func<ItemDrop.ItemData.SharedData, bool> slotCriteria, bool canBeHidden = false)
+public sealed class AppearanceSlot(Func<ItemDrop.ItemData.SharedData, bool> slotCriteria = null, bool canBeHidden = false)
 {
-    public Func<ItemDrop.ItemData.SharedData, bool> IsValidForSlot = slotCriteria;
+    private Func<ItemDrop.ItemData.SharedData, bool> IsValidForSlot = slotCriteria ?? (valid => false);
     public string ItemName = string.Empty;
     public int ItemVariant;
     public bool Hidden;

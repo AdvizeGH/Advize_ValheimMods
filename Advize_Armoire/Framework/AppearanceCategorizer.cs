@@ -29,7 +29,6 @@ static class AppearanceCategorizer
             .Where(item => item.m_itemData.m_shared.m_icons.Length > 0 && !config.DisabledAppearanceNames.Contains(item.name) && 
             (!config.ExcludeDLCItems || string.IsNullOrEmpty(item.m_itemData.m_shared.m_dlc)));
 
-
         // Categorize items
         Dictionary<AppearanceSlotType, List<ItemDrop>> categorized = [];
 

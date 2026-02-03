@@ -258,7 +258,7 @@ public partial class ArmoireUI : MonoBehaviour
         StartCoroutine(DeferredSetCurrentSelected());
     }
 
-    IEnumerator DeferredSetCurrentSelected()
+    private IEnumerator DeferredSetCurrentSelected()
     {
         yield return null; // Wait one frame for scrollable grid to settle
         currentAppearanceButton.Select();

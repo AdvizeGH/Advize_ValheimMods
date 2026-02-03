@@ -1,6 +1,8 @@
 ﻿namespace Advize_Armoire;
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using HarmonyLib;
 using static StaticMembers;
 
@@ -13,35 +15,32 @@ static class EquipmentPatches
     [HarmonyPatch(typeof(VisEquipment))]
     static class VisEquipmentPatches
     {
+        private static readonly Dictionary<string, (AppearanceSlotType slot, Func<Player, ItemDrop.ItemData> targetedItem)> SimpleItemMap = new()
+        {
+            { nameof(VisEquipment.SetHelmetItem), (AppearanceSlotType.Helmet, player => player.m_helmetItem) },
+            { nameof(VisEquipment.SetChestItem), (AppearanceSlotType.Chest, player => player.m_chestItem) },
+            { nameof(VisEquipment.SetLegItem), (AppearanceSlotType.Legs, player => player.m_legItem) },
+            { nameof(VisEquipment.SetUtilityItem), (AppearanceSlotType.Utility, player => player.m_utilityItem) },
+            { nameof(VisEquipment.SetTrinketItem), (AppearanceSlotType.Trinket, player => player.m_trinketItem) }
+        };
+
         [HarmonyPatch(nameof(VisEquipment.SetHelmetItem))]
-        [HarmonyPrefix]
-        static void SetHelmetItem(VisEquipment __instance, ref string name) =>
-            TryOverrideItem(__instance, ref name, p => p.m_helmetItem, AppearanceSlotType.Helmet);
-
         [HarmonyPatch(nameof(VisEquipment.SetChestItem))]
-        [HarmonyPrefix]
-        static void SetChestItem(VisEquipment __instance, ref string name) =>
-            TryOverrideItem(__instance, ref name, p => p.m_chestItem, AppearanceSlotType.Chest);
-
         [HarmonyPatch(nameof(VisEquipment.SetLegItem))]
+        [HarmonyPatch(nameof(VisEquipment.SetUtilityItem))]
+        [HarmonyPatch(nameof(VisEquipment.SetTrinketItem))]
         [HarmonyPrefix]
-        static void SetLegItem(VisEquipment __instance, ref string name) =>
-            TryOverrideItem(__instance, ref name, p => p.m_legItem, AppearanceSlotType.Legs);
+        static void SetSimpleItem(VisEquipment __instance, MethodBase __originalMethod, ref string name)
+        {
+            if (!SimpleItemMap.TryGetValue(__originalMethod.Name, out (AppearanceSlotType slot, Func<Player, ItemDrop.ItemData> targetedItem) entry)) return;
+
+            TryOverrideItem(__instance, ref name, entry.targetedItem, entry.slot);
+        }
 
         [HarmonyPatch(nameof(VisEquipment.SetShoulderItem))]
         [HarmonyPrefix]
         static void SetShoulderItem(VisEquipment __instance, ref string name, ref int variant) =>
             TryOverrideItemWithVariant(__instance, ref name, ref variant, p => p.m_shoulderItem, AppearanceSlotType.Shoulder);
-
-        [HarmonyPatch(nameof(VisEquipment.SetUtilityItem))]
-        [HarmonyPrefix]
-        static void SetUtilityItem(VisEquipment __instance, ref string name) =>
-            TryOverrideItem(__instance, ref name, p => p.m_utilityItem, AppearanceSlotType.Utility);
-
-        [HarmonyPatch(nameof(VisEquipment.SetTrinketItem))]
-        [HarmonyPrefix]
-        static void SetTrinketItem(VisEquipment __instance, ref string name) =>
-            TryOverrideItem(__instance, ref name, p => p.m_trinketItem, AppearanceSlotType.Trinket);
 
         [HarmonyPatch(nameof(VisEquipment.SetLeftItem))]
         [HarmonyPrefix]

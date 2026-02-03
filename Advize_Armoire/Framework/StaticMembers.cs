@@ -33,50 +33,102 @@ static class StaticMembers
 
     internal static Dictionary<AppearanceSlotType, AppearanceSlot> ActiveOverrides = new()
     {
-        { AppearanceSlotType.Helmet, new AppearanceSlot(sd => sd.m_itemType == ItemType.Helmet && sd.m_skillType == (SkillType)1, canBeHidden: true) },
+        { AppearanceSlotType.Helmet, new AppearanceSlot(canBeHidden: true) },
+        { AppearanceSlotType.Chest, new AppearanceSlot(canBeHidden: true) },
+        { AppearanceSlotType.Legs, new AppearanceSlot(canBeHidden: true) },
+        { AppearanceSlotType.Shoulder, new AppearanceSlot(canBeHidden: true) },
+        { AppearanceSlotType.Utility, new AppearanceSlot(canBeHidden: true) },
+        { AppearanceSlotType.Trinket, new AppearanceSlot(canBeHidden: true) },
 
-        { AppearanceSlotType.Chest, new AppearanceSlot(sd => sd.m_itemType == ItemType.Chest && sd.m_skillType == (SkillType)1, canBeHidden: true) },
+        { AppearanceSlotType.Bow,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.Bow &&
+                candidate.m_skillType == SkillType.Bows)
+        },
 
-        { AppearanceSlotType.Legs, new AppearanceSlot(sd => sd.m_itemType == ItemType.Legs && sd.m_skillType == (SkillType)1, canBeHidden: true) },
+        { AppearanceSlotType.Crossbow,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.Bow &&
+                candidate.m_skillType == SkillType.Crossbows)
+        },
 
-        { AppearanceSlotType.Shoulder, new AppearanceSlot(sd => sd.m_itemType == ItemType.Shoulder && sd.m_skillType == (SkillType)1, canBeHidden: true) },
-        //{ AppearanceSlotType.Shoulder, new AppearanceSlot(sd => sd.m_itemType == ItemType.Shoulder && (sd.m_skillType is (SkillType)1 or SkillType.None), canBeHidden: true) },
-        //The above will be needed if the slotCriteria is ever used for something other than weapons (AdventureBackpacks items are SkillType.None)
+        { AppearanceSlotType.Shield,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.Shield &&
+                candidate.m_skillType == SkillType.Blocking)
+        },
 
-        { AppearanceSlotType.Utility, new AppearanceSlot(sd => sd.m_itemType == ItemType.Utility && sd.m_skillType == (SkillType)1, canBeHidden: true) },
+        { AppearanceSlotType.OneHandedAxe,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.OneHandedWeapon &&
+                candidate.m_skillType == SkillType.Axes)
+        },
 
-        { AppearanceSlotType.Trinket, new AppearanceSlot(sd => sd.m_itemType == ItemType.Trinket && sd.m_skillType == (SkillType)1, canBeHidden: true) },
+        { AppearanceSlotType.OneHandedClub,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.OneHandedWeapon &&
+                candidate.m_skillType == SkillType.Clubs)
+        },
 
-        { AppearanceSlotType.Bow, new AppearanceSlot(sd => sd.m_itemType == ItemType.Bow && sd.m_skillType == SkillType.Bows) },
+        { AppearanceSlotType.OneHandedSword,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.OneHandedWeapon &&
+                candidate.m_skillType == SkillType.Swords)
+        },
 
-        { AppearanceSlotType.Crossbow, new AppearanceSlot(sd => sd.m_itemType == ItemType.Bow && sd.m_skillType == SkillType.Crossbows) },
+        { AppearanceSlotType.Knife,
+            new AppearanceSlot(slotCriteria: candidate =>
+                (candidate.m_itemType is ItemType.OneHandedWeapon or ItemType.TwoHandedWeapon) &&
+                candidate.m_skillType == SkillType.Knives)
+        },
 
-        { AppearanceSlotType.Shield, new AppearanceSlot(sd => sd.m_itemType == ItemType.Shield && sd.m_skillType == SkillType.Blocking) },
+        { AppearanceSlotType.Spear,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.OneHandedWeapon &&
+                candidate.m_skillType == SkillType.Spears)
+        },
 
-        { AppearanceSlotType.OneHandedAxe, new AppearanceSlot(sd => sd.m_itemType == ItemType.OneHandedWeapon && sd.m_skillType == SkillType.Axes) },
+        { AppearanceSlotType.TwoHandedAxe,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.TwoHandedWeapon &&
+                candidate.m_skillType == SkillType.Axes)
+        },
 
-        { AppearanceSlotType.OneHandedClub, new AppearanceSlot(sd => sd.m_itemType == ItemType.OneHandedWeapon && sd.m_skillType == SkillType.Clubs) },
+        { AppearanceSlotType.TwoHandedClub,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.TwoHandedWeapon &&
+                candidate.m_skillType == SkillType.Clubs)
+        },
 
-        { AppearanceSlotType.OneHandedSword, new AppearanceSlot(sd => sd.m_itemType == ItemType.OneHandedWeapon && sd.m_skillType == SkillType.Swords) },
+        { AppearanceSlotType.TwoHandedSword,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.TwoHandedWeapon &&
+                candidate.m_skillType == SkillType.Swords)
+        },
 
-        { AppearanceSlotType.Knife, new AppearanceSlot(sd => (sd.m_itemType is ItemType.OneHandedWeapon or ItemType.TwoHandedWeapon) && sd.m_skillType == SkillType.Knives) },
+        { AppearanceSlotType.Polearm,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.TwoHandedWeapon &&
+                candidate.m_skillType == SkillType.Polearms)
+        },
 
-        { AppearanceSlotType.Spear, new AppearanceSlot(sd => sd.m_itemType == ItemType.OneHandedWeapon && sd.m_skillType == SkillType.Spears) },
+        { AppearanceSlotType.Pickaxe,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.TwoHandedWeapon &&
+                candidate.m_skillType == SkillType.Pickaxes)
+        },
 
-        { AppearanceSlotType.TwoHandedAxe, new AppearanceSlot(sd => sd.m_itemType == ItemType.TwoHandedWeapon && sd.m_skillType == SkillType.Axes) },
+        { AppearanceSlotType.Staff,
+            new AppearanceSlot(slotCriteria: candidate =>
+                (candidate.m_itemType is ItemType.TwoHandedWeapon/* or ItemType.TwoHandedWeaponLeft */) &&
+                (candidate.m_skillType is SkillType.ElementalMagic or SkillType.BloodMagic))
+        },
 
-        { AppearanceSlotType.TwoHandedClub, new AppearanceSlot(sd => sd.m_itemType == ItemType.TwoHandedWeapon && sd.m_skillType == SkillType.Clubs) },
-
-        { AppearanceSlotType.TwoHandedSword, new AppearanceSlot(sd => sd.m_itemType == ItemType.TwoHandedWeapon && sd.m_skillType == SkillType.Swords) },
-
-        { AppearanceSlotType.Polearm, new AppearanceSlot( sd => sd.m_itemType == ItemType.TwoHandedWeapon && sd.m_skillType == SkillType.Polearms) },
-
-        { AppearanceSlotType.Pickaxe, new AppearanceSlot(sd => sd.m_itemType == ItemType.TwoHandedWeapon && sd.m_skillType == SkillType.Pickaxes) },
-
-        { AppearanceSlotType.Staff, new AppearanceSlot(sd => (sd.m_itemType is ItemType.TwoHandedWeapon/* or ItemType.TwoHandedWeaponLeft*/) &&
-            (sd.m_skillType is SkillType.ElementalMagic or SkillType.BloodMagic)) },
-
-        { AppearanceSlotType.Fist, new AppearanceSlot(sd => sd.m_itemType == ItemType.TwoHandedWeapon && sd.m_skillType == SkillType.Unarmed) }
+        { AppearanceSlotType.Fist,
+            new AppearanceSlot(slotCriteria: candidate =>
+                candidate.m_itemType == ItemType.TwoHandedWeapon &&
+                candidate.m_skillType == SkillType.Unarmed)
+        }
     };
 
     internal static List<Dictionary<AppearanceSlotType, AppearanceSlot>> OutfitOverrides = [.. Enumerable.Range(0, 3).Select(_ => PluginUtils.CloneOverrides(ActiveOverrides))];
