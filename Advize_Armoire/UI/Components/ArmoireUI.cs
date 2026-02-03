@@ -49,6 +49,7 @@ public partial class ArmoireUI : MonoBehaviour
     private Button _currentlySelectedButton = null;
     private AppearanceSlotType _lastSlotTypeSelected;
     private int _currentOutfitIndex = 0;
+    private Coroutine scrollLerpRoutine;
 
     public void LateUpdate()
     {
@@ -168,11 +169,10 @@ public partial class ArmoireUI : MonoBehaviour
 
     private void UpdateScrollViewButtonSelection(bool selected, GameObject go)
     {
-        Dbgl("Updating scroll view button selection");
         go.transform.Find("selected").gameObject.SetActive(selected);
 
-        //Center selected button within viewport
-        if (selected)
+        // Center selected button within viewport
+        if (selected && !ZInput.GetMouseButton(0)) // Don't scroll when selected via mouse
         {
             RectTransform selectedRect = go.GetComponent<RectTransform>();
 
@@ -180,12 +180,36 @@ public partial class ArmoireUI : MonoBehaviour
             float viewportHeight = scrollRect.viewport.rect.height;
 
             // Get the position of the target relative to content
-            float targetLocalY = -selectedRect.anchoredPosition.y; // Flip because anchoredPosition is bottom-up
+            float targetLocalY = -selectedRect.anchoredPosition.y;
             float centerOffset = targetLocalY - viewportHeight / 2f;
 
             float normalized = Mathf.Clamp01(centerOffset / (contentHeight - viewportHeight));
-            scrollRect.verticalNormalizedPosition = 1f - normalized;
+            float targetPos = 1f - normalized;
+
+            // Start smooth scroll
+            if (scrollLerpRoutine != null)
+                StopCoroutine(scrollLerpRoutine);
+
+            scrollLerpRoutine = StartCoroutine(LerpScrollView(targetPos));
         }
+    }
+
+    private IEnumerator LerpScrollView(float target, float duration = 0.15f)
+    {
+        float start = scrollRect.verticalNormalizedPosition;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = time / duration;
+
+            scrollRect.verticalNormalizedPosition = Mathf.Lerp(start, target, Mathf.SmoothStep(0f, 1f, t));
+
+            yield return null;
+        }
+
+        scrollRect.verticalNormalizedPosition = target;
     }
 
     internal void UpdateAppearanceSlot(AppearanceSlotType itemCategory, string itemName, int itemVariant, bool hidden)
