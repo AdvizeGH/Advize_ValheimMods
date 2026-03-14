@@ -1,13 +1,15 @@
 ﻿namespace Advize_PlantEasily;
 
+using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
-using static PlantEasily;
+using static ModContext;
+using static ModUtils;
 
 [HarmonyPatch]
 static class InteractPatches
 {
-    static string GetPrefabName(Interactable i) => i.ToString().Replace("(Clone) (Pickable)", "");
+    private static readonly List<int> _instanceIDS = [];
 
     [HarmonyPatch(typeof(Player), nameof(Player.Interact))]
     static void Prefix(Player __instance, GameObject go, bool hold, bool alt)
@@ -15,46 +17,60 @@ static class InteractPatches
         if (!config.ModActive || (!config.EnableBulkHarvest && !config.ReplantOnHarvest) || __instance.InAttack() || __instance.InDodge() || (hold && Time.time - __instance.m_lastHoverInteractTime < 0.2f))
             return;
 
-        if (go.GetComponentInParent<Interactable>() is not Interactable interactable) return;
+        if (go.GetComponentInParent<Interactable>() is not Interactable interactable)
+            return;
 
-        if (interactable as Pickable && config.ReplantOnHarvest && pickableNamesToReplantDB.ContainsKey(GetPrefabName(interactable)))
-            instanceIDS.Add(((Pickable)interactable).GetInstanceID());
+        if (config.ReplantOnHarvest && interactable is Pickable pickable)
+        {
+            string prefabName = Utils.GetPrefabName(pickable.gameObject);
+
+            if (ReplantDB.Registry.ContainsKey(prefabName))
+                _instanceIDS.Add(pickable.GetInstanceID());
+        }
 
         if (!config.EnableBulkHarvest || (!ZInput.GetKey(config.KeyboardHarvestModifierKey, false) && !ZInput.GetKey(config.GamepadModifierKey, false)))
             return;
 
-        if (interactable as Pickable || interactable as Beehive)
+        if (interactable is not Pickable && interactable is not Beehive)
+            return;
+
+        foreach (Interactable extraInteractable in FindResourcesInRadius(go))
         {
-            foreach (Interactable extraInteractable in FindResourcesInRadius(go))
+            if (config.ReplantOnHarvest && extraInteractable is Pickable extraPickable)
             {
-                if (config.ReplantOnHarvest && pickableNamesToReplantDB.ContainsKey(GetPrefabName(extraInteractable)))
-                {
-                    instanceIDS.Add(((Pickable)extraInteractable).GetInstanceID());
-                }
-                extraInteractable.Interact(__instance, hold, alt);
+                string pickablePrefabName = Utils.GetPrefabName(extraPickable.gameObject);
+
+                if (ReplantDB.Registry.ContainsKey(pickablePrefabName))
+                    _instanceIDS.Add(extraPickable.GetInstanceID());
             }
+
+            extraInteractable.Interact(__instance, hold, alt);
         }
     }
 
     [HarmonyPatch(typeof(Pickable), nameof(Pickable.SetPicked))]
     static void Prefix(Pickable __instance, bool picked)
     {
-        if (!config.ModActive || !config.ReplantOnHarvest || instanceIDS.Count == 0 || !picked) return;
+        if (!config.ModActive || !config.ReplantOnHarvest || _instanceIDS.Count == 0 || !picked) return;
 
         int instanceID = __instance.GetInstanceID();
-        if (!instanceIDS.Contains(instanceID)) return;
+        if (!_instanceIDS.Remove(instanceID))
+            return;
 
-        instanceIDS.Remove(instanceID);
+        string plantPrefabKey = string.IsNullOrEmpty(PlacementState.LastSelectedPlantName) ? Utils.GetPrefabName(__instance.gameObject) : PlacementState.LastSelectedPlantName;
+
+        if (!ReplantDB.Registry.TryGetValue(plantPrefabKey, out ReplantDB replantEntry))
+            return;
+
+        if (!PrefabRefs.TryGetValue(replantEntry.PlantName, out GameObject prefab))
+            return;
 
         Player player = Player.m_localPlayer;
-        string plantPrefabName = string.IsNullOrEmpty(lastPlacementGhost) ? 
-            pickableNamesToReplantDB[__instance.name.Replace("(Clone)", "")].plantName : 
-            pickableNamesToReplantDB[lastPlacementGhost].plantName;
-        Piece piece = prefabRefs[plantPrefabName].GetComponent<Piece>();
+        Piece piece = prefab.GetComponent<Piece>();
 
-        if (!player.HaveRequirements(piece, Player.RequirementMode.CanBuild) && !Player.m_localPlayer.m_noPlacementCost) return;
+        if (!player.HaveRequirements(piece, Player.RequirementMode.CanBuild) && !player.m_noPlacementCost) return;
 
-        PlacePiece(player, __instance.gameObject, piece.gameObject);
+        PlacementController.PlacePiece(player, __instance.gameObject, piece.gameObject);
         player.ConsumeResources(piece.m_resources, 0);
     }
 }

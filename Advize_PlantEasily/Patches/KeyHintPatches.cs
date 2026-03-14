@@ -1,25 +1,29 @@
 ﻿namespace Advize_PlantEasily;
 
-using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
+using HarmonyLib;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static PlantEasily;
+using static ModContext;
+using static ModUtils;
 
 [HarmonyPatch]
 static class KeyHintPatches
 {
-    static GameObject keyboardHint;
-    static GameObject gamepadHint;
-    static readonly Dictionary<string, string> inputBindingPathToButtonDefNames = [];
+    internal static string KeyboardHarvestModifierKeyLocalized;
+    internal static string GamepadModifierKeyLocalized;
+
+    private static GameObject _keyboardHint;
+    private static GameObject _gamepadHint;
+    private static readonly Dictionary<string, string> _inputBindingPathToButtonDefNames = [];
 
     internal static void UpdateKeyHintText()
     {
-        if (keyboardHint) UpdateKeyboardHints();
-        if (gamepadHint) UpdateGamepadHints();
+        if (_keyboardHint) UpdateKeyboardHints();
+        if (_gamepadHint) UpdateGamepadHints();
     }
 
     [HarmonyPatch(typeof(KeyHints), nameof(KeyHints.Start))]
@@ -35,7 +39,7 @@ static class KeyHintPatches
     static void SetGamePadBindings()
     {
         //Seems to be called when game settings are saved
-        if (!gamepadHint)
+        if (!_gamepadHint)
             CreateGamepadHints();
         UpdateGamepadHints();
     }
@@ -55,46 +59,53 @@ static class KeyHintPatches
     //Patch to a completely different class to support all of this thanks to bog witch update
     [HarmonyPatch(typeof(ZInput), nameof(ZInput.AddButton))]
     [HarmonyPrefix]
-    static void AddButton(string name, string path) => inputBindingPathToButtonDefNames[path] = name;
+    static void AddButton(string name, string path) => _inputBindingPathToButtonDefNames[path] = name;
 
     static void CreateKeyBoardHints()
     {
-        Transform Keyboard = KeyHints.m_instance.m_buildHints.transform.Find("Keyboard");
+        Transform keyboardRoot = KeyHints.m_instance.m_buildHints.transform.Find("Keyboard");
 
-        keyboardHint = Object.Instantiate(Keyboard.Find("Copy").gameObject, Keyboard); // Copy the "Copy" KeyHint
-        keyboardHint.name = "Resize Grid";
-        keyboardHint.transform.SetSiblingIndex(3);
-        keyboardHint.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Grid Size";
-        keyboardHint.transform.GetChild(0).GetComponent<LayoutElement>().preferredWidth = 75;
+        _keyboardHint = Object.Instantiate(keyboardRoot.Find("Copy").gameObject, keyboardRoot); // Copy the "Copy" KeyHint
+        _keyboardHint.name = "Resize Grid";
 
-        GameObject hintKey = Object.Instantiate(keyboardHint.transform.GetChild(1).gameObject);
-        Object.Instantiate(hintKey, keyboardHint.transform);
-        Object.Instantiate(hintKey, keyboardHint.transform);
-        Object.Instantiate(hintKey, keyboardHint.transform);
+        Transform hintRoot = _keyboardHint.transform;
+        Transform label = hintRoot.GetChild(0);
+
+        hintRoot.SetSiblingIndex(3);
+        label.GetComponent<TextMeshProUGUI>().text = "Grid Size";
+        label.GetComponent<LayoutElement>().preferredWidth = 75;
+
+        GameObject keyTemplate = hintRoot.GetChild(1).gameObject;
+        for (int i = 0; i < 3; i++)
+            Object.Instantiate(keyTemplate, hintRoot);
 
         UpdateKeyboardHints();
     }
 
     static void CreateGamepadHints()
     {
-        Transform Gamepad = KeyHints.m_instance.m_buildHints.transform.Find("Gamepad");
-        // Can't use transform.Find() with a '/' in the string or it searches hierarchy like a path name
-        GameObject hintToClone = Gamepad.GetComponentsInChildren<Transform>().Where(x => x.gameObject.name == "Text - Copy Alt1/2").First().gameObject;
+        Transform gamepadRoot = KeyHints.m_instance.m_buildHints.transform.Find("Gamepad");
 
-        gamepadHint = Object.Instantiate(hintToClone, Gamepad); // Copy the "Copy Alt1/2" KeyHint
-        gamepadHint.name = "Resize Grid";
-        gamepadHint.transform.SetSiblingIndex(3);
+        // Can't use transform.Find() with a '/' in the string or it searches hierarchy like a path name
+        GameObject hintTemplate = gamepadRoot.GetComponentsInChildren<Transform>().Where(x => x.gameObject.name == "Text - Copy Alt1/2").First().gameObject;
+
+        _gamepadHint = Object.Instantiate(hintTemplate, gamepadRoot); // Copy the "Copy Alt1/2" KeyHint
+        _gamepadHint.name = "Resize Grid";
+        _gamepadHint.transform.SetSiblingIndex(3);
     }
 
     static void UpdateKeyboardHints()
     {
-        keyboardHarvestModifierKeyLocalized = KeyCodeToLocalizableString(config.KeyboardHarvestModifierKey);
+        KeyboardHarvestModifierKeyLocalized = KeyCodeToLocalizableString(config.KeyboardHarvestModifierKey);
 
-        keyboardHint.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(KeyCodeToLocalizableString(config.KeyboardModifierKey));
-        keyboardHint.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(KeyCodeToLocalizableString(config.DecreaseXKey));
-        keyboardHint.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(KeyCodeToLocalizableString(config.IncreaseYKey));
-        keyboardHint.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(KeyCodeToLocalizableString(config.IncreaseXKey));
-        keyboardHint.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = Localization.instance.Localize(KeyCodeToLocalizableString(config.DecreaseYKey));
+        Localization localization = Localization.instance;
+        Transform hintRoot = _keyboardHint.transform;
+
+        hintRoot.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = localization.Localize(KeyCodeToLocalizableString(config.KeyboardModifierKey));
+        hintRoot.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = localization.Localize(KeyCodeToLocalizableString(config.DecreaseXKey));
+        hintRoot.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = localization.Localize(KeyCodeToLocalizableString(config.IncreaseYKey));
+        hintRoot.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = localization.Localize(KeyCodeToLocalizableString(config.IncreaseXKey));
+        hintRoot.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = localization.Localize(KeyCodeToLocalizableString(config.DecreaseYKey));
     }
 
     static string KeyCodeToLocalizableString(KeyCode keyCode)
@@ -102,12 +113,12 @@ static class KeyHintPatches
         string keyCodeToPath = ZInput.KeyCodeToPath(keyCode);
         string key = ZInput.instance.MapKeyFromPath(keyCodeToPath);
         string modifiedKey = key.Substring(0, 1).ToLower() + key.Substring(1);
-        string buttonDefBindingToName = inputBindingPathToButtonDefNames.TryGetValue(keyCodeToPath, out string buttonDefName) ? buttonDefName : "";
+        string buttonDefBindingToName = _inputBindingPathToButtonDefNames.TryGetValue(keyCodeToPath, out string buttonDefName) ? buttonDefName : "";
         string localizableKeyString = ZInput.instance.GetBoundKeyString(buttonDefBindingToName, true);
 
         if (modifiedKey.EndsWith("Arrow"))
         {
-            switch(modifiedKey)
+            switch (modifiedKey)
             {
                 case "upArrow":
                     localizableKeyString = "↑";
@@ -136,17 +147,17 @@ static class KeyHintPatches
     static void UpdateGamepadHints()
     {
         string keyCodeToPath = ZInput.KeyCodeToPath(config.GamepadModifierKey);
-        string buttonDefBindingToName = inputBindingPathToButtonDefNames[keyCodeToPath];
-        gamepadModifierKeyLocalized = ZInput.instance.GetBoundKeyString(buttonDefBindingToName);
+        string buttonDefBindingToName = _inputBindingPathToButtonDefNames[keyCodeToPath];
+        GamepadModifierKeyLocalized = ZInput.instance.GetBoundKeyString(buttonDefBindingToName);
 
-        if (gamepadHint.TryGetComponent<TextMeshProUGUI>(out var gamepadKeyText))
+        if (_gamepadHint.TryGetComponent(out TextMeshProUGUI gamepadKeyText))
         {
             string[] gamepadKeys = ["JoyDPadLeft", "JoyDPadUp", "JoyDPadRight", "JoyDPadDown"];
             string full = "";
 
             System.Array.ForEach(gamepadKeys, gamepadKey => full += ZInput.instance.GetBoundKeyString(gamepadKey));
 
-            gamepadKeyText.text = $"Resize Grid {gamepadModifierKeyLocalized} + {full}";
+            gamepadKeyText.text = $"Resize Grid {GamepadModifierKeyLocalized} + {full}";
             Localization.instance.Localize(gamepadKeyText.transform);
         }
     }
@@ -154,7 +165,7 @@ static class KeyHintPatches
     static void SetKeyHintsActive()
     {
         bool flag = config.ShowHUDKeyHints && HoldingCultivator;
-        keyboardHint.SetActive(flag);
-        gamepadHint.SetActive(flag);
+        _keyboardHint.SetActive(flag);
+        _gamepadHint.SetActive(flag);
     }
 }

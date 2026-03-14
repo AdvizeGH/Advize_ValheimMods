@@ -1,42 +1,53 @@
 ﻿namespace Advize_PlantEasily;
 
 using HarmonyLib;
-using static PlantEasily;
+using static ModContext;
 
 [HarmonyPatch]
 static class HoverTextPatches
 {
-    static string CurrentModifierKey => ZInput.GamepadActive ? gamepadModifierKeyLocalized : keyboardHarvestModifierKeyLocalized;
-    static string GetPrefabName(Pickable p) => p.name.Replace("(Clone)", "");
+    static string CurrentModifierKey => ZInput.GamepadActive ? KeyHintPatches.GamepadModifierKeyLocalized : KeyHintPatches.KeyboardHarvestModifierKeyLocalized;
+
+    static bool ShouldShowHints() => config.ModActive && config.EnableBulkHarvest && config.ShowHoverKeyHints;
+
+    static string BuildAreaHint(string actionText)
+    {
+        return $"\n[<b><color=yellow>{CurrentModifierKey}</color> + <color=yellow>$KEY_Use</color></b>] {actionText} (area)";
+    }
 
     [HarmonyPatch(typeof(Beehive), nameof(Beehive.GetHoverText))]
     static void Postfix(Beehive __instance, ref string __result)
     {
-        if (!config.ModActive || !config.EnableBulkHarvest || !config.ShowHoverKeyHints) return;
+        if (!ShouldShowHints())
+            return;
 
-        // only add our hover text if honey can actually be extracted
         bool isPrivate = !PrivateArea.CheckAccess(__instance.transform.position, 0f, flash: false);
         bool hasHoney = __instance.GetHoneyLevel() > 0;
-        if (isPrivate || !hasHoney) return;
 
-        string hoverTextSuffix = $"\n[<b><color=yellow>{CurrentModifierKey}</color> + <color=yellow>$KEY_Use</color></b>] {__instance.m_extractText} (area)";
-        __result += Localization.instance.Localize(hoverTextSuffix);
+        if (isPrivate || !hasHoney)
+            return;
+
+        string suffix = BuildAreaHint(__instance.m_extractText);
+        __result += Localization.instance.Localize(suffix);
     }
 
     [HarmonyPatch(typeof(Pickable), nameof(Pickable.GetHoverText))]
     static void Postfix(Pickable __instance, ref string __result)
     {
-        if (!config.ModActive || !config.EnableBulkHarvest || !config.ShowHoverKeyHints) return;
+        if (!ShouldShowHints() || __instance.GetPicked() || __instance.GetEnabled == 0)
+            return;
 
-        // only add our hover text if the pickable can actually be picked
-        if (__instance.GetPicked() || __instance.GetEnabled == 0) return;
+        string suffix = BuildAreaHint("$inventory_pickup");
 
-        string hoverTextSuffix = $"\n[<b><color=yellow>{CurrentModifierKey}</color> + <color=yellow>$KEY_Use</color></b>] $inventory_pickup (area)";
-        if (config.ReplantOnHarvest && config.ShowHoverReplantHint && pickableNamesToReplantDB.ContainsKey(GetPrefabName(__instance)))
+        if (config.ReplantOnHarvest && config.ShowHoverReplantHint && ReplantDB.Registry.TryGetValue(Utils.GetPrefabName(__instance.gameObject), out _))
         {
-            string hoverName = string.IsNullOrEmpty(lastPlacementGhost) ? __instance.GetHoverName() : pickableNamesToReplantDB[lastPlacementGhost].pickable.GetHoverName();
-            hoverTextSuffix += $"\nReplant as: <color=green>{hoverName}</color>";
+            string hoverName = string.IsNullOrEmpty(PlacementState.LastSelectedPlantName)
+                ? __instance.GetHoverName()
+                : ReplantDB.Registry[PlacementState.LastSelectedPlantName].Pickable.GetHoverName();
+
+            suffix += $"\nReplant as: <color=green>{hoverName}</color>";
         }
-        __result += Localization.instance.Localize(hoverTextSuffix);
+
+        __result += Localization.instance.Localize(suffix);
     }
 }

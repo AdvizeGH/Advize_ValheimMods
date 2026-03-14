@@ -2,25 +2,26 @@
 
 using BepInEx.Configuration;
 using UnityEngine;
-using static PlantEasily;
+using static ModContext;
 
 internal class PickableDB
 {
     private static bool initialized = false;
 
-    internal string key;
+    internal readonly string key;
+
+    internal ConfigEntry<float> configEntry;
     internal string itemName;
     private Piece piece;
-    internal ConfigEntry<float> configEntry;
 
-    internal GameObject Prefab => prefabRefs[key];
+    internal GameObject Prefab => PrefabRefs[key];
     internal Piece Piece => piece ??= Prefab?.GetComponent<Piece>();
 
     internal PickableDB(string k) => key = k;
 
     internal static void InitPickableSpacingConfig()
     {
-        if (prefabRefs.Count == 0) return;
+        if (PrefabRefs.Count == 0) return;
 
         if (!initialized)
         {
@@ -28,7 +29,7 @@ internal class PickableDB
             initialized = true;
         }
 
-        pickableRefs.ForEach(pdb => pdb.Piece.m_harvestRadius = pdb.configEntry.Value);
+        PickableRefs.ForEach(pdb => pdb.Piece.m_harvestRadius = pdb.configEntry.Value);
         Player.m_localPlayer?.SetupPlacementGhost();
     }
 }

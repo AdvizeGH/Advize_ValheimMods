@@ -1,9 +1,10 @@
 ﻿namespace Advize_PlantEasily;
 
-using BepInEx.Configuration;
 using System.Collections.Generic;
+using BepInEx.Configuration;
 using UnityEngine;
-using Attributes = ModConfig.ConfigurationManagerAttributes;
+using static ConfigEventHandlers;
+using static ModContext;
 
 sealed class ModConfig
 {
@@ -35,6 +36,9 @@ sealed class ModConfig
     private readonly ConfigEntry<int> rows;
     private readonly ConfigEntry<int> columns;
     private readonly ConfigEntry<bool> randomizeRotation;
+    private readonly ConfigEntry<bool> enableScatter;
+    private readonly ConfigEntry<float> positionScatterRadius;
+    private readonly ConfigEntry<float> rotationScatterAngle;
     private readonly ConfigEntry<bool> enableDebugMessages;
 
     //Grid
@@ -42,7 +46,7 @@ sealed class ModConfig
     private readonly ConfigEntry<bool> minimizeGridSpacing;
     private readonly ConfigEntry<GridSnappingStyle> gridSnappingStyle;
     private readonly ConfigEntry<bool> forceAltPlacement;
-    //private readonly ConfigEntry<bool> offsetOddRows; // Re-add later if you can work out the last bit of snapping jankyness
+    private readonly ConfigEntry<bool> preferCardinalSnapping;
     private readonly ConfigEntry<float> extraCropSpacing;
     private readonly ConfigEntry<float> extraSaplingSpacing;
 
@@ -54,11 +58,12 @@ sealed class ModConfig
 
     //Performance
     private readonly ConfigEntry<int> maxConcurrentPlacements;
+    private readonly ConfigEntry<int> ghostUpdateBatchSize;
     private readonly ConfigEntry<int> bulkPlantingBatchSize;
 
     //Pickables
-    private readonly ConfigEntry<float> defaultGridSpacing;
     private readonly ConfigEntry<bool> preventOverlappingPlacements;
+    private readonly ConfigEntry<float> defaultGridSpacing;
 
     //UI
     private readonly ConfigEntry<bool> showCost;
@@ -69,12 +74,15 @@ sealed class ModConfig
     private readonly ConfigEntry<bool> showHoverReplantHint;
     private readonly ConfigEntry<bool> showGhostsDuringPlacement;
     private readonly ConfigEntry<bool> showGridDirections;
+    private readonly ConfigEntry<bool> showSnapDirection;
     private readonly ConfigEntry<bool> highlightRootPlacementGhost;
     private readonly ConfigEntry<Color> rootGhostHighlightColor;
     private readonly ConfigEntry<Color> rowStartColor;
     private readonly ConfigEntry<Color> rowEndColor;
     private readonly ConfigEntry<Color> columnStartColor;
     private readonly ConfigEntry<Color> columnEndColor;
+    private readonly ConfigEntry<Color> snapStartColor;
+    private readonly ConfigEntry<Color> snapEndColor;
 
     internal ModConfig(ConfigFile configFile)
     {
@@ -82,128 +90,117 @@ sealed class ModConfig
         configFile.SaveOnConfigSet = false;
 
         //Controls
-        enableModKey = Config.Bind("Controls", "EnableModKey", new KeyboardShortcut(KeyCode.F8),
-            new ConfigDescription(
-                "Key to toggle on/off all mod features. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                null,
-                new Attributes { Description = "Key to toggle on/off all mod features.", Order = 10 }));
-        enableSnappingKey = Config.Bind("Controls", "EnableSnappingKey", new KeyboardShortcut(KeyCode.F10),
-            new ConfigDescription(
-                "Key to toggle on/off piece snapping functionality. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                null,
-                new Attributes { Description = "Key to toggle on/off piece snapping functionality.", Order = 9 }));
-        toggleAutoReplantKey = Config.Bind("Controls", "ToggleAutoReplantKey", new KeyboardShortcut(KeyCode.F6),
-            new ConfigDescription(
-                "Key to toggle on/off the [Harvesting]ReplantOnHarvest setting. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                null,
-                new Attributes { Description = "Key to toggle on/off the [Harvesting]ReplantOnHarvest setting.", Order = 8 }));
-        increaseXKey = Config.Bind("Controls", "IncreaseXKey", new KeyboardShortcut(KeyCode.RightArrow),
-            new ConfigDescription(
-                "Key to increase number of grid columns. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                null,
-                new Attributes { Description = "Key to increase number of grid columns.", Order = 7 }));
-        increaseYKey = Config.Bind("Controls", "IncreaseYKey", new KeyboardShortcut(KeyCode.UpArrow),
-            new ConfigDescription(
-                "Key to increase number of grid rows. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                null,
-                new Attributes { Description = "Key to increase number of grid rows.", Order = 6 }));
-        decreaseXKey = Config.Bind("Controls", "DecreaseXKey", new KeyboardShortcut(KeyCode.LeftArrow),
-            new ConfigDescription(
-                "Key to decrease number of grid columns. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                null,
-                new Attributes { Description = "Key to decrease number of grid columns.", Order = 5 }));
-        decreaseYKey = Config.Bind("Controls", "DecreaseYKey", new KeyboardShortcut(KeyCode.DownArrow),
-            new ConfigDescription(
-                "Key to decrease number of grid rows. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                null,
-                new Attributes { Description = "Key to decrease number of grid rows.", Order = 4 }));
-        keyboardModifierKey = Config.Bind("Controls", "KeyboardModifierKey", new KeyboardShortcut(KeyCode.RightControl),
-            new ConfigDescription(
-                "Modifier key when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                null,
-                new Attributes { Description = "Modifier key when using keyboard controls.", Order = 3 }));
-        gamepadModifierKey = Config.Bind("Controls", "GamepadModifierKey", new KeyboardShortcut(KeyCode.JoystickButton4),
-            new ConfigDescription(
-                "Modifier key when using gamepad controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                null,
-                new Attributes { Description = "Modifier key when using gamepad controls.", Order = 2 }));
-        keyboardHarvestModifierKey = Config.Bind("Controls", "KeyboardHarvestModifierKey", new KeyboardShortcut(KeyCode.LeftShift),
-            new ConfigDescription(
-                "Modifier key to enable bulk harvest when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
-                null,
-                new Attributes { Description = "Modifier key to enable bulk harvest when using keyboard controls.", Order = 1 }));
+        enableModKey = Config.BindInOrder("Controls", "EnableModKey", new KeyboardShortcut(KeyCode.F8),
+            "Key to toggle on/off all mod features. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+            a => { a.Description = "Key to toggle on/off all mod features."; });
+        enableSnappingKey = Config.BindInOrder("Controls", "EnableSnappingKey", new KeyboardShortcut(KeyCode.F10),
+            "Key to toggle on/off piece snapping functionality. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+            a => { a.Description = "Key to toggle on/off piece snapping functionality."; });
+        toggleAutoReplantKey = Config.BindInOrder("Controls", "ToggleAutoReplantKey", new KeyboardShortcut(KeyCode.F6),
+            "Key to toggle on/off the [Harvesting]ReplantOnHarvest setting. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+            a => { a.Description = "Key to toggle on/off the [Harvesting]ReplantOnHarvest setting."; });
+        increaseXKey = Config.BindInOrder("Controls", "IncreaseXKey", new KeyboardShortcut(KeyCode.RightArrow),
+            "Key to increase number of grid columns. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+            a => { a.Description = "Key to increase number of grid columns."; });
+        increaseYKey = Config.BindInOrder("Controls", "IncreaseYKey", new KeyboardShortcut(KeyCode.UpArrow),
+            "Key to increase number of grid rows. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+            a => { a.Description = "Key to increase number of grid rows."; });
+        decreaseXKey = Config.BindInOrder("Controls", "DecreaseXKey", new KeyboardShortcut(KeyCode.LeftArrow),
+            "Key to decrease number of grid columns. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+            a => { a.Description = "Key to decrease number of grid columns."; });
+        decreaseYKey = Config.BindInOrder("Controls", "DecreaseYKey", new KeyboardShortcut(KeyCode.DownArrow),
+            "Key to decrease number of grid rows. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+            a => { a.Description = "Key to decrease number of grid rows."; });
+        keyboardModifierKey = Config.BindInOrder("Controls", "KeyboardModifierKey", new KeyboardShortcut(KeyCode.RightControl),
+            "Modifier key when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+            a => { a.Description = "Modifier key when using keyboard controls."; });
+        gamepadModifierKey = Config.BindInOrder("Controls", "GamepadModifierKey", new KeyboardShortcut(KeyCode.JoystickButton4),
+            "Modifier key when using gamepad controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+            a => { a.Description = "Modifier key when using gamepad controls."; });
+        keyboardHarvestModifierKey = Config.BindInOrder("Controls", "KeyboardHarvestModifierKey", new KeyboardShortcut(KeyCode.LeftShift),
+            "Modifier key to enable bulk harvest when using keyboard controls. See https://docs.unity3d.com/ScriptReference/KeyCode.html",
+            a => { a.Description = "Modifier key to enable bulk harvest when using keyboard controls."; });
 
         //Difficulty
-        preventPartialPlanting = Config.Bind("Difficulty", "PreventPartialPlanting", false, "Prevents placement of resources when any placement ghosts are invalid for any reason.");
-        preventInvalidPlanting = Config.Bind("Difficulty", "PreventInvalidPlanting", true, "Prevents plants from being placed where they will be unable to grow.");
-        useStamina = Config.Bind("Difficulty", "UseStamina", true, "Consume stamina for every piece placed.");
-        useDurability = Config.Bind("Difficulty", "UseDurability", true, "Decrease durability of cultivator for every piece placed.");
+        preventPartialPlanting = Config.BindInOrder("Difficulty", "PreventPartialPlanting", false, "Prevents placement of resources when any placement ghosts are invalid for any reason.");
+        preventInvalidPlanting = Config.BindInOrder("Difficulty", "PreventInvalidPlanting", true, "Prevents plants from being placed where they will be unable to grow.");
+        useStamina = Config.BindInOrder("Difficulty", "UseStamina", true, "Consume stamina for every piece placed.");
+        useDurability = Config.BindInOrder("Difficulty", "UseDurability", true, "Decrease durability of cultivator for every piece placed.");
 
         //General
-        modActive = Config.Bind("General", "ModActive", true, new ConfigDescription("Enables all mod features.", null, new Attributes { Order = 6 }));
-        snapActive = Config.Bind("General", "SnapActive", true, new ConfigDescription("Enables grid snapping feature.", null, new Attributes { Order = 5 }));
-        rows = Config.Bind("General", "Rows", 2, new ConfigDescription("Number of rows for planting grid aka height.", null, new Attributes { Order = 4 }));
-        columns = Config.Bind("General", "Columns", 2, new ConfigDescription("Number of columns for planting grid aka width.", null, new Attributes { Order = 3 }));
-        randomizeRotation = Config.Bind("General", "RandomizeRotation", true, new ConfigDescription("Randomizes rotation of pieces once placed.", null, new Attributes { Order = 2 }));
-        enableDebugMessages = Config.Bind("General", "EnableDebugMessages", false, new ConfigDescription("Enable mod debug messages in console.", null, new Attributes { Order = 1 }));
+        modActive = Config.BindInOrder("General", "ModActive", true, "Enables all mod features.");
+        snapActive = Config.BindInOrder("General", "SnapActive", true, "Enables grid snapping feature.");
+        rows = Config.BindInOrder("General", "Rows", 2, "Number of rows for planting grid aka height.");
+        columns = Config.BindInOrder("General", "Columns", 2, "Number of columns for planting grid aka width.");
+        randomizeRotation = Config.BindInOrder("General", "RandomizeRotation", true, "Randomizes rotation of pieces once placed.");
+        enableScatter = Config.BindInOrder("General", "EnableScatter", true, "Enables subtle randomization of placement to prevent grids from looking overly uniform. Controls both positional scatter and rotational tilt.");
+        positionScatterRadius = Config.BindInOrder("General", "PositionScatterRadius", 0f, "Applies small random offsets to the X/Z position of placed pieces. Keep values low (0.01–0.05) to avoid visible grid distortion, especially in large grids.");
+        rotationScatterAngle = Config.BindInOrder("General", "RotationScatterAngle", 0f, "Applies small random X/Z tilt to placed pieces. Recommended values: 1–3 degrees. Excessive tilt may interfere with crop growth or placement clearance.");
+        enableDebugMessages = Config.BindInOrder("General", "EnableDebugMessages", false, "Enable mod debug messages in console.");
 
         //Grid
-        globallyAlignGridDirections = Config.Bind("Grid", "GloballyAlignGridDirections", true, "When set to true, new grid placements will have their column and row directions align with the global grid.");
-        minimizeGridSpacing = Config.Bind("Grid", "MinimizeGridSpacing", false, "Allows for tighter grids, but with varying spacing used between diverse/distinct plants. ");
-        gridSnappingStyle = Config.Bind("Grid", "GridSnappingStyle", GridSnappingStyle.Intelligent, "Determines grid snapping style. Intelligent will attempt to prevent a new grid from overlapping with an old one. Legacy will allow any orientation of new rows and columns.");
-        forceAltPlacement = Config.Bind("Grid", "ForceAltPlacement", false, "When enabled, alternate placement mode for the cultivator is always used. Alternate placement mode allows free rotation when snapping to a single piece.");
-        //offsetOddRows = Config.Bind("Grid", "OffsetOddRows", false, "When enabled, alters grid formation by offsetting each odd row.");
-        extraCropSpacing = Config.Bind("Grid", "ExtraCropSpacing", 0f, "Adds extra spacing between crops. Accepts negative values to decrease spacing (not recommended).");
-        extraSaplingSpacing = Config.Bind("Grid", "ExtraSaplingSpacing", 0f, "Adds extra spacing between saplings. Accepts negative values to decrease spacing (not recommended).");
+        globallyAlignGridDirections = Config.BindInOrder("Grid", "GloballyAlignGridDirections", true, "When set to true, new grid placements will have their column and row directions align with the global grid.");
+        minimizeGridSpacing = Config.BindInOrder("Grid", "MinimizeGridSpacing", false, "Allows for tighter grids, but with varying spacing used between diverse/distinct plants. ");
+        gridSnappingStyle = Config.BindInOrder("Grid", "GridSnappingStyle", GridSnappingStyle.Intelligent, "Determines grid snapping style. Intelligent will attempt to prevent a new grid from overlapping with an old one. Legacy will allow any orientation of new rows and columns.");
+        forceAltPlacement = Config.BindInOrder("Grid", "ForceAltPlacement", false, "When enabled, alternate placement mode for the cultivator is always used. Alternate placement mode allows free rotation when snapping to a single piece.");
+        preferCardinalSnapping = Config.BindInOrder("Grid", "PreferCardinalSnapping", false, "Prefer cardinal snap points over diagonal snap points when snapping to existing grids.");
+        extraCropSpacing = Config.BindInOrder("Grid", "ExtraCropSpacing", 0f, "Adds extra spacing between crops. Accepts negative values to decrease spacing (not recommended).");
+        extraSaplingSpacing = Config.BindInOrder("Grid", "ExtraSaplingSpacing", 0f, "Adds extra spacing between saplings. Accepts negative values to decrease spacing (not recommended).");
 
         //Harvesting
-        enableBulkHarvest = Config.Bind("Harvesting", "EnableBulkHarvest", true, "Enables the ability to harvest multiple resources at once.");
-        harvestStyle = Config.Bind("Harvesting", "HarvestStyle", HarvestStyle.AllResources, "Determines bulk harvest style. LikeResources only harvests resources of the type you've interacted with. AllResources harvests all eligible resources.");
-        harvestRadius = Config.Bind("Harvesting", "HarvestRadius", 3.0f, "Determines radius used to search for resources when bulk harvesting.");
-        replantOnHarvest = Config.Bind("Harvesting", "ReplantOnHarvest", false, new ConfigDescription("Enables automatic replanting of crops when harvested, provided you have the resources.", null, new Attributes { Order = 4 }));
-        
+        enableBulkHarvest = Config.BindInOrder("Harvesting", "EnableBulkHarvest", true, "Enables the ability to harvest multiple resources at once.");
+        harvestStyle = Config.BindInOrder("Harvesting", "HarvestStyle", HarvestStyle.AllResources, "Determines bulk harvest style. LikeResources only harvests resources of the type you've interacted with. AllResources harvests all eligible resources.");
+        harvestRadius = Config.BindInOrder("Harvesting", "HarvestRadius", 3.0f, "Determines radius used to search for resources when bulk harvesting.");
+        replantOnHarvest = Config.BindInOrder("Harvesting", "ReplantOnHarvest", false, "Enables automatic replanting of crops when harvested, provided you have the resources.");
+
         //Performance
-        maxConcurrentPlacements = Config.Bind("Performance", "MaxConcurrentPlacements", 500, new ConfigDescription("Maximum amount of pieces that can be placed at once with the cultivator.", new AcceptableValueRange<int>(2, 10000)));
-        bulkPlantingBatchSize = Config.Bind("Performance", "BulkPlantingBatchSize", 2, new ConfigDescription("This value determines how many concurrent pieces can be placed per frame. Increase to speed up planting. Reduce this value if the game hangs when placing too many pieces at once.", new AcceptableValueRange<int>(2, 10000)));
-        
+        maxConcurrentPlacements = Config.BindInOrder("Performance", "MaxConcurrentPlacements", 500, "Maximum amount of pieces that can be placed at once with the cultivator.", acceptableValues: new AcceptableValueRange<int>(2, 10000));
+        ghostUpdateBatchSize = Config.BindInOrder("Performance", "GhostUpdateBatchSize", 20, "This value determines how many placement ghosts can update their positions, rotations, etc. per frame. Reducing this value will improve performance during placement and snapping.", acceptableValues: new AcceptableValueRange<int>(1, 10000));
+        bulkPlantingBatchSize = Config.BindInOrder("Performance", "BulkPlantingBatchSize", 2, "This value determines how many concurrent pieces can be placed per frame. Increase to speed up planting. Reduce this value if the game hangs when placing too many pieces at once.", acceptableValues: new AcceptableValueRange<int>(2, 10000));
+
         //Pickables
-        defaultGridSpacing = Config.Bind("Pickables", "DefaultGridSpacing", 1.0f, new ConfigDescription("Determines default distance/spacing between pickable resources when planting.", null, new Attributes { Order = 1 }));
-        preventOverlappingPlacements = Config.Bind("Pickables", "PreventOverlappingPlacements", true, new ConfigDescription("Prevents placement of pickable resources on top of colliding obstructions.", null, new Attributes { Order = 2 }));
+        preventOverlappingPlacements = Config.BindInOrder("Pickables", "PreventOverlappingPlacements", true, "Prevents placement of pickable resources on top of colliding obstructions.");
+        defaultGridSpacing = Config.BindInOrder("Pickables", "DefaultGridSpacing", 1.0f, "Determines default distance/spacing between pickable resources when planting.");
 
         //UI
-        showCost = Config.Bind("UI", "ShowCost", true, new ConfigDescription("Update resource cost in build UI.", null, new Attributes { Order = 14 }));
-        costDisplayStyle = Config.Bind("UI", "CostDisplayStyle", CostDisplayStyle.TotalCount, new ConfigDescription("Determines display style of the ShowCost setting. TotalCount shows total number of pieces to be placed. FullCost shows combined resoure cost of all pieces.", null, new Attributes { Order = 13 }));
-        costDisplayLocation = Config.Bind("UI", "CostDisplayLocation", CostDisplayLocation.RightSide, new ConfigDescription("Determines whether to prepend or append text to the resource cost in build UI. LeftSide or RightSide will prepend or append respectively.", null, new Attributes { Order = 12 }));
-        showHUDKeyHints = Config.Bind("UI", "ShowHUDKeyHints", true, new ConfigDescription("Show KeyHints in build HUD.", null, new Attributes { Order = 11 }));
-        showHoverKeyHints = Config.Bind("UI", "ShowHoverKeyHints", true, new ConfigDescription("Show KeyHints in hover text.", null, new Attributes { Order = 10 }));
-        showHoverReplantHint = Config.Bind("UI", "ShowHoverReplantHint", true, new ConfigDescription("Show crop to be replanted upon harvest in hover text.", null, new Attributes { Order = 9 }));
-        showGhostsDuringPlacement = Config.Bind("UI", "ShowGhostsDuringPlacement", true, new ConfigDescription("Show silhouettes of placement ghosts during placement.", null, new Attributes { Order = 8 }));
-        showGridDirections = Config.Bind("UI", "ShowGridDirections", true, new ConfigDescription("Render lines indicating direction of rows and columns.", null, new Attributes { Order = 7 }));
-        highlightRootPlacementGhost = Config.Bind("UI", "HighlightRootGhost", true, new ConfigDescription("Highlight the root placement ghost while bulk planting.", null, new Attributes { Order = 6 }));
-        rootGhostHighlightColor = Config.Bind("UI", "RootGhostHighlightColor", Color.green, new ConfigDescription("Highlight color for root placement ghost when [UI]HighlightRootGhost is enabled.", null, new Attributes { Order = 5 }));
-        rowStartColor = Config.Bind("UI", "RowStartColor", Color.blue, new ConfigDescription("Starting color for row direction when [UI]ShowGridDirections is enabled.", null, new Attributes { Order = 4 }));
-        rowEndColor = Config.Bind("UI", "RowEndColor", Color.cyan, new ConfigDescription("Ending color for row direction when [UI]ShowGridDirections is enabled.", null, new Attributes { Order = 3 }));
-        columnStartColor = Config.Bind("UI", "ColumnStartColor", Color.green, new ConfigDescription("Starting color for column direction when [UI]ShowGridDirections is enabled.", null, new Attributes { Order = 2 }));
-        columnEndColor = Config.Bind("UI", "ColumnEndColor", Color.yellow, new ConfigDescription("Ending color for column direction when [UI]ShowGridDirections is enabled.", null, new Attributes { Order = 1 }));
+        showCost = Config.BindInOrder("UI", "ShowCost", true, "Update resource cost in build UI.");
+        costDisplayStyle = Config.BindInOrder("UI", "CostDisplayStyle", CostDisplayStyle.TotalCount, "Determines display style of the ShowCost setting. TotalCount shows total number of pieces to be placed. FullCost shows combined resoure cost of all pieces.");
+        costDisplayLocation = Config.BindInOrder("UI", "CostDisplayLocation", CostDisplayLocation.RightSide, "Determines whether to prepend or append text to the resource cost in build UI. LeftSide or RightSide will prepend or append respectively.");
+        showHUDKeyHints = Config.BindInOrder("UI", "ShowHUDKeyHints", true, "Show KeyHints in build HUD.");
+        showHoverKeyHints = Config.BindInOrder("UI", "ShowHoverKeyHints", true, "Show KeyHints in hover text.");
+        showHoverReplantHint = Config.BindInOrder("UI", "ShowHoverReplantHint", true, "Show crop to be replanted upon harvest in hover text.");
+        showGhostsDuringPlacement = Config.BindInOrder("UI", "ShowGhostsDuringPlacement", true, "Show silhouettes of placement ghosts during placement.");
+        showGridDirections = Config.BindInOrder("UI", "ShowGridDirections", true, "Render lines indicating direction of rows and columns.");
+        showSnapDirection = Config.BindInOrder("UI", "ShowSnapDirection", true, "Render a line from root placement ghost to the position it's snapping from.");
+        highlightRootPlacementGhost = Config.BindInOrder("UI", "HighlightRootGhost", true, "Highlight the root placement ghost while bulk planting.");
+        rootGhostHighlightColor = Config.BindInOrder("UI", "RootGhostHighlightColor", Color.green, "Highlight color for root placement ghost when [UI]HighlightRootGhost is enabled.");
+        rowStartColor = Config.BindInOrder("UI", "RowStartColor", Color.blue, "Starting color for row direction when [UI]ShowGridDirections is enabled.");
+        rowEndColor = Config.BindInOrder("UI", "RowEndColor", Color.cyan, "Ending color for row direction when [UI]ShowGridDirections is enabled.");
+        columnStartColor = Config.BindInOrder("UI", "ColumnStartColor", Color.green, "Starting color for column direction when [UI]ShowGridDirections is enabled.");
+        columnEndColor = Config.BindInOrder("UI", "ColumnEndColor", Color.yellow, "Ending color for column direction when [UI]ShowGridDirections is enabled.");
+        snapStartColor = Config.BindInOrder("UI", "SnapStartColor", Color.red, "Starting color for snap direction when [UI]ShowGridDirections is enabled.");
+        snapEndColor = Config.BindInOrder("UI", "SnapEndColor", Color.magenta, "Ending color for snap direction when [UI]ShowGridDirections is enabled.");
 
         configFile.Save();
         configFile.SaveOnConfigSet = true;
 
-        rows.SettingChanged += PlantEasily.GridSizeChanged;
-        columns.SettingChanged += PlantEasily.GridSizeChanged;
-        maxConcurrentPlacements.SettingChanged += PlantEasily.GridSizeChanged;
-        increaseXKey.SettingChanged += PlantEasily.KeybindsChanged;
-        increaseYKey.SettingChanged += PlantEasily.KeybindsChanged;
-        decreaseXKey.SettingChanged += PlantEasily.KeybindsChanged;
-        decreaseYKey.SettingChanged += PlantEasily.KeybindsChanged;
-        keyboardModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
-        gamepadModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
-        keyboardHarvestModifierKey.SettingChanged += PlantEasily.KeybindsChanged;
-        showGridDirections.SettingChanged += (_, _) => PlantEasily.gridRenderer?.SetActive(false);
-        rowStartColor.SettingChanged += PlantEasily.GridColorChanged;
-        rowEndColor.SettingChanged += PlantEasily.GridColorChanged;
-        columnStartColor.SettingChanged += PlantEasily.GridColorChanged;
-        columnEndColor.SettingChanged += PlantEasily.GridColorChanged;
+        rows.SettingChanged += GridSizeChanged;
+        columns.SettingChanged += GridSizeChanged;
+        maxConcurrentPlacements.SettingChanged += GridSizeChanged;
+        increaseXKey.SettingChanged += KeybindsChanged;
+        increaseYKey.SettingChanged += KeybindsChanged;
+        decreaseXKey.SettingChanged += KeybindsChanged;
+        decreaseYKey.SettingChanged += KeybindsChanged;
+        keyboardModifierKey.SettingChanged += KeybindsChanged;
+        gamepadModifierKey.SettingChanged += KeybindsChanged;
+        keyboardHarvestModifierKey.SettingChanged += KeybindsChanged;
+        showGridDirections.SettingChanged += (_, _) => GhostGrid.DirectionRenderer?.SetActive(false);
+        rowStartColor.SettingChanged += GridColorChanged;
+        rowEndColor.SettingChanged += GridColorChanged;
+        columnStartColor.SettingChanged += GridColorChanged;
+        columnEndColor.SettingChanged += GridColorChanged;
+        snapStartColor.SettingChanged += GridColorChanged;
+        snapEndColor.SettingChanged += GridColorChanged;
     }
 
     internal void BindPickableSpacingSettings()
@@ -224,12 +221,12 @@ sealed class ModConfig
             { "CloudberryBush", 1.0f }
         };
 
-        foreach (PickableDB pdb in PlantEasily.pickableRefs)
+        foreach (PickableDB pdb in PickableRefs)
         {
             float gridSpacing = predefinedSpacingDefaults.TryGetValue(pdb.key, out float spacing) ? spacing : DefaultGridSpacing;
             pdb.itemName = Localization.instance.Localize(pdb.Prefab.GetComponent<Pickable>().m_itemPrefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_name);
             pdb.configEntry = Config.Bind("Pickables", $"{pdb.key} GridSpacing", gridSpacing, $"Determines distance/spacing between {pdb.itemName} when planting.");
-            pdb.configEntry.SettingChanged += PlantEasily.GridSpacingChanged;
+            pdb.configEntry.SettingChanged += GridSpacingChanged;
         }
 
         predefinedSpacingDefaults.Clear();
@@ -275,13 +272,23 @@ sealed class ModConfig
         set { columns.BoxedValue = Mathf.Max(value, 1); }
     }
     internal bool RandomizeRotation => randomizeRotation.Value;
+    internal bool TryGetScatterRadius(out float radius)
+    {
+        radius = positionScatterRadius.Value;
+        return enableScatter.Value && radius != 0f;
+    }
+    internal bool TryGetScatterAngle(out float angle)
+    {
+        angle = rotationScatterAngle.Value;
+        return enableScatter.Value && angle != 0f;
+    }
     internal bool EnableDebugMessages => enableDebugMessages.Value;
     //Grid
     internal bool GloballyAlignGridDirections => globallyAlignGridDirections.Value;
     internal bool MinimizeGridSpacing => minimizeGridSpacing.Value;
     internal GridSnappingStyle GridSnappingStyle => gridSnappingStyle.Value;
     internal bool ForceAltPlacement => forceAltPlacement.Value;
-    //internal bool OffsetOddRows => offsetOddRows.Value; // Maybe re-add in 2.1 if you can resolve remaining jankyness
+    internal bool PreferCardinalSnapping => preferCardinalSnapping.Value;
     internal float ExtraCropSpacing => extraCropSpacing.Value;
     internal float ExtraSaplingSpacing => extraSaplingSpacing.Value;
     //Harvesting
@@ -295,10 +302,11 @@ sealed class ModConfig
     }
     //Performance
     internal int MaxConcurrentPlacements => maxConcurrentPlacements.Value;
+    internal int GhostUpdateBatchSize => ghostUpdateBatchSize.Value;
     internal int BulkPlantingBatchSize => bulkPlantingBatchSize.Value;
     //Pickables
-    internal float DefaultGridSpacing => defaultGridSpacing.Value;
     internal bool PreventOverlappingPlacements => preventOverlappingPlacements.Value;
+    internal float DefaultGridSpacing => defaultGridSpacing.Value;
     //UI
     internal bool ShowCost => showCost.Value;
     internal CostDisplayStyle CostDisplayStyle => costDisplayStyle.Value;
@@ -308,39 +316,13 @@ sealed class ModConfig
     internal bool ShowHoverReplantHint => showHoverReplantHint.Value;
     internal bool ShowGhostsDuringPlacement => showGhostsDuringPlacement.Value;
     internal bool ShowGridDirections => showGridDirections.Value;
+    internal bool ShowSnapDirection => showSnapDirection.Value;
     internal bool HighlightRootPlacementGhost => highlightRootPlacementGhost.Value;
     internal Color RootGhostHighlightColor => rootGhostHighlightColor.Value;
     internal Color RowStartColor => rowStartColor.Value;
     internal Color RowEndColor => rowEndColor.Value;
     internal Color ColumnStartColor => columnStartColor.Value;
     internal Color ColumnEndColor => columnEndColor.Value;
-    
-
-#nullable enable
-    internal class ConfigurationManagerAttributes
-    {
-        public string? Description;
-        public int? Order;
-    }
-}
-
-internal enum GridSnappingStyle
-{
-    Intelligent,
-    Legacy
-}
-internal enum HarvestStyle
-{
-    LikeResources,
-    AllResources
-}
-internal enum CostDisplayStyle
-{
-    TotalCount,
-    FullCost
-}
-internal enum CostDisplayLocation
-{
-    LeftSide,
-    RightSide
+    internal Color SnapStartColor => snapStartColor.Value;
+    internal Color SnapEndColor => snapEndColor.Value;
 }

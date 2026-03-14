@@ -105,7 +105,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\ConfigEnums.cs" />
+    <Compile Include="Configuration\ConfigEventHandlers.cs" />
+    <Compile Include="Configuration\ConfigExtensions.cs" />
+    <Compile Include="Configuration\ConfigurationManagerAttributes.cs" />
     <Compile Include="Configuration\ModConfig.cs" />
+    <Compile Include="Core\PlacementController.cs" />
+    <Compile Include="Core\ModEnums.cs" />
+    <Compile Include="Core\ModUtils.cs" />
+    <Compile Include="Core\SnapSystem\CollisionScanner.cs" />
+    <Compile Include="Core\SnapSystem\GhostCache.cs" />
+    <Compile Include="Core\SnapSystem\GhostStatus.cs" />
+    <Compile Include="Core\SnapSystem\PlacementState.cs" />
+    <Compile Include="Core\SnapSystem\GhostGrid.cs" />
+    <Compile Include="Core\SnapSystem\SnapPoint.cs" />
+    <Compile Include="Core\SnapSystem\SnapPointGenerator.cs" />
+    <Compile Include="Core\SnapSystem\SnapSystem.cs" />
+    <Compile Include="Core\ModContext.cs" />
     <Compile Include="Patches\HoverTextPatches.cs" />
     <Compile Include="Patches\KeyHintPatches.cs" />
     <Compile Include="Patches\PlacementPatches.cs" />
@@ -114,8 +130,8 @@
     <Compile Include="Patches\ModInitPatches.cs" />
     <Compile Include="Patches\UIPatches.cs" />
     <Compile Include="PlantEasily.cs" />
-    <Compile Include="PickableDB.cs" />
-    <Compile Include="ReplantDB.cs" />
+    <Compile Include="Core\PickableDB.cs" />
+    <Compile Include="Core\ReplantDB.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
