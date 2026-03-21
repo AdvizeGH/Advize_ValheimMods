@@ -26,7 +26,8 @@ static class PieceInitPatches
 
         if (!isInitialized)
         {
-            InitializeArmoirePiece(__instance);
+            if (SystemInfo.graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.Null)
+                InitializeArmoirePiece(__instance);
             isInitialized = true;
         }
     }

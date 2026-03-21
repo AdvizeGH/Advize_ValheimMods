@@ -12,7 +12,7 @@ public sealed class Armoire : BaseUnityPlugin
 {
     public const string PluginID = "advize.Armoire";
     public const string PluginName = "Armoire";
-    public const string Version = "1.1.2";
+    public const string Version = "1.1.4";
 
     internal void Awake()
     {
