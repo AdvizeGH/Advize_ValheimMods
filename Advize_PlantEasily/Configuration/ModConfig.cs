@@ -129,7 +129,7 @@ sealed class ModConfig
 
         //General
         modActive = Config.BindInOrder("General", "ModActive", true, "Enables all mod features.");
-        snapActive = Config.BindInOrder("General", "SnapActive", true, "Enables grid snapping feature.");
+        snapActive = Config.BindInOrder("General", "SnapActive", true, "Enables the grid snapping feature.");
         rows = Config.BindInOrder("General", "Rows", 2, "Number of rows for planting grid aka height.");
         columns = Config.BindInOrder("General", "Columns", 2, "Number of columns for planting grid aka width.");
         randomizeRotation = Config.BindInOrder("General", "RandomizeRotation", true, "Randomizes rotation of pieces once placed.");

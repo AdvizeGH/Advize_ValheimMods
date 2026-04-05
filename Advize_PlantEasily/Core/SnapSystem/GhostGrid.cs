@@ -27,7 +27,7 @@ internal static class GhostGrid
     private static string _lastPieceName;
     private static bool _preservePool;
 
-    private static int MaxActiveGhosts => Mathf.Min(config.Rows * config.Columns - 1, config.MaxConcurrentPlacements - 1);
+    internal static int MaxActiveGhosts => Mathf.Min(config.Rows * config.Columns - 1, config.MaxConcurrentPlacements - 1);
     private static int TotalCells => 1 + MaxActiveGhosts;
     private static int ActualRows => (TotalCells + config.Columns - 1) / config.Columns;
     private static int ActualColumns => Mathf.Min(config.Columns, TotalCells);

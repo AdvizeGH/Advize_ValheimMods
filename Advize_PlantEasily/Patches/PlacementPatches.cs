@@ -139,11 +139,10 @@ static class PlacementPatches
 
             __instance.m_placeRotation = placementRotation;
 
-            int MaxActiveGhosts = Mathf.Min(config.Rows * config.Columns - 1, config.MaxConcurrentPlacements - 1);
-            if (MaxActiveGhosts < 1)
+            if (GhostGrid.MaxActiveGhosts < 1)
                 return;
 
-            for (int i = 0; i < MaxActiveGhosts; i++)
+            for (int i = 0; i < GhostGrid.MaxActiveGhosts; i++)
             {
                 Status status = GhostGrid.GhostPlacementStatus[i + 1];
 

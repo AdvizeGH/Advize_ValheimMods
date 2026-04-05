@@ -67,7 +67,9 @@ internal sealed class PlacementController : MonoBehaviour
         {
             count++;
             PlacePiece(player, go, piecePrefab);
-            if (count % config.BulkPlantingBatchSize == 0) yield return null;
+
+            if (count % config.BulkPlantingBatchSize == 0)
+                yield return null;
         }
 
         ValidExtraGhosts.Clear();

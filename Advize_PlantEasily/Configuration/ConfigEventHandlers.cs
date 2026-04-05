@@ -1,7 +1,6 @@
 ﻿namespace Advize_PlantEasily;
 
 using System;
-using UnityEngine;
 using static ModContext;
 
 internal static class ConfigEventHandlers
