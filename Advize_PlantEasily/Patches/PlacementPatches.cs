@@ -85,6 +85,12 @@ static class PlacementPatches
             if (!config.ModActive || !piece || !HoldingCultivator || !IsPlantOrPickable(piece.gameObject))
                 return true;
 
+            if (PlacementController.IsPlanting)
+            {
+                __result = false;
+                return false;
+            }
+
             if (config.PreventInvalidPlanting)
             {
                 Status rootStatus = GhostStatus.EvaluateStatus(__instance.m_placementGhost);
