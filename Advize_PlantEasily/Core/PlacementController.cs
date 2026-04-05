@@ -34,7 +34,12 @@ internal sealed class PlacementController : MonoBehaviour
             _instance = null;
     }
 
-    internal IEnumerator BulkPlanting(GameObject piecePrefab)
+    internal void StartBulkPlanting(GameObject piecePrefab)
+    {
+        StartCoroutine(BulkPlanting(piecePrefab));
+    }
+
+    private IEnumerator BulkPlanting(GameObject piecePrefab)
     {
         Player player = Player.m_localPlayer;
         _isPlanting = true;

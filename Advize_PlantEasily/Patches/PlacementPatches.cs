@@ -126,7 +126,7 @@ static class PlacementPatches
 
         static void Prefix(Player __instance) => placementRotation = __instance.m_placeRotation;
 
-        static void Postfix(Player __instance, Piece piece)
+        static void Postfix(Player __instance, PieceTable ___m_buildPieces, Piece piece)
         {
             if (!config.ModActive || !piece || !HoldingCultivator || !IsPlantOrPickable(piece.gameObject))
                 return;
@@ -154,7 +154,13 @@ static class PlacementPatches
             int placementMultiplier = __instance.m_noPlacementCost ? 0 : GhostGrid.ValidExtraGhosts.Count;
 
             if (GhostGrid.ValidExtraGhosts.Count > 0)
-                PlacementController.Instance.StartCoroutine("BulkPlanting", piece.gameObject);
+            {
+                Piece.PieceCategory category = ___m_buildPieces.GetSelectedCategory();
+                Vector2Int index = ___m_buildPieces.GetSelectedIndex();
+                GameObject piecePrefab = ___m_buildPieces.GetPiece(category, index).gameObject;
+
+                PlacementController.Instance.StartBulkPlanting(piecePrefab);
+            }
 
             ItemDrop.ItemData rightItem = __instance.GetRightItem();
 
