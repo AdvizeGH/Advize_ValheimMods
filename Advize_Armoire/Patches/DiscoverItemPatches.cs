@@ -32,6 +32,8 @@ static class DiscoverItemPatches
     static void UnlockNewAppearance(ItemDrop.ItemData discoveredItem)
     {
         Dbgl($"New item discovered: {discoveredItem.m_shared.m_name}");
+        if (!config.ShowUnlockMessages)
+            return;
         ItemDrop item = discoveredItem.m_dropPrefab.GetComponent<ItemDrop>();
         AppearanceSlotType? slotType = PluginUtils.GetSlotTypeForItemDrop(item);
         if (slotType is null) return;

@@ -14,6 +14,7 @@ sealed class ModConfig
     private readonly ConfigEntry<string> disabledAppearanceNames;
     private readonly ConfigEntry<bool> excludeDLCItems;
     private readonly ConfigEntry<bool> showUndiscoveredHoverDetails;
+    private readonly ConfigEntry<bool> showUnlockMessages;
     private readonly ConfigEntry<bool> enableDebugMessages;
 
     //UIPosition
@@ -47,6 +48,11 @@ sealed class ModConfig
             "ShowUndiscoveredHoverDetails",
             false,
             "Shows/hides additional details in undiscovered appearance tooltips.");
+        showUnlockMessages = ConfigFile.Bind(
+            "General",
+            "ShowUnlockMessages",
+            true,
+            "Shows/hides the message that pops up when a new appearance is unlocked.");
         enableDebugMessages = ConfigFile.Bind(
             "General",
             "EnableDebugMessages",
@@ -107,6 +113,8 @@ sealed class ModConfig
     internal bool ExcludeDLCItems => excludeDLCItems.Value;
 
     internal bool ShowUndiscoveredHoverDetails => showUndiscoveredHoverDetails.Value;
+
+    internal bool ShowUnlockMessages => showUnlockMessages.Value;
 
     internal bool EnableDebugMessages => enableDebugMessages.Value;
 
