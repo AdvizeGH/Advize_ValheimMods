@@ -32,13 +32,13 @@ static class DiscoverItemPatches
     static void UnlockNewAppearance(ItemDrop.ItemData discoveredItem)
     {
         Dbgl($"New item discovered: {discoveredItem.m_shared.m_name}");
-        if (!config.ShowUnlockMessages)
-            return;
         ItemDrop item = discoveredItem.m_dropPrefab.GetComponent<ItemDrop>();
         AppearanceSlotType? slotType = PluginUtils.GetSlotTypeForItemDrop(item);
         if (slotType is null) return;
 
-        MessageHud.instance.QueueUnlockMsg(ArmoireIcon, "<color=#00FFFF>Appearance Unlocked!</color>", discoveredItem.m_shared.m_name);
+        if (config.ShowUnlockMessages)
+            MessageHud.instance.QueueUnlockMsg(ArmoireIcon, "<color=#00FFFF>Appearance Unlocked!</color>", discoveredItem.m_shared.m_name);
+
         UnlockedAppearances[slotType.Value][item] = item.m_itemData.m_shared.m_icons.Length;
         AppearanceTracker.UpdateTotal();
     }
