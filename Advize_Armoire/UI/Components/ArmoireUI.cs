@@ -158,6 +158,7 @@ public partial class ArmoireUI : MonoBehaviour
     {
         ActiveOverrides = PluginUtils.CloneOverrides(OutfitOverrides[_currentOutfitIndex]);
         Player.m_localPlayer.SetupEquipment();
+        AppearanceData.SaveAppearanceData("Armoire_Appearances");
     }
 
     private void DeleteOutfitButtonClicked()
