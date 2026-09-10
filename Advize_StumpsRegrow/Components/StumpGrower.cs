@@ -40,7 +40,7 @@ public sealed class StumpGrower : SlowUpdate, Hoverable
         _updateTime = Time.time + 10f;
     }
 
-    public override void SUpdate(float time, Vector2i referenceZone)
+    public override void SUpdate(float time, Vector2s referenceZone)
     {
         if (_nView.IsValid() && time > _updateTime)
         {
@@ -112,6 +112,11 @@ public sealed class StumpGrower : SlowUpdate, Hoverable
         }
 
         return GetHoverName();
+    }
+
+    public float GetHoverOffset()
+    {
+        return 0;
     }
 
     private string FormatTimeString(float growthTime)

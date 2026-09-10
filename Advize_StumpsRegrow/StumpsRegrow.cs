@@ -13,7 +13,7 @@ public sealed class StumpsRegrow : BaseUnityPlugin
 {
     public const string PluginID = "advize.StumpsRegrow";
     public const string PluginName = "StumpsRegrow";
-    public const string Version = "1.0.5";
+    public const string Version = "1.1.0";
 
     internal static ManualLogSource ModLogger = new($" {PluginName}");
     internal static ModConfig config;
@@ -35,7 +35,7 @@ public sealed class StumpsRegrow : BaseUnityPlugin
     {
         BepInEx.Logging.Logger.Sources.Add(ModLogger);
         System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(StumpGrower).TypeHandle);
-        config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.0.5", ModRequired = true });
+        config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.1.0", ModRequired = true });
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginID);
     }
 

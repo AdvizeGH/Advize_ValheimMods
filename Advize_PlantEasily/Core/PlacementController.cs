@@ -2,6 +2,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Splatform;
 using UnityEngine;
 using static GhostGrid;
 using static ModContext;
@@ -102,7 +103,7 @@ internal sealed class PlacementController : MonoBehaviour
         GameObject clone = Instantiate(piecePrefab, position, rotation);
         TerrainModifier.SetTriggerOnPlaced(trigger: false);
 
-        clone.GetComponent<Piece>().SetCreator(player.GetPlayerID());
+        clone.GetComponent<Piece>().SetCreator(player.GetPlayerID(), PlatformManager.DistributionPlatform.LocalUser.PlatformUserID);
 
         Game.instance.IncrementPlayerStat(PlayerStatType.Builds);
         player.RaiseSkill(Skills.SkillType.Farming, 1f);

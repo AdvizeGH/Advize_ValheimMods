@@ -117,6 +117,11 @@ public class ArmoireDoor : MonoBehaviour, Hoverable, Interactable
 
     public string GetHoverName() => "Armoire";
 
+    public float GetHoverOffset()
+    {
+        return 0;
+    }
+
     public bool Interact(Humanoid character, bool hold, bool alt)
     {
         Dbgl("Interacted with armoire");

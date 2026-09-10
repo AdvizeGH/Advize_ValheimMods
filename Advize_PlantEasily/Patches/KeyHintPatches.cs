@@ -57,7 +57,7 @@ static class KeyHintPatches
     }
 
     //Patch to a completely different class to support all of this thanks to bog witch update
-    [HarmonyPatch(typeof(ZInput), nameof(ZInput.AddButton))]
+    [HarmonyPatch(typeof(ZInput), nameof(ZInput.AddButton), [typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool), typeof(float), typeof(float)])]
     [HarmonyPrefix]
     static void AddButton(string name, string path) => _inputBindingPathToButtonDefNames[path] = name;
 

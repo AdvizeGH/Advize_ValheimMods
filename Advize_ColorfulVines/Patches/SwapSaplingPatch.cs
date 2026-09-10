@@ -1,6 +1,7 @@
 ﻿namespace Advize_ColorfulVines;
 
 using HarmonyLib;
+using Splatform;
 using UnityEngine;
 using static StaticMembers;
 
@@ -14,7 +15,7 @@ static class SwapSaplingPatch
             return;
 
         Piece piece = Object.Instantiate(prefabRefs["VineAsh_sapling"], __instance.transform.position, __instance.transform.rotation).GetComponent<Piece>();
-        piece.SetCreator(Player.m_localPlayer.GetPlayerID());
+        piece.SetCreator(Player.m_localPlayer.GetPlayerID(), PlatformManager.DistributionPlatform.LocalUser.PlatformUserID);
 
         VineColor component = piece.GetComponent<VineColor>();
 

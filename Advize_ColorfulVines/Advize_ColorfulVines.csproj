@@ -70,6 +70,10 @@
       <HintPath>$(GamePath)\BepInEx\core\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Splatform">
+      <HintPath>$(GamePath)\valheim_Data\Managed\Splatform.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

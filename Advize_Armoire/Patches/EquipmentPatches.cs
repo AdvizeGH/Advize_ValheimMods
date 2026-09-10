@@ -20,79 +20,94 @@ static class EquipmentPatches
             { nameof(VisEquipment.SetHelmetItem), (AppearanceSlotType.Helmet, player => player.m_helmetItem) },
             { nameof(VisEquipment.SetChestItem), (AppearanceSlotType.Chest, player => player.m_chestItem) },
             { nameof(VisEquipment.SetLegItem), (AppearanceSlotType.Legs, player => player.m_legItem) },
-            { nameof(VisEquipment.SetUtilityItem), (AppearanceSlotType.Utility, player => player.m_utilityItem) },
-            { nameof(VisEquipment.SetTrinketItem), (AppearanceSlotType.Trinket, player => player.m_trinketItem) }
+            { nameof(VisEquipment.SetUtilityItem), (AppearanceSlotType.Utility, player => player.m_utilityItem) }
         };
 
         [HarmonyPatch(nameof(VisEquipment.SetHelmetItem))]
         [HarmonyPatch(nameof(VisEquipment.SetChestItem))]
         [HarmonyPatch(nameof(VisEquipment.SetLegItem))]
         [HarmonyPatch(nameof(VisEquipment.SetUtilityItem))]
-        [HarmonyPatch(nameof(VisEquipment.SetTrinketItem))]
         [HarmonyPrefix]
-        static void SetSimpleItem(VisEquipment __instance, MethodBase __originalMethod, ref string name)
+        static void SetSimpleItem(VisEquipment __instance, MethodBase __originalMethod, ref int itemHash)
         {
             if (!SimpleItemMap.TryGetValue(__originalMethod.Name, out (AppearanceSlotType slot, Func<Player, ItemDrop.ItemData> targetedItem) entry)) return;
 
-            TryOverrideItem(__instance, ref name, entry.targetedItem, entry.slot);
+            TryOverrideItemHash(__instance, ref itemHash, entry.targetedItem, entry.slot);
+        }
+
+        [HarmonyPatch(nameof(VisEquipment.SetTrinketItem))]
+        [HarmonyPrefix]
+        static void SetTrinketItem(VisEquipment __instance, ref string name)
+        {
+            TryOverrideItemString(__instance, ref name, p => p.m_trinketItem, AppearanceSlotType.Trinket);
         }
 
         [HarmonyPatch(nameof(VisEquipment.SetShoulderItem))]
         [HarmonyPrefix]
-        static void SetShoulderItem(VisEquipment __instance, ref string name, ref int variant) =>
-            TryOverrideItemWithVariant(__instance, ref name, ref variant, p => p.m_shoulderItem, AppearanceSlotType.Shoulder);
+        static void SetShoulderItem(VisEquipment __instance, ref int itemHash, ref int variant) =>
+            TryOverrideItemWithVariant(__instance, ref itemHash, ref variant, p => p.m_shoulderItem, AppearanceSlotType.Shoulder);
 
         [HarmonyPatch(nameof(VisEquipment.SetLeftItem))]
         [HarmonyPrefix]
-        static void SetLeftItem(VisEquipment __instance, ref string name, ref int variant) =>
-            TryOverrideMatchingItem(__instance, ref name, ref variant, p => p.m_leftItem, OverrideTarget.LeftItem);
+        static void SetLeftItem(VisEquipment __instance, ref int itemHash, ref int variant) =>
+            TryOverrideMatchingItem(__instance, ref itemHash, ref variant, p => p.m_leftItem, OverrideTarget.LeftItem);
 
         [HarmonyPatch(nameof(VisEquipment.SetLeftBackItem))]
         [HarmonyPrefix]
-        static void SetLeftBackItem(VisEquipment __instance, ref string name, ref int variant) =>
-            TryOverrideMatchingItem(__instance, ref name, ref variant, p => p.m_hiddenLeftItem);
+        static void SetLeftBackItem(VisEquipment __instance, ref int itemHash, ref int variant) =>
+            TryOverrideMatchingItem(__instance, ref itemHash, ref variant, p => p.m_hiddenLeftItem);
 
         [HarmonyPatch(nameof(VisEquipment.SetRightItem))]
         [HarmonyPrefix]
-        static void SetRightItem(VisEquipment __instance, ref string name)
+        static void SetRightItem(VisEquipment __instance, ref int itemHash)
         {
             int dummyVariant = 0;
-            TryOverrideMatchingItem(__instance, ref name, ref dummyVariant, p => p.m_rightItem, OverrideTarget.RightItem);
+            TryOverrideMatchingItem(__instance, ref itemHash, ref dummyVariant, p => p.m_rightItem, OverrideTarget.RightItem);
         }
 
         [HarmonyPatch(nameof(VisEquipment.SetRightBackItem))]
         [HarmonyPrefix]
-        static void SetRightBackItem(VisEquipment __instance, ref string name)
+        static void SetRightBackItem(VisEquipment __instance, ref int itemHash)
         {
             int dummyVariant = 0;
-            TryOverrideMatchingItem(__instance, ref name, ref dummyVariant, p => p.m_hiddenRightItem);
+            TryOverrideMatchingItem(__instance, ref itemHash, ref dummyVariant, p => p.m_hiddenRightItem);
         }
 
         private static bool ShouldOverrideAppearance(VisEquipment instance) =>
             config.EnableOverrides && (instance.gameObject == Player.m_localPlayer?.gameObject || !ZNetScene.instance);
 
-        private static void TryOverrideItem(VisEquipment instance, ref string name, Func<Player, ItemDrop.ItemData> targetedItem, AppearanceSlotType slotType)
+        private static void TryOverrideItemHash(VisEquipment instance, ref int itemHash, Func<Player, ItemDrop.ItemData> targetedItem, AppearanceSlotType slotType)
         {
             if (!ShouldOverrideAppearance(instance) || !instance.TryGetComponent(out Player player) || targetedItem(player) == null) return;
+
+            AppearanceSlot slot = ActiveOverrides[slotType];
+            if (!string.IsNullOrEmpty(slot.ItemName) || slot.Hidden)
+                itemHash = HashCache.Get(slot.ItemName);
+        }
+
+        private static void TryOverrideItemString(VisEquipment instance, ref string name, Func<Player, ItemDrop.ItemData> targetedItem, AppearanceSlotType slotType)
+        {
+            if (!ShouldOverrideAppearance(instance) || !instance.TryGetComponent(out Player player) || targetedItem(player) == null)
+                return;
 
             AppearanceSlot slot = ActiveOverrides[slotType];
             if (!string.IsNullOrEmpty(slot.ItemName) || slot.Hidden)
                 name = slot.ItemName;
         }
 
-        private static void TryOverrideItemWithVariant(VisEquipment instance, ref string name, ref int variant, Func<Player, ItemDrop.ItemData> targetedItem, AppearanceSlotType slotType)
+        private static void TryOverrideItemWithVariant(VisEquipment instance, ref int itemHash, ref int variant, Func<Player, ItemDrop.ItemData> targetedItem, AppearanceSlotType slotType)
         {
             if (!ShouldOverrideAppearance(instance) || !instance.TryGetComponent(out Player player) || targetedItem(player) == null) return;
 
             AppearanceSlot slot = ActiveOverrides[slotType];
             if (!string.IsNullOrEmpty(slot.ItemName) || slot.Hidden)
             {
-                name = slot.ItemName;
+                itemHash = HashCache.Get(slot.ItemName);
                 variant = slot.ItemVariant;
             }
         }
 
-        private static void TryOverrideMatchingItem(VisEquipment instance, ref string name, ref int variant, Func<Player, ItemDrop.ItemData> targetedItem, OverrideTarget? target = null)
+        private static void TryOverrideMatchingItem(VisEquipment instance, ref int itemHash, ref int variant, Func<Player, ItemDrop.ItemData> targetedItem, OverrideTarget? target = null)
         {
             if (!ShouldOverrideAppearance(instance) || !instance.TryGetComponent(out Player player)) return;
 
@@ -104,14 +119,14 @@ static class EquipmentPatches
 
             if (hasMatch)
             {
-                name = match.ItemName;
+                itemHash = HashCache.Get(match.ItemName);
                 variant = match.ItemVariant;
             }
 
             if (target == OverrideTarget.LeftItem)
-                overriddenLeftItem = hasMatch ? name : "";
+                overriddenLeftItem = hasMatch ? match.ItemName : "";
             else if (target == OverrideTarget.RightItem)
-                overriddenRightItem = hasMatch ? name : "";
+                overriddenRightItem = hasMatch ? match.ItemName : "";
         }
 
         private enum OverrideTarget

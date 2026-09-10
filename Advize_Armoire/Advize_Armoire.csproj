@@ -118,6 +118,7 @@
   <ItemGroup>
     <Compile Include="Armoire.cs" />
     <Compile Include="Components\ArmoireDoor.cs" />
+    <Compile Include="Framework\HashCache.cs" />
     <Compile Include="Networking\VersionHandshake.cs" />
     <Compile Include="UI\Components\ArmoireInputMonitor.cs" />
     <Compile Include="UI\Components\ArmoireInputHandler.cs" />
