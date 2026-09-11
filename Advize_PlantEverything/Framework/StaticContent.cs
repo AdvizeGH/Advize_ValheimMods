@@ -27,6 +27,8 @@ static class StaticContent
         { "BlueberryBushDescription", "Plant blueberries to grow blueberry bushes." },
         { "CloudberryBushName", "Cloudberry Bush" },
         { "CloudberryBushDescription", "Plant cloudberries to grow cloudberry bushes." },
+        { "LingonberryBushName", "Lingonberry Bush" },
+        { "LingonberryBushDescription", "Plant lingonberries to grow lingonberry bushes." },
         { "PickableMushroomName", "Pickable Mushrooms" },
         { "PickableMushroomDescription", "Plant mushrooms to grow more pickable mushrooms." },
         { "PickableYellowMushroomName", "Pickable Yellow Mushrooms" },
@@ -123,6 +125,7 @@ static class StaticContent
         { "Bush02_en" },
         { "RaspberryBush" },
         { "CloudberryBush" },
+        { "LingonberryBush" },
         { "FirTree" },
         { "FirTree_Sapling" },
         { "FirTree_small" },
@@ -232,6 +235,16 @@ static class StaticContent
                 respawnTime = config.CloudberryRespawnTime,
                 biome = enforceBiomes ? Heightmap.Biome.Plains : 0,
                 icon = true,
+                isGrounded = true,
+                recover = config.RecoverResources
+            },
+            new PieceDB
+            {
+                key = "LingonberryBush",
+                ResourceCost = config.LingonberryCost,
+                resourceReturn = config.LingonberryReturn,
+                respawnTime = config.LingonberryRespawnTime,
+                biome = enforceBiomes ? Heightmap.Biome.DeepNorth : 0,
                 isGrounded = true,
                 recover = config.RecoverResources
             },
