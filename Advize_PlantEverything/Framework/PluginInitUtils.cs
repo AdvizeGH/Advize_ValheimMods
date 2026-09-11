@@ -225,7 +225,7 @@ static class PluginInitUtils
                 {
                     if (config.ShowPickableSpawners)
                     {
-                        moddedPickedChild.SetParent(pdb.Prefab.transform);
+                        moddedPickedChild.SetParent(pdb.Prefab.transform, false);
                     }
 
                     if (!piecesInitialized)

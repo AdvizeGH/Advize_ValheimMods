@@ -13,7 +13,7 @@ public sealed class PlantEverything : BaseUnityPlugin
 {
     public const string PluginID = "advize.PlantEverything";
     public const string PluginName = "PlantEverything";
-    public const string Version = "1.21.0";
+    public const string Version = "1.21.1";
 
     public void Awake()
     {
