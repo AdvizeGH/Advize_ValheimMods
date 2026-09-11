@@ -35,16 +35,19 @@ sealed class ModConfig
     private ConfigEntry<bool> resourcesSpawnEmpty;
     private ConfigEntry<bool> enemiesTargetPieces;
 
-    //Berries 9
+    //Berries 12
     private ConfigEntry<int> raspberryCost;
     private ConfigEntry<int> blueberryCost;
     private ConfigEntry<int> cloudberryCost;
+    private ConfigEntry<int> lingonberryCost;
     private ConfigEntry<int> raspberryRespawnTime;
     private ConfigEntry<int> blueberryRespawnTime;
     private ConfigEntry<int> cloudberryRespawnTime;
+    private ConfigEntry<int> lingonberryRespawnTime;
     private ConfigEntry<int> raspberryReturn;
     private ConfigEntry<int> blueberryReturn;
     private ConfigEntry<int> cloudberryReturn;
+    private ConfigEntry<int> lingonberryReturn;
 
     //Crops 31
     private ConfigEntry<bool> enableCropOverrides;
@@ -343,6 +346,11 @@ sealed class ModConfig
             "CloudberryCost",
             5,
             "Number of cloudberries required to place a cloudberry bush. Set to 0 to disable the ability to plant this resource.");
+        lingonberryCost = Config(
+            "Berries",
+            "LingonberryCost",
+            5,
+            "Number of cloudberries required to place a lingonberry bush. Set to 0 to disable the ability to plant this resource.");
         raspberryRespawnTime = Config(
             "Berries",
             "RaspberryRespawnTime",
@@ -358,6 +366,11 @@ sealed class ModConfig
             "CloudberryRespawnTime",
             300,
             "Number of minutes it takes for a cloudberry bush to respawn berries.");
+        lingonberryRespawnTime = Config(
+            "Berries",
+            "LingonberryRespawnTime",
+            300,
+            "Number of minutes it takes for a lingonberry bush to respawn berries.");
         raspberryReturn = Config(
             "Berries",
             "RaspberryReturn",
@@ -373,6 +386,11 @@ sealed class ModConfig
             "CloudberryReturn",
             1,
             "Number of berries a cloudberry bush will spawn.");
+        lingonberryReturn = Config(
+            "Berries",
+            "LingonberryReturn",
+            1,
+            "Number of berries a lingonberry bush will spawn.");
 
         //Crops
         enableCropOverrides = Config(
@@ -1010,12 +1028,15 @@ sealed class ModConfig
         raspberryCost.SettingChanged += PieceSettingChanged;
         blueberryCost.SettingChanged += PieceSettingChanged;
         cloudberryCost.SettingChanged += PieceSettingChanged;
+        lingonberryCost.SettingChanged += PieceSettingChanged;
         raspberryRespawnTime.SettingChanged += PieceSettingChanged;
         blueberryRespawnTime.SettingChanged += PieceSettingChanged;
         cloudberryRespawnTime.SettingChanged += PieceSettingChanged;
+        lingonberryRespawnTime.SettingChanged += PieceSettingChanged;
         raspberryReturn.SettingChanged += PieceSettingChanged;
         blueberryReturn.SettingChanged += PieceSettingChanged;
         cloudberryReturn.SettingChanged += PieceSettingChanged;
+        lingonberryReturn.SettingChanged += PieceSettingChanged;
 
         //Crops
         enableCropOverrides.SettingChanged += CropSettingChanged;
@@ -1184,12 +1205,15 @@ sealed class ModConfig
     internal int RaspberryCost => raspberryCost.Value;
     internal int BlueberryCost => blueberryCost.Value;
     internal int CloudberryCost => cloudberryCost.Value;
+    internal int LingonberryCost => lingonberryCost.Value;
     internal int RaspberryRespawnTime => raspberryRespawnTime.Value;
     internal int BlueberryRespawnTime => blueberryRespawnTime.Value;
     internal int CloudberryRespawnTime => cloudberryRespawnTime.Value;
+    internal int LingonberryRespawnTime => lingonberryRespawnTime.Value;
     internal int RaspberryReturn => raspberryReturn.Value;
     internal int BlueberryReturn => blueberryReturn.Value;
     internal int CloudberryReturn => cloudberryReturn.Value;
+    internal int LingonberryReturn => lingonberryReturn.Value;
     internal bool EnableCropOverrides => enableCropOverrides.Value;
     internal bool OverrideModdedCrops => overrideModdedCrops.Value;
     internal float CropMinScale => cropMinScale.Value;
