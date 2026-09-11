@@ -81,9 +81,12 @@ static class StaticContent
         { "BeechSeeds" },
         { "BirchSeeds" },
         { "LingonberryBush" },
+        { "sapling_seedkale" },
         { "FirCone" },
         { "PineCone" },
         { "Sap" },
+        { "sapling_oat" },
+        { "sapling_Kale" },
         { "Pickable_Branch" },
         { "Pickable_Dandelion" },
         { "Pickable_Fiddlehead" },
@@ -137,6 +140,7 @@ static class StaticContent
         { "YggaShoot3" },
         { "YggaShoot_small1" },
         { "shrub_2" },
+        { "sapling_poteitr" },
         { "shrub_2_heath" },
         { "SwampTree1" },
         { "vines" },
@@ -705,6 +709,34 @@ static class StaticContent
                 resourceCost = overridesEnabled ? config.JotunPuffsCost : 1,
                 resourceReturn = overridesEnabled ? config.JotunPuffsReturn : 1,
                 extraDrops = true
+            },
+            new PrefabDB
+            {
+                key = "sapling_oat",
+                biome = enforceBiomesVanilla ? TemperateBiomes : AllBiomes,
+                resourceCost = overridesEnabled ? config.OatCost : 1,
+                resourceReturn = overridesEnabled ? config.OatReturn : 3
+            },
+            new PrefabDB
+            {
+                key = "sapling_poteitr",
+                biome = enforceBiomesVanilla ? TemperateBiomes : AllBiomes,
+                resourceCost = overridesEnabled ? config.PoteitrCost : 1,
+                resourceReturn = overridesEnabled ? config.PoteitrReturn : 3
+            },
+            new PrefabDB
+            {
+                key = "sapling_Kale",
+                biome = enforceBiomesVanilla ? TemperateBiomes : AllBiomes,
+                resourceCost = overridesEnabled ? config.KaleCost : 1,
+                resourceReturn = overridesEnabled ? config.KaleReturn : 3
+            },
+            new PrefabDB
+            {
+                key = "sapling_seedkale",
+                biome = enforceBiomesVanilla ? TemperateBiomes : AllBiomes,
+                resourceCost = overridesEnabled ? config.SeedKaleCost : 1,
+                resourceReturn = overridesEnabled ? config.SeedKaleReturn : 3
             }
         ];
     }

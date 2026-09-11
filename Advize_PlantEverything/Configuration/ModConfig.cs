@@ -49,7 +49,7 @@ sealed class ModConfig
     private ConfigEntry<int> cloudberryReturn;
     private ConfigEntry<int> lingonberryReturn;
 
-    //Crops 31
+    //Crops 39
     private ConfigEntry<bool> enableCropOverrides;
     private ConfigEntry<bool> overrideModdedCrops;
     private ConfigEntry<bool> cropRequireCultivation;
@@ -81,6 +81,14 @@ sealed class ModConfig
     private ConfigEntry<int> magecapReturn;
     private ConfigEntry<int> jotunPuffsCost;
     private ConfigEntry<int> jotunPuffsReturn;
+    private ConfigEntry<int> oatCost;
+    private ConfigEntry<int> oatReturn;
+    private ConfigEntry<int> poteitrCost;
+    private ConfigEntry<int> poteitrReturn;
+    private ConfigEntry<int> kaleCost;
+    private ConfigEntry<int> kaleReturn;
+    private ConfigEntry<int> seedKaleCost;
+    private ConfigEntry<int> seedKaleReturn;
 
     //Debris 9
     private ConfigEntry<int> pickableBranchCost;
@@ -548,6 +556,46 @@ sealed class ModConfig
             "JotunPuffsReturn",
             3,
             new ConfigDescription("Resources gained upon harvesting Jotun puffs.", null, cropSettingAttributes[0]));
+        oatCost = Config(
+            "Crops",
+            "OatCost",
+            1,
+            new ConfigDescription("Resource cost of planting oats.", null, cropSettingAttributes[0]));
+        oatReturn = Config(
+            "Crops",
+            "OatReturn",
+            3,
+            new ConfigDescription("Resources gained upon harvesting oats.", null, cropSettingAttributes[0]));
+        poteitrCost = Config(
+            "Crops",
+            "PoteitrCost",
+            1,
+            new ConfigDescription("Resource cost of planting poteitrs.", null, cropSettingAttributes[0]));
+        poteitrReturn = Config(
+            "Crops",
+            "PoteitrReturn",
+            3,
+            new ConfigDescription("Resources gained upon harvesting poteitrs.", null, cropSettingAttributes[0]));
+        kaleCost = Config(
+            "Crops",
+            "KaleCost",
+            1,
+            new ConfigDescription("Resource cost of planting kale.", null, cropSettingAttributes[0]));
+        kaleReturn = Config(
+            "Crops",
+            "KaleReturn",
+            3,
+            new ConfigDescription("Resources gained upon harvesting kale.", null, cropSettingAttributes[0]));
+        seedKaleCost = Config(
+            "Crops",
+            "SeedKaleCost",
+            1,
+            new ConfigDescription("Resource cost of planting seed kale.", null, cropSettingAttributes[0]));
+        seedKaleReturn = Config(
+            "Crops",
+            "SeedKaleReturn",
+            3,
+            new ConfigDescription("Resources gained upon harvesting seed kale.", null, cropSettingAttributes[0]));
 
         //Debris
         pickableBranchCost = Config(
@@ -1064,6 +1112,18 @@ sealed class ModConfig
         seedTurnipReturn.SettingChanged += CropSettingChanged;
         turnipCost.SettingChanged += CropSettingChanged;
         turnipReturn.SettingChanged += CropSettingChanged;
+        magecapCost.SettingChanged += CropSettingChanged;
+        magecapReturn.SettingChanged += CropSettingChanged;
+        jotunPuffsCost.SettingChanged += CropSettingChanged;
+        jotunPuffsReturn.SettingChanged += CropSettingChanged;
+        oatCost.SettingChanged += CropSettingChanged;
+        oatReturn.SettingChanged += CropSettingChanged;
+        poteitrCost.SettingChanged += CropSettingChanged;
+        poteitrReturn.SettingChanged += CropSettingChanged;
+        kaleCost.SettingChanged += CropSettingChanged;
+        kaleReturn.SettingChanged += CropSettingChanged;
+        seedKaleCost.SettingChanged += CropSettingChanged;
+        seedKaleReturn.SettingChanged += CropSettingChanged;
 
         //Debris
         pickableBranchCost.SettingChanged += PieceSettingChanged;
@@ -1245,6 +1305,14 @@ sealed class ModConfig
     internal int MagecapReturn => magecapReturn.Value;
     internal int JotunPuffsCost => jotunPuffsCost.Value;
     internal int JotunPuffsReturn => jotunPuffsReturn.Value;
+    internal int OatCost => oatCost.Value;
+    internal int OatReturn => oatReturn.Value;
+    internal int PoteitrCost => poteitrCost.Value;
+    internal int PoteitrReturn => poteitrReturn.Value;
+    internal int KaleCost => kaleCost.Value;
+    internal int KaleReturn => kaleReturn.Value;
+    internal int SeedKaleCost => seedKaleCost.Value;
+    internal int SeedKaleReturn => seedKaleReturn.Value;
     internal int PickableBranchCost => pickableBranchCost.Value;
     internal int PickableBranchReturn => pickableBranchReturn.Value;
     internal int PickableBranchRespawnTime => pickableBranchRespawnTime.Value;
