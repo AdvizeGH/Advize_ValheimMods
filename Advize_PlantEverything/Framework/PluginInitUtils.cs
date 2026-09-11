@@ -592,7 +592,7 @@ static class PluginInitUtils
             if (!saplingRefs[i].enabled)
                 continue;
             if (!pieceTable.m_pieces.Contains(saplingRefs[i].Prefab))
-                pieceTable.m_pieces.Insert(16, saplingRefs[i].Prefab);
+                pieceTable.m_pieces.Insert(18, saplingRefs[i].Prefab);
         }
         for (int i = 0; i < pieceRefs.Count; i++)
         {

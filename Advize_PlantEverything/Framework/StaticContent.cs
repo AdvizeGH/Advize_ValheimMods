@@ -86,6 +86,8 @@ static class StaticContent
         { "PineCone" },
         { "Sap" },
         { "sapling_oat" },
+        { "FirTree_big_Sapling" },
+        //{ "FirConeFrost" },
         { "sapling_Kale" },
         { "Pickable_Branch" },
         { "Pickable_Dandelion" },
@@ -141,6 +143,7 @@ static class StaticContent
         { "YggaShoot_small1" },
         { "shrub_2" },
         { "sapling_poteitr" },
+        //{ "FirTree_big" },
         { "shrub_2_heath" },
         { "SwampTree1" },
         { "vines" },
@@ -627,7 +630,16 @@ static class StaticContent
                 growRadius = config.OakGrowRadius,
                 minScale = config.OakMinScale,
                 maxScale = config.OakMaxScale
-            }
+            },
+            new SaplingDB
+            {
+                key = "FirTree_big_Sapling",
+                biome = config.EnforceBiomesVanilla ? TemperateBiomes : AllBiomes,
+                growTime = config.TimberwoodGrowthTime,
+                growRadius = config.TimberwoodGrowRadius,
+                minScale = config.TimberwoodMinScale,
+                maxScale = config.TimberwoodMaxScale
+            },
         ];
     }
 

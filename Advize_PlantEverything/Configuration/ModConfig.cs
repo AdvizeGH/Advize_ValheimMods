@@ -126,7 +126,7 @@ sealed class ModConfig
     private ConfigEntry<int> dandelionReturn;
     private ConfigEntry<int> fiddleheadReturn;
 
-    //Saplings 41
+    //Saplings 45
     private ConfigEntry<bool> overrideModdedSaplings;
     private ConfigEntry<float> moddedSaplingMinScale;
     private ConfigEntry<float> moddedSaplingMaxScale;
@@ -168,6 +168,10 @@ sealed class ModConfig
     private ConfigEntry<float> ashwoodMaxScale;
     private ConfigEntry<float> ashwoodGrowthTime;
     private ConfigEntry<float> ashwoodGrowRadius;
+    private ConfigEntry<float> timberwoodMinScale;
+    private ConfigEntry<float> timberwoodMaxScale;
+    private ConfigEntry<float> timberwoodGrowthTime;
+    private ConfigEntry<float> timberwoodGrowRadius;
 
     //Seeds 7
     private ConfigEntry<bool> enableSeedOverrides;
@@ -959,6 +963,26 @@ sealed class ModConfig
             "AshwoodGrowRadius",
             2f,
             "Radius of free space required for an ashwood sapling to grow.");
+        timberwoodMinScale = Config(
+            "Saplings",
+            "TimberwoodMinScale",
+            1f,
+            "The minimum scaling factor used to scale a timberwood tree upon growth.");
+        timberwoodMaxScale = Config(
+            "Saplings",
+            "TimberwoodMaxScale",
+            2.5f,
+            "The minimum scaling factor used to scale a timberwood tree upon growth.");
+        timberwoodGrowthTime = Config(
+            "Saplings",
+            "TimberwoodGrowthTime",
+            3000f,
+            "Number of seconds it takes for a timberwood tree to grow from a timberwood sapling (will take at least 10 seconds after planting to grow).");
+        timberwoodGrowRadius = Config(
+            "Saplings",
+            "TimberwoodGrowRadius",
+            2f,
+            "Radius of free space required for a timberwood sapling to grow.");
 
         //Seeds
         enableSeedOverrides = Config(
@@ -1203,6 +1227,10 @@ sealed class ModConfig
         ashwoodGrowthTime.SettingChanged += SaplingSettingChanged;
         ashwoodMinScale.SettingChanged += SaplingSettingChanged;
         ashwoodMaxScale.SettingChanged += SaplingSettingChanged;
+        timberwoodGrowRadius.SettingChanged += SaplingSettingChanged;
+        timberwoodGrowthTime.SettingChanged += SaplingSettingChanged;
+        timberwoodMinScale.SettingChanged += SaplingSettingChanged;
+        timberwoodMaxScale.SettingChanged += SaplingSettingChanged;
 
         //Seeds
         enableSeedOverrides.SettingChanged += SeedSettingChanged;
@@ -1384,6 +1412,10 @@ sealed class ModConfig
     internal float AshwoodMaxScale => ashwoodMaxScale.Value;
     internal float AshwoodGrowthTime => ashwoodGrowthTime.Value;
     internal float AshwoodGrowRadius => ashwoodGrowRadius.Value;
+    internal float TimberwoodMinScale => timberwoodMinScale.Value;
+    internal float TimberwoodMaxScale => timberwoodMaxScale.Value;
+    internal float TimberwoodGrowthTime => timberwoodGrowthTime.Value;
+    internal float TimberwoodGrowRadius => timberwoodGrowRadius.Value;
     internal bool EnableSeedOverrides => enableSeedOverrides.Value;
     internal int SeedDropMin => seedDropMin.Value;
     internal int SeedDropMax => seedDropMax.Value;
