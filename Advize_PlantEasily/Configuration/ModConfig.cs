@@ -218,7 +218,8 @@ sealed class ModConfig
             { "Pickable_Thistle", 0.75f },
             { "BlueberryBush", 1.5f },
             { "RaspberryBush", 1.5f },
-            { "CloudberryBush", 1.0f }
+            { "CloudberryBush", 1.0f },
+            { "LingonberryBush", 1.5f}
         };
 
         foreach (PickableDB pdb in PickableRefs)
