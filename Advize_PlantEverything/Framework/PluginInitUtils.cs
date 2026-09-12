@@ -513,10 +513,13 @@ static class PluginInitUtils
             pickable.m_amount = pdb.resourceReturn;
 
             //For jotun puffs and magecap
-            pickable.m_extraDrops.m_drops.Clear();
-            if (pdb.extraDrops & !overridesEnabled)
+            if (pdb.extraDrops)
             {
-                pickable.m_extraDrops.m_drops.Add(new DropTable.DropData { m_item = pickable.m_itemPrefab, m_stackMin = 1, m_stackMax = 1, m_weight = 0 });
+                pickable.m_extraDrops.m_drops.Clear();
+                if (!overridesEnabled)
+                {
+                    pickable.m_extraDrops.m_drops.Add(new DropTable.DropData { m_item = pickable.m_itemPrefab, m_stackMin = 1, m_stackMax = 1, m_weight = 0 });
+                }
             }
         }
 

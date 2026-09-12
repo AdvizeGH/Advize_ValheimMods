@@ -13,14 +13,14 @@ public sealed class PlantEverything : BaseUnityPlugin
 {
     public const string PluginID = "advize.PlantEverything";
     public const string PluginName = "PlantEverything";
-    public const string Version = "1.21.1";
+    public const string Version = "1.21.2";
 
     public void Awake()
     {
         Runtime.MakeAllAssetsLoadable();
         BepInEx.Logging.Logger.Sources.Add(ModLogger);
         assetBundle = LoadAssetBundle("planteverything");
-        config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.21.0" });
+        config = new(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "1.21.2" });
 
         if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null)
         {
