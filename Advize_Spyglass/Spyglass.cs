@@ -20,7 +20,7 @@ public partial class Spyglass : BaseUnityPlugin
     public const string Version = "3.2.0";
 
     private readonly Harmony harmony = new(PluginID);
-    public static ManualLogSource SGLogger = new($" {PluginName}");
+    public static ManualLogSource ModLogger = new($" {PluginName}");
 
     private static readonly Dictionary<string, GameObject> prefabRefs = [];
     private static GameObject prefab;
@@ -50,7 +50,7 @@ public partial class Spyglass : BaseUnityPlugin
 
     public void Awake()
     {
-        BepInEx.Logging.Logger.Sources.Add(SGLogger);
+        BepInEx.Logging.Logger.Sources.Add(ModLogger);
         assetBundle = LoadAssetBundle("spyglass");
         config = new ModConfig(Config, new ServerSync.ConfigSync(PluginID) { DisplayName = PluginName, CurrentVersion = Version, MinimumRequiredVersion = "3.2.0", ModRequired = true });
         if (config.EnableLocalization)
@@ -284,15 +284,10 @@ public partial class Spyglass : BaseUnityPlugin
 
     private static bool IsSpyglassEquipped(Player player) => player.GetRightItem()?.m_shared.m_name == "$csSpyglassName";
 
-    internal static void Dbgl(string message, bool forceLog = false, bool logError = false)
+    internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)
     {
         if (forceLog || config.EnableDebugMessages)
-        {
-            if (!logError)
-                SGLogger.LogInfo(message);
-            else
-                SGLogger.LogError(message);
-        }
+            ModLogger.Log(level, message);
     }
 
     internal class LocalizedStrings

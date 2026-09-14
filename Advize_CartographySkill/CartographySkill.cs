@@ -26,16 +26,6 @@ public partial class CartographySkill : BaseUnityPlugin
     private static readonly Dictionary<string, Texture2D> cachedTextures = [];
     private static readonly Dictionary<Texture2D, Sprite> cachedSprites = [];
 
-    internal static readonly Dictionary<LogLevel, Action<string>> logActions = new()
-    {
-        { LogLevel.Fatal, ModLogger.LogFatal },
-        { LogLevel.Error, ModLogger.LogError },
-        { LogLevel.Warning, ModLogger.LogWarning },
-        { LogLevel.Message, ModLogger.LogMessage },
-        { LogLevel.Info, ModLogger.LogInfo },
-        { LogLevel.Debug, ModLogger.LogDebug }
-    };
-
     private static bool IsMatchingSkillName(string name) => string.Equals(config.SkillName, name, StringComparison.OrdinalIgnoreCase);
 
     public void Awake()
@@ -129,6 +119,6 @@ public partial class CartographySkill : BaseUnityPlugin
     internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)
     {
         if (forceLog || config.EnableDebugMessages)
-            logActions[level](message);
+            ModLogger.Log(level, message);
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace Advize_PlantEverything;
 
-using System;
 using System.Collections.Generic;
 using BepInEx.Logging;
 using UnityEngine;
@@ -14,16 +13,6 @@ static class StaticMembers
 
     private static string customConfigPath;
     internal static string CustomConfigPath => customConfigPath ??= SetupConfigDirectory();
-
-    internal static readonly Dictionary<LogLevel, Action<string>> logActions = new()
-    {
-        { LogLevel.Fatal, ModLogger.LogFatal },
-        { LogLevel.Error, ModLogger.LogError },
-        { LogLevel.Warning, ModLogger.LogWarning },
-        { LogLevel.Message, ModLogger.LogMessage },
-        { LogLevel.Info, ModLogger.LogInfo },
-        { LogLevel.Debug, ModLogger.LogDebug }
-    };
 
     internal static readonly Dictionary<string, GameObject> prefabRefs = [];
     internal static List<PieceDB> pieceRefs = [];
@@ -51,6 +40,6 @@ static class StaticMembers
     internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)
     {
         if (forceLog || config.EnableDebugMessages)
-            logActions[level](message);
+            ModLogger.Log(level, message);
     }
 }

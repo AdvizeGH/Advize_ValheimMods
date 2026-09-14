@@ -1,6 +1,5 @@
 ﻿namespace Advize_ColorfulVines;
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Logging;
@@ -12,16 +11,6 @@ static class StaticMembers
     internal static ManualLogSource ModLogger = new($" {PluginName}");
     internal static ModConfig config;
     internal static readonly Dictionary<string, GameObject> prefabRefs = [];
-
-    internal static readonly Dictionary<LogLevel, Action<string>> logActions = new()
-    {
-        { LogLevel.Fatal, ModLogger.LogFatal },
-        { LogLevel.Error, ModLogger.LogError },
-        { LogLevel.Warning, ModLogger.LogWarning },
-        { LogLevel.Message, ModLogger.LogMessage },
-        { LogLevel.Info, ModLogger.LogInfo },
-        { LogLevel.Debug, ModLogger.LogDebug }
-    };
 
     internal static readonly int saplingHash = "CV_VineAsh_sapling".GetStableHashCode();
     internal static readonly int ModdedVineHash = "cv_ModdedVine".GetStableHashCode();
@@ -50,5 +39,5 @@ static class StaticMembers
     internal static Vector3 ColorToVector3(Color color) => color == Color.black ? ColorBlackVector3 : new(color.r, color.g, color.b);
     internal static Color Vector3ToColor(Vector3 vector3) => vector3 == ColorBlackVector3 ? Color.black : new(vector3.x, vector3.y, vector3.z);
 
-    internal static void Dbgl(string message, LogLevel level = LogLevel.Info) => logActions[level](message);
+    internal static void Dbgl(string message, LogLevel level = LogLevel.Info) => ModLogger.Log(level, message);
 }

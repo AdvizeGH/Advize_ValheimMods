@@ -1,6 +1,5 @@
 ﻿namespace Advize_Armoire;
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,16 +19,6 @@ static class StaticMembers
     internal static GameObject guiPrefab = null;
     internal static GameObject armoireSlot = null;
     internal static GameObject armoirePiecePrefab = null;
-
-    internal static readonly Dictionary<LogLevel, Action<string>> logActions = new()
-    {
-        { LogLevel.Fatal, ModLogger.LogFatal },
-        { LogLevel.Error, ModLogger.LogError },
-        { LogLevel.Warning, ModLogger.LogWarning },
-        { LogLevel.Message, ModLogger.LogMessage },
-        { LogLevel.Info, ModLogger.LogInfo },
-        { LogLevel.Debug, ModLogger.LogDebug }
-    };
 
     internal static Dictionary<AppearanceSlotType, AppearanceSlot> ActiveOverrides = new()
     {
@@ -164,6 +153,6 @@ static class StaticMembers
     internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)
     {
         if (forceLog || config.EnableDebugMessages)
-            logActions[level](message);
+            ModLogger.Log(level, message);
     }
 }

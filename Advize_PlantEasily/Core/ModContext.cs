@@ -14,17 +14,7 @@ internal static class ModContext
 
     internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)
     {
-        if (!forceLog && !config.EnableDebugMessages)
-            return;
-
-        switch (level)
-        {
-            case LogLevel.Info: ModLogger.LogInfo(message); break;
-            case LogLevel.Warning: ModLogger.LogWarning(message); break;
-            case LogLevel.Error: ModLogger.LogError(message); break;
-            case LogLevel.Message: ModLogger.LogMessage(message); break;
-            case LogLevel.Debug: ModLogger.LogDebug(message); break;
-            case LogLevel.Fatal: ModLogger.LogFatal(message); break;
-        }
+        if (forceLog || config.EnableDebugMessages)
+            ModLogger.Log(level, message);
     }
 }

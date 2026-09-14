@@ -1,6 +1,5 @@
 ﻿namespace Advize_StumpsRegrow;
 
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using BepInEx;
@@ -21,16 +20,6 @@ public sealed class StumpsRegrow : BaseUnityPlugin
     internal static readonly Dictionary<string, List<GameObject>> TreesPerStump = [];
     internal static readonly int HashedZDOName = "sr_TreeBaseName".GetStableHashCode();
 
-    internal static readonly Dictionary<LogLevel, Action<string>> logActions = new()
-        {
-            { LogLevel.Fatal, ModLogger.LogFatal },
-            { LogLevel.Error, ModLogger.LogError },
-            { LogLevel.Warning, ModLogger.LogWarning },
-            { LogLevel.Message, ModLogger.LogMessage },
-            { LogLevel.Info, ModLogger.LogInfo },
-            { LogLevel.Debug, ModLogger.LogDebug }
-        };
-
     internal void Awake()
     {
         BepInEx.Logging.Logger.Sources.Add(ModLogger);
@@ -39,5 +28,5 @@ public sealed class StumpsRegrow : BaseUnityPlugin
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyInstanceId: PluginID);
     }
 
-    internal static void Dbgl(string message, LogLevel level = LogLevel.Info) => logActions[level](message);
+    internal static void Dbgl(string message, LogLevel level = LogLevel.Info) => ModLogger.Log(level, message);
 }
