@@ -75,45 +75,20 @@ public partial class CartographySkill : BaseUnityPlugin
 
     private static Texture2D LoadTexture(string fileName)
     {
-        Texture2D result;
+        if (cachedTextures.TryGetValue(fileName, out Texture2D texture))
+            return texture;
 
-        if (cachedTextures.ContainsKey(fileName))
-        {
-            result = cachedTextures[fileName];
-        }
-        else
-        {
-            result = assetBundle.LoadAsset<Texture2D>(fileName);
-            cachedTextures.Add(fileName, result);
-        }
-
-        return result;
+        return cachedTextures[fileName] = assetBundle.LoadAsset<Texture2D>(fileName);
     }
 
     private static Sprite CreateSprite(string fileName, Rect spriteSection)
     {
-        try
-        {
-            Sprite result;
-            Texture2D texture = LoadTexture(fileName);
+        Texture2D texture = LoadTexture(fileName);
 
-            if (cachedSprites.ContainsKey(texture))
-            {
-                result = cachedSprites[texture];
-            }
-            else
-            {
-                result = Sprite.Create(texture, spriteSection, Vector2.zero);
-                cachedSprites.Add(texture, result);
-            }
-            return result;
-        }
-        catch
-        {
-            Dbgl("Unable to load texture", forceLog: true, level: LogLevel.Error);
-        }
+        if (cachedSprites.TryGetValue(texture, out Sprite sprite))
+            return sprite;
 
-        return null;
+        return cachedSprites[texture] = Sprite.Create(texture, spriteSection, Vector2.zero);
     }
 
     internal static void Dbgl(string message, bool forceLog = false, LogLevel level = LogLevel.Info)
