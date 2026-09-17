@@ -1,5 +1,6 @@
 ﻿namespace Advize_Armoire;
 
+using System;
 using System.Collections.Generic;
 using BepInEx.Configuration;
 using UnityEngine;
@@ -13,6 +14,7 @@ sealed class ModConfig
     private readonly ConfigEntry<bool> showAllAppearances;
     private readonly ConfigEntry<string> disabledAppearanceNames;
     private readonly ConfigEntry<bool> excludeDLCItems;
+    private readonly ConfigEntry<bool> excludeNPCItems;
     private readonly ConfigEntry<bool> showUndiscoveredHoverDetails;
     private readonly ConfigEntry<bool> showUnlockMessages;
     private readonly ConfigEntry<bool> enableDebugMessages;
@@ -43,6 +45,10 @@ sealed class ModConfig
             "General",
             "ExcludeDLCItems",
             true, "Excludes DLC items (OdinCape, HelmetOdin) from being totalled as locked/unlocked.");
+        excludeNPCItems = ConfigFile.Bind(
+            "General",
+            "ExcludeNPCItems",
+            true, "Excludes NPC items (Beginning with FW_ or SP_ prefixes) from being totalled as locked/unlocked.");
         showUndiscoveredHoverDetails = ConfigFile.Bind(
             "General",
             "ShowUndiscoveredHoverDetails",
@@ -61,14 +67,8 @@ sealed class ModConfig
 
         enableOverrides.SettingChanged += (_, _) => { Player.m_localPlayer?.SetupEquipment(); };
 
-        excludeDLCItems.SettingChanged += (_, _) =>
-        {
-            if (Player.m_localPlayer is Player player)
-                AppearanceCategorizer.RecalculateAppearances(player);
-
-            if (ArmoireUIController.TryGetArmoirePanel(out ArmoireUI armoireUI) && armoireUI.scrollView.activeSelf)
-                armoireUI.RebuildScrollableGrid();
-        };
+        excludeDLCItems.SettingChanged += ExclusionSettingChanged;
+        excludeNPCItems.SettingChanged += ExclusionSettingChanged;
 
         allowDragging = ConfigFile.Bind(
             "UIPosition",
@@ -111,6 +111,7 @@ sealed class ModConfig
     internal HashSet<string> DisabledAppearanceNames => [.. disabledAppearanceNames.Value.Split(',')];
 
     internal bool ExcludeDLCItems => excludeDLCItems.Value;
+    internal bool ExcludeNPCItems => excludeNPCItems.Value;
 
     internal bool ShowUndiscoveredHoverDetails => showUndiscoveredHoverDetails.Value;
 
@@ -124,5 +125,14 @@ sealed class ModConfig
     {
         get { return uiPosition.Value; }
         set { uiPosition.BoxedValue = value; }
+    }
+
+    private static void ExclusionSettingChanged(object o, EventArgs e)
+    {
+        if (Player.m_localPlayer is Player player)
+            AppearanceCategorizer.RecalculateAppearances(player);
+
+        if (ArmoireUIController.TryGetArmoirePanel(out ArmoireUI armoireUI) && armoireUI.scrollView.activeSelf)
+            armoireUI.RebuildScrollableGrid();
     }
 }

@@ -444,8 +444,8 @@ public partial class ArmoireUI : MonoBehaviour
 
             if (!ZInput.GetButton("JoyRotate"))
             {
-                float stickX = ZInput.GetJoyRightStickX(true);
-                float stickY = ZInput.GetJoyRightStickY(true);
+                float stickX = ZInput.GetJoyRightStickX();
+                float stickY = ZInput.GetJoyRightStickY();
                 Vector2 stickInput = new(stickX, -stickY);
 
                 if (PlayerController.cameraDirectionLock != Vector2.zero && stickInput != PlayerController.cameraDirectionLock)

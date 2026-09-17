@@ -27,7 +27,7 @@ static class AppearanceCategorizer
         // If excludeDLCItems is false, the DLC condition is ignored. If true, it filters them out.
         IEnumerable<ItemDrop> allRelevantItems = GetAllItemsByTypes(RelevantTypes)
             .Where(item => item.m_itemData.m_shared.m_icons.Length > 0 && !config.DisabledAppearanceNames.Contains(item.name) && 
-            (!config.ExcludeDLCItems || string.IsNullOrEmpty(item.m_itemData.m_shared.m_dlc)));
+            (!config.ExcludeDLCItems || string.IsNullOrEmpty(item.m_itemData.m_shared.m_dlc)) && (!config.ExcludeNPCItems || !HasExcludedPrefix(item.name)));
 
         // Categorize items
         Dictionary<AppearanceSlotType, List<ItemDrop>> categorized = [];
@@ -115,6 +115,20 @@ static class AppearanceCategorizer
         .Select(go => go.GetComponent<ItemDrop>()).Where(item => item && types.Contains(item.m_itemData.m_shared.m_itemType))];
 
     private static Dictionary<ItemDrop, int> BuildIconCountMap(List<ItemDrop> items) => items.ToDictionary(item => item, item => item.m_itemData.m_shared.m_icons.Length);
+
+    private static bool HasExcludedPrefix(string name)
+    {
+        if (name.Length < 3)
+            return false;
+
+        if (name[0] == 'F' && name[1] == 'W' && name[2] == '_')
+            return true;
+
+        if (name[0] == 'S' && name[1] == 'P' && name[2] == '_')
+            return true;
+
+        return false;
+    }
 
     internal static void RecalculateAppearances(Player player)
     {
