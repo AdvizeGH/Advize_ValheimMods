@@ -28,7 +28,7 @@ static class InteractPatches
                 _instanceIDS.Add(pickable.GetInstanceID());
         }
 
-        if (!config.EnableBulkHarvest || (!ZInput.GetKey(config.KeyboardHarvestModifierKey, false) && !ZInput.GetKey(config.GamepadModifierKey, false)))
+        if (!config.EnableBulkHarvest || (!ZInput.GetKey(config.KeyboardHarvestModifierKey, false) && !alt))
             return;
 
         if (interactable is not Pickable && interactable is not Beehive)

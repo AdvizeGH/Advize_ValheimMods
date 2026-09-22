@@ -14,7 +14,6 @@ using static ModUtils;
 static class KeyHintPatches
 {
     internal static string KeyboardHarvestModifierKeyLocalized;
-    internal static string GamepadModifierKeyLocalized;
 
     private static GameObject _keyboardHint;
     private static GameObject _gamepadHint;
@@ -148,7 +147,7 @@ static class KeyHintPatches
     {
         string keyCodeToPath = ZInput.KeyCodeToPath(config.GamepadModifierKey);
         string buttonDefBindingToName = _inputBindingPathToButtonDefNames[keyCodeToPath];
-        GamepadModifierKeyLocalized = ZInput.instance.GetBoundKeyString(buttonDefBindingToName);
+        string gamepadModifierKeyLocalized = ZInput.instance.GetBoundKeyString(buttonDefBindingToName);
 
         if (_gamepadHint.TryGetComponent(out TextMeshProUGUI gamepadKeyText))
         {
@@ -157,7 +156,7 @@ static class KeyHintPatches
 
             System.Array.ForEach(gamepadKeys, gamepadKey => full += ZInput.instance.GetBoundKeyString(gamepadKey));
 
-            gamepadKeyText.text = $"Resize Grid {GamepadModifierKeyLocalized} + {full}";
+            gamepadKeyText.text = $"Resize Grid {gamepadModifierKeyLocalized} + {full}";
             Localization.instance.Localize(gamepadKeyText.transform);
         }
     }

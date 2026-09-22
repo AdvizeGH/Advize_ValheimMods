@@ -6,7 +6,7 @@ using static ModContext;
 [HarmonyPatch]
 static class HoverTextPatches
 {
-    static string CurrentModifierKey => ZInput.GamepadActive ? KeyHintPatches.GamepadModifierKeyLocalized : KeyHintPatches.KeyboardHarvestModifierKeyLocalized;
+    static string CurrentModifierKey => ZInput.GamepadActive ? "$KEY_AltKeys" : KeyHintPatches.KeyboardHarvestModifierKeyLocalized;
 
     static bool ShouldShowHints() => config.ModActive && config.EnableBulkHarvest && config.ShowHoverKeyHints;
 
