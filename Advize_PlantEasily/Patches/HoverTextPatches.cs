@@ -12,7 +12,7 @@ static class HoverTextPatches
 
     static string BuildAreaHint(string actionText)
     {
-        return $"\n[<b><color=yellow>{CurrentModifierKey}</color> + <color=yellow>$KEY_Use</color></b>] {actionText} (area)";
+        return $"\n[<color=yellow><b>{CurrentModifierKey} + $KEY_Use</b></color>] {actionText} (area)";
     }
 
     [HarmonyPatch(typeof(Beehive), nameof(Beehive.GetHoverText))]
