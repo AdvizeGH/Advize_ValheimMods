@@ -362,7 +362,7 @@ sealed class ModConfig
             "Berries",
             "LingonberryCost",
             5,
-            "Number of cloudberries required to place a lingonberry bush. Set to 0 to disable the ability to plant this resource.");
+            "Number of lingonberries required to place a lingonberry bush. Set to 0 to disable the ability to plant this resource.");
         raspberryRespawnTime = Config(
             "Berries",
             "RaspberryRespawnTime",
