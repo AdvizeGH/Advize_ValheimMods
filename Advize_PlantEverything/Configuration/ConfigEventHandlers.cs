@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static PluginInitUtils;
 using static StaticMembers;
 
@@ -22,6 +23,13 @@ static class ConfigEventHandlers
         { "Crop", [InitCrops] },
         { "Vine", [InitVines] }
     };
+    private static readonly Dictionary<Action, int> s_methodPriority = 
+        s_initMethods["Core"].Select((method, index) => new { method, index }).ToDictionary(x => x.method, x => x.index);
+
+    private static int GetMethodPriority(Action method)
+    {
+        return s_methodPriority.TryGetValue(method, out int priority) ? priority : int.MaxValue;
+    }
 
     private static bool PerformingLocalConfigChange
     {
@@ -54,12 +62,16 @@ static class ConfigEventHandlers
             PerformingLocalConfigChange = true;
             return;
         }
-        while (s_reInitMethodQueue.Count > 0)
-        {
-            Action method = s_reInitMethodQueue.Dequeue();
+
+        // Sort queued methods by priority
+        List<Action> ordered = [.. s_reInitMethodQueue.OrderBy(GetMethodPriority)];
+
+        // Execute in correct order
+        foreach (Action method in ordered)
             method.Invoke();
-        }
+
         s_reInitMethodSet.Clear();
+        s_reInitMethodQueue.Clear();
         s_reInitQueueInProcess = false;
     }
 
