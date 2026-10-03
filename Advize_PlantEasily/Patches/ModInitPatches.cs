@@ -43,7 +43,7 @@ static class ModInitPatches
         HashSet<GameObject> unfilteredSet = new(unfilteredPrefabs);
         List<GameObject> moddedPrefabs = __instance.m_prefabs.Where(go => !unfilteredSet.Contains(go)).Where(IsValidCrop).ToList();
 
-        Dbgl($"({moddedPrefabs.Count}) modded crops detected");
+        Dbgl($"({moddedPrefabs.Count}) modded crops detected: " + string.Join(", ", moddedPrefabs.Select(go => go.name)));
 
         foreach (GameObject go in moddedPrefabs)
             _ = new ReplantDB(go);
