@@ -11,7 +11,7 @@ internal static class ModUtils
 
     internal static bool IsPlantOrPickable(GameObject go) => go.GetComponent<Plant>() || go.GetComponent<Pickable>();
 
-    internal static bool HasGrowSpace(Plant plant, Vector3 position) => Physics.OverlapSphere(position, plant.m_growRadius, Plant.m_spaceMask).Length == 0;
+    internal static bool HasGrowSpace(Plant plant, Vector3 position) => Physics.OverlapSphere(position, plant.m_growRadius, PlantCollisionMask).Length == 0;
 
     internal static bool PositionHasCollisions(Vector3 position) => Physics.CheckCapsule(position, position + (Vector3.up * 0.1f), Mathf.Epsilon, CollisionScanner.CollisionMask);
 
@@ -76,6 +76,8 @@ internal static class ModUtils
 
         return extraInteractables;
     }
+
+    private static readonly int PlantCollisionMask = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid");
 
     private static float PickableSnapRadius(Piece p) => p?.m_harvestRadius > 0 ? p.m_harvestRadius : config.DefaultGridSpacing;
 }
