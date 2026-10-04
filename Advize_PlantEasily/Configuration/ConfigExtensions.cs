@@ -3,10 +3,13 @@
 using System;
 using System.Collections.Generic;
 using BepInEx.Configuration;
+using ConditionalConfigSyncAPI;
 using Attributes = ConfigurationManagerAttributes;
 
 internal static class ConfigExtensions
 {
+    internal static ConfigSync Sync { get; set; }
+
     private static readonly Dictionary<string, int> _sectionOrder = [];
 
     internal static ConfigEntry<T> BindInOrder<T>(
@@ -16,7 +19,8 @@ internal static class ConfigExtensions
         T defaultValue,
         string description,
         Action<Attributes> manualAttributes = null,
-        AcceptableValueBase acceptableValues = null)
+        AcceptableValueBase acceptableValues = null,
+        SyncMode syncMode = SyncMode.AlwaysClientControlled)
     {
         if (!_sectionOrder.TryGetValue(section, out int next))
             next = 100;
@@ -29,6 +33,11 @@ internal static class ConfigExtensions
             _sectionOrder[section] = next - 1;
 
         ConfigDescription desc = new(description, acceptableValues, automaticAttributes);
-        return config.Bind(section, key, defaultValue, desc);
+
+        ConfigEntry<T> entry = config.Bind(section, key, defaultValue, desc);
+
+        Sync?.RegisterConfigEntry(entry, syncMode);
+
+        return entry;
     }
 }

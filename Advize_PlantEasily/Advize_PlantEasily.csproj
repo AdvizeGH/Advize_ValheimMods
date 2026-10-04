@@ -109,6 +109,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\ConditionalConfigSyncAPI.cs" />
     <Compile Include="Configuration\ConfigEnums.cs" />
     <Compile Include="Configuration\ConfigEventHandlers.cs" />
     <Compile Include="Configuration\ConfigExtensions.cs" />

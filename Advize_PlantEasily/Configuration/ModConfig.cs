@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using BepInEx.Configuration;
+using ConditionalConfigSyncAPI;
 using UnityEngine;
 using static ConfigEventHandlers;
 using static ModContext;
@@ -9,6 +10,7 @@ using static ModContext;
 sealed class ModConfig
 {
     private readonly ConfigFile Config;
+    private readonly ConfigSync ConfigSync; // Cache locally, may use in the future
 
     //Controls
     private readonly ConfigEntry<KeyboardShortcut> enableModKey;
@@ -86,6 +88,10 @@ sealed class ModConfig
 
     internal ModConfig(ConfigFile configFile)
     {
+        ConfigSync = new ConfigSync(PlantEasily.PluginID, PlantEasily.PluginName, PlantEasily.Version,
+            minimumRequiredVersion: PlantEasily.MinimumRequiredVersion, modRequired: false);
+        ConfigExtensions.Sync = ConfigSync;
+
         Config = configFile;
         configFile.SaveOnConfigSet = false;
 
@@ -124,8 +130,8 @@ sealed class ModConfig
         //Difficulty
         preventPartialPlanting = Config.BindInOrder("Difficulty", "PreventPartialPlanting", false, "Prevents placement of resources when any placement ghosts are invalid for any reason.");
         preventInvalidPlanting = Config.BindInOrder("Difficulty", "PreventInvalidPlanting", true, "Prevents plants from being placed where they will be unable to grow.");
-        useStamina = Config.BindInOrder("Difficulty", "UseStamina", true, "Consume stamina for every piece placed.");
-        useDurability = Config.BindInOrder("Difficulty", "UseDurability", true, "Decrease durability of cultivator for every piece placed.");
+        useStamina = Config.BindInOrder("Difficulty", "UseStamina", true, "Consume stamina for every piece placed.", syncMode: SyncMode.AlwaysServerControlled);
+        useDurability = Config.BindInOrder("Difficulty", "UseDurability", true, "Decrease durability of cultivator for every piece placed.", syncMode: SyncMode.AlwaysServerControlled);
 
         //General
         modActive = Config.BindInOrder("General", "ModActive", true, "Enables all mod features.");
@@ -154,7 +160,7 @@ sealed class ModConfig
         replantOnHarvest = Config.BindInOrder("Harvesting", "ReplantOnHarvest", false, "Enables automatic replanting of crops when harvested, provided you have the resources.");
 
         //Performance
-        maxConcurrentPlacements = Config.BindInOrder("Performance", "MaxConcurrentPlacements", 500, "Maximum amount of pieces that can be placed at once with the cultivator.", acceptableValues: new AcceptableValueRange<int>(2, 10000));
+        maxConcurrentPlacements = Config.BindInOrder("Performance", "MaxConcurrentPlacements", 500, "Maximum amount of pieces that can be placed at once with the cultivator.", acceptableValues: new AcceptableValueRange<int>(2, 10000), syncMode: SyncMode.AlwaysServerControlled);
         ghostUpdateBatchSize = Config.BindInOrder("Performance", "GhostUpdateBatchSize", 20, "This value determines how many placement ghosts can update their positions, rotations, etc. per frame. Reducing this value will improve performance during placement and snapping.", acceptableValues: new AcceptableValueRange<int>(1, 10000));
         bulkPlantingBatchSize = Config.BindInOrder("Performance", "BulkPlantingBatchSize", 2, "This value determines how many concurrent pieces can be placed per frame. Increase to speed up planting. Reduce this value if the game hangs when placing too many pieces at once.", acceptableValues: new AcceptableValueRange<int>(2, 10000));
 
