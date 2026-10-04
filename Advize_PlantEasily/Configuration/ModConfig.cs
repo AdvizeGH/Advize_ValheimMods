@@ -160,7 +160,7 @@ sealed class ModConfig
         replantOnHarvest = Config.BindInOrder("Harvesting", "ReplantOnHarvest", false, "Enables automatic replanting of crops when harvested, provided you have the resources.");
 
         //Performance
-        maxConcurrentPlacements = Config.BindInOrder("Performance", "MaxConcurrentPlacements", 500, "Maximum amount of pieces that can be placed at once with the cultivator.", acceptableValues: new AcceptableValueRange<int>(2, 10000), syncMode: SyncMode.AlwaysServerControlled);
+        maxConcurrentPlacements = Config.BindInOrder("Performance", "MaxConcurrentPlacements", 500, "Maximum amount of pieces that can be placed at once with the cultivator.", acceptableValues: new AcceptableValueRange<int>(2, 10000));
         ghostUpdateBatchSize = Config.BindInOrder("Performance", "GhostUpdateBatchSize", 20, "This value determines how many placement ghosts can update their positions, rotations, etc. per frame. Reducing this value will improve performance during placement and snapping.", acceptableValues: new AcceptableValueRange<int>(1, 10000));
         bulkPlantingBatchSize = Config.BindInOrder("Performance", "BulkPlantingBatchSize", 2, "This value determines how many concurrent pieces can be placed per frame. Increase to speed up planting. Reduce this value if the game hangs when placing too many pieces at once.", acceptableValues: new AcceptableValueRange<int>(2, 10000));
 

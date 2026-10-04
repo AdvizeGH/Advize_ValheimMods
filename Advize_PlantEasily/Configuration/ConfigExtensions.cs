@@ -20,7 +20,8 @@ internal static class ConfigExtensions
         string description,
         Action<Attributes> manualAttributes = null,
         AcceptableValueBase acceptableValues = null,
-        SyncMode syncMode = SyncMode.AlwaysClientControlled)
+        SyncMode syncMode = SyncMode.Conditional,
+        bool serverControlled = false)
     {
         if (!_sectionOrder.TryGetValue(section, out int next))
             next = 100;
@@ -36,7 +37,7 @@ internal static class ConfigExtensions
 
         ConfigEntry<T> entry = config.Bind(section, key, defaultValue, desc);
 
-        Sync?.RegisterConfigEntry(entry, syncMode);
+        Sync?.RegisterConfigEntry(entry, syncMode, serverControlledByDefault: serverControlled);
 
         return entry;
     }
