@@ -202,6 +202,22 @@ static class StaticContent
                 resourceName = "PretendSeeds2",
                 resourceCost = 2,
                 groundOnly = false
+            },
+            new ExtraResource
+            {
+                // a spawner builds a new prefab from the template prefab
+                prefabName = "PE_FakePrefab3",
+                spawnerName = "PE_FakeSpawner3",
+                dropItem = "Resin",
+                respawnTime = 240,
+                amount = 1,
+                fullVisual = "Resin",
+                emptyVisual = "Pickable_Mushroom_yellow_Picked",
+                resourceName = "Wood",
+                resourceCost = 10,
+                groundOnly = true,
+                pieceName = "Resin Node",
+                pieceDescription = "Yields resin as it regrows."
             }
         ];
     }
@@ -482,31 +498,36 @@ static class StaticContent
 
             foreach (ExtraResource er in deserializedExtraResources)
             {
-                if (!prefabRefs.ContainsKey(er.prefabName) || !prefabRefs[er.prefabName])
+                string pieceKey = er.IsSpawner ? er.spawnerName : er.prefabName;
+
+                if (!prefabRefs.ContainsKey(pieceKey) || !prefabRefs[pieceKey])
                 {
-                    Dbgl($"{er.prefabName} is not in dictionary of prefab references or has a null value", level: LogLevel.Warning);
+                    Dbgl($"{pieceKey} is not in dictionary of prefab references or has a null value", level: LogLevel.Warning);
                     queueReattempt = true;
                     continue;
                 }
 
                 if (!ObjectDB.instance?.GetItemPrefab(er.resourceName)?.GetComponent<ItemDrop>())
                 {
-                    Dbgl($"{er.prefabName}'s required resource {er.resourceName} not found", level: LogLevel.Warning);
+                    Dbgl($"{pieceKey}'s required resource {er.resourceName} not found", level: LogLevel.Warning);
                     queueReattempt = true;
                     continue;
                 }
 
                 newList.Add(new PieceDB()
                 {
-                    key = er.prefabName,
+                    key = pieceKey,
                     Resource = new KeyValuePair<string, int>(er.resourceName, er.resourceCost),
                     isGrounded = er.groundOnly,
                     extraResource = true,
-                    pieceName = er.pieceName == "" ? er.prefabName : er.pieceName,
+                    isSpawner = er.IsSpawner,
+                    templateName = er.prefabName,
+                    dropItem = er.IsSpawner ? er.dropItem : null,
+                    pieceName = string.IsNullOrEmpty(er.pieceName) ? pieceKey : er.pieceName,
                     pieceDescription = er.pieceDescription
                 });
 
-                foreach (Collider c in prefabRefs[er.prefabName].GetComponentsInChildren<Collider>())
+                foreach (Collider c in prefabRefs[pieceKey].GetComponentsInChildren<Collider>())
                 {
                     string layer = LayerMask.LayerToName(c.gameObject.layer);
                     //Dbgl($"Layer to potentially add is {layer}");

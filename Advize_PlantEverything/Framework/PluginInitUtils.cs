@@ -87,6 +87,12 @@ static class PluginInitUtils
         foreach (ExtraResource er in deserializedExtraResources)
         {
             //Dbgl($"er3 {er.prefabName}, {er.resourceName}, {er.resourceCost}, {er.groundOnly}");
+            if (er.IsSpawner)
+            {
+                if (SpawnerFactory.Ensure(er, instance, logErrors)) addedExtraResources = true;
+                continue;
+            }
+
             if (!prefabRefs.TryGetValue(er.prefabName, out GameObject targetPrefab))
             {
                 targetPrefab = instance.GetPrefab(er.prefabName);
@@ -102,6 +108,8 @@ static class PluginInitUtils
                 }
             }
         }
+
+        SpawnerFactory.Prune(instance, deserializedExtraResources);
 
         return addedExtraResources;
     }
@@ -161,7 +169,7 @@ static class PluginInitUtils
                 ];
             }
 
-            pdb.Piece.m_icon = pdb.icon ? CreateSprite($"{pdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : resource.m_itemData.GetIcon();
+            pdb.Piece.m_icon = pdb.icon ? CreateSprite($"{pdb.key}PieceIcon.png", new Rect(0, 0, 64, 64)) : GetIcon(pdb, resource);
 
             pdb.Piece.m_placeEffect.m_effectPrefabs =
             [
@@ -204,7 +212,7 @@ static class PluginInitUtils
             }
 
             Pickable pickable = pdb.Prefab.GetComponent<Pickable>();
-            if (pickable && !deserializedExtraResources.Any(x => x.prefabName == pdb.key))
+            if (pickable && !pdb.extraResource && !deserializedExtraResources.Any(x => x.prefabName == pdb.key))
             {
                 pickable.m_respawnTimeMinutes = pdb.respawnTime;
                 pickable.m_amount = pdb.resourceReturn;
@@ -261,6 +269,22 @@ static class PluginInitUtils
         }
 
         piecesInitialized = true;
+    }
+
+    /// <summary>
+    /// The icon shown in the build menu. Spawners show the item they yield,
+    /// every other piece shows the item it is built from.
+    /// </summary>
+    private static Sprite GetIcon(PieceDB pdb, ItemDrop resource)
+    {
+        if (pdb.isSpawner && !string.IsNullOrEmpty(pdb.dropItem))
+        {
+            ItemDrop drop = ObjectDB.instance?.GetItemPrefab(pdb.dropItem)?.GetComponent<ItemDrop>();
+
+            if (drop) return drop.m_itemData.GetIcon();
+        }
+
+        return resource.m_itemData.GetIcon();
     }
 
     internal static void InitSaplingRefs()

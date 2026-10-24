@@ -335,7 +335,7 @@ sealed class ModConfig
             "Difficulty",
             "ResourcesSpawnEmpty",
             false,
-            "Specifies whether resources should spawn empty or full. Applies to berry bushes, mushrooms, flowers, and debris.");
+            "Specifies whether resources should spawn empty or full. Applies to berry bushes, mushrooms, flowers, debris, and the resources added through ExtraResources.json.");
         enemiesTargetPieces = Config(
             "Difficulty",
             "EnemiesTargetPieces",
