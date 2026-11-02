@@ -39,7 +39,7 @@ sealed class ModConfig
         disabledAppearanceNames = ConfigFile.Bind(
             "General",
             "DisabledAppearanceNames",
-            "ShieldKnight,ShieldIronSquare,CapeTest,PickaxeStone, SledgeCheat, SwordCheat",
+            "ShieldKnight,ShieldIronSquare,CapeTest,PickaxeStone,SledgeCheat,SwordCheat,IceShoes,IceSkates",
             "To disable specific appearances from being totalled as locked/unlocked, list their prefab names here separated by a comma. Names are case-sensitive.");
         excludeDLCItems = ConfigFile.Bind(
             "General",
