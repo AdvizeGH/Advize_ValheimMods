@@ -65,6 +65,10 @@ static class PlacementPatches
             if (!config.ModActive || !PlacementState.PlacementGhost || PlacementController.IsPlanting)
                 return;
 
+            // Grid not built (e.g. the Cultivator was unequipped this frame, PlacementGhost is destroyed only at frame end)
+            if (GhostGrid.ExtraGhosts.Count < GhostGrid.MaxActiveGhosts)
+                return;
+
             PlacementState.Update(__instance.transform.position);
             GhostGrid.Update(__instance);
         }
