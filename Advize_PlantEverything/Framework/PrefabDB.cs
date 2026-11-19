@@ -45,6 +45,9 @@ internal sealed class PieceDB : PrefabDB
     internal bool? canBeRemoved;
     internal bool extraResource;
     internal bool hideWhenPicked;
+    internal bool isSpawner;
+    internal string templateName;
+    internal string dropItem;
 
     internal Piece Piece => piece ??= PluginUtils.CreatePiece(this);
 

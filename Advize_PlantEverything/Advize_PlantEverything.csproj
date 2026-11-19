@@ -118,6 +118,7 @@
     <Compile Include="Configuration\ConfigurationManagerAttributes.cs" />
     <Compile Include="Configuration\ConfigWatcher.cs" />
     <Compile Include="Framework\ExtraResource.cs" />
+    <Compile Include="Framework\SpawnerFactory.cs" />
     <Compile Include="Framework\PluginInitUtils.cs" />
     <Compile Include="Framework\StaticMembers.cs" />
     <Compile Include="Localization\ModLocalization.cs" />

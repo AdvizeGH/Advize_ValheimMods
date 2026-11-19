@@ -1,0 +1,14 @@
+{
+    "prefabName": "Pickable_Mushroom_yellow",
+    "spawnerName": "PE_ResinNode",
+    "dropItem": "Resin",
+    "respawnTime": 60,
+    "amount": 2,
+    "fullVisual": "Resin",
+    "emptyVisual": "Pickable_Mushroom_yellow_Picked",
+    "resourceName": "Resin",
+    "resourceCost": 10,
+    "groundOnly": true,
+    "pieceName": "Resin Node",
+    "pieceDescription": "Yields resin as it regrows."
+};

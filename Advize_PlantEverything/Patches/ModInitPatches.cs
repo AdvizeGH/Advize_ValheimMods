@@ -15,6 +15,15 @@ static class ModInitPatches
     {
         if (!isDedicatedServer)
             InitPrefabRefs();
+
+        // The spawners are built from the items of the database, so they can
+        // only be created once it exists. They have to be registered before the
+        // objects of the world are created, otherwise the game removes the
+        // spawners that were placed in it.
+        if (ZNetScene.instance && InitExtraResourceRefs(ZNetScene.instance))
+        {
+            ConfigEventHandlers.PieceSettingChanged(null, null);
+        }
     }
 
     [HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]

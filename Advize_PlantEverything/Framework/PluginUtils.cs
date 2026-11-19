@@ -3,7 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 using BepInEx;
 using BepInEx.Logging;
 using UnityEngine;
@@ -35,6 +37,13 @@ static class PluginUtils
 
     internal static bool IsModdedPrefabOrSapling(string s) => s.StartsWith("$pe") || s.EndsWith("_sapling");
 
+    /// <summary>
+    /// Prefabs added through ExtraResources.json, either a spawner the mod
+    /// created or a prefab the user pointed at. They follow the same rules as
+    /// the plants of the mod.
+    /// </summary>
+    internal static bool IsExtraResourcePrefab(string prefabName) => pieceRefs.Any(pdb => pdb.extraResource && pdb.key == prefabName);
+
     internal static bool HoldingCultivator => Player.m_localPlayer?.GetRightItem()?.m_shared.m_name == "$item_cultivator";
 
     internal static void RemoveFromCultivator(List<PrefabDB> prefabs)
@@ -55,10 +64,13 @@ static class PluginUtils
     {
         Piece piece = GetOrAddPieceComponent(prefabRefs[pdb.key]);
 
+        // spawners are named after themselves, the template decides how they behave
+        string sourceName = pdb.templateName ?? pdb.key;
+
         piece.m_name = pdb.extraResource ? pdb.pieceName : $"$pe{pdb.Name}Name";
         piece.m_description = pdb.extraResource ? pdb.pieceDescription : $"$pe{pdb.Name}Description";
         piece.m_category = Piece.PieceCategory.Misc;
-        piece.m_cultivatedGroundOnly = (pdb.key.Contains("berryBush") || pdb.key.Contains("Pickable")) && config.RequireCultivation;
+        piece.m_cultivatedGroundOnly = (sourceName.Contains("berryBush") || sourceName.Contains("Pickable")) && config.RequireCultivation;
         piece.m_groundOnly = piece.m_groundPiece = pdb.isGrounded ?? !config.PlaceAnywhere;
         piece.m_canBeRemoved = pdb.canBeRemoved ?? true;
         piece.m_targetNonPlayerBuilt = false;
@@ -119,15 +131,15 @@ static class PluginUtils
         string filePath = Path.Combine(CustomConfigPath, "ExtraResources.json");
         Dbgl($"deserializedExtraResources.Count is {deserializedExtraResources.Count}");
 
-        string fullContent = "";
-        //foreach (ExtraResource test in deserializedExtraResources)
-        //{
-        //    fullContent += SerializeExtraResource(test) + ";\n";
-        //}
-        fullContent += SerializeExtraResource(deserializedExtraResources[0]) + ";\n\n";
-        fullContent += SerializeExtraResource(deserializedExtraResources[1], false) + ";\n";
+        StringBuilder fullContent = new();
 
-        File.WriteAllText(filePath, fullContent);
+        for (int i = 0; i < deserializedExtraResources.Count; i++)
+        {
+            fullContent.Append(SerializeExtraResource(deserializedExtraResources[i]));
+            fullContent.Append(";\n");
+        }
+
+        File.WriteAllText(filePath, fullContent.ToString());
         Dbgl($"Serialized extraResources to {filePath}", true);
     }
 
